@@ -4,7 +4,8 @@
 **Read first:** pages [1](01-Concepts.md) to [6](06-Tests.md)  
 **Code:** whichever the recipe touches
 
-Recipes for the common changes. After any code change: run `pytest`, update `CLAUDE.md`,
+Recipes for the common changes. After any code change: run `pytest` (`test_docs_cover_code.py`
+fails if a new board field, skill, tool or config key is missing from the overview docs), update `CLAUDE.md`,
 the matching skill and these docs in the same commit (the rule in `CLAUDE.md`), then
 commit. In the maintainer's copy the post-commit hook publishes to the template.
 

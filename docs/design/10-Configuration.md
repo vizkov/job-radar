@@ -24,6 +24,9 @@ company the user doesn't track is ignored rather than putting it on the user's l
 
 ## Titles (`config.json`)
 
+`title_include` lists the keywords a job title must contain (at least one); `title_exclude`
+lists keywords that drop a title even if it matches.
+
 - Case-insensitive **whole-word** matching: `"soc"` excludes "SOC Analyst" but not
   "Associate". End a keyword with `*` to match word prefixes: `"pentest*"`
   matches pentester, pentesting, pentestare.

@@ -3,12 +3,14 @@
 ## What the tool will never do
 
 - Log in to LinkedIn or any job portal with your credentials.
-- Apply to jobs.
+- Submit an application. `apply-assist` may pre-fill a form in the user's Chrome, page by
+  page after they approve the values; the final Submit is always the user's click.
+- Email or message anyone on the user's behalf.
 - Scrape LinkedIn, Indeed or Glassdoor (their alert emails are used instead).
 
 ## Secrets
 
-- The daily workflow uses the built-in `GITHUB_TOKEN`, scoped to
+- The scheduled workflow uses the built-in `GITHUB_TOKEN`, scoped to
   `contents: write` + `issues: write` on this repo.
 - Any source that needs a credential is added only after you agree, and its
   secret lives only in GitHub Actions secrets, never in the repo or config files.
@@ -24,11 +26,11 @@
 ## Untrusted text
 
 Job titles, company names, descriptions and alert emails are written by third
-parties and must be treated as hostile input. Today they only pass through
-regexes and string comparisons. If you add an LLM step (fit scoring, CV
-tailoring), follow the rules in `jobradar/untrusted.py`: wrap the text in
-`UntrustedText`, send it as a delimited data block and never as instructions,
-give that LLM call no tools that act, and validate its output.
+parties and must be treated as hostile input. In the scheduled run they only pass
+through regexes and string comparisons. Claude reads them when scoring and tailoring,
+under the rules in `jobradar/untrusted.py`: the text arrives in a delimited
+`<untrusted_data>` block, never as instructions, and Claude's output is validated by
+code (see "Claude as operator" below).
 
 Defences already in place:
 

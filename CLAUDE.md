@@ -50,7 +50,8 @@ prioritise the freshest Tier 1 roles, since applying early matters to this user.
 - Board views are code (`VIEWS` in `tools/board_sync.py`): `board_sync.py views` builds/restores
   them, `design-diff` shows drift (the session brief checks it). Sort and board grouping can't be set
   by API: relay the clicks it prints. To change a view for good, edit `VIEWS` and commit.
-- User guide: `docs/wiki/`. Design reference (yours): `docs/design/`.
+- User guide: `docs/wiki/`. Design reference (yours): `docs/design/`, starting at its README:
+  concepts, architecture, a run and a session step by step, and every file and function.
 
 ## Rules you must follow
 

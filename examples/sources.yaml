@@ -73,10 +73,10 @@ sources:
   alert_email:
     # Parses job-alert emails saved by tools/fetch_alert_emails.py. That script runs in its
     # own workflow step (radar.yml), the only place the mailbox password exists; which
-    # providers and how many days it fetches is set there. Setup: docs/wiki/Job-alert-emails.md.
+    # providers and how many days it fetches is set there. Setup: docs/design/Job-alert-emails.md.
     # Why not scrape LinkedIn/Indeed (e.g. python-jobspy)? Their terms prohibit it, Actions IPs
     # get blocked, and jobspy can't install here (numpy 1.26 pin, no Python 3.13 wheels).
-    enabled: false        # turn on after adding the two GitHub secrets (docs/wiki/Job-alert-emails.md)
+    enabled: false        # turn on after adding the two GitHub secrets (docs/design/Job-alert-emails.md)
     timeout_seconds: 120
     providers: [linkedin, indeed, glassdoor]
     eml_dir: .alert_mail  # written by tools/fetch_alert_emails.py

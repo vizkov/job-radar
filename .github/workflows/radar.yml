@@ -40,7 +40,7 @@ jobs:
     if: needs.guard.outputs.allowed == 'true'
     permissions:
       contents: write   # commit state/ and digests/
-      issues: write     # open the daily digest as an issue
+      issues: write     # open role issues and update the Radar status issue
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:

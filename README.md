@@ -21,7 +21,8 @@ Claude can fill application forms in Chrome for you to check and submit
 and lists everything it can do on request (`/manual`).
 
 Start here: [docs/wiki/Home.md](docs/wiki/Home.md) · what to say to Claude:
-[docs/wiki/Using-it.md](docs/wiki/Using-it.md).
+[docs/wiki/Using-it.md](docs/wiki/Using-it.md). How it works inside, file by file:
+[docs/design/README.md](docs/design/README.md).
 
 Built on [ats-scrapers](https://github.com/kalil0321/ats-scrapers) (ATS fetching) plus
 company→board mappings from ats-scrapers and

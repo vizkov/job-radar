@@ -61,6 +61,7 @@ Score (rules in `config.json` → `tiering`):
 | Best country | GB, NL, IE +2; CH, DE, SE, remote-Europe +1 |
 | Employer on your list | +1 |
 | Licensed sponsor in the role's country (UK/NL) | +1 |
+| Posted within `fresh_days` (3) | +`fresh_bonus` (1): applying early matters |
 
 Tier 1 when the score ≥ `tier1_min_score` (6). Examples:
 

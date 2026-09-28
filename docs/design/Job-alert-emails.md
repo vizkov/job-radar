@@ -25,10 +25,10 @@ dependency of the scrapers therefore never shares a process with your password.
 The mailbox is opened read-only (IMAP `EXAMINE`, `BODY.PEEK[]`): nothing is
 marked read or deleted.
 
-The `alert_email` source is **enabled**, and the fetch step receives the two
-secrets. Until you finish the setup below, the Radar status card's Sources table shows it as
-`FAILED: RuntimeError: JOBALERT_IMAP_USER / JOBALERT_IMAP_PASSWORD not set`. The
-other sources are unaffected.
+The fetch step always runs. If the source is enabled before the secrets exist, the Radar
+status card's Sources table shows
+`FAILED: RuntimeError: JOBALERT_IMAP_USER / JOBALERT_IMAP_PASSWORD not set`. The other
+sources are unaffected.
 
 ## Why not python-jobspy?
 
@@ -79,8 +79,9 @@ main account, and set `JOBALERT_IMAP_USER` to your main address. Revoke the app 
 5. **Add GitHub secrets** (repo → Settings → Secrets and variables → Actions):
    `JOBALERT_IMAP_USER` = the dedicated address, `JOBALERT_IMAP_PASSWORD` = the
    app password.
-6. **Already done in the repo:** `sources.yaml` has `alert_email: enabled: true`,
-   and `.github/workflows/radar.yml` passes both secrets to the fetch step only.
+6. **Turn it on:** set `alert_email: enabled: true` in `profile/sources.yaml` (the
+   sample in `examples/` ships with it off). The workflow already
+   passes both secrets to the fetch step only.
    To use fewer providers, trim `--providers` in that step and `providers` in
    `sources.yaml`.
 

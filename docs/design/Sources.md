@@ -1,6 +1,7 @@
 # Sources
 
-All sources are configured in `sources.yaml`. Each has `enabled`, a
+How the adapters are built is in the [code reference](05-Code-reference.md#53-jobradarsources-the-adapters); this page is about
+running them. All sources are configured in `sources.yaml`. Each has `enabled`, a
 `timeout_seconds` cap for the whole source, and source-specific settings. A
 source that crashes or times out is reported on the Radar status card; the others still run.
 
@@ -12,12 +13,12 @@ python radar.py --dry-run --source <name> [--include-outside]
 
 | Source | Default | Run time | Credentials | Covers |
 |---|---|---|---|---|
-| `ats` | on | ~4 min | none | 223 verified company boards (Greenhouse, Workday, Lever, Ashby, …) |
+| `ats` | on | ~4 min | none | Every verified company board in `boards.json` (Greenhouse, Workday, Lever, Ashby, …) |
 | `bundesagentur` | on | ~10 s | none (public key) | Germany's public employment service |
 | `jobtech` | on | ~10 s | none | Sweden's public employment service |
 | `eures` | on | ~1–2 min | none | EU portal: NL, IE, CH, SE (no UK; DE via bundesagentur) |
 | `careers_page` | on | ~10 s for 5 pages | none | Company careers pages without an ATS (`profile/careers_pages.yaml`) |
-| `alert_email` | on (needs secrets) | not measured yet | Gmail app password (dedicated mailbox safer) | LinkedIn / Indeed / Glassdoor alert emails; see [Job-alert emails](Job-alert-emails.md) |
+| `alert_email` | off in `examples/`; on once the secrets exist | not measured yet | Gmail app password (dedicated mailbox safer) | LinkedIn / Indeed / Glassdoor alert emails; see [Job-alert emails](Job-alert-emails.md) |
 
 Run times measured 2026-09-27 on a home connection.
 
@@ -107,7 +108,7 @@ jobs section). For these, LinkedIn job alerts are the better route.
 ### JavaScript-rendered pages
 
 Mark a page `render: js` to load it in headless Chromium. That needs the
-optional browser extra, which is **local only** (keeps the daily Actions run
+optional browser extra, which is **local only** (keeps the scheduled Actions run
 light):
 
 ```bash

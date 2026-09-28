@@ -1,15 +1,43 @@
-# job-radar design reference
+# job-radar design reference: start here
 
-For Claude (which operates the system) and for maintainers. The user-facing guide is
-[docs/wiki](../wiki/Home.md); the operating rules are in `CLAUDE.md` and `.claude/skills/`.
+These pages explain how job-radar works inside, for someone who has never seen it.
+Read them in order. By the end you should be able to open any file in the repo and know
+what it is for, what each function in it does, what it reads and writes, and why it was
+built that way.
 
-| Page | What it covers |
+If you only want to *use* job-radar, you're in the wrong place: read the user guide in
+[docs/wiki](../wiki/Home.md). Claude, which operates the system, uses these pages as its
+reference.
+
+## Reading order
+
+| # | Page | You'll learn |
+|---|---|---|
+| 1 | [Concepts](01-Concepts.md) | Every term used in these docs, in plain words: ATS, Project board, workflow, skill, ref, tier… |
+| 2 | [Architecture](02-Architecture.md) | The three places code runs, the folders, and every data file: who writes it, who reads it |
+| 3 | [A scheduled run, step by step](03-Scheduled-run.md) | What happens three times a day in GitHub Actions, followed through the code, with one real role's journey |
+| 4 | [A Claude session, step by step](04-Claude-session.md) | What happens when the user opens Claude Code: the session brief, skills, scoring, tailoring, applying |
+| 5 | [Code reference](05-Code-reference.md) | Every file and every function, one line each, with the subtle lines called out |
+| 6 | [Tests](06-Tests.md) | How the tests are organised, what each covers, how they stay offline and isolated |
+| 7 | [Changing it](07-Changing-it.md) | Recipes: add a source, a setting, a board field or view, a skill, a dependency |
+
+## Deep dives (read when you need them)
+
+| Page | Covers |
 |---|---|
-| [Board internals](Board-internals.md) | Issues → cards, labels vs fields, fill, stale, board template sync |
-| [Setup](Setup.md) | Public template vs private copy, first-time setup commands, template publishing, workflows |
-| [Sources](Sources.md) | Each source adapter: cost, failure modes, how to test one |
-| [Job-alert emails](Job-alert-emails.md) | Alert-email pipeline, secret isolation, main vs dedicated mailbox |
-| [Tiers and sponsorship](Tiers-and-sponsorship.md) | Tier rules, freshness, UK/NL sponsor-register matching |
-| [Configuration](Configuration.md) | The files in `profile/` |
-| [Troubleshooting](Troubleshooting.md) | Health signals and what to check |
-| [Security model](Security-model.md) | Secrets, untrusted job ads, privacy split, what it never does |
+| [Sources](Sources.md) | Each place roles come from: what it costs, what breaks, how to add one |
+| [Tiers and sponsorship](Tiers-and-sponsorship.md) | The fit score and the UK/NL visa-sponsor match, with worked examples |
+| [Configuration](Configuration.md) | Every settings file in `profile/` |
+| [Board internals](Board-internals.md) | Issues → cards, labels vs fields, views as code |
+| [Job-alert emails](Job-alert-emails.md) | LinkedIn/Indeed/Glassdoor alerts: the secret isolation and anti-spoofing |
+| [Security model](Security-model.md) | Threats and the defence for each |
+| [Setup and publishing](Setup.md) | Public template vs private copy, first-time setup, auto-publishing |
+| [Troubleshooting](Troubleshooting.md) | Symptoms → causes → fixes |
+
+## Conventions in these pages
+
+- Paths are relative to the repo root: `tools/board_sync.py`, `profile/config.json`.
+- `function()` names are given with their file the first time: `radar.py: select()`.
+- **"Private"** means the file exists only in the user's private copy and is never
+  published. **"Public"** means it ships in the public template.
+- "The user" is the job seeker. "Claude" is the AI operating the system for them.

@@ -60,6 +60,30 @@ PricewaterhouseCoopers,PwC UK Cyber
 Known limitation: short generic target names (Bird, Box, Bolt, Exact, Orange,
 Sky, Unity) match any employer with exactly that normalized name.
 
+## Board (`config.json` → `board`)
+
+| Key | Default | Meaning |
+|---|---|---|
+| `enabled` | true | Queue new roles for the board at all |
+| `tiers` | [1, 2] | Which tiers become cards |
+| `baseline_tiers` | [1] | Which tiers become cards on the very first run |
+| `include_outside` | false | Also make cards for employers not on the target list |
+| `max_per_run` | 40 | Issues created per run; the rest wait in the queue |
+| `stale_days` | 5 | Days unlisted before a card gets `possibly-closed` |
+
+The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
+`tools/board_sync.py` ([Board internals](Board-internals.md)).
+
+## Other `config.json` keys
+
+| Key | Meaning |
+|---|---|
+| `tiering` | Score weights and `tier1_min_score`; see [Tiers and sponsorship](Tiers-and-sponsorship.md) |
+| `sponsorship.fuzzy_yes` / `fuzzy_unknown` | Fuzzy name-match thresholds (0–100) for the sponsor registers |
+| `board_timeout_seconds` | Time cap per ATS board fetch (180) |
+| `concurrency` | ATS boards fetched at once (6) |
+| `_comment` keys | Ignored by the code; notes for humans |
+
 ## Dependencies
 
 `requirements.in` lists direct dependencies; `requirements.txt` is the

@@ -68,13 +68,13 @@ def export(dest: Path) -> None:
         rel = f.relative_to(ROOT).as_posix()
         if f.is_dir() or any(fnmatch.fnmatch(rel, p) for p in NEVER_COPY):
             continue
-        if is_private(rel):
+        if not is_public(rel):  # same allowlist as publish(): unknown kinds of file stay out
             skipped += 1
             continue
         (dest / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(f, dest / rel)
         copied += 1
-    print(f"copied {copied} files to {dest}, left out {skipped} private files")
+    print(f"copied {copied} files to {dest}, left out {skipped} private or unlisted files")
 
 
 def drift(fetch: bool = True) -> list[str]:

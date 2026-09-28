@@ -5,7 +5,7 @@ job-radar is meant to run as **two repos**:
 | Repo | Visibility | Contains |
 |---|---|---|
 | **Template** | public | Code, docs, tests, generic `examples/`, public sponsor registers |
-| **Your copy** | **private** | The same code **plus** `profile/` (your settings), `state/`, `digests/`, `data/matches.csv`, `boards.json` and the daily issues |
+| **Your copy** | **private** | The same code **plus** `profile/` (your settings), `state/`, `digests/`, `data/matches.csv`, `boards.json` and the role issues |
 
 Why: GitHub keeps secrets out of forks and copies, but everything else in a
 public repo is public, including the issues, committed digests and Actions logs.
@@ -32,7 +32,7 @@ Then open **Claude Code** in that folder and say **"set this up for me"**.
 Claude follows the `setup` skill: it builds your profile from your CV and
 preferences, maps your target companies to job boards, fetches the sponsor
 registers, creates your Project board, optionally walks you through alert emails,
-and switches on the daily run. It asks you only for what it can't do itself:
+and switches on the scheduled runs. It asks you only for what it can't do itself:
 
 | You do | Why |
 |---|---|

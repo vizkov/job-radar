@@ -36,8 +36,9 @@ publish`): a failing test blocks the publish.
 | `careers/` | Five real careers pages (MDSec, Code White, SySS, SEC Consult, NSIDE) | saved by hand |
 | `alert_email/` | **Synthetic** alert emails per provider, plus spoofed, wrong-DKIM and unknown-sender cases | `make_fixtures.py` in that folder |
 
-The alert-email fixtures are modelled on each provider's layout, not real exports. Real
-alerts (address redacted) would make those tests stronger.
+Most alert-email fixtures are modelled on each provider's layout. `alert_email/real/` holds a
+sanitised copy of real LinkedIn alerts (2026-09: name, address and tracking tokens removed), which
+exposed insight lines being read as job titles. Indeed and Glassdoor still have synthetic fixtures only.
 
 ## What each test file covers
 

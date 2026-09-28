@@ -136,3 +136,16 @@ def test_changed_alert_sender_is_named(tmp_path):
     res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["linkedin"]}).fetch())
     unit = next(u for u in res.units if u.key == "linkedin:senders")
     assert "jobs-alerts@linkedin.com" in unit.error and not any(u.key == "mailbox:none" for u in res.units)
+
+
+def test_real_linkedin_layout_insight_lines_are_not_titles():
+    """Sanitised from real alerts (2026-09): cards are title / company / location, then an optional
+    blank line and an insight ("This company is actively hiring", "1 connection", "Fast growing")."""
+    jobs = to_postings(load("real/linkedin_real_2026_09.eml"), LI)
+    assert len(jobs) >= 8
+    assert not any("actively hiring" in j.title.lower() or j.title.lower() in ("fast growing", "1 connection") for j in jobs)
+    assert all(j.company and j.location and j.countries for j in jobs)
+    by_title = {(j.title, j.company): j for j in jobs}
+    assert by_title[("Cloud Security Specialist", "Alliander")].countries == frozenset({"NL"})
+    assert by_title[("Infrastructure Security Engineer", "ElevenLabs")].location == "London"
+    assert all(j.url.startswith("https://www.linkedin.com/jobs/view/") for j in jobs)

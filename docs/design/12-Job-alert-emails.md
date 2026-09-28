@@ -148,7 +148,7 @@ before turning `require_dkim` off.
   source fails with an IMAP login error in the Sources table.
 - **Quiet weeks** with no alerts are normal and not flagged.
 
-> **The test fixtures are synthetic**, modelled on each provider's alert layout.
-> Export 2–3 real alerts per provider into `tests/fixtures/alert_email/`
-> (redact the user's address) and run `pytest tests/test_alert_email.py` before
-> relying on it. Indeed's layout in particular is a best guess.
+> **LinkedIn is tested against real alerts** (a sanitised copy from 2026-09 in
+> `tests/fixtures/alert_email/real/`), which showed LinkedIn's card "insight" lines ("This company is
+> actively hiring", "Fast growing") must not be read as titles. **Indeed and Glassdoor fixtures are still
+> synthetic**: once those alerts are set up, save one real email of each the same way.

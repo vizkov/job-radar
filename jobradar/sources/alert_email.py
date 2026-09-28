@@ -39,7 +39,10 @@ from jobradar.sources import register
 _NOISE = re.compile(r"^(easy apply|apply with .*|actively recruiting|promoted|be an early applicant|urgently hiring|"
                     r"\d+\s+(connections?|alumni|applicants?|school alumni).*|.*\bago$|new|view job:?.*|"
                     r"see all jobs.*|.*salary.*|[£€$].*|\d+\s*(company alumni|connection).*|"
-                    r"responsive employer|just posted|\d(\.\d)?\s*★?|easily apply|view all jobs.*)$", re.I)
+                    r"responsive employer|just posted|\d(\.\d)?\s*★?|easily apply|view all jobs.*|"
+                    # LinkedIn card "insights" (seen in real alerts, 2026-09): not title, company or location
+                    r"this company is actively hiring|actively hiring|fast growing|hiring multiple candidates|"
+                    r"top applicant|in your network|school alumni|<[^>]+>.*)$", re.I)
 
 
 def _part(msg: Message, ctype: str) -> str:
@@ -76,7 +79,9 @@ def parse_text(p: Provider, body: str) -> list[dict]:
         line = " ".join(raw.split())
         jid = _find_id(p, line) if "http" in line else None
         if jid:
-            card = [l for l in (para or prev) if not _NOISE.match(l)]
+            # An insight line ("This company is actively hiring") can sit after a blank line, alone in
+            # its paragraph: then the card is the paragraph before it.
+            card = [l for l in para if not _NOISE.match(l)] or [l for l in prev if not _NOISE.match(l)]
             if card and len(card) <= 6:  # longer = prose, not a job card
                 company, location = _split_company_location(card[1:])
                 jobs.append({"id": jid, "title": card[0], "company": company, "location": location})

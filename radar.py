@@ -45,9 +45,16 @@ def load(p: Path, default):
     return json.loads(p.read_text()) if p.exists() else default
 
 
-def select(results: list[SourceResult], include_outside, matcher=None) -> tuple[list[Posting], Counter]:
+DROP_REASONS = {"country": "outside your countries", "title": "titles not matching",
+                "employment": "not permanent", "company": "employers not on your list"}
+
+
+def select(results: list[SourceResult], include_outside, matcher=None,
+           dropped: Counter | None = None) -> tuple[list[Posting], Counter]:
     """Country + title filter, then company matching. Returns kept postings and per-source match counts.
-    include_outside: bool for all sources, or {source: bool}."""
+    include_outside: bool for all sources, or {source: bool}. `dropped`, if given, counts why each
+    listing was dropped, keyed (source, reason) with reasons from DROP_REASONS."""
+    dropped = dropped if dropped is not None else Counter()
     matcher = matcher or default_matcher()
     tgt = target_countries() | {"REMOTE-EU"}
     kept, matched = [], Counter()
@@ -55,14 +62,20 @@ def select(results: list[SourceResult], include_outside, matcher=None) -> tuple[
         outside_ok = include_outside.get(res.source, False) if isinstance(include_outside, dict) else include_outside
         for p in res.postings:
             countries = p.countries & tgt
+            if not countries:
+                dropped[(res.source, "country")] += 1
+                continue
             # a hash-watched careers page has no job titles to filter; its change notice always passes
-            if not countries or not (p.raw.get("page_changed") or title_matches(p.title)):
+            if not (p.raw.get("page_changed") or title_matches(p.title)):
+                dropped[(res.source, "title")] += 1
                 continue
             if not_permanent(p.title) or not_permanent(p.raw.get("employment", "")):
+                dropped[(res.source, "employment")] += 1
                 continue  # permanent roles only (config.json: employment_exclude)
             p.countries = frozenset(countries)
             p.company_canonical = matcher.resolve(p.company, p.company_hint)
             if p.company_canonical is None and not outside_ok:
+                dropped[(res.source, "company")] += 1
                 continue
             kept.append(p)
             matched[res.source] += 1
@@ -172,8 +185,21 @@ def render_digest(today, baseline, new: list[Group], broken, results: list[Sourc
     return "\n".join(lines) + "\n"
 
 
+def drop_lines(results: list[SourceResult], matched: Counter, dropped: Counter) -> list[str]:
+    """One line per source that found listings: how many, why they were dropped, how many kept."""
+    out = []
+    for r in results:
+        found = len(r.postings)
+        if not found:
+            continue
+        why = [f"{dropped[(r.source, k)]} {label}" for k, label in DROP_REASONS.items() if dropped[(r.source, k)]]
+        out.append(f"- **{r.source}**: {found} found" + (" → " + " · ".join(why) if why else "")
+                   + f" · **{matched[r.source]} kept**")
+    return out
+
+
 def render_status(today, baseline, new: list[Group], broken, results: list[SourceResult],
-                  matched: Counter, queued: int) -> str:
+                  matched: Counter, queued: int, dropped: Counter | None = None) -> str:
     """Body of the single "Radar status" issue: counts and health, no job titles."""
     on_list = [g for g in new if g.best.company_canonical]
     t1 = sum(1 for g in on_list if g.tags.get("tier") == 1)
@@ -197,6 +223,8 @@ def render_status(today, baseline, new: list[Group], broken, results: list[Sourc
         raw = sum(u.raw_count for u in r.units)
         status = "ok" if r.ok else f"FAILED: {md(r.error[:80])}"
         lines.append(f"| {r.source} | {status} | {bad}/{len(r.units)} | {raw} | {matched[r.source]} | {r.seconds:.0f}s |")
+    if dropped is not None and (dl := drop_lines(results, matched, dropped)):
+        lines += ["", "### What each source found, and why listings were dropped", "", *dl]
     lines += ["", "_Ask Claude for a briefing; open the Project board to track applications._"]
     return "\n".join(lines) + "\n"
 
@@ -260,7 +288,8 @@ def main(argv=None):
     default_outside = args.include_outside or bool(scfg.get("include_outside_list", False))
     outside = {name: args.include_outside or bool((c or {}).get("include_outside_list", default_outside))
                for name, c in (scfg.get("sources") or {}).items()}
-    kept, matched = select(results, outside)
+    dropped: Counter = Counter()
+    kept, matched = select(results, outside, dropped=dropped)
     new = diff_seen(group_postings(kept), seen, today)
     enrich(new)
     broken = update_health(health, results)
@@ -268,7 +297,7 @@ def main(argv=None):
 
     board_groups = select_for_board(new, CONFIG.get("board", {}), baseline)
     queue = enqueue(load_queue(STATE / "board_queue.json"), [payload(g) for g in board_groups])
-    status_md = render_status(today, baseline, new, broken, results, matched, len(queue))
+    status_md = render_status(today, baseline, new, broken, results, matched, len(queue), dropped)
     summary = (f"{len(new)} new roles, {len(board_groups)} for the board, {len(broken)} silent sources, "
                + ", ".join(f"{r.source}={'ok' if r.ok else 'FAILED'}" for r in results))
     if args.dry_run:

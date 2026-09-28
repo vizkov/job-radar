@@ -103,7 +103,9 @@ For every posting from every source:
    field doesn't match. The result goes in `p.company_canonical`. If it's `None` and the
    source isn't set to include outsiders, drop it.
 
-It also counts matches per source for the report.
+It also counts matches per source, and every drop by reason (country, title, not permanent,
+employer not on the list; `DROP_REASONS`), so the status card can say what each source found and why
+listings were dropped.
 
 ### Deduplicate and diff: `group_postings()` then `diff_seen()`
 

@@ -22,13 +22,14 @@ only), `--include-outside` (keep employers not on the list).
 |---|---|
 | `STATE`, `DIGESTS`, `DATA` | The `state/`, `digests/` and `data/` folders. |
 | `load(path, default)` | Reads a JSON file, or returns `default` if it doesn't exist. |
-| `select(results, include_outside, matcher)` | Country filter, title filter, company matching; returns kept postings and per-source match counts. `include_outside` is a bool or a per-source dict. |
+| `DROP_REASONS`, `drop_lines(results, matched, dropped)` | Why a listing was dropped (country, title, employment, company), and one status line per source: found → dropped by reason → kept. |
+| `select(results, include_outside, matcher, dropped)` | Country filter, title filter, company matching; returns kept postings and per-source match counts. `include_outside` is a bool or a per-source dict. |
 | `diff_seen(groups, seen, today)` | Returns groups none of whose keys are in `seen`; stamps all their keys with today. |
 | `enrich(new, sponsors)` | Adds sponsor tags, score, tier and reasons to each new group's `tags`. |
 | `_sponsor_note(g)` / `_line(g)` | One digest line for a group: escaped title link, location, posted date, sponsor note, "also on" links. |
 | `_by_score(groups)` | Sort by score descending, then title. |
 | `render_digest(...)` | The full Markdown digest (tiers → companies → roles, outside list, broken sources, source table). |
-| `render_status(...)` | The short "Radar status" text: counts and source table, no job titles. |
+| `render_status(...)` | The short "Radar status" text: counts, source table and per-source drop reasons, no job titles. |
 | `append_matches(new, today)` | Appends one row per new group to `data/matches.csv`, migrating the header if columns changed. |
 | `main(argv)` | The sequence: load → fetch → select → group → diff → enrich → health → render → queue → write. |
 

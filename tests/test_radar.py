@@ -113,3 +113,22 @@ def test_matches_csv_column_change_is_migrated(tmp_path, monkeypatch):
     rows = list(csv.DictReader(open(tmp_path / "matches.csv", encoding="utf-8")))
     assert [r["company"] for r in rows] == ["Old Co", "X"]
     assert rows[0]["ref"] == "" and rows[1]["ref"] and rows[1]["title"] == "Pentester"
+
+
+def test_drop_reasons_are_counted_per_source():
+    from collections import Counter
+    from jobradar.matching import CompanyMatcher
+    from jobradar.model import Posting, SourceResult
+    m = CompanyMatcher(["Bridewell"], [])
+    ps = [Posting("linkedin_email", "Bridewell", "Senior Penetration Tester", "London", frozenset({"GB"}), "u1"),
+          Posting("linkedin_email", "Acme", "Senior Penetration Tester", "London", frozenset({"GB"}), "u2"),
+          Posting("linkedin_email", "Bridewell", "Sales Manager", "London", frozenset({"GB"}), "u3"),
+          Posting("linkedin_email", "Bridewell", "Pentester", "Boston", frozenset({"US"}), "u4"),
+          Posting("linkedin_email", "Bridewell", "Pentester (Contract)", "London", frozenset({"GB"}), "u5")]
+    res = SourceResult("alert_email", postings=ps)
+    dropped = Counter()
+    kept, matched = radar.select([res], include_outside=False, matcher=m, dropped=dropped)
+    assert len(kept) == 1 and dropped == Counter({("alert_email", "company"): 1, ("alert_email", "title"): 1,
+                                                  ("alert_email", "country"): 1, ("alert_email", "employment"): 1})
+    line = radar.drop_lines([res], matched, dropped)[0]
+    assert line.startswith("- **alert_email**: 5 found →") and "1 outside your countries" in line and "**1 kept**" in line

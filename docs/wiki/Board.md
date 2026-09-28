@@ -60,3 +60,30 @@ links the repo. One step has no command-line equivalent: in the Project, open
 **⋯ → Workflows → Auto-add to project**, set the filter `is:issue label:role`
 and turn it on. The GitHub free plan may limit how many auto-add workflows a
 Project can have; this setup needs one.
+
+## Board template (for new copies)
+
+The board design lives in a public, empty Project:
+https://github.com/users/vizkov/projects/3 ("job-radar board template"). It has the five
+fields and both views but no cards. `tools/board_sync.py setup-project` copies it
+(`board.template` in `config.json`), so a new user gets the same views in one step.
+GitHub doesn't copy the repo-specific **Auto-add** workflow; that one click stays manual.
+
+When you change your board's design (fields or views), refresh the template: create a new
+copy with `gh project copy <your board number> --source-owner <you> --target-owner <you>
+--title "job-radar board template"`, make it public, and update `board.template`.
+Copying never includes your cards.
+
+## More views worth adding
+
+All Roles and Pipeline already show every tier. Filtered views make daily use faster
+(View → New view, then type the filter in the filter bar and **Save view**):
+
+| View | Layout | Filter |
+|---|---|---|
+| Act now | Table, sort Fit ↓ | `tier:T1 stage:New,Shortlisted -label:possibly-closed` |
+| Tier 2 | Table, sort Fit ↓ | `tier:T2 -stage:Rejected,Skipped` |
+| In progress | Board by Stage | `stage:Applied,Interview,Offer` |
+| Clean-up | Table | `label:possibly-closed` |
+
+Tier 2 cards start arriving from the next scheduled run (the first run only added Tier 1).

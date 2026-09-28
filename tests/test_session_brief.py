@@ -105,3 +105,10 @@ def test_board_items_and_pull_via_fakes(tmp_path):
     def runner(cmd, t):
         return (True, "origin") if cmd[:2] == ["git", "remote"] else (False, "fatal: Not possible to fast-forward")
     assert "fast-forward" in sb.pull(runner)
+
+
+def test_system_updates_and_unpublished_code(tmp_path):
+    root = make_root(tmp_path, [row("a" * 16, "2026-10-04")])
+    text = brief(root, updates=["Freshness, closed-posting detection"], unpublished=["tools/radar.py"])
+    assert "System updated since last session" in text and "Freshness, closed-posting detection" in text
+    assert "1 code file(s) changed here but not in the public template (tools/radar.py)" in text

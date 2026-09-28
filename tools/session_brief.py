@@ -185,6 +185,23 @@ def start_fill(now: datetime) -> str:
     return "started in the background (log: work/board_fill.log)"
 
 
+def template_status(since: datetime, runner=run) -> tuple[list[str], list[str]]:
+    """(template commit subjects since `since`, private code files not yet published)."""
+    ok, remotes = runner(["git", "remote"], 10)
+    if not ok or "template" not in remotes.split():
+        return [], []
+    runner(["git", "fetch", "-q", "template"], 30)
+    ok, log = runner(["git", "log", "template/main", f"--since={since.isoformat()}", "--format=%s"], 15)
+    updates = [safe(l, 120) for l in log.splitlines() if l.strip()] if ok else []
+    try:
+        sys.path.insert(0, str(ROOT / "tools"))
+        from public_template import drift  # stdlib-only
+        unpublished = drift(fetch=False)
+    except Exception:
+        unpublished = []
+    return updates, unpublished
+
+
 def last_run_health(runner=run) -> str | None:
     ok, out = runner(["gh", "run", "list", "--workflow", "job-radar", "--limit", "1",
                       "--json", "conclusion,status,createdAt"], 20)
@@ -246,7 +263,7 @@ def _age(posted: str, today: date) -> str:
 
 def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, items: list[dict] | None,
           board_note: str | None, fill_note: str | None, changes: list[dict], follow_ups: list[tuple[str, int]],
-          run_note: str | None) -> str:
+          run_note: str | None, updates: list[str] = (), unpublished: list[str] = ()) -> str:
     rows = read_matches(root)
     scores = read_scores(root)
     by_ref = {r.get("ref"): r for r in rows}
@@ -299,7 +316,15 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         r = by_ref.get(ref, {})
         lines.append(f"- Follow-up due: {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)}, "
                      f"Applied {days} days ago with no change")
+    if updates:
+        lines.append("- System updated since last session (re-read CLAUDE.md / skills if relevant; tell the user "
+                     "about new capabilities in one line):")
+        lines += [f"  - {u}" for u in updates[:8]]
     checks = health_checks(root, now, rows, scores, last_run, alert_row, run_note)
+    if unpublished:
+        checks.append(f"{len(unpublished)} code file(s) changed here but not in the public template "
+                      f"({', '.join(unpublished[:4])}{'…' if len(unpublished) > 4 else ''}): offer to publish them "
+                      "with tools/public_template.py publish")
     if checks or problems:
         lines.append("- Health:")
         lines += [f"  - {n}" for n in checks]
@@ -324,7 +349,9 @@ def main() -> int:
             follow_ups = stale_applications(items, now)
             if any(not i.get("stage") for i in items):
                 fill_note = start_fill(now)
-        print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, last_run_health(run)))
+        updates, unpublished = template_status(since, run)
+        print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, last_run_health(run),
+                    updates, unpublished))
         WORK.mkdir(exist_ok=True)
         LAST.write_text(now.isoformat())
     except Exception as e:  # never break a session

@@ -27,6 +27,8 @@ class FakeProjectGh:
             return "me"
         if args[:2] == ("project", "list"):
             return json.dumps({"projects": self.projects})
+        if args[:2] == ("project", "copy"):
+            return json.dumps({"number": 9, "id": "PVT_9", "url": "https://github.com/users/me/projects/9"})
         if args[:2] == ("project", "create"):
             return json.dumps({"number": 3, "id": "PVT_1", "url": "https://github.com/users/me/projects/3"})
         if args[:2] == ("project", "field-create"):
@@ -129,3 +131,12 @@ def test_board_saved_even_if_link_fails(board_file):
 def test_repo_of_another_owner_rejected(board_file):
     with pytest.raises(ValueError, match="isn't owned"):
         bs.setup_project(FakeProjectGh(), "someoneelse/repo")
+
+
+def test_setup_copies_public_board_template(board_file):
+    gh = FakeProjectGh(fields=[{"id": "F_Stage", "name": "Stage", "options": [{"id": "o", "name": "New"}]}])
+    bs.setup_project(gh, "me/my-job-radar", template="vizkov/3")
+    assert ("project", "copy", "3", "--source-owner", "vizkov", "--target-owner", "me",
+            "--title", "Job search", "--format", "json") in gh.calls
+    assert not any(c[:2] == ("project", "create") for c in gh.calls)
+    assert json.loads(board_file.read_text())["number"] == "9"

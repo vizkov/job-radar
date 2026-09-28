@@ -2,6 +2,10 @@
 
     python tools/public_template.py export <dest>   # copy a clean template tree to <dest>
     python tools/public_template.py check           # fail if this git repo tracks private files
+    python tools/public_template.py drift           # code in this private copy not yet in the template
+    python tools/public_template.py publish <template-clone-dir> -m "message"
+                                                    # copy that code to a clone of the template, test,
+                                                    # check, commit, push; then: git pull template main
 
 Private = your settings (profile/) and everything a run produces or derives from
 your targets: state, digests, matches, the board list and coverage reports.
@@ -59,6 +63,41 @@ def export(dest: Path) -> None:
     print(f"copied {copied} files to {dest}, left out {skipped} private files")
 
 
+def drift(fetch: bool = True) -> list[str]:
+    """Non-private files changed on this branch since it last merged the template."""
+    if fetch:
+        subprocess.run(["git", "fetch", "-q", "template"], cwd=ROOT, capture_output=True, timeout=60)
+    r = subprocess.run(["git", "diff", "--name-only", "template/main...HEAD"], cwd=ROOT,
+                       capture_output=True, text=True)
+    dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"], cwd=ROOT,
+                           capture_output=True, text=True).stdout.splitlines()
+    paths = set(r.stdout.split()) | {line[3:].strip().strip('"') for line in dirty}
+    return sorted(p for p in paths if p and not is_private(p) and not any(fnmatch.fnmatch(p, n) for n in NEVER_COPY))
+
+
+def publish(template_dir: Path, message: str) -> None:
+    files = drift()
+    if not files:
+        print("nothing to publish: the template already has all code changes")
+        return
+    for rel in files:
+        src, dst = ROOT / rel, template_dir / rel
+        if src.exists():
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(src, dst)
+        elif dst.exists():
+            dst.unlink()  # deleted here, delete there
+    tests = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider"], cwd=template_dir,
+                           capture_output=True, text=True)
+    if tests.returncode != 0:
+        raise SystemExit("tests failed in the template copy; nothing committed:\n" + tests.stdout[-2000:])
+    subprocess.run([sys.executable, "tools/public_template.py", "check"], cwd=template_dir, check=True)
+    subprocess.run(["git", "add", "-A"], cwd=template_dir, check=True)
+    subprocess.run(["git", "commit", "-q", "-m", message], cwd=template_dir, check=True)
+    subprocess.run(["git", "push", "-q", "origin", "main"], cwd=template_dir, check=True)
+    print(f"published {len(files)} files: {', '.join(files)}\nnow run: git pull template main")
+
+
 def check() -> None:
     tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
     leaks = [t for t in tracked if is_private(t)]
@@ -74,5 +113,9 @@ if __name__ == "__main__":
         export(Path(sys.argv[2]).resolve())
     elif len(sys.argv) == 2 and sys.argv[1] == "check":
         check()
+    elif len(sys.argv) == 2 and sys.argv[1] == "drift":
+        print("\n".join(drift()) or "no unpublished code changes")
+    elif len(sys.argv) == 5 and sys.argv[1] == "publish" and sys.argv[3] == "-m":
+        publish(Path(sys.argv[2]).resolve(), sys.argv[4])
     else:
         raise SystemExit(__doc__)

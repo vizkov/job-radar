@@ -204,16 +204,22 @@ def _save_board(gh: Gh, board: dict) -> None:
         BOARD_FILE.write_text(json.dumps(board, indent=1), encoding="utf-8")
 
 
-def setup_project(gh: Gh, repo: str, title: str = "Job search", owner: str = "@me") -> str:
+def setup_project(gh: Gh, repo: str, title: str = "Job search", owner: str = "@me",
+                  template: str | None = None) -> str:
     """Create (or adopt) the Project, add job-radar's fields, link the repo. Safe to re-run:
     board.json is saved as soon as the Project exists, and an existing Project with the
-    same title is reused instead of creating a duplicate."""
+    same title is reused instead of creating a duplicate. With `template` ("owner/number" of a
+    public board template), the new Project is a copy of it: same views and fields, no items."""
     board = load_board()
     if board is None:
         if owner == "@me":  # `gh project link` compares owner names literally, so resolve @me
             owner = gh("api", "user", "--jq", ".login") or owner
         existing_projects = gh_json(gh, "project", "list", "--owner", owner, "--format", "json").get("projects", [])
         proj = next((p for p in existing_projects if p.get("title") == title and not p.get("closed")), None)
+        if proj is None and template:
+            src_owner, _, src_number = template.partition("/")
+            proj = gh_json(gh, "project", "copy", src_number, "--source-owner", src_owner,
+                           "--target-owner", owner, "--title", title, "--format", "json")
         if proj is None:
             proj = gh_json(gh, "project", "create", "--owner", owner, "--title", title, "--format", "json")
         board = {"owner": owner, "number": str(proj["number"]), "id": proj["id"], "url": proj.get("url", "")}
@@ -322,7 +328,8 @@ def main(argv=None) -> int:
     elif args.what == "setup-project":
         if not args.repo:
             ap.error("setup-project needs --repo OWNER/REPO")
-        print(setup_project(gh, args.repo))
+        cfg = json.loads(profile_path("config.json").read_text(encoding="utf-8")).get("board", {})
+        print(setup_project(gh, args.repo, template=cfg.get("template")))
     elif args.what == "fill":
         print(fill_new(gh))
     elif args.what == "stale":

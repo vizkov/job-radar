@@ -69,6 +69,10 @@ prioritise the freshest Tier 1 roles, since applying early matters to this user.
    and `work/` are private. Never push them to the public template (remote `template`);
    run `python tools/public_template.py check` before any push there.
 7. Commit the user's changes to their private repo (`origin`) with a clear message after
-   they agree to a change; don't push to `template`.
+   they agree to a change. **Code changes must also reach the public template** so it stays
+   current: after committing, run `python tools/public_template.py publish <template clone> -m "…"`
+   (copies only non-private files, tests, checks, pushes), then `git pull template main`.
+   Never push private files to `template`. When you add or change a capability, update this
+   file, the matching skill and the wiki in the same change, so future sessions know about it.
 8. Be honest about uncertainty: a sponsor tag is a legal-entity match, a fit score is a
    judgement, a board field may not be set yet. Say so.

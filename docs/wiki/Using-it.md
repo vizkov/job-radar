@@ -55,7 +55,8 @@ Not sure what's possible? Ask **"what can this do?"** or type `/manual`.
 
 ## What happens without you
 
-Three times a day (08:17, 14:17, 20:17 IST) job-radar checks for new roles and adds them
+Three times a day (02:47, 08:47 and 14:47 UTC, which is 08:17, 14:17 and 20:17 in India)
+job-radar checks for new roles and adds them
 to your board as **New** cards: Tier 1 and 2, at companies on your list. When you next
 open Claude Code, a briefing is ready: new roles, cards you moved, follow-ups due,
 anything broken. Scoring and tailoring happen when you ask. Say "what's new?" when you
@@ -63,9 +64,11 @@ sit down, or just look at the board.
 
 ## Costs
 
-Nothing beyond your Claude subscription (Claude's work counts toward its normal usage
-limits; there's no separate API bill). The scheduled runs use free GitHub Actions
-minutes, about 15–25 minutes a day.
+Nothing beyond your Claude subscription (Claude Pro or Max; there's no separate API bill).
+Claude's work counts toward your plan's normal usage limits: briefings and tracking are
+light, scoring or tailoring many roles in one go is heavier, so score the freshest ones
+first. The automatic runs use about 15–25 minutes a day of GitHub Actions, within the free
+plan's 2,000 minutes a month for private repos.
 
 ## Your data
 
@@ -77,7 +80,16 @@ minutes, about 15–25 minutes a day.
 | Fit scores | `data/scores.jsonl` |
 | Job descriptions Claude fetched (not saved to GitHub) | `work/jd/<Role ID>/` |
 
-All of it stays in your private repo; none of it is ever published. How that's
-enforced: [Security model](../design/13-Security-model.md).
+All of it stays in your **private** repo, which only you (and anyone you invite) can see.
+The automatic runs save their results there; Claude saves your changes there only after
+you agree. None of it is ever published: the public job-radar project receives code
+improvements only. How that's enforced: [Security model](../design/13-Security-model.md).
+
+## Who contacts whom
+
+- job-radar **never contacts employers** and never applies anywhere.
+- The automatic runs read public job boards from GitHub's servers.
+- When Claude fetches a full job description, or checks a company's jobs page, that
+  request comes from your computer, like opening the page in a browser.
 
 **Next:** [3. Board](Board.md)

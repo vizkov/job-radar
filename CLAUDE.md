@@ -19,7 +19,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "tailor my CV for …", "prep my application for …", "write a cover letter for …" | `tailor-application` |
 | "fill in the application for …", "help me apply to …" | `apply-assist` (Chrome; the user approves every page and submits) |
 | "I applied to …", "got an interview with …", "rejected by …", "not interested in …" | `track` |
-| "stop showing …", "add company …", "also look in Germany", "too much noise" | `tune-radar` |
+| "stop showing …", "add company …", "also look in Germany", "too much noise", "pause/resume the radar" | `tune-radar` |
 | "is anything broken?", "why no new roles?", a source failing in the status issue | `health` |
 | brief says "weekly system review due", "what could be better?" | `system-review` |
 | brief shows CV gaps, "how do I strengthen my CV?", "which certs matter?" | `cv-review` |

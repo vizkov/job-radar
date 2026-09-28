@@ -25,4 +25,7 @@ Steps:
    docs/design/14-Setup-and-publishing.md) then `python verify_boards.py --quiet`; report whether a board was found. If not,
    look for a careers page and offer to add it.
 4. Run `pytest -q` if you touched anything beyond these data files.
+   **Pause / resume:** `gh workflow disable job-radar` / `gh workflow enable job-radar` (the scheduled
+   search only; the board and data stay). Confirm with `gh workflow list`, and tell the user no new roles
+   arrive while paused.
 5. Tell the user what changed and the before/after numbers; commit to `origin` when they agree.

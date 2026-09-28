@@ -1,0 +1,64 @@
+name: sponsor-registers
+
+# Weekly refresh of the UK Home Office licensed-sponsor register and the Dutch IND
+# recognised-sponsor register (data/registers/). Commits only when they changed.
+on:
+  schedule:
+    - cron: "23 4 * * 1"      # Mondays 04:23 UTC
+  workflow_dispatch: {}
+
+permissions: {}   # granted per job below
+
+concurrency:
+  group: job-radar          # never race the daily radar commit
+  cancel-in-progress: false
+
+jobs:
+  guard:
+    # Runs the real job only in a PRIVATE repo: in a public one the digests, issues and
+    # logs would publish your job search. To run in a public repo anyway, set the
+    # repository variable JOB_RADAR_ALLOW_PUBLIC=true (Settings -> Variables -> Actions).
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      allowed: ${{ steps.check.outputs.allowed }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ALLOW_PUBLIC: ${{ vars.JOB_RADAR_ALLOW_PUBLIC }}
+        run: |
+          private=$(gh api "repos/$GITHUB_REPOSITORY" --jq .private)
+          if [ "$private" = "true" ] || [ "$ALLOW_PUBLIC" = "true" ]; then
+            echo "allowed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Public repository: skipped so your job search isn't published. Use a private copy (see README) or set JOB_RADAR_ALLOW_PUBLIC=true."
+            echo "allowed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  refresh:
+    needs: guard
+    if: needs.guard.outputs.allowed == 'true'
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262  # v4.4.0
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.13"   # must match the interpreter requirements.txt was locked with
+          cache: pip
+      - run: pip install --require-hashes -r requirements.txt
+      - run: python tools/refresh_registers.py
+      - run: |
+          git config user.name  "job-radar"
+          git config user.email "job-radar@users.noreply.github.com"
+          git add data/registers
+          # meta.json always changes (refresh date); only commit when a register did
+          if git diff --cached --quiet -- data/registers/uk_sponsors.csv data/registers/nl_sponsors.csv; then
+            echo "registers unchanged"; exit 0
+          fi
+          git commit -m "sponsor registers: $(date -u +%F)"
+          git push

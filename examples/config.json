@@ -1,0 +1,58 @@
+{
+  "_comment": "Edit freely. Title keywords are case-insensitive whole-word matches; end one with * to match word prefixes (pentest* matches pentester, pentesting). Exclude wins over include.",
+
+  "priority_countries": ["GB", "NL", "IE", "CH", "DE", "SE"],
+  "extra_countries": ["FR", "ES", "IT", "DK", "FI", "NO", "AT", "BE", "LU", "PT", "EE", "LT", "PL"],
+  "include_extra_countries": false,
+
+  "title_include": [
+    "application security", "appsec", "app sec", "product security", "software security",
+    "penetration test*", "pentest*", "pen test*", "security consultant", "security engineer",
+    "secure code", "secure coding", "devsecops", "threat model*", "security tester",
+    "vulnerabilit*", "security architect", "security lead", "offensive security", "vapt", "ethical hack*",
+    "penetrationstest*", "anwendungssicherheit", "applikationssäkerhet"
+  ],
+
+  "title_exclude": [
+    "director", "head of", "vp", "vice president", "principal",
+    "soc", "security operations", "incident response", "red team*",
+    "cloud security", "ai security", "grc", "governance", "physical security",
+    "sales", "account executive", "recruiter", "manager",
+    "intern", "internship", "thesis", "student", "werkstudent*", "praktik*", "trainee", "apprentice*"
+  ],
+
+  "tiering": {
+    "_comment": "Score = best title keyword + seniority words + country + bonuses. score >= tier1_min_score is Tier 1. Keywords use the same whole-word/* rules as title_include.",
+    "tier1_min_score": 6,
+    "title_keywords": {
+      "application security": 4, "appsec": 4, "app sec": 4, "product security": 4, "software security": 3,
+      "penetration test*": 4, "pentest*": 4, "pen test*": 4, "penetrationstest*": 4, "ethical hack*": 3,
+      "threat model*": 4, "secure code": 3, "secure coding": 3, "offensive security": 3, "vapt": 3,
+      "security consultant": 2, "security tester": 2, "security engineer": 1, "security architect": 1,
+      "security lead": 1, "devsecops": 1, "vulnerabilit*": 0
+    },
+    "seniority_keywords": {"senior": 1, "sr": 1, "lead": 1, "staff": 0,
+                           "junior": -2, "associate": -1, "graduate": -3, "entry level": -3},
+    "country": {"GB": 2, "NL": 2, "IE": 2, "CH": 1, "DE": 1, "SE": 1, "REMOTE-EU": 1},
+    "on_target_list": 1,
+    "sponsor_yes": 1
+  },
+
+  "sponsorship": {
+    "_comment": "Fuzzy name-match thresholds (0-100) against the UK/NL sponsor registers. >= fuzzy_yes is yes; between the two is unknown.",
+    "fuzzy_yes": 94,
+    "fuzzy_unknown": 86
+  },
+
+  "board": {
+    "_comment": "New roles become issues labelled 'role'; the GitHub Project auto-adds them. baseline_tiers applies to the very first run only.",
+    "enabled": true,
+    "tiers": [1, 2],
+    "baseline_tiers": [1],
+    "include_outside": false,
+    "max_per_run": 40
+  },
+
+  "board_timeout_seconds": 180,
+  "concurrency": 6
+}

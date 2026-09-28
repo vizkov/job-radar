@@ -1,0 +1,9 @@
+# Direct dependencies of the daily run. Lock with:
+#   pip-compile --generate-hashes --strip-extras -o requirements.txt requirements.in
+# Bump deliberately, review the diff of the ats-scrapers source before bumping it.
+ats-scrapers==0.3.0      # all ATS fetching
+beautifulsoup4==4.15.0   # imported by ats-scrapers 0.3.0 but not declared as its dependency
+pyyaml==6.0.3            # sources.yaml (safe_load only)
+selectolax==0.4.8       # careers pages + alert-email HTML: fast, small C parser, no JS execution
+defusedxml==0.7.1        # careers-page RSS/Atom feeds: stdlib XML parsers are unsafe on untrusted input
+rapidfuzz==3.14.6         # fuzzy company-name matching against the UK/NL sponsor registers (C++, fast)

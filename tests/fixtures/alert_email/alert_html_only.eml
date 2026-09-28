@@ -1,0 +1,25 @@
+From: LinkedIn <jobalerts-noreply@linkedin.com>
+To: jobalerts-inbox@example.com
+Subject: Security Consultant at MDSec
+Date: Sun, 27 Sep 2026 07:12:00 +0000
+Message-ID: <synthetic-2@example.com>
+Authentication-Results: mx.google.com; dkim=pass header.i=@linkedin.com
+ header.s=d2048-2021 header.b=abc; spf=pass
+ smtp.mailfrom=jobalerts-noreply@linkedin.com; dmarc=pass
+ header.from=linkedin.com
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body>
+<table><tr><td>
+<a href=3D"https://uk.linkedin.com/comm/jobs/view/security-consultant-at-mdse=
+c-4099999999?url=3Dhttps://evil.example/login">
+Security Consultant</a><div>MDSec</div><div>Manchester, England, United Kingd=
+om</div>
+</td></tr></table>
+<table><tr><td><a href=3D"https://www.linkedin.com/comm/jobs/view/4099999998/=
+">Threat Modeling Lead</a>
+<div>Secura</div><div>Eindhoven, North Brabant, Netherlands</div></td></tr></=
+table>
+</body></html>

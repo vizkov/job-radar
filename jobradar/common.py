@@ -1,0 +1,169 @@
+"""Shared helpers: load config, fetch a board with a time cap, classify job location/title."""
+from __future__ import annotations
+
+import asyncio
+import json
+import re
+from dataclasses import dataclass, field
+from pathlib import Path
+
+from ats_scrapers.scrapers import get_scraper
+
+from jobradar.paths import ROOT, profile_path
+
+CONFIG = json.loads(profile_path("config.json").read_text(encoding="utf-8"))
+
+# Fallback when a scraper doesn't populate country_iso: match the location text.
+# Country names are trusted anywhere; city names are ignored when the location is
+# clearly North American/Australian ("Cambridge, MA", "London, ON", "Perth, WA").
+_COUNTRY_NAMES = {
+    "GB": ["united kingdom", "england", "scotland", r"(?<!new south )wales", "northern ireland", "uk", "gb", "gbr"],
+    "NL": ["netherlands", "nederland", "holland", "nld"],
+    "IE": [r"(?<!northern )ireland", "irl"],
+    "CH": ["switzerland", "schweiz", "suisse", "svizzera", "che"],
+    "DE": ["germany", "deutschland", "deu"],
+    "SE": ["sweden", "sverige", "swe"],
+    "FR": ["france"], "ES": ["spain", "españa"], "IT": ["italy", "italia"], "DK": ["denmark"],
+    "FI": ["finland"], "NO": ["norway"], "AT": ["austria"], "BE": ["belgium"], "LU": ["luxembourg"],
+    "PT": ["portugal"], "EE": ["estonia"], "LT": ["lithuania"], "PL": ["poland"],
+}
+_CITY_NAMES = {
+    "GB": ["london", "manchester", "edinburgh", "glasgow", "cambridge", "bristol", "reading", "leeds",
+           "birmingham", "belfast", "guildford", "cheltenham", "southampton", "norwich", "newbury",
+           "swindon", "abingdon", "durham", "ipswich"],
+    "NL": ["amsterdam", "the hague", "den haag", "rotterdam", "utrecht", "eindhoven", "delft", "amstelveen",
+           "amersfoort", "leusden", "veldhoven", "zoetermeer", "maastricht"],
+    "IE": ["dublin", "cork", "galway", "limerick", "waterford", "dundalk"],
+    "CH": ["zurich", "zürich", "geneva", "genève", "geneve", "bern", "lausanne", "basel", "baar", "aarau",
+           "rapperswil"],
+    "DE": ["berlin", "munich", "münchen", "muenchen", "frankfurt", "hamburg", "stuttgart", "cologne", "köln",
+           "koeln", "heidelberg", "düsseldorf", "dusseldorf", "bonn", "walldorf", "ulm", "bochum", "freiburg",
+           "tübingen", "tuebingen"],
+    "SE": ["stockholm", "gothenburg", "göteborg", "malmö", "malmo", "linköping", "karlskrona", "kista"],
+    "FR": ["paris", "lyon", "montpellier", "roubaix"], "ES": ["madrid", "barcelona", "bilbao"],
+    "IT": ["milan", "milano", "rome"], "DK": ["copenhagen", "aarhus"], "FI": ["helsinki", "espoo"],
+    "NO": ["oslo"], "AT": ["vienna", "wien"], "BE": ["brussels"], "PT": ["lisbon", "porto"],
+    "EE": ["tallinn"], "LT": ["vilnius"], "PL": ["krakow", "kraków", "warsaw"],
+}
+
+
+def _words_re(words):
+    return re.compile(r"\b(?:" + "|".join(words) + r")\b", re.I)
+
+
+_COUNTRY_RE = {c: _words_re(w) for c, w in _COUNTRY_NAMES.items()}
+_CITY_RE = {c: _words_re(w) for c, w in _CITY_NAMES.items()}
+_REMOTE_EUROPE = re.compile(r"remote.*(europe|emea|\beu\b)|(europe|emea|\beu\b).*remote", re.I)
+# Upper-case state/province codes after a comma. DE and IN are left out on purpose:
+# "Berlin, DE" is common and must not be read as Delaware.
+_NON_EUROPE = re.compile(
+    r"(?i:united states|\busa\b|\bu\.s\.|canada|australia|\baus\b)"
+    r"|,\s*(?:AL|AK|AZ|AR|CA|CO|CT|FL|GA|HI|ID|IL|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY"
+    r"|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC|ON|BC|QC|AB|NSW|VIC|QLD)\b")
+
+ISO_ALIASES = {"UK": "GB"}
+
+
+def target_countries() -> set[str]:
+    s = set(CONFIG["priority_countries"])
+    if CONFIG.get("include_extra_countries"):
+        s |= set(CONFIG["extra_countries"])
+    return s
+
+
+def all_europe() -> set[str]:
+    return set(CONFIG["priority_countries"]) | set(CONFIG["extra_countries"])
+
+
+def countries_for(country_iso: str | None, location: str | None) -> set[str]:
+    """Countries a posting is in, from a scraper-supplied ISO code and/or location text.
+
+    A non-European ISO code is trusted over the text (so ``US`` + "Cambridge, MA" stays
+    US). A European code is extended with text matches, which catches multi-location
+    postings like "London; Amsterdam"."""
+    found = set()
+    iso = (country_iso or "").upper()
+    iso = ISO_ALIASES.get(iso, iso)
+    loc = location or ""
+    if iso:
+        found.add(iso)
+    if not iso or iso in all_europe():
+        non_europe = bool(_NON_EUROPE.search(loc))
+        for c, rx in _COUNTRY_RE.items():
+            if rx.search(loc):
+                found.add(c)
+        if not non_europe:
+            for c, rx in _CITY_RE.items():
+                if rx.search(loc):
+                    found.add(c)
+    if _REMOTE_EUROPE.search(loc):
+        found.add("REMOTE-EU")
+    return found
+
+
+def job_countries(job) -> set[str]:
+    """Countries an ats-scrapers Job is in."""
+    return countries_for(getattr(job, "country_iso", None), getattr(job, "location", None))
+
+
+def keyword_re(words: list[str]) -> re.Pattern:
+    """Whole-word match per keyword; a trailing * matches word prefixes ("pentest*" → "pentester")."""
+    parts = []
+    for w in words:
+        w = w.strip().lower()
+        if w.endswith("*"):
+            parts.append(r"\b" + re.escape(w[:-1]))
+        else:
+            parts.append(r"\b" + re.escape(w) + r"\b")
+    return re.compile("|".join(parts) or r"(?!x)x", re.I)
+
+
+_TITLE_INCLUDE = keyword_re(CONFIG["title_include"])
+_TITLE_EXCLUDE = keyword_re(CONFIG["title_exclude"])
+
+
+def title_matches(title: str) -> bool:
+    if _TITLE_EXCLUDE.search(title or ""):
+        return False
+    return bool(_TITLE_INCLUDE.search(title or ""))
+
+
+@dataclass
+class BoardResult:
+    url: str
+    ats: str
+    ok: bool = False
+    error: str = ""
+    jobs: list = field(default_factory=list)
+
+
+async def fetch_board(ats: str, slug: str, url: str, sem: asyncio.Semaphore) -> BoardResult:
+    res = BoardResult(url=url, ats=ats)
+    timeout = CONFIG.get("board_timeout_seconds", 180)
+    async with sem:
+        try:
+            kwargs = {"include_descriptions": False, "timeout": 30.0}
+            if ats == "workday":
+                kwargs["max_fetch_seconds"] = float(timeout - 10)
+            scraper = get_scraper(ats, slug, **kwargs)
+            res.jobs = await asyncio.wait_for(scraper.afetch(), timeout=timeout)
+            res.ok = True
+        except asyncio.TimeoutError:
+            res.error = f"timeout after {timeout}s"
+        except Exception as e:  # scrapers raise many things; record and move on
+            res.error = f"{type(e).__name__}: {str(e)[:200]}"
+    return res
+
+
+async def fetch_many(boards: list[tuple[str, str, str]], progress: bool = True) -> dict[str, BoardResult]:
+    """boards: list of (ats, scraper_slug, url). Returns url -> BoardResult."""
+    sem = asyncio.Semaphore(CONFIG.get("concurrency", 6))
+    tasks = [asyncio.create_task(fetch_board(a, s, u, sem)) for a, s, u in boards]
+    out = {}
+    for i, t in enumerate(asyncio.as_completed(tasks), 1):
+        r = await t
+        out[r.url] = r
+        if progress:
+            status = f"{len(r.jobs)} jobs" if r.ok else f"ERROR {r.error[:60]}"
+            print(f"[{i}/{len(tasks)}] {r.ats:15} {r.url[:70]:70} {status}", flush=True)
+    return out

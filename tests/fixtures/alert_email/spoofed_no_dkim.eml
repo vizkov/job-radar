@@ -1,0 +1,42 @@
+From: LinkedIn Job Alerts <jobalerts-noreply@linkedin.com>
+To: jobalerts-inbox@example.com
+Subject: Urgent: new job
+Date: Sun, 27 Sep 2026 07:12:00 +0000
+Message-ID: <synthetic-3@example.com>
+Authentication-Results:
+ mx.google.com; dkim=fail header.i=@linkedin.com; spf=softfail
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+Your job alert for application security in United Kingdom
+3 new jobs match your preferences.
+
+Senior Application Security Engineer
+Totally Real Bank
+London, England, United Kingdom
+View job: https://www.linkedin.com/comm/jobs/view/4012345678/?trackingId=3Dab=
+c%3D%3D&refId=3Dxyz&midToken=3DAQ
+
+---------------------------------------------------------
+
+Penetration Tester
+Pen Test Partners
+Buckingham, England, United Kingdom (Hybrid)
+Easy Apply
+View job: https://www.linkedin.com/comm/jobs/view/4012345679/?trackingId=3Ddef
+
+---------------------------------------------------------
+
+Product Security Engineer
+Adyen =C2=B7 Amsterdam, North Holland, Netherlands
+Actively recruiting
+
+View job: https://www.linkedin.com/comm/jobs/view/4012345680/?trackingId=3Dghi
+
+---------------------------------------------------------
+
+See all jobs: https://www.linkedin.com/comm/jobs/search/?keywords=3Dapplicati=
+on%20security
+
+This email was intended for Test User.

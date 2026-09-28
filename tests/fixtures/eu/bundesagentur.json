@@ -1,0 +1,758 @@
+{
+ "ergebnisliste": [
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Penetration Tester (m/w/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-09-16"
+   },
+   "verguetungsangabe": "JAHRESGEHALT",
+   "artDerVerguetung": "GEHALTSSPANNE",
+   "gehaltsspanneVon": 65000.0,
+   "gehaltsspanneBis": 90000.0,
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "70173",
+      "ort": "Stuttgart",
+      "region": "BADEN_WUERTTEMBERG",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 48.781275217,
+     "laenge": 9.180618762
+    }
+   ],
+   "chiffrenummer": "VA44-30133-S",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-16"
+   },
+   "datumErsteVeroeffentlichung": "2026-09-01",
+   "aenderungsdatum": "2026-09-16T07:41:46.221",
+   "hauptberuf": "IT-Tester/in",
+   "alternativBeruf1": "Informatiker/in",
+   "firma": "FERCHAU GmbH Niederlassung Stuttgart Mobility",
+   "arbeitgeberKundennummerHash": "ROik87b7c4puiQuhGetKx6ykdxR8Oqrk7zm8oH8gSdU=",
+   "referenznummer": "12265-281385_JB5236213-S",
+   "alleBerufe": [
+    "IT-Tester/in",
+    "Informatiker/in"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Penetration Tester (w/m/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": false,
+   "eintrittszeitraum": {
+    "von": "2026-09-03"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "22085",
+      "ort": "Hamburg",
+      "region": "HAMBURG",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 53.574048,
+     "laenge": 10.0168264
+    },
+    {
+     "adresse": {
+      "plz": "90443",
+      "ort": "Nürnberg, Mittelfranken",
+      "region": "BAYERN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 49.439479,
+     "laenge": 11.0688731
+    },
+    {
+     "adresse": {
+      "plz": "80331",
+      "ort": "München",
+      "region": "BAYERN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 48.1355827,
+     "laenge": 11.5739758
+    },
+    {
+     "adresse": {
+      "plz": "40878",
+      "ort": "Ratingen",
+      "region": "NORDRHEIN_WESTFALEN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 51.2983022,
+     "laenge": 6.8459883
+    },
+    {
+     "adresse": {
+      "plz": "70173",
+      "ort": "Stuttgart",
+      "region": "BADEN_WUERTTEMBERG",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 48.7812752,
+     "laenge": 9.1806188
+    },
+    {
+     "adresse": {
+      "plz": "60313",
+      "ort": "Frankfurt am Main",
+      "region": "HESSEN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 50.115356,
+     "laenge": 8.6832822
+    }
+   ],
+   "homeofficemoeglich": true,
+   "homeofficetyp": "NACH_VEREINBARUNG",
+   "chiffrenummer": "185851",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-03"
+   },
+   "datumErsteVeroeffentlichung": "2026-09-03",
+   "aenderungsdatum": "2026-09-03T07:23:24.623",
+   "externeURL": "https://www.get-in-it.de/jobsuche/p185851?utm_source=arbeitsagentur&utm_medium=organic&utm_campaign=launch-basic",
+   "hauptberuf": "IT-Qualitätssicherungskoordinator/in",
+   "firma": "Sogeti – Part of Capgemini",
+   "referenznummer": "13644-185851-S",
+   "alleBerufe": [
+    "IT-Qualitätssicherungskoordinator/in"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Senior Penetration Tester (m/w/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-08-13"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "45143",
+      "ort": "Essen, Ruhr",
+      "region": "NORDRHEIN_WESTFALEN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 51.460954,
+     "laenge": 6.9785051
+    }
+   ],
+   "homeofficemoeglich": false,
+   "chiffrenummer": "DE_RS_18509",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-08-13"
+   },
+   "datumErsteVeroeffentlichung": "2026-08-13",
+   "aenderungsdatum": "2026-08-17T07:26:50.843",
+   "hauptberuf": "Ethical Hacker",
+   "firma": "thyssenkrupp AG",
+   "arbeitgeberKundennummerHash": "sTp9KqWaRtL6_g1PGAweQnPA2QHCMREfNevKuxMpTxQ=",
+   "referenznummer": "16604-967926-008-S",
+   "alleBerufe": [
+    "Ethical Hacker"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Penetration Tester (m/w/d) Cybersecurity",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-10-01"
+   },
+   "verguetungsangabe": "JAHRESGEHALT",
+   "artDerVerguetung": "GEHALTSSPANNE",
+   "gehaltsspanneVon": 75000.0,
+   "gehaltsspanneBis": 100000.0,
+   "vertragsdauer": "UNBEFRISTET",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "80804",
+      "ort": "München",
+      "region": "BAYERN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 48.1705757,
+     "laenge": 11.5776185
+    }
+   ],
+   "homeofficemoeglich": true,
+   "homeofficetyp": "NACH_VEREINBARUNG",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-08-10"
+   },
+   "datumErsteVeroeffentlichung": "2026-08-07",
+   "aenderungsdatum": "2026-09-27T17:34:21.518",
+   "hauptberuf": "Ethical Hacker",
+   "alternativBeruf1": "Cyber-Security-Consultant",
+   "alternativBeruf2": "Informationssicherheitsbeauftragte/r",
+   "firma": "grey engineering GmbH",
+   "arbeitgeberKundennummerHash": "jlO2YLzSXc7W7vPN8FSP5Mf_8Ae4ZOhl-NCiOOyOAJs=",
+   "referenznummer": "17902-k59932.6263-S",
+   "alleBerufe": [
+    "Ethical Hacker",
+    "Cyber-Security-Consultant",
+    "Informationssicherheitsbeauftragte/r"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Penetration Tester OT Security (w/m/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-04-13"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "45127",
+      "ort": "Essen, Ruhr",
+      "region": "NORDRHEIN_WESTFALEN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 51.457028,
+     "laenge": 7.0101254
+    }
+   ],
+   "homeofficemoeglich": false,
+   "chiffrenummer": "241967",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-04-13"
+   },
+   "datumErsteVeroeffentlichung": "2026-04-13",
+   "aenderungsdatum": "2026-04-13T19:59:42.475",
+   "hauptberuf": "Ethical Hacker",
+   "firma": "E.ON Digital Technology GmbH",
+   "arbeitgeberKundennummerHash": "HKlDHSDrZFQng1FrcwjBlZAwqWDvjOGsWMp4Ql1ylfk=",
+   "referenznummer": "12728-241967-2-S",
+   "alleBerufe": [
+    "Ethical Hacker"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "(Junior) Penetration Tester OT Security (m/w/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": false,
+   "eintrittszeitraum": {
+    "von": "2026-09-04"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "45128",
+      "ort": "Essen, Ruhr",
+      "region": "NORDRHEIN_WESTFALEN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 51.4443867,
+     "laenge": 7.0130497
+    }
+   ],
+   "homeofficemoeglich": true,
+   "homeofficetyp": "NACH_VEREINBARUNG",
+   "chiffrenummer": "304712",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-04"
+   },
+   "datumErsteVeroeffentlichung": "2026-09-04",
+   "aenderungsdatum": "2026-09-04T07:07:32.393",
+   "externeURL": "https://www.get-in-it.de/jobsuche/p304712?utm_source=arbeitsagentur&utm_medium=organic&utm_campaign=launch-basic",
+   "hauptberuf": "IT-Qualitätssicherungskoordinator/in",
+   "firma": "E.ON",
+   "referenznummer": "13644-304712-S",
+   "alleBerufe": [
+    "IT-Qualitätssicherungskoordinator/in"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Penetration Tester im IT-Security Consulting (m/w/d)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": false,
+   "eintrittszeitraum": {
+    "von": "2026-09-03"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "56743",
+      "ort": "Mendig",
+      "region": "RHEINLAND_PFALZ",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 50.3727256,
+     "laenge": 7.2715079
+    },
+    {
+     "adresse": {
+      "plz": "56068",
+      "ort": "Koblenz am Rhein",
+      "region": "RHEINLAND_PFALZ",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 50.3529515,
+     "laenge": 7.5910254
+    }
+   ],
+   "homeofficemoeglich": true,
+   "homeofficetyp": "NACH_VEREINBARUNG",
+   "chiffrenummer": "233238",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-03"
+   },
+   "datumErsteVeroeffentlichung": "2026-09-03",
+   "aenderungsdatum": "2026-09-03T07:24:31.100",
+   "externeURL": "https://www.get-in-it.de/jobsuche/p233238?utm_source=arbeitsagentur&utm_medium=organic&utm_campaign=launch-basic",
+   "hauptberuf": "IT-Berater/in",
+   "firma": "ProSec",
+   "referenznummer": "13644-233238-S",
+   "alleBerufe": [
+    "IT-Berater/in"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Penetration Tester / Ethical Hacker (m/w/d) Siemens AG",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-09-15"
+   },
+   "verguetungsangabe": "JAHRESGEHALT",
+   "artDerVerguetung": "GEHALTSSPANNE",
+   "gehaltsspanneVon": 65000.0,
+   "gehaltsspanneBis": 85000.0,
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "76135",
+      "ort": "Karlsruhe, Baden",
+      "region": "BADEN_WUERTTEMBERG",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 48.995668192,
+     "laenge": 8.379959478
+    }
+   ],
+   "chiffrenummer": "VA93-11241-KAIT",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-15"
+   },
+   "datumErsteVeroeffentlichung": "2026-09-15",
+   "aenderungsdatum": "2026-09-15T09:20:17.777",
+   "hauptberuf": "Ethical Hacker",
+   "firma": "FERCHAU GmbH Niederlassung Karlsruhe City",
+   "arbeitgeberKundennummerHash": "6E0pgGnZYE8MUFrGpDFYUtXnZJM7geagU-4h7X47idc=",
+   "referenznummer": "12265-487306_JB5032533-S",
+   "alleBerufe": [
+    "Ethical Hacker"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "IT Security Analyst (m/w/d) Penetration Tester (m/w/d) Ethical Hacker (m/w/d)",
+   "quereinstiegGeeignet": true,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-09-11"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "strasse": "Alte Seilerei",
+      "hausnummer": "11",
+      "plz": "96052",
+      "ort": "Bamberg",
+      "region": "BAYERN",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 49.902708,
+     "laenge": 10.883031
+    }
+   ],
+   "homeofficemoeglich": true,
+   "homeofficetyp": "NACH_VEREINBARUNG",
+   "chiffrenummer": "Referenz SecAn_AA1001",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-11"
+   },
+   "datumErsteVeroeffentlichung": "2022-02-25",
+   "aenderungsdatum": "2026-09-25T14:42:14.637",
+   "hauptberuf": "Cyber-Security-Consultant",
+   "alternativBeruf1": "IT-Systemanalytiker/in",
+   "alternativBeruf2": "Ethical Hacker",
+   "firma": "whitelisthackers GmbH",
+   "arbeitgeberKundennummerHash": "IafYJvvGfhBh3845RseFzUpjlInloHYiOBCeIRmc4Xw=",
+   "referenznummer": "10000-1188166175-S",
+   "alleBerufe": [
+    "Cyber-Security-Consultant",
+    "IT-Systemanalytiker/in",
+    "Ethical Hacker"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Auditor – Vulnerability Identification, Penetration Testing, Software & IT (d/m/f/x)",
+   "quereinstiegGeeignet": false,
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-09-25"
+   },
+   "verguetungsangabe": "KEINE_ANGABEN",
+   "vertragsdauer": "KEINE_ANGABE",
+   "istGeringfuegigeBeschaeftigung": false,
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "70372",
+      "ort": "Stuttgart",
+      "region": "BADEN_WUERTTEMBERG",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 48.7990649,
+     "laenge": 9.2261569
+    }
+   ],
+   "homeofficemoeglich": false,
+   "chiffrenummer": "MER00042A2",
+   "veroeffentlichungszeitraum": {
+    "von": "2026-09-24"
+   },
+   "datumErsteVeroeffentlichung": "2026-09-24",
+   "aenderungsdatum": "2026-09-24T17:01:03.365",
+   "hauptberuf": "IT-Tester/in",
+   "firma": "Mercedes-Benz Group AG",
+   "arbeitgeberKundennummerHash": "bYpSzo25jH8dzHywMh1uD_MCt5b5rndEW4jvwEZ3HUQ=",
+   "referenznummer": "13151-1588269-2-S",
+   "alleBerufe": [
+    "IT-Tester/in"
+   ]
+  },
+  {
+   "stellenangebotsart": "ARBEIT",
+   "stellenangebotsTitel": "Ethical Hacker / Penetrationstester (m/w/d) – Schwerpunkt IoT-Security & Testkonzepte - ID: 342",
+   "arbeitszeitSchichtNachtWochenende": false,
+   "arbeitszeitTeilzeitAbend": false,
+   "arbeitszeitTeilzeitNachmittag": false,
+   "arbeitszeitTeilzeitVormittag": false,
+   "arbeitszeitTeilzeitFlexibel": false,
+   "arbeitszeitVollzeit": true,
+   "eintrittszeitraum": {
+    "von": "2026-09-10"
+   },
+   "verguetungsangabe": "JAHRESGEHALT",
+   "artDerVerguetung": "GEHALTSSPANNE",
+   "gehaltsspanneVon": 50000.0,
+   "gehaltsspanneBis": 65000.0,
+   "vertragsdauer": "UNBEFRISTET",
+   "stellenlokationen": [
+    {
+     "adresse": {
+      "plz": "76139",
+      "ort": "Karlsruhe, Baden",
+      "region": "BADEN_WUERTTEMBERG",
+      "land": "DEUTSCHLAND"
+     },
+     "breite": 49.0271588,
+     "laenge": 8.4481732
+    }
+   ],
+   "veroeffentlichungszeitraum": {
+    "von": "2026-08-18"
+   },
+   "datumErsteVeroeffentlichung": "2026-06-18",
+   "aenderungsdatum": "2026-09-10T11:41:23.452",
+   "hauptberuf": "IT-Sicherheitskoordinator/in",
+   "alternativBeruf1": "Tester/in, Testperson",
+   "alternativBeruf2": "Bachelor Professional - IT (Informationssicherheit)",
+   "firma": "SINTEC Informatik GmbH",
+   "arbeitgeberKundennummerHash": "IOgsfX4o0WzWgK6wNo_9q9Zhm_b5CYPVXhNuFemAPlg=",
+   "referenznummer": "10001-1003246829-S",
+   "alleBerufe": [
+    "Tester/in, Testperson",
+    "IT-Sicherheitskoordinator/in",
+    "Bachelor Professional - IT (Informationssicherheit)"
+   ]
+  }
+ ],
+ "maxErgebnisse": 11,
+ "page": 1,
+ "size": 25,
+ "facetten": {
+  "verguetung": {
+   "counts": {
+    "jahr": 4
+   },
+   "maxCount": 11
+  },
+  "befristung": {
+   "counts": {
+    "2": 2,
+    "3": 9
+   },
+   "maxCount": 11
+  },
+  "externestellenboersen": {
+   "counts": {
+    "false": 8,
+    "true": 3
+   },
+   "maxCount": 11
+  },
+  "behinderung": {
+   "counts": {
+    "false": 9
+   },
+   "maxCount": 11
+  },
+  "berufsfeld": {
+   "counts": {
+    "IT-Netzwerktechnik, -Administration, -Organisation": 10,
+    "IT-Systemanalyse, -Anwendungsberatung und -Vertrieb": 1
+   },
+   "maxCount": 11
+  },
+  "pav": {
+   "counts": {
+    "false": 11
+   },
+   "maxCount": 11
+  },
+  "topberuf": {
+   "counts": {
+    "Ethical Hacker": 5
+   },
+   "scores": {
+    "Ethical Hacker": 173335124
+   },
+   "maxCount": 11
+  },
+  "arbeitsort": {
+   "counts": {
+    "Bamberg": 1,
+    "Essen, Ruhr": 3,
+    "Frankfurt am Main": 1,
+    "Hamburg": 1,
+    "Karlsruhe, Baden": 2,
+    "Koblenz am Rhein": 1,
+    "Mendig": 1,
+    "München": 2,
+    "Nürnberg, Mittelfranken": 1,
+    "Ratingen": 1,
+    "Stuttgart": 3
+   },
+   "maxCount": 11
+  },
+  "veroeffentlichtseit": {
+   "counts": {
+    "14": 2,
+    "28": 6,
+    "7": 1,
+    "alle": 11
+   },
+   "maxCount": 11
+  },
+  "schulbildung": {
+   "counts": {
+    "0": 11,
+    "1": 11,
+    "11": 11,
+    "12": 11,
+    "2": 11,
+    "3": 11,
+    "4": 11,
+    "5": 11,
+    "6": 11
+   },
+   "maxCount": 11
+  },
+  "arbeitsort_plz": {
+   "counts": {
+    "22085": 1,
+    "40878": 1,
+    "45127": 1,
+    "45128": 1,
+    "45143": 1,
+    "56068": 1,
+    "56743": 1,
+    "60313": 1,
+    "70173": 2,
+    "70372": 1,
+    "76135": 1,
+    "76139": 1,
+    "80331": 1,
+    "80804": 1,
+    "90443": 1,
+    "96052": 1
+   },
+   "maxCount": 11
+  },
+  "arbeitgeber": {
+   "counts": {
+    "E.ON": 1,
+    "E.ON Digital Technology GmbH": 1,
+    "FERCHAU GmbH Niederlassung Karlsruhe City": 1,
+    "FERCHAU GmbH Niederlassung Stuttgart Mobility": 1,
+    "Mercedes-Benz Group AG": 1,
+    "ProSec": 1,
+    "SINTEC Informatik GmbH": 1,
+    "Sogeti – Part of Capgemini": 1,
+    "grey engineering GmbH": 1,
+    "thyssenkrupp AG": 1,
+    "whitelisthackers GmbH": 1
+   },
+   "maxCount": 11
+  },
+  "beruf": {
+   "counts": {
+    "Bachelor Professional - IT (Informationssicherheit)": 1,
+    "Cyber-Security-Consultant": 2,
+    "Ethical Hacker": 5,
+    "IT-Berater/in": 1,
+    "IT-Qualitätssicherungskoordinator/in": 2,
+    "IT-Sicherheitskoordinator/in": 1,
+    "IT-Systemanalytiker/in": 1,
+    "IT-Tester/in": 2,
+    "Informatiker/in": 1,
+    "Informationssicherheitsbeauftragte/r": 1,
+    "Tester/in, Testperson": 1
+   },
+   "maxCount": 11
+  },
+  "homeoffice": {
+   "counts": {
+    "nv_true": 5
+   },
+   "maxCount": 11
+  },
+  "angebotsart": {
+   "counts": {
+    "1": 11
+   },
+   "maxCount": 11
+  },
+  "branche": {
+   "counts": {
+    "11": 3,
+    "13": 1,
+    "28": 3,
+    "5": 1
+   },
+   "maxCount": 11
+  },
+  "quereinstieg": {
+   "counts": {
+    "false": 10,
+    "true": 1
+   },
+   "maxCount": 11
+  },
+  "arbeitszeit": {
+   "counts": {
+    "vz": 8
+   },
+   "maxCount": 11
+  },
+  "eintrittsdatum": {
+   "counts": {
+    "10_01_01-now": 10,
+    "26_09_01-26_10_01": 8,
+    "26_10_01-26_11_01": 1
+   },
+   "maxCount": 11
+  },
+  "zeitarbeit": {
+   "counts": {
+    "false": 7,
+    "true": 4
+   },
+   "maxCount": 11
+  },
+  "topberufsfeld": {
+   "counts": {
+    "IT-Netzwerktechnik, -Administration, -Organisation": 10,
+    "IT-Systemanalyse, -Anwendungsberatung und -Vertrieb": 1
+   },
+   "scores": {
+    "IT-Netzwerktechnik, -Administration, -Organisation": 930335,
+    "IT-Systemanalyse, -Anwendungsberatung und -Vertrieb": 13887
+   },
+   "maxCount": 11
+  }
+ }
+}

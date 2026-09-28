@@ -1,0 +1,39 @@
+---
+name: tailor-application
+description: Build a tailored, ATS-safe CV and cover letter for one role from the user's own career docs, validate it, and render .docx/.md files for review. Use when the user asks to tailor their CV, prep an application, or write a cover letter for a specific role.
+---
+
+# Tailor an application
+
+1. **Identify the role.** Find its ref in `data/matches.csv` (match company/title) or on the board card.
+   If it isn't scored yet, run the `score-roles` steps for it first — the must-haves drive the tailoring.
+2. **Make the folder** `profile/applications/<YYYY-MM-DD>-<company>-<role>/` (lowercase, hyphens).
+3. **Write `tailored.json`:**
+   ```json
+   {"key": "<ref>",
+    "headline": "one line, e.g. Application Security Engineer — secure code review & threat modeling",
+    "sections": [{"heading": "Summary", "bullets": [{"source_id": "P01", "text": "..."}]},
+                 {"heading": "Experience — <Employer> (<dates>)", "bullets": [{"source_id": "B03", "text": "..."}]},
+                 {"heading": "Certifications", "bullets": [{"source_id": "E01", "text": "..."}]}],
+    "skills": ["Burp Suite", "Semgrep"],
+    "cover_letter": [{"source_id": "C01", "text": "..."}, {"source_id": "S01", "text": "..."}]}
+   ```
+   Rules (enforced by the checker):
+   - Every bullet comes from one of the user's lines: `P`/`B`/`E` IDs in sections, `C`/`S` IDs in the
+     cover letter. Each ID at most once.
+   - You may select, reorder and lightly rephrase — mirror the JD's vocabulary **only where the original
+     line supports it**. No new numbers, employers, tools, links, emails or phone numbers.
+   - Skills must appear somewhere in the career docs.
+   - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
+     two pages.
+   - Headline: the target role title and 1-2 strengths; no contact details.
+   - Cover letter: 3-4 paragraphs from cover blocks and condensed STAR stories; mention sponsorship needs
+     honestly if the role is abroad (block `C03`-style text if they have one).
+4. **Validate:** `python tools/jd_check.py tailor <folder>`. Fix every error; never work around one.
+   Warnings about heavy rewording mean you drifted from what the user actually did — tighten it.
+5. **Render:** `python tools/render_resume.py <folder>` → `resume.docx` (plain single-column, ATS-safe),
+   `resume.md` (for a styled version in Claude Design), `cover_letter.md`.
+   Needs `pip install --require-hashes -r requirements-career.txt` once.
+6. **Hand over for review.** Show the user the diff the checker printed (what changed from their master
+   CV), where the files are, and any JD must-haves their CV couldn't evidence. They review, edit and
+   apply themselves. Then offer to move the card to Shortlisted (`track`).

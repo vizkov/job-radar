@@ -1,0 +1,24 @@
+From: Indeed <alert@indeed.com>
+To: jobalerts-inbox@example.com
+Subject: application security jobs in United Kingdom
+Date: Sun, 27 Sep 2026 07:12:00 +0000
+Message-ID: <synthetic-5@example.com>
+Authentication-Results: mx.google.com; dkim=pass header.i=@indeed.com
+ header.s=s1 header.b=abc; spf=pass
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body>
+<table><tr><td>
+  <a href=3D"https://cts.indeed.com/v3/H4sIAAAA?target=3Dhttps%3A%2F%2Fuk.ind=
+eed.com%2Frc%2Fclk%2Fdl%3Fjk%3D0a1b2c3d4e5f6a7b%26from%3Dja">
+    <b>Application Security Engineer</b></a>
+  <div>NCC Group</div><div>Manchester</div><div>Easily apply</div>
+</td></tr></table>
+<table><tr><td>
+  <a href=3D"https://uk.indeed.com/rc/clk/dl?jk=3D1122334455667788&amp;from=
+=3Dja&amp;qd=3Dx">Senior Security Consultant</a>
+  <div>Bridewell - London</div><div>Just posted</div>
+</td></tr></table>
+</body></html>

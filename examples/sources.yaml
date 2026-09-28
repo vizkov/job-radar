@@ -1,0 +1,83 @@
+# Which sources radar.py polls, and how. Filters (titles, countries, tiers) live in
+# config.json; this file only says where postings come from.
+#
+# Every source runs under its own timeout; one failing never stops the others.
+# Test one live without touching state:  python radar.py --dry-run --source <name>
+
+# Postings from employers not in targets.tsv are dropped. Set true to list
+# them in a separate "Outside your list" digest section instead. Any source can
+# override this with its own include_outside_list.
+include_outside_list: false
+
+sources:
+  ats:
+    # Company ATS boards verified by verify_boards.py (boards.json).
+    enabled: true
+    timeout_seconds: 2700   # whole-source cap; each board also has board_timeout_seconds in config.json
+    boards_file: boards.json
+
+  # --- EU public job APIs --------------------------------------------------
+  # Own keyword clients: ats-scrapers' versions of these crawl the whole site
+  # (Bundesagentur alone is ~1M jobs), which is useless for a daily search.
+  # `queries` only narrow what's downloaded; config.json's title filter decides
+  # what's reported. `health_query` is a broad canary that should never be empty.
+  # Expect mostly staffing-agency and outside-your-list results.
+
+  bundesagentur:
+    # Germany. Documented public API (jobsuche.api.bund.dev), public API key.
+    enabled: true
+    timeout_seconds: 300
+    days: 7
+    max_pages: 4          # 50 per page
+    health_query: Security
+    queries: [Penetration Tester, Pentester, Penetrationstester, Application Security, AppSec,
+              Product Security, Security Consultant, Security Engineer, DevSecOps, Threat Modeling,
+              Ethical Hacker]
+
+  jobtech:
+    # Sweden (Arbetsförmedlingen open data). Multi-word queries are sent as phrases.
+    enabled: true
+    timeout_seconds: 300
+    days: 7
+    max_pages: 2          # 100 per page
+    health_query: security
+    queries: [application security, appsec, product security, penetration tester, penetrationstest,
+              pentest, pentestare, security engineer, security consultant, devsecops, ethical hacker]
+
+  eures:
+    # EU portal. No UK (left EURES after Brexit); DE left out (mirrors bundesagentur).
+    # Title search is fuzzy and multi-word queries are OR-ed (15k results for "security
+    # engineer"), so use single words. "security" (~1k/week across NL/IE/CH/SE) is the
+    # catch-all for Security Engineer/Consultant/Architect titles.
+    enabled: true
+    timeout_seconds: 400
+    days: 7               # 1, 3, 7 or 30
+    max_pages: 25         # 50 per page; only "security" needs this many
+    countries: [NL, IE, CH, SE]
+    health_query: security
+    queries: [security, penetration, pentest, pentester, appsec, devsecops, hacker]
+    # Dutch EURES listings hide the employer name, so they can never match your list.
+    # Set true to see them (~50-80 in-scope NL roles a week when tested) in "Outside your list".
+    include_outside_list: false
+
+  # --- Company careers pages without an ATS ---------------------------------
+  careers_page:
+    # Pages and selectors live in careers_pages.yaml (one request per page per run,
+    # robots.txt respected). Selectors break when a site is redesigned: that shows up as
+    # "page layout changed" or an empty page flagged in the digest.
+    enabled: true
+    timeout_seconds: 600
+    respect_robots: true
+
+  # --- Job-alert emails: LinkedIn, Indeed, Glassdoor (no scraping, no logins) ---
+  alert_email:
+    # Parses job-alert emails saved by tools/fetch_alert_emails.py. That script runs in its
+    # own workflow step (radar.yml), the only place the mailbox password exists; which
+    # providers and how many days it fetches is set there. Setup: docs/wiki/Job-alert-emails.md.
+    # Why not scrape LinkedIn/Indeed (e.g. python-jobspy)? Their terms prohibit it, Actions IPs
+    # get blocked, and jobspy can't install here (numpy 1.26 pin, no Python 3.13 wheels).
+    enabled: false        # turn on after adding the two GitHub secrets (docs/wiki/Job-alert-emails.md)
+    timeout_seconds: 120
+    providers: [linkedin, indeed, glassdoor]
+    eml_dir: .alert_mail  # written by tools/fetch_alert_emails.py
+    require_dkim: true    # drop mails without a passing DKIM signature for the provider (spoofing)

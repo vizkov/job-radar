@@ -1,0 +1,54 @@
+# Employer spellings that normalization alone can't fold into a target.
+# canonical = a name from targets.tsv (or its display form). Normalization already
+# handles case, accents, punctuation, Ltd/LLP/GmbH/B.V./AG, and UK/NL/Cyber qualifiers,
+# so "Deloitte LLP" or "Pen Test Partners Ltd" need no row here.
+alias,canonical
+PricewaterhouseCoopers,PwC UK Cyber
+Ernst & Young,EY UK Cyber
+Ernst and Young,EY UK Cyber
+Amazon Web Services,Amazon / AWS
+Amazon Development Centre,Amazon / AWS
+Alphabet,Google
+Google Cloud,Google
+J.P. Morgan,JPMorgan Chase
+JP Morgan,JPMorgan Chase
+JPMorgan,JPMorgan Chase
+Citigroup,Citi
+Citibank,Citi
+Bank of America Merrill Lynch,Bank of America
+Merrill Lynch,Bank of America
+HSBC Bank,HSBC
+Barclays Bank,Barclays
+ING Bank,ING
+ING Groep,ING
+ABN AMRO Bank,ABN AMRO
+Cooperatieve Rabobank,Rabobank
+Lloyds Bank,Lloyds Banking Group
+NatWest,NatWest Group
+Royal Bank of Scotland,NatWest Group
+Nationwide Building Society,Nationwide
+Zurich Insurance Company,Zurich Insurance
+Swiss Reinsurance,Swiss Re
+Munchener Ruck,Munich Re
+Munich Reinsurance,Munich Re
+Robert Bosch,Bosch
+Koninklijke Philips,Philips
+Deutsche Telekom Security,Deutsche Telekom
+Telekom Security,Deutsche Telekom
+T-Systems International,T-Systems
+BAE Systems Applied Intelligence,BAE Systems Digital Intelligence
+Thales DIS,Thales
+Eviden,Atos / Eviden
+Tata Consultancy Services,TCS
+HCL Technologies,HCLTech
+Klarna Bank,Klarna
+Booking,Booking.com
+Just Eat,Just Eat Takeaway
+Takeaway.com,Just Eat Takeaway
+Wise Payments,Wise
+Monzo Bank,Monzo
+Starling,Starling Bank
+Checkout,Checkout.com
+Kroll,Kroll Cyber Risk
+Nettitude,Nettitude (Lloyd's Register)
+Orange Cyberdefense Netherlands,Orange Cyberdefense NL

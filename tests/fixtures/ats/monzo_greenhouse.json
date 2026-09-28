@@ -1,0 +1,719 @@
+{
+ "board": {
+  "ats": "greenhouse",
+  "slug": "monzo",
+  "url": "https://job-boards.greenhouse.io/monzo"
+ },
+ "jobs": [
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8143930",
+   "title": "Anaplan Support Analyst",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8143930",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-08-24T09:04:42-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7115379",
+   "title": "Android Engineer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7115379",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-03-09T09:32:35-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7343996",
+   "title": "Android Engineer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7343996",
+   "location": "Barcelona",
+   "country_iso": null,
+   "posted_at": "2025-10-21T08:12:57-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6635595",
+   "title": "Backend Engineer III ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6635595",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2025-02-17T04:44:43-05:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8207588",
+   "title": "Credit Bureau Relationship Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8207588",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-25T05:55:04-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8023162",
+   "title": "Credit Model Validation Manager (Machine Learning & NPV Models)",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8023162",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-06-23T10:40:39-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7991227",
+   "title": "Credit Risk Manager, Portfolio Management",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7991227",
+   "location": "London; Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-06-09T10:42:10-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7194922",
+   "title": "Data Science Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7194922",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2025-08-26T14:12:43-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/5758065",
+   "title": "Data Science Manager,  Financial Crime ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "5758065",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2024-02-29T10:59:30-05:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8146871",
+   "title": "Director of Data, Payments",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8146871",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-08-21T08:27:34-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7825424",
+   "title": "Director of Product Design",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7825424",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-05-27T09:45:58-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8223264",
+   "title": "Employee Relations Advisor",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8223264",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-22T10:34:01-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8025854",
+   "title": "Engineering Director, EU",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8025854",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-06-24T12:01:40-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6945371",
+   "title": "Engineering Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6945371",
+   "location": "Barcelona",
+   "country_iso": null,
+   "posted_at": "2025-07-31T05:55:49-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/5018066",
+   "title": "Engineering Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "5018066",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2023-04-28T07:57:31-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8223615",
+   "title": "FOS Root Cause Analysis Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8223615",
+   "location": "Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-23T05:41:24-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8156063",
+   "title": "FP&A Data & Analytics Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8156063",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-08-25T09:27:10-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8173733",
+   "title": "Graduate Credit Analyst",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8173733",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-09-09T04:30:30-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6369658",
+   "title": "Lead Data Scientist",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6369658",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2024-11-04T09:29:27-05:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8121191",
+   "title": "Lead Machine Learning Scientist, Business Banking",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8121191",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-08-11T05:08:48-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8103509",
+   "title": "Lead Machine Learning Scientist, Customer Operations",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8103509",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-08-03T12:55:03-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8050756",
+   "title": "Lead Machine Learning Scientist, FinCrime",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8050756",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-07-08T08:04:26-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8041029",
+   "title": "Lead Machine Learning Scientist, Search",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8041029",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-07-08T04:32:45-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6758088",
+   "title": "Lead Product Designer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6758088",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2025-04-04T11:37:24-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8185694",
+   "title": "Lead Product Designer, Growth",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8185694",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-09T05:05:09-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8156058",
+   "title": "Lead Product Manager, Payments",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8156058",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-08-25T07:25:10-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8043988",
+   "title": "Machine Learning, Tech Lead",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8043988",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-07-03T04:42:01-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8195225",
+   "title": "Martech Specialist, AI Deployment",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8195225",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-09-11T09:44:51-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8200681",
+   "title": "Operational Tax, Senior Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8200681",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-15T11:34:38-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8161520",
+   "title": "Payments Control Partner ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8161520",
+   "location": "London; Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-17T06:52:52-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7966820",
+   "title": "Product Marketing Lead",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7966820",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-05-29T11:19:46-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8096409",
+   "title": "Risk Assurance Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8096409",
+   "location": "Madrid",
+   "country_iso": null,
+   "posted_at": "2026-08-04T03:34:04-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8096406",
+   "title": "Risk Assurance Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8096406",
+   "location": "Barcelona",
+   "country_iso": null,
+   "posted_at": "2026-08-04T03:34:04-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7686358",
+   "title": "Risk Assurance Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7686358",
+   "location": "Dublin",
+   "country_iso": null,
+   "posted_at": "2026-03-10T08:28:34-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8105783",
+   "title": "Sales Account Executive, Fixed Term Contract",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8105783",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-08-05T03:26:01-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8232647",
+   "title": "Savings Pricing Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8232647",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-25T06:39:07-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6076740",
+   "title": "Senior Analytics Engineer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6076740",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2024-07-01T08:16:57-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6635837",
+   "title": "Senior Backend Engineer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6635837",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2025-02-14T13:27:02-05:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8180014",
+   "title": "Senior Brand Designer, Fixed Term Contract ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8180014",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-09-07T09:58:32-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8092745",
+   "title": "Senior Credit Risk Manager, Credit Platform ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8092745",
+   "location": "London; Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-07-30T07:38:25-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8064099",
+   "title": "Senior Data Scientist",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8064099",
+   "location": "Barcelona",
+   "country_iso": null,
+   "posted_at": "2026-07-17T06:05:22-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8195476",
+   "title": "Senior Director of People Operations",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8195476",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-15T10:44:26-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6394676",
+   "title": "Senior Engineering Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6394676",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2024-11-15T05:09:33-05:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8132044",
+   "title": "Senior Finance Business Partner",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8132044",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-08-17T11:28:49-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8207682",
+   "title": "Senior Financial Crime Investigator  - EU, Spanish & English ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8207682",
+   "location": "Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-17T06:35:48-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8168952",
+   "title": "Senior Financial Risk and Controls Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8168952",
+   "location": "Dublin",
+   "country_iso": null,
+   "posted_at": "2026-09-01T04:18:53-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8225870",
+   "title": "Senior FinCrime Operations Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8225870",
+   "location": "Dublin",
+   "country_iso": null,
+   "posted_at": "2026-09-23T06:07:32-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8225843",
+   "title": "Senior Fraud Operations Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8225843",
+   "location": "Dublin",
+   "country_iso": null,
+   "posted_at": "2026-09-23T06:07:49-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7621662",
+   "title": "Senior Legal Counsel, Digital Assets and Payments ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7621662",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-08-07T06:54:58-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7996955",
+   "title": "Senior Machine Learning Manager, Borrowing",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7996955",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-06-24T10:29:27-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8121259",
+   "title": "Senior Marketing Manager, EU Business Banking",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8121259",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-08-11T06:57:33-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7732437",
+   "title": "Senior Product Director, Business Banking",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7732437",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-03-18T12:07:28-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/7861991",
+   "title": "Senior Product Marketing Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "7861991",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-04-29T08:33:47-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8121253",
+   "title": "Senior Product Marketing Manager, Business Banking",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8121253",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-08-12T03:54:42-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8053177",
+   "title": "Senior Regulatory Reporting Analyst",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8053177",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-07-09T09:35:51-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8098915",
+   "title": "Senior Risk & Compliance Officer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8098915",
+   "location": "Madrid",
+   "country_iso": null,
+   "posted_at": "2026-07-31T10:38:56-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8098655",
+   "title": "Senior Risk & Compliance Officer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8098655",
+   "location": "Barcelona",
+   "country_iso": null,
+   "posted_at": "2026-07-31T10:38:55-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8204229",
+   "title": "Senior Security Analyst",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8204229",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-15T14:02:28-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6656737",
+   "title": "Senior Software Engineer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6656737",
+   "location": "Barcelona",
+   "country_iso": null,
+   "posted_at": "2025-02-25T03:53:09-05:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6036797",
+   "title": "Senior Staff Backend Engineer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6036797",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2024-06-12T09:48:53-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8083280",
+   "title": "Senior Technical Program Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8083280",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-07-24T09:44:43-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8015240",
+   "title": "Senior User Research Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8015240",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-07-22T12:54:59-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8203888",
+   "title": "Senior Workforce Management Analyst ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8203888",
+   "location": "Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-22T02:49:02-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6758449",
+   "title": "Software Engineer III",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6758449",
+   "location": "Barcelona",
+   "country_iso": null,
+   "posted_at": "2025-04-04T05:28:10-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8013699",
+   "title": "Staff Analytics Engineer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8013699",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-06-24T05:36:47-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6656228",
+   "title": "Staff Backend Engineer",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6656228",
+   "location": "Barcelona",
+   "country_iso": null,
+   "posted_at": "2025-02-25T03:53:57-05:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/6636147",
+   "title": "Staff Backend Engineer ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "6636147",
+   "location": "Cardiff, London or Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2025-02-14T13:21:29-05:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8222576",
+   "title": "Staff Technical Program Manager, Operations",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8222576",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-09-22T07:16:56-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8231337",
+   "title": "Strategic Innovation Lead, Operations",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8231337",
+   "location": "Remote (UK)",
+   "country_iso": null,
+   "posted_at": "2026-09-24T13:09:20-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8172921",
+   "title": "Technology and Operational Risk Senior Manager",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8172921",
+   "location": "Dublin",
+   "country_iso": null,
+   "posted_at": "2026-09-02T05:58:18-04:00"
+  },
+  {
+   "url": "https://job-boards.greenhouse.io/monzo/jobs/8223018",
+   "title": "Transfer Pricing Tax Manager ",
+   "company": "monzo",
+   "ats_type": "greenhouse",
+   "ats_id": "8223018",
+   "location": "London",
+   "country_iso": null,
+   "posted_at": "2026-09-22T10:35:58-04:00"
+  }
+ ]
+}

@@ -1,0 +1,19 @@
+From: Glassdoor Jobs <noreply@glassdoor.com>
+To: jobalerts-inbox@example.com
+Subject: Product Security Engineer at Wise
+Date: Sun, 27 Sep 2026 07:12:00 +0000
+Message-ID: <synthetic-6@example.com>
+Authentication-Results: mx.google.com; dkim=pass header.i=@glassdoor.com
+ header.s=s1 header.b=abc; spf=pass
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+
+<html><body>
+<table><tr><td>
+  <a href=3D"https://www.glassdoor.co.uk/partner/jobListing.htm?pos=3D101&amp=
+;jobListingId=3D1009876543210&amp;ao=3D1">
+    Product Security Engineer</a>
+  <p>Wise</p><p>London</p><p>4.1 =E2=98=85</p>
+</td></tr></table>
+</body></html>

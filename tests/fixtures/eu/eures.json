@@ -1,0 +1,766 @@
+{
+ "numberRecords": 25,
+ "jvs": [
+  {
+   "title": "House Pentester/Ethical Hacker",
+   "id": "NTgzMGUwZTktNTRmZi0zYTc1LWUwNjMtNjg5M2IyMGEwMjdjIDQy",
+   "creationDate": 1785805982461,
+   "lastModificationDate": 1790471565918,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL226"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": "directhire",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Responsable Régional des Ventes FR/ALL - Suisse romande",
+   "id": "NDRlYjNkOWEtZTZkNy00NDU4LWJjNzgtZTkyN2FhYzI5YTJhIDYx",
+   "creationDate": 1790346606117,
+   "lastModificationDate": 1790452804318,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH011"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C3322"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "Albedis Lausanne",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Support Commercial - département des ventes Suisse Romande",
+   "id": "MWYxMmM1NzItZTJlMy00YTExLWI3Y2EtNDM3NGU1YzUxY2EzIDYx",
+   "creationDate": 1790325004741,
+   "lastModificationDate": 1790452802594,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH013"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C2431"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "ISS Facility Services AG",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Courtier Ventes Résidentielles (H/F)",
+   "id": "MjEzS1JCWiA5",
+   "creationDate": 1788519386000,
+   "lastModificationDate": 1790319250000,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     null
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/occupation/8ec8df02-e9dd-43b7-b416-5846ae0414ab"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": "directhire",
+   "employer": {
+    "name": "Cabinet de recrutement AUBE & RH",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "fr"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Junior Pentester IB",
+   "id": "NWM0NmYwYTktMmEwYy00OWZlLWUwNjMtNjg5M2IyMGExMWJiIDQy",
+   "creationDate": 1790298870866,
+   "lastModificationDate": 1790298870866,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL131"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": "directhire",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Pentester/Ethical Hacker",
+   "id": "NWMzMmQyZDAtNmNkNy05NDMzLWUwNjMtNjg5M2IyMGE2ZDNjIDQy",
+   "creationDate": 1790212346751,
+   "lastModificationDate": 1790212346751,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL363"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [],
+   "positionScheduleCodes": [
+    "parttime",
+    "flextime",
+    "fulltime"
+   ],
+   "positionOfferingCode": "directhire",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Pentester/Ethical Hacker",
+   "id": "NWMzMmQyZDAtNjc1Zi05NDMzLWUwNjMtNjg5M2IyMGE2ZDNjIDQy",
+   "creationDate": 1790212339905,
+   "lastModificationDate": 1790212339905,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL363"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [],
+   "positionScheduleCodes": [
+    "parttime",
+    "flextime",
+    "fulltime"
+   ],
+   "positionOfferingCode": "directhire",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Responsable des ventes Suisse romande",
+   "id": "MmRiZjUzOTUtODdmYy00ZjU4LTgwNzYtOTFlYmNkNDdiYzNjIDYx",
+   "creationDate": 1790019003370,
+   "lastModificationDate": 1790193606707,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH021"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C1324"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "kohler + partner",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Responsable régional des ventes (h/f/d) – Service externe, Suisse romande",
+   "id": "YmE5MzE5N2UtMWZkMS00MjZhLTgzN2UtYTM3MTU4MzVmMzI5IDYx",
+   "creationDate": 1789973002617,
+   "lastModificationDate": 1790107248026,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH040"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C1213"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "ElectronicPartner Schweiz AG",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Assistante/assistant des ventes avec expérience   100%",
+   "id": "MmM4MTRiNmItNTJiYS00M2UxLTg0NmMtYTdkMWQxZTZkM2QzIDYx",
+   "creationDate": 1789972992203,
+   "lastModificationDate": 1790107247641,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH011"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C3334"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "Omnia Immobilier SA",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Responsable régional des ventes  – Service externe, Suisse romande",
+   "id": "ZDliZTU5YTUtZWY1Ny00ZWFlLWIxNDMtOTc3NDU1YjNjOGY5IDYx",
+   "creationDate": 1789972923287,
+   "lastModificationDate": 1790107246584,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH040"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C1213"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "ElectronicPartner Schweiz AG",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Gestionnaire des ventes et comptabilité entre 50% et 100%",
+   "id": "ZWMxNjY1ZTAtNmY2MC00MjdiLThlZDktNWY2MWY3NmI3YTkwIDYx",
+   "creationDate": 1789972869584,
+   "lastModificationDate": 1790107245301,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH021"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C4110"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "Synton SA",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Responsable régional des ventes",
+   "id": "MzRmOGY3ZTctZDdlNy00NjkyLWIzZjMtNDczMDZkZTA1YTJkIDYx",
+   "creationDate": 1789972459247,
+   "lastModificationDate": 1790107236271,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH021"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C2431"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "René Gerber AG",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Responsable régional des ventes, région Genève et Vaud",
+   "id": "NTE0MzE1YWMtYjk5Zi00ZTdiLThkNTMtMzQ1ZmEwYmMwNzNhIDYx",
+   "creationDate": 1789972275643,
+   "lastModificationDate": 1790107231503,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH023"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C3322"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "Lanz Oensingen AG",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Responsable régional des ventes   – Service externe, Suisse romande",
+   "id": "MmQxYjExMmEtZGU3MC00N2U3LWJiMTYtYjM1ZDRlYjlhZjBjIDYx",
+   "creationDate": 1789972923367,
+   "lastModificationDate": 1790107224443,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH040"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C1213"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "ElectronicPartner Schweiz AG",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Case Manager Rentes",
+   "id": "OTIxZGRhYzktN2VmOS00MDJjLWFkYzYtMWNiZmNlNGYwYmE2IDYx",
+   "creationDate": 1789972798115,
+   "lastModificationDate": 1790107221972,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH021"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C3353"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "IV-Stelle Bern",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Responsable des ventes en solutions acoustiques, 80-100%",
+   "id": "NTNlNGZkNWItNzIyOC00YTU0LWIzZDQtYzdmNGZiMzY2NTQ5IDYx",
+   "creationDate": 1789972384985,
+   "lastModificationDate": 1790107212870,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "CH": [
+     "CH011"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C2431"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": null,
+   "employer": {
+    "name": "Saint Gobain",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "en"
+   ],
+   "score": null,
+   "translationType": "ENGLISH"
+  },
+  {
+   "title": "Allround Monteur - Peest",
+   "id": "NWMwYTk3MjEtMGUxOC04ZWY0LWUwNjMtNjg5M2IyMGFlOWY4IDQy",
+   "creationDate": 1790039516961,
+   "lastModificationDate": 1790039516961,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL131"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/occupation/b0480558-269d-4903-9bc7-f390cd6a6964"
+   ],
+   "positionScheduleCodes": [
+    "flextime"
+   ],
+   "positionOfferingCode": "directhire",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Dentist",
+   "id": "NTk4NmRjMzctMDA3ZS04ZGU4LWUwNjMtNjg5M2IyMGEyNWRjIDQy",
+   "creationDate": 1787274805607,
+   "lastModificationDate": 1789780379314,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL225"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/occupation/a580e79a-b752-49c1-b033-b5ab2b34bfba"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": "temporary",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Dentist",
+   "id": "NTk4NmRjMzctMDE4MC04ZGU4LWUwNjMtNjg5M2IyMGEyNWRjIDQy",
+   "creationDate": 1787274808953,
+   "lastModificationDate": 1789780377719,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL213"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/occupation/a580e79a-b752-49c1-b033-b5ab2b34bfba"
+   ],
+   "positionScheduleCodes": [
+    "parttime",
+    "flextime",
+    "fulltime"
+   ],
+   "positionOfferingCode": "temporary",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Production worker retest (749723)",
+   "id": "NWJiYTFmYzQtNzVkMC01ODhlLWUwNjMtNjg5M2IyMGFjYjM2IDQy",
+   "creationDate": 1789693935166,
+   "lastModificationDate": 1789693935166,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL415"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/occupation/245be6d1-fe9a-4ac8-9f81-122a687e4724"
+   ],
+   "positionScheduleCodes": [
+    "flextime"
+   ],
+   "positionOfferingCode": "directhire",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Pentestare till Nordens ledande specialistbolag – Knowit",
+   "id": "NjE1OTc3NSAxMjE",
+   "creationDate": 1789387154323,
+   "lastModificationDate": 1789387154323,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "SE": [
+     "SE123"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/isco/C2511",
+    "http://data.europa.eu/esco/occupation/f2b15a0e-e65a-438a-affb-29b9d50b77d1"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": "temporary",
+   "employer": {
+    "name": "ACADEMIC WORK SWEDEN AB",
+    "legalID": null,
+    "organisationSizeCode": null,
+    "organisationOwnershipTypeCode": null,
+    "website": null,
+    "sectorCodes": [],
+    "description": null
+   },
+   "availableLanguages": [
+    "sv"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Production Worker Retest",
+   "id": "NTkyMjQ3MDAtMTczOC0yMDYzLWUwNjMtNjg5M2IyMGFiZTE0IDQy",
+   "creationDate": 1786842747966,
+   "lastModificationDate": 1789348433910,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL415"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/occupation/245be6d1-fe9a-4ac8-9f81-122a687e4724"
+   ],
+   "positionScheduleCodes": [
+    "parttime",
+    "flextime",
+    "fulltime"
+   ],
+   "positionOfferingCode": "temporary",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Pentester / Ethical Hacker",
+   "id": "NWI2OWE4NjctOGM4OC00OTY3LWUwNjMtNjg5M2IyMGEwOWE2IDQy",
+   "creationDate": 1789348363245,
+   "lastModificationDate": 1789348363245,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL350"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": "temporary",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  },
+  {
+   "title": "Production Worker Retest",
+   "id": "NWFmMGY1NWEtNjIxYi1kMGViLWUwNjMtNjg5M2IyMGE4MDE2IDQy",
+   "creationDate": 1788829997243,
+   "lastModificationDate": 1788829997243,
+   "numberOfPosts": 1,
+   "locationMap": {
+    "NL": [
+     "NL415"
+    ]
+   },
+   "euresFlag": false,
+   "jobCategoriesCodes": [
+    "http://data.europa.eu/esco/occupation/245be6d1-fe9a-4ac8-9f81-122a687e4724"
+   ],
+   "positionScheduleCodes": [
+    "fulltime"
+   ],
+   "positionOfferingCode": "directhire",
+   "employer": null,
+   "availableLanguages": [
+    "nl"
+   ],
+   "score": null,
+   "translationType": "FIRST_LANGUAGE"
+  }
+ ]
+}

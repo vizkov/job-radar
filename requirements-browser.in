@@ -1,0 +1,4 @@
+# Optional, LOCAL ONLY: careers pages marked `render: js`. Never installed by GitHub Actions.
+#   pip install --require-hashes -r requirements-browser.txt && playwright install chromium
+-c requirements.txt
+playwright==1.63.0       # headless Chromium for JS-rendered careers pages

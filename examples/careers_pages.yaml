@@ -1,0 +1,86 @@
+# Careers pages for companies with no supported ATS. Read by the careers_page source.
+#
+# Before adding a page here, check whether it embeds a real ATS (look for
+# greenhouse / lever / ashby / workable / personio / recruitee / teamtailor /
+# smartrecruiters in the page source). If it does, add it to overrides.csv
+# instead: the ATS path is far more robust than CSS selectors.
+#
+# Fields:
+#   company           name as in targets.tsv
+#   url               page to fetch
+#   mode              selector | feed | hash
+#   default_location  used when the page gives no (recognizable) location
+#   tested            date the config was checked live, or "untested"
+#   enabled           default true
+#   render: js        page needs a browser (Playwright, local only)
+# selector mode:
+#   item              CSS selector for one job
+#   title             CSS selector inside item (default: item text)
+#   link              CSS selector inside item (default: first <a>), or "#id" to use url#<item id>
+#   location          CSS selector inside item (optional)
+#   anchor            selector that exists even with zero jobs; missing = layout changed (error)
+#   expect_jobs       true = zero jobs counts as broken (for pages that always list something)
+# feed mode:
+#   feed_url          RSS/Atom or JSON URL (default: url)
+#   items_path        JSON: dotted path to the job list, e.g. "data.jobs"
+#   fields            JSON: {title:, url:, location:, id:} key names
+# hash mode:
+#   container         CSS selector of the listing section to hash (default: body)
+#   ignore_patterns   regexes removed before hashing (timestamps, counters)
+
+- company: MDSec
+  url: https://www.mdsec.co.uk/careers/
+  mode: selector
+  anchor: section.careers-list-wrapper
+  item: ul.careers-list li
+  title: div.article-title
+  location: div.careers-list-location   # says "Flexible", so default_location applies
+  default_location: Manchester, United Kingdom
+  tested: 2026-09-27   # 2 roles listed; apply links go to MDSec's Indeed page
+
+- company: SySS
+  url: https://www.syss.de/jobs-karriere/syss-als-arbeitgeber
+  mode: selector
+  item: div.whitepaper
+  title: div.media-body
+  link: div.media-body a      # links are PDF job ads
+  default_location: Tübingen, Germany
+  expect_jobs: true           # always lists several (incl. apprenticeships); empty = broken
+  tested: 2026-09-27   # 8 ads listed, none AppSec that day
+
+- company: Code White
+  url: https://code-white.com/careers/
+  mode: selector
+  anchor: "#challenge"
+  item: div.default-content-container-element[id]
+  title: h1
+  link: "#id"
+  default_location: Ulm, Germany
+  tested: 2026-09-27   # Senior Penetration Tester listed (Ulm/Mannheim/remote DE)
+
+- company: SEC Consult
+  url: https://sec-consult.com/career/
+  mode: selector
+  anchor: div.tx-ls-jobs
+  item: div.jobs-item
+  title: h3
+  link: a.jobs-item__link
+  location: li.jobs-item__workplace
+  default_location: Vienna, Austria
+  tested: 2026-09-27   # mostly Vienna (AT is an extra country, off by default)
+
+- company: NSIDE Attack Logic
+  url: https://www.nsideattacklogic.de/karriere/
+  mode: hash
+  container: main
+  ignore_patterns: ['\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[+-]\d{2}:\d{2}']   # CMS "modified" stamp
+  default_location: Munich, Germany
+  tested: 2026-09-27   # page says all positions are filled; any change is worth a look
+
+# Not seeded, found while testing:
+#   Pen Test Partners  careers page times out for non-browser clients (robots.txt loads fine).
+#   Synacktiv          job list is injected client-side; would need render: js. France only.
+#   Secura             now redirects to Bureau Veritas Cybersecurity (acquired).
+#   Computest          now redirects to defion.security (renamed).
+#   usd AG, Bridewell  use Personio / Workable: add to overrides.csv instead.
+#   Cure53             no jobs section on the site.

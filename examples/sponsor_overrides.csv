@@ -1,0 +1,6 @@
+# Pin a company's sponsor-register entry when the automatic match is wrong or missing.
+# company = name as in targets.tsv; uk / nl = exact register name, "no", or empty (= automatic).
+company,uk,nl
+Wise,Wise Payments Limited,
+ING,ING Services Limited,ING Bank N.V.
+Amazon,Amazon UK Services Ltd,

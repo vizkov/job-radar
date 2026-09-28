@@ -1,0 +1,5 @@
+# Test/dev only; never installed by the daily workflow.
+-c requirements.txt
+pytest==9.1.1            # test runner
+respx==0.23.1            # mocks httpx so adapter tests run offline against fixtures
+python-docx==1.2.0       # tests for tools/render_resume.py

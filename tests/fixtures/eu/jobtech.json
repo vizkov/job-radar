@@ -1,0 +1,2149 @@
+{
+ "total": {
+  "value": 21
+ },
+ "positions": 29,
+ "query_time_in_millis": 1,
+ "result_time_in_millis": 28,
+ "hits": [
+  {
+   "relevance": 1.0,
+   "id": "30971542",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/30971542",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5569239030/logotyper/logo.png",
+   "headline": "Cyber Security Engineer",
+   "application_deadline": "2026-10-25T23:59:59",
+   "number_of_vacancies": 5,
+   "employment_type": {
+    "concept_id": "kpPX_CNN_gDU",
+    "label": "Tillsvidareanställning (inkl. eventuell provanställning)",
+    "legacy_ams_taxonomy_id": null
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": null,
+    "organization_number": "5569239030",
+    "name": "Mission Consultancy Assistance Sweden AB",
+    "workplace": "Mission Consultancy Assistance Sweden AB"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "rQds_YGd_quU",
+    "label": "Mjukvaruutvecklare",
+    "legacy_ams_taxonomy_id": "80"
+   },
+   "workplace_model": {
+    "concept_id": "ZxwM_gtz_n61",
+    "label": "Arbete på plats"
+   },
+   "workplace_address": {
+    "municipality": "Göteborg",
+    "municipality_code": "1480",
+    "municipality_concept_id": "PVZL_BQT_XtL",
+    "region": "Västra Götalands län",
+    "region_code": "14",
+    "region_concept_id": "zdoY_6u5_Krt",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Engelbrektsgatan 71",
+    "postcode": "41252",
+    "city": "GÖTEBORG",
+    "coordinates": [
+     11.9837802668284,
+     57.7012991155208
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Göteborg",
+     "municipality_code": "1480",
+     "municipality_concept_id": "PVZL_BQT_XtL",
+     "region": "Västra Götalands län",
+     "region_code": "14",
+     "region_concept_id": "zdoY_6u5_Krt",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Engelbrektsgatan 71",
+     "postcode": "41252",
+     "city": "GÖTEBORG",
+     "coordinates": [
+      11.9837802668284,
+      57.7012991155208
+     ]
+    }
+   ],
+   "publication_date": "2026-04-29T10:13:10",
+   "last_publication_date": "2026-10-25T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_ANNONSERA",
+   "timestamp": 1789636600800
+  },
+  {
+   "relevance": 0.9723339087303966,
+   "id": "31523268",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31523268",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5567475495/logotyper/logo.png",
+   "headline": "Security Engineer",
+   "application_deadline": "2026-12-31T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "kpPX_CNN_gDU",
+    "label": "Tillsvidareanställning (inkl. eventuell provanställning)",
+    "legacy_ams_taxonomy_id": null
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "http://www.sinch.com",
+    "organization_number": "5567475495",
+    "name": "Sinch Sweden AB",
+    "workplace": "Sinch Sweden AB"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "9yMK_8ep_D1K",
+    "label": "IT-säkerhetstekniker",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Kalmar",
+    "municipality_code": "0880",
+    "municipality_concept_id": "Pnmg_SgP_uHQ",
+    "region": "Kalmar län",
+    "region_code": "08",
+    "region_concept_id": "9QUH_2bb_6Np",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Slöjdaregatan 1",
+    "postcode": "39366",
+    "city": "Kalmar",
+    "coordinates": [
+     16.3380459754836,
+     56.6880964017527
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Kalmar",
+     "municipality_code": "0880",
+     "municipality_concept_id": "Pnmg_SgP_uHQ",
+     "region": "Kalmar län",
+     "region_code": "08",
+     "region_concept_id": "9QUH_2bb_6Np",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Slöjdaregatan 1",
+     "postcode": "39366",
+     "city": "Kalmar",
+     "coordinates": [
+      16.3380459754836,
+      56.6880964017527
+     ]
+    },
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Lindhagensgatan 112",
+     "postcode": "11251",
+     "city": "Stockholm",
+     "coordinates": [
+      18.0117537668125,
+      59.3361608384984
+     ]
+    }
+   ],
+   "publication_date": "2026-09-25T18:15:50",
+   "last_publication_date": "2026-12-31T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_ANNONSERA",
+   "timestamp": 1790352950683
+  },
+  {
+   "relevance": 0.9389673253628656,
+   "id": "31252630",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31252630",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5590062245/logotyper/logo.png",
+   "headline": "Cyber Security Engineer till UMS Skeldar i Linköping",
+   "application_deadline": "2026-12-30T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "https://umsskeldarab.teamtailor.com",
+    "organization_number": "5590062245",
+    "name": "UMS Skeldar Sweden AB",
+    "workplace": "UMS Skeldar"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "MGCL_TYX_EUA",
+    "label": "Datasäkerhetsansvarig",
+    "legacy_ams_taxonomy_id": "5944"
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Linköping",
+    "municipality_code": "0580",
+    "municipality_concept_id": "bm2x_1mr_Qhx",
+    "region": "Östergötlands län",
+    "region_code": "05",
+    "region_concept_id": "oLT3_Q9p_3nn",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Låsbomsgatan 18",
+    "postcode": "58941",
+    "city": "Linköping",
+    "coordinates": [
+     15.7069071889961,
+     58.3931577833929
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Linköping",
+     "municipality_code": "0580",
+     "municipality_concept_id": "bm2x_1mr_Qhx",
+     "region": "Östergötlands län",
+     "region_code": "05",
+     "region_concept_id": "oLT3_Q9p_3nn",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Låsbomsgatan 18",
+     "postcode": "58941",
+     "city": "Linköping",
+     "coordinates": [
+      15.7069071889961,
+      58.3931577833929
+     ]
+    }
+   ],
+   "publication_date": "2026-07-06T15:31:15",
+   "last_publication_date": "2026-12-30T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1783344675759
+  },
+  {
+   "relevance": 0.8748112618987484,
+   "id": "31507817",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31507817",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5562421718/logotyper/logo.png",
+   "headline": "Senior Security Engineer",
+   "application_deadline": "2026-10-25T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "Xj7x_7yZ_jEn",
+    "label": "3 månader – upp till 6 månader",
+    "legacy_ams_taxonomy_id": "3"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "https://randstad.se/job-redirect/22b1e9ce-23f5-4daa-9002-fc9dbd0dcfb8",
+    "organization_number": "5562421718",
+    "name": "Randstad AB",
+    "workplace": "Randstad"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "Rd3G_bFa_zvR",
+    "label": "Civilingenjör, maskin",
+    "legacy_ams_taxonomy_id": "6504"
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": null,
+    "postcode": "11827",
+    "city": "STOCKHOLM",
+    "coordinates": [
+     18.06849786295011,
+     59.31280928174247
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": null,
+     "postcode": "11827",
+     "city": "STOCKHOLM",
+     "coordinates": [
+      18.06849786295011,
+      59.31280928174247
+     ]
+    }
+   ],
+   "publication_date": "2026-09-22T16:15:03",
+   "last_publication_date": "2026-10-25T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1790086503665
+  },
+  {
+   "relevance": 0.8748112618987484,
+   "id": "31432217",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31432217",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5590748926/logotyper/logo.png",
+   "headline": "Senior Security Engineer",
+   "application_deadline": "2027-03-02T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": null,
+    "organization_number": "5590748926",
+    "name": "Einride AB (publ)",
+    "workplace": "Einride"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "9yMK_8ep_D1K",
+    "label": "IT-säkerhetstekniker",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": "ZxwM_gtz_n61",
+    "label": "Arbete på plats"
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": null,
+    "postcode": "11645",
+    "city": "Stockholm",
+    "coordinates": [
+     18.091175863345644,
+     59.31797227070779
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": null,
+     "postcode": "11645",
+     "city": "Stockholm",
+     "coordinates": [
+      18.091175863345644,
+      59.31797227070779
+     ]
+    }
+   ],
+   "publication_date": "2026-09-03T09:13:31",
+   "last_publication_date": "2027-03-02T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1788419611619
+  },
+  {
+   "relevance": 0.8748112618987484,
+   "id": "31299802",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31299802",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5564873585/logotyper/logo.png",
+   "headline": "IT Security Engineer",
+   "application_deadline": "2027-01-24T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "https://cambio.teamtailor.com",
+    "organization_number": "5564873585",
+    "name": "Cambio Healthcare Systems AB",
+    "workplace": "Cambio"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "9yMK_8ep_D1K",
+    "label": "IT-säkerhetstekniker",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Sveavägen 44",
+    "postcode": "11134",
+    "city": "Stockholm",
+    "coordinates": [
+     18.0625616149858,
+     59.3369161713183
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Sveavägen 44",
+     "postcode": "11134",
+     "city": "Stockholm",
+     "coordinates": [
+      18.0625616149858,
+      59.3369161713183
+     ]
+    }
+   ],
+   "publication_date": "2026-07-28T11:39:59",
+   "last_publication_date": "2027-01-24T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1785231599762
+  },
+  {
+   "relevance": 0.8748112618987484,
+   "id": "31252998",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31252998",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5560297029/logotyper/logo.png",
+   "headline": "Cyber Security Engineer",
+   "application_deadline": "2027-01-01T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "kpPX_CNN_gDU",
+    "label": "Tillsvidareanställning (inkl. eventuell provanställning)",
+    "legacy_ams_taxonomy_id": null
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": null,
+    "organization_number": "5560297029",
+    "name": "Hitachi Energy Sweden AB",
+    "workplace": "Hitachi Energy, Ludvika"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "fZoS_si8_SFg",
+    "label": "IT-säkerhetsansvarig",
+    "legacy_ams_taxonomy_id": "2720"
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": null,
+    "municipality_code": null,
+    "municipality_concept_id": null,
+    "region": null,
+    "region_code": null,
+    "region_concept_id": null,
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": null,
+    "postcode": null,
+    "city": null,
+    "coordinates": [
+     null,
+     null
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": null,
+     "municipality_code": null,
+     "municipality_concept_id": null,
+     "region": null,
+     "region_code": null,
+     "region_concept_id": null,
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": null,
+     "postcode": null,
+     "city": null,
+     "coordinates": [
+      null,
+      null
+     ]
+    }
+   ],
+   "publication_date": "2026-07-06T16:48:10",
+   "last_publication_date": "2027-01-01T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_ANNONSERA",
+   "timestamp": 1783349290657
+  },
+  {
+   "relevance": 0.8748112618987484,
+   "id": "31083679",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31083679",
+   "logo_url": null,
+   "headline": "Information Security Engineer",
+   "application_deadline": "2026-11-22T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "https://careers.consiliumsafety.com",
+    "organization_number": "5565192134",
+    "name": "Consilium Safety Group AB",
+    "workplace": "Consilium Safety"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "9yMK_8ep_D1K",
+    "label": "IT-säkerhetstekniker",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Göteborg",
+    "municipality_code": "1480",
+    "municipality_concept_id": "PVZL_BQT_XtL",
+    "region": "Västra Götalands län",
+    "region_code": "14",
+    "region_concept_id": "zdoY_6u5_Krt",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Salsmästaregatan 21",
+    "postcode": "42246",
+    "city": "Hisings Backa",
+    "coordinates": [
+     11.986769339203,
+     57.7252647637861
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Göteborg",
+     "municipality_code": "1480",
+     "municipality_concept_id": "PVZL_BQT_XtL",
+     "region": "Västra Götalands län",
+     "region_code": "14",
+     "region_concept_id": "zdoY_6u5_Krt",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Salsmästaregatan 21",
+     "postcode": "42246",
+     "city": "Hisings Backa",
+     "coordinates": [
+      11.986769339203,
+      57.7252647637861
+     ]
+    }
+   ],
+   "publication_date": "2026-05-26T11:49:43",
+   "last_publication_date": "2026-11-22T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1779788983890
+  },
+  {
+   "relevance": 0.8642125330840419,
+   "id": "31520907",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31520907",
+   "logo_url": null,
+   "headline": "Senior Cyber Security Engineer - Network Security (CISSP)",
+   "application_deadline": "2026-10-25T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "kpPX_CNN_gDU",
+    "label": "Tillsvidareanställning (inkl. eventuell provanställning)",
+    "legacy_ams_taxonomy_id": null
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": null,
+    "organization_number": "5560701715",
+    "name": "H & M Hennes & Mauritz GBC AB",
+    "workplace": "Ekonomi/Logistik"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "9yMK_8ep_D1K",
+    "label": "IT-säkerhetstekniker",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Årstaängsvägen 19",
+    "postcode": "11743",
+    "city": "Stockholm",
+    "coordinates": [
+     18.06858,
+     59.329323
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Årstaängsvägen 19",
+     "postcode": "11743",
+     "city": "Stockholm",
+     "coordinates": [
+      18.06858,
+      59.329323
+     ]
+    }
+   ],
+   "publication_date": "2026-09-25T13:03:35",
+   "last_publication_date": "2026-10-25T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_ANNONSERA",
+   "timestamp": 1790334215645
+  },
+  {
+   "relevance": 0.8642125330840419,
+   "id": "31448696",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31448696",
+   "logo_url": null,
+   "headline": "Senior Security Engineer - Network Security",
+   "application_deadline": "2026-10-08T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "kpPX_CNN_gDU",
+    "label": "Tillsvidareanställning (inkl. eventuell provanställning)",
+    "legacy_ams_taxonomy_id": null
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": null,
+    "organization_number": "5560701715",
+    "name": "H & M Hennes & Mauritz GBC AB",
+    "workplace": "H&M Group"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "fZoS_si8_SFg",
+    "label": "IT-säkerhetsansvarig",
+    "legacy_ams_taxonomy_id": "2720"
+   },
+   "workplace_model": {
+    "concept_id": "ZxwM_gtz_n61",
+    "label": "Arbete på plats"
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Årstaängsvägen 13",
+    "postcode": "11134",
+    "city": "STOCKHOLM",
+    "coordinates": [
+     18.061474943800267,
+     59.33769106462821
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Årstaängsvägen 13",
+     "postcode": "11134",
+     "city": "STOCKHOLM",
+     "coordinates": [
+      18.061474943800267,
+      59.33769106462821
+     ]
+    }
+   ],
+   "publication_date": "2026-09-08T08:04:30",
+   "last_publication_date": "2026-10-08T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_ANNONSERA",
+   "timestamp": 1788847470664
+  },
+  {
+   "relevance": 0.8047743129755196,
+   "id": "31229361",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31229361",
+   "logo_url": null,
+   "headline": "Cyber Security Engineer (Automotive)",
+   "application_deadline": "2026-12-17T23:59:59",
+   "number_of_vacancies": 5,
+   "employment_type": {
+    "concept_id": "kpPX_CNN_gDU",
+    "label": "Tillsvidareanställning (inkl. eventuell provanställning)",
+    "legacy_ams_taxonomy_id": null
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "http://www.bertrandt.com",
+    "organization_number": "5595267021",
+    "name": "Bertrandt Sverige AB",
+    "workplace": "Bertrandt Sverige AB"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "GuRB_LaM_Adb",
+    "label": "Civilingenjör inom elektroteknik",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Göteborg",
+    "municipality_code": "1480",
+    "municipality_concept_id": "PVZL_BQT_XtL",
+    "region": "Västra Götalands län",
+    "region_code": "14",
+    "region_concept_id": "zdoY_6u5_Krt",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Theres Svenssons Gata 13",
+    "postcode": "41755",
+    "city": "GÖTEBORG",
+    "coordinates": [
+     11.9442700443529,
+     57.70673593025
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Göteborg",
+     "municipality_code": "1480",
+     "municipality_concept_id": "PVZL_BQT_XtL",
+     "region": "Västra Götalands län",
+     "region_code": "14",
+     "region_concept_id": "zdoY_6u5_Krt",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Theres Svenssons Gata 13",
+     "postcode": "41755",
+     "city": "GÖTEBORG",
+     "coordinates": [
+      11.9442700443529,
+      57.70673593025
+     ]
+    }
+   ],
+   "publication_date": "2026-06-30T09:01:00",
+   "last_publication_date": "2026-12-17T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_ANNONSERA",
+   "timestamp": 1782802860655
+  },
+  {
+   "relevance": 0.79506795886691,
+   "id": "31499049",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31499049",
+   "logo_url": null,
+   "headline": "Senior Application Security Engineer",
+   "application_deadline": "2026-12-31T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "kpPX_CNN_gDU",
+    "label": "Tillsvidareanställning (inkl. eventuell provanställning)",
+    "legacy_ams_taxonomy_id": null
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": null,
+    "organization_number": "5569396459",
+    "name": "Gears of Leo AB",
+    "workplace": "Gears Of Leo AB"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "rQds_YGd_quU",
+    "label": "Mjukvaruutvecklare",
+    "legacy_ams_taxonomy_id": "80"
+   },
+   "workplace_model": {
+    "concept_id": "ZxwM_gtz_n61",
+    "label": "Arbete på plats"
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": null,
+    "postcode": null,
+    "city": null,
+    "coordinates": [
+     null,
+     null
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": null,
+     "postcode": null,
+     "city": null,
+     "coordinates": [
+      null,
+      null
+     ]
+    }
+   ],
+   "publication_date": "2026-09-21T09:36:35",
+   "last_publication_date": "2026-12-31T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_ANNONSERA",
+   "timestamp": 1789976195643
+  },
+  {
+   "relevance": 0.79506795886691,
+   "id": "31469884",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31469884",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5593322125/logotyper/logo.png",
+   "headline": "Senior Application Security Engineer",
+   "application_deadline": "2027-03-11T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "https://jobs.nordicinvestin.se",
+    "organization_number": "5593322125",
+    "name": "Nordic Investin Group Aktiebolag",
+    "workplace": "Nordic Investin Group"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "9yMK_8ep_D1K",
+    "label": "IT-säkerhetstekniker",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": "ZxwM_gtz_n61",
+    "label": "Arbete på plats"
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "103 16",
+    "postcode": "10316",
+    "city": "Stockholm",
+    "coordinates": [
+     18.0648752,
+     59.3344829
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "103 16",
+     "postcode": "10316",
+     "city": "Stockholm",
+     "coordinates": [
+      18.0648752,
+      59.3344829
+     ]
+    }
+   ],
+   "publication_date": "2026-09-12T13:24:08",
+   "last_publication_date": "2027-03-11T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1789212248519
+  },
+  {
+   "relevance": 0.79506795886691,
+   "id": "31469882",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31469882",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5593322125/logotyper/logo.png",
+   "headline": "Senior Cloud Security Engineer",
+   "application_deadline": "2027-03-11T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "https://jobs.nordicinvestin.se",
+    "organization_number": "5593322125",
+    "name": "Nordic Investin Group Aktiebolag",
+    "workplace": "Nordic Investin Group"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "9yMK_8ep_D1K",
+    "label": "IT-säkerhetstekniker",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": "ZxwM_gtz_n61",
+    "label": "Arbete på plats"
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "103 16",
+    "postcode": "10316",
+    "city": "Stockholm",
+    "coordinates": [
+     18.0648752,
+     59.3344829
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "103 16",
+     "postcode": "10316",
+     "city": "Stockholm",
+     "coordinates": [
+      18.0648752,
+      59.3344829
+     ]
+    }
+   ],
+   "publication_date": "2026-09-12T13:23:30",
+   "last_publication_date": "2027-03-11T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1789212210422
+  },
+  {
+   "relevance": 0.79506795886691,
+   "id": "31239866",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31239866",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5560297029/logotyper/logo.png",
+   "headline": "IT/OT Security Engineer",
+   "application_deadline": "2026-12-28T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "kpPX_CNN_gDU",
+    "label": "Tillsvidareanställning (inkl. eventuell provanställning)",
+    "legacy_ams_taxonomy_id": null
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": null,
+    "organization_number": "5560297029",
+    "name": "Hitachi Energy Sweden AB",
+    "workplace": "Hitachi Energy, Ludvika"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "GuRB_LaM_Adb",
+    "label": "Civilingenjör inom elektroteknik",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Ludvika",
+    "municipality_code": "2085",
+    "municipality_concept_id": "Ny2b_2bo_7EL",
+    "region": "Dalarnas län",
+    "region_code": "20",
+    "region_concept_id": "oDpK_oZ2_WYt",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": null,
+    "postcode": null,
+    "city": null,
+    "coordinates": [
+     null,
+     null
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Ludvika",
+     "municipality_code": "2085",
+     "municipality_concept_id": "Ny2b_2bo_7EL",
+     "region": "Dalarnas län",
+     "region_code": "20",
+     "region_concept_id": "oDpK_oZ2_WYt",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": null,
+     "postcode": null,
+     "city": null,
+     "coordinates": [
+      null,
+      null
+     ]
+    }
+   ],
+   "publication_date": "2026-07-02T12:00:05",
+   "last_publication_date": "2026-12-28T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_ANNONSERA",
+   "timestamp": 1782986405746
+  },
+  {
+   "relevance": 0.7365190192387353,
+   "id": "31174065",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31174065",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5568138589/logotyper/logo.png",
+   "headline": "Security Operations Engineer",
+   "application_deadline": "2026-11-30T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "kpPX_CNN_gDU",
+    "label": "Tillsvidareanställning (inkl. eventuell provanställning)",
+    "legacy_ams_taxonomy_id": null
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "https://www.kambi.com/",
+    "organization_number": "5568138589",
+    "name": "Kambi Sweden AB",
+    "workplace": "Kambi Sweden AB"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "YLgW_3fm_CmS",
+    "label": "IT-säkerhetschef/IT security manager",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": "ZxwM_gtz_n61",
+    "label": "Arbete på plats"
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": null,
+    "postcode": null,
+    "city": null,
+    "coordinates": [
+     null,
+     null
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": null,
+     "postcode": null,
+     "city": null,
+     "coordinates": [
+      null,
+      null
+     ]
+    }
+   ],
+   "publication_date": "2026-06-12T14:40:40",
+   "last_publication_date": "2026-11-30T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_ANNONSERA",
+   "timestamp": 1788256635679
+  },
+  {
+   "relevance": 0.7307314246859651,
+   "id": "31515898",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31515898",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5591906689/logotyper/logo.png",
+   "headline": "Cyber Security Engineer till Ovzon",
+   "application_deadline": "2026-10-22T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": null,
+    "organization_number": "5591906689",
+    "name": "Tech Talents Consulting i Sverige AB",
+    "workplace": "Tech Talents"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "9yMK_8ep_D1K",
+    "label": "IT-säkerhetstekniker",
+    "legacy_ams_taxonomy_id": null
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Gustavslundsvägen 137",
+    "postcode": "16751",
+    "city": "Bromma",
+    "coordinates": [
+     17.9839375980405,
+     59.3284728016953
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Gustavslundsvägen 137",
+     "postcode": "16751",
+     "city": "Bromma",
+     "coordinates": [
+      17.9839375980405,
+      59.3284728016953
+     ]
+    }
+   ],
+   "publication_date": "2026-09-24T12:55:23",
+   "last_publication_date": "2026-10-22T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1790247323493
+  },
+  {
+   "relevance": 0.728648159844608,
+   "id": "31363754",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31363754",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5591411326/logotyper/logo.png",
+   "headline": "Cyber Security Engineer till Ovzon",
+   "application_deadline": "2026-10-25T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": null,
+    "organization_number": "5591411326",
+    "name": "Friday Väst AB",
+    "workplace": "Friday"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "VegM_wQc_A2T",
+    "label": "IT-säkerhetschef",
+    "legacy_ams_taxonomy_id": "2717"
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Skeppsbron 38",
+    "postcode": "11130",
+    "city": "Stockholm",
+    "coordinates": [
+     18.0748502719333,
+     59.323180011692
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Skeppsbron 38",
+     "postcode": "11130",
+     "city": "Stockholm",
+     "coordinates": [
+      18.0748502719333,
+      59.323180011692
+     ]
+    }
+   ],
+   "publication_date": "2026-08-18T09:47:43",
+   "last_publication_date": "2026-10-25T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1790082403710
+  },
+  {
+   "relevance": 0.6897212528055925,
+   "id": "31144647",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31144647",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5566387139/logotyper/logo.png",
+   "headline": "Zitac söker en driven IT-konsult med fokus på Hosting, Azure och Backup",
+   "application_deadline": "2026-12-02T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "https://zitac.teamtailor.com",
+    "organization_number": "5566387139",
+    "name": "ZITAC CONSULTING AB",
+    "workplace": "Zitac"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": true,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "tdCZ_6Pn_VzT",
+    "label": "IT-tekniker/Datatekniker",
+    "legacy_ams_taxonomy_id": "6625"
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Malmö",
+    "municipality_code": "1280",
+    "municipality_concept_id": "oYPt_yRA_Smm",
+    "region": "Skåne län",
+    "region_code": "12",
+    "region_concept_id": "CaRE_1nn_cSU",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "Kungsgatan 6",
+    "postcode": "21155",
+    "city": "Malmo",
+    "coordinates": [
+     13.01110493879348,
+     55.59793454016474
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Malmö",
+     "municipality_code": "1280",
+     "municipality_concept_id": "oYPt_yRA_Smm",
+     "region": "Skåne län",
+     "region_code": "12",
+     "region_concept_id": "CaRE_1nn_cSU",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "Kungsgatan 6",
+     "postcode": "21155",
+     "city": "Malmo",
+     "coordinates": [
+      13.01110493879348,
+      55.59793454016474
+     ]
+    }
+   ],
+   "publication_date": "2026-06-05T10:40:35",
+   "last_publication_date": "2026-12-02T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1781764988696
+  },
+  {
+   "relevance": 0.6243346157609804,
+   "id": "31516366",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31516366",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5591548135/logotyper/logo.png",
+   "headline": "Senior Network Security Engineer / Network Operations Consultant",
+   "application_deadline": "2027-03-23T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "1paU_aCR_nGn",
+    "label": "Behovsanställning",
+    "legacy_ams_taxonomy_id": "4"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": null,
+    "label": null,
+    "legacy_ams_taxonomy_id": null
+   },
+   "working_hours_type": {
+    "concept_id": null,
+    "label": null,
+    "legacy_ams_taxonomy_id": null
+   },
+   "scope_of_work": {
+    "min": null,
+    "max": null
+   },
+   "access": null,
+   "employer": {
+    "url": "https://careers.cyberinstincts.com",
+    "organization_number": "5591548135",
+    "name": "Cyber Instincts AB",
+    "workplace": "Cyber Instincts AB"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "Nkbd_wa9_TZF",
+    "label": "Nätverkstekniker",
+    "legacy_ams_taxonomy_id": "5912"
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Göteborg",
+    "municipality_code": "1480",
+    "municipality_concept_id": "PVZL_BQT_XtL",
+    "region": "Västra Götalands län",
+    "region_code": "14",
+    "region_concept_id": "zdoY_6u5_Krt",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": "United Spaces Lindholmen",
+    "postcode": "41755",
+    "city": "Göteborg",
+    "coordinates": [
+     11.947749993967735,
+     57.70964233014656
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Göteborg",
+     "municipality_code": "1480",
+     "municipality_concept_id": "PVZL_BQT_XtL",
+     "region": "Västra Götalands län",
+     "region_code": "14",
+     "region_concept_id": "zdoY_6u5_Krt",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": "United Spaces Lindholmen",
+     "postcode": "41755",
+     "city": "Göteborg",
+     "coordinates": [
+      11.947749993967735,
+      57.70964233014656
+     ]
+    }
+   ],
+   "publication_date": "2026-09-24T13:53:06",
+   "last_publication_date": "2027-03-23T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1790250786237
+  },
+  {
+   "relevance": 0.5792971156787899,
+   "id": "31296928",
+   "external_id": null,
+   "original_id": null,
+   "label": [],
+   "webpage_url": "https://arbetsformedlingen.se/platsbanken/annonser/31296928",
+   "logo_url": "https://arbetsformedlingen.se/rest/employer-logo-api/api/v1/organisation/5567183693/logotyper/logo.png",
+   "headline": "Azure Cloud Specialist",
+   "application_deadline": "2026-10-16T23:59:59",
+   "number_of_vacancies": 1,
+   "employment_type": {
+    "concept_id": "PFZr_Syz_cUq",
+    "label": "Vanlig anställning",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_type": {
+    "concept_id": "oG8G_9cW_nRf",
+    "label": "Fast månads- vecko- eller timlön",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "salary_description": null,
+   "duration": {
+    "concept_id": "a7uU_j21_mkL",
+    "label": "Tills vidare",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "working_hours_type": {
+    "concept_id": "6YE1_gAC_R2G",
+    "label": "Heltid",
+    "legacy_ams_taxonomy_id": "1"
+   },
+   "scope_of_work": {
+    "min": 100,
+    "max": 100
+   },
+   "access": null,
+   "employer": {
+    "url": "https://www.eccera.com/",
+    "organization_number": "5567183693",
+    "name": "Eccera Professionals AB",
+    "workplace": "Eccera Professionals AB"
+   },
+   "experience_required": true,
+   "access_to_own_car": false,
+   "driving_license_required": false,
+   "driving_license": null,
+   "occupation": {
+    "concept_id": "Nkbd_wa9_TZF",
+    "label": "Nätverkstekniker",
+    "legacy_ams_taxonomy_id": "5912"
+   },
+   "workplace_model": {
+    "concept_id": null,
+    "label": null
+   },
+   "workplace_address": {
+    "municipality": "Stockholm",
+    "municipality_code": "0180",
+    "municipality_concept_id": "AvNB_uwa_6n6",
+    "region": "Stockholms län",
+    "region_code": "01",
+    "region_concept_id": "CifL_Rzy_Mku",
+    "country": "Sverige",
+    "country_code": "199",
+    "country_concept_id": "i46j_HmG_v64",
+    "street_address": null,
+    "postcode": "11135",
+    "city": "Stockholm",
+    "coordinates": [
+     18.064698255640515,
+     59.33570226447933
+    ]
+   },
+   "workplace_addresses": [
+    {
+     "municipality": "Stockholm",
+     "municipality_code": "0180",
+     "municipality_concept_id": "AvNB_uwa_6n6",
+     "region": "Stockholms län",
+     "region_code": "01",
+     "region_concept_id": "CifL_Rzy_Mku",
+     "country": "Sverige",
+     "country_code": "199",
+     "country_concept_id": "i46j_HmG_v64",
+     "street_address": null,
+     "postcode": "11135",
+     "city": "Stockholm",
+     "coordinates": [
+      18.064698255640515,
+      59.33570226447933
+     ]
+    }
+   ],
+   "publication_date": "2026-07-27T12:20:45",
+   "last_publication_date": "2026-10-16T23:59:59",
+   "removed": false,
+   "removed_date": null,
+   "source_type": "VIA_JOBPOSTING",
+   "timestamp": 1790063413584
+  }
+ ]
+}

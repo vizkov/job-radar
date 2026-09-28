@@ -1,0 +1,4 @@
+# Optional, LOCAL ONLY: rendering tailored résumés (tools/render_resume.py). Never installed by Actions.
+#   pip install --require-hashes -r requirements-career.txt
+-c requirements.txt
+python-docx==1.2.0       # writes the single-column, ATS-safe resume.docx

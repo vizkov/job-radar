@@ -17,9 +17,16 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "what's new?", "how's my search going?", "anything good this week?" | `consultant-brief` |
 | "which of these fit me?", "score the new roles", "is this one worth it?" | `score-roles` |
 | "tailor my CV for …", "prep my application for …", "write a cover letter for …" | `tailor-application` |
+| "fill in the application for …", "help me apply to …" | `apply-assist` (Chrome; the user approves every page and submits) |
 | "I applied to …", "got an interview with …", "rejected by …", "not interested in …" | `track` |
 | "stop showing …", "add company …", "also look in Germany", "too much noise" | `tune-radar` |
 | "is anything broken?", "why no new roles?", a source failing in the status issue | `health` |
+
+## Session start
+
+A SessionStart hook (`tools/session_brief.py`) pulls the latest data, reads the board, starts
+filling new cards' fields in the background, and puts a "job-radar session brief" in your
+context. Start from it; don't redo those steps. If it says the pull failed, tell the user.
 
 ## How the machinery fits together
 
@@ -46,8 +53,9 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
    and lightly rephrase the user's own lines, citing their IDs. No new employers,
    skills, numbers, links or contact details. `tools/jd_check.py` enforces this —
    never work around a rejection; fix the content or tell the user what's missing.
-3. **Never apply, submit, email or message anyone** on the user's behalf. You prepare;
-   the user reviews and sends.
+3. **Never submit an application, email or message anyone** on the user's behalf. With
+   `apply-assist` you may pre-fill application forms in the user's Chrome, page by page after
+   they approve the exact values; the final Submit is always the user's click.
 4. **Never fetch LinkedIn, Indeed or Glassdoor pages** (their terms prohibit scraping).
    Ask the user to paste those job descriptions.
 5. **Secrets never go in files, commits or chat.** The Gmail app password lives only in

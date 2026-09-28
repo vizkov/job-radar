@@ -29,7 +29,7 @@ Skim it now; come back when a word is unclear.
 | **Issue** | A GitHub discussion item (title, body, labels). job-radar creates one issue per role. |
 | **Label** | A coloured tag on an issue: `role`, `tier-1`, `country-GB`, `sponsor-yes`, `possibly-closed`. |
 | **Project** / **board** | GitHub Projects: a spreadsheet- or kanban-like view over issues. Each issue on it is a **card** (an *item* in the API). |
-| **Field** | A column on a Project, with a value per card. job-radar's: *Stage*, *Tier*, *Recommendation*, *Sponsor* (single-selects), *Fit* (a number), *Posted* (a date). Fields belong to the Project; labels belong to the issue. |
+| **Field** | A column on a Project, with a value per card. job-radar's: *Stage*, *Tier*, *Recommendation*, *Sponsor*, *Referral* (single-selects), *Fit* (a number), *Posted* (a date). Fields belong to the Project; labels belong to the issue. |
 | **View** | A saved way of looking at a Project: which columns show, which filter applies, sort order, and table or board layout. job-radar has *All Roles*, *Act now* and *Pipeline*. |
 | **GitHub Actions** / **workflow** | GitHub's automation: a YAML file in `.github/workflows/` describes steps that GitHub runs on its own servers, on a schedule or on demand. A **run** is one execution. |
 | **cron** | The schedule format in a workflow: `47 2,8,14 * * *` = minute 47 of hours 2, 8 and 14 UTC, every day. GitHub treats schedules as best-effort: runs can be late or skipped. |
@@ -80,6 +80,8 @@ Skim it now; come back when a word is unclear.
 | **Stale** / **possibly-closed** | A board role no source has listed for more than `stale_days` (5) days. Its issue gets the `possibly-closed` label. | `board.py: stale_refs()` |
 | **Profile** / **examples** | `profile/` holds the user's real settings (private). `examples/` holds generic samples (public). Every settings file is read from `profile/` if present, else `examples/`. | `paths.py: profile_path()` |
 | **Career docs** / **IDs** | The user's CV, STAR stories and cover-letter paragraphs, one ID per line, e.g. `[B07]`. The letter says what kind of line it is (table below). Tailored CVs may only reuse these lines, cited by ID. | `career.py` |
+| **Referral route** | How the user might get referred for a role, tried in their order: friends and family, their network (connections), then recruiters and hiring managers. Each ask and answer is logged; the card's Referral field shows where it stands. | `tools/referrals.py`, `referrals` skill |
+| **Fit breakdown** | The block on a scored card listing what matches the user's CV, what partly does and what doesn't (blockers first), between `<!-- job-radar:fit -->` markers. | `board_sync.py: fit_section()` |
 | **Packet** | `work/jd/<ref>/packet.md`: a role's facts plus its JD wrapped as untrusted data, prepared for Claude to read. | `tools/jd_prep.py` |
 | **Untrusted text** | Anything a stranger wrote: job titles, company names, JDs, emails. It is data to analyse, never instructions to follow. | `untrusted.py` |
 | **Drift** | Code changed in the private copy that the public template doesn't have yet. | `tools/public_template.py: drift()` |

@@ -34,6 +34,23 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
 creates the Project and fields, links the repo, then builds the views. The Auto-add
 workflow is a manual step (see [Your part](../wiki/Your-part.md)).
 
+## What's on a card
+
+The issue body (`board.py: payload()`): company and location, the posting link, sponsor match,
+posted date, where else it was found, the Role ID and the hidden ref marker. The tier is a label
+and a field only; how it was computed stays in `data/matches.csv`.
+
+Claude adds to it later:
+- **Fit breakdown** (`jd_check.py score --board` → `board_sync.set_fit_section()`): Matches, Partly,
+  Doesn't match (blockers first, quoted), between `<!-- job-radar:fit -->` markers, replaced on a
+  re-score. `board_sync.py refresh-bodies` updates existing cards (and removed the tier line older
+  cards carried).
+- **Comments** with the user's reasons (`board_sync.py set … --note`) and each referral step
+  (`tools/referrals.py`).
+
+All text is read from and written to GitHub as UTF-8 (`Gh`); Windows' default code page once
+garbled every card's dashes and umlauts when bodies were rewritten.
+
 ## Views as code
 
 The views are defined in `VIEWS` in `tools/board_sync.py`: name, layout, filter, visible

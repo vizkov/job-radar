@@ -66,6 +66,8 @@ alerts (address redacted) would make those tests stronger.
 | `test_career.py` | `career`, `manual` | Parsing, contact tokens, comments ignored, duplicate IDs, missing CV message; manual lists everything; colour only when asked |
 | `test_session_brief.py` | `tools/session_brief` | Counts and freshness, health checks, quiet alert emails, drag logging and follow-ups, hostile titles neutralised, gh/git via fakes, system updates, missed-run restart |
 | `test_public_template.py` | `tools/public_template` | Code is public; private or unknown paths never published; renames; wiki link rewriting |
+| `test_referrals.py` | `tools/referrals` | Contacts found loosely and in the user's order; ask/result logged and put on the card; unanswered asks after the wait |
+| `test_check_doc_links.py` | `tools/check_doc_links` | The repo's docs have no broken links; a link with a space or a missing target is caught |
 
 ## Faking `gh`
 

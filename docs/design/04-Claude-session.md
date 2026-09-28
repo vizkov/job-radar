@@ -197,7 +197,18 @@ standard headings, no tables or images, which applicant tracking systems parse
 reliably), `resume.md` and `cover_letter.md`. Name and contact details come only from
 `master_resume.md`'s front matter.
 
-## 4.5 Applying (`apply-assist`)
+## 4.5 Referrals (`referrals`)
+
+The user asks for a referral **before** applying, in their order: friends and family, their
+network, then recruiters and hiring managers. `tools/referrals.py contacts "<company>"` lists the
+people they've told Claude about (`profile/network.csv`, loosely matched by company); Claude asks
+for more, drafts each message in `profile/applications/<folder>/outreach.md` from the user's own
+lines, and the user sends it. `referrals.py ask/result/route` log every step to
+`data/referrals.jsonl`, set the card's **Referral** field (Finding contact, Asked, Referred, No
+route, Not needed) and comment the step on the issue. The session brief's `referral_notes()` lists
+asks unanswered after `referrals.wait_days` (default 4): one follow-up, or apply directly.
+
+## 4.6 Applying (`apply-assist`)
 
 Claude opens the role's own ATS link (from `matches.csv`, never a link a page suggests)
 in the user's Chrome. For each form page: Claude reads the fields, proposes a value for
@@ -207,12 +218,14 @@ answered by Claude. A **Sonnet subagent** types the approved values only; Claude
 re-reads the page and checks every field itself. Claude moves between pages; the **final
 Submit is always the user's click**. LinkedIn, Indeed and Glassdoor are never automated.
 
-## 4.6 Tracking and the board (`track`, views)
+## 4.7 Tracking and the board (`track`, views)
 
 **`board_sync.py set <ref> Stage=Applied`** (`set_role_fields()`): finds the card whose
 issue body contains `job-radar:ref=<ref>` (`find_item()`), sets each field, logs Stage and
 Recommendation changes to `data/pipeline_log.jsonl` (`by: "claude"`), and closes the issue
-for final stages (Offer, Rejected, Skipped).
+for final stages (Offer, Rejected, Skipped). With `--note "…"` the user's reason is stored with the change and
+posted as a comment on the issue. That is how feedback reaches the card: nothing reads comments
+the user writes on issues themselves.
 
 **Views as code.** `VIEWS` in `board_sync.py` defines *All Roles*, *Act now* and
 *Pipeline*: layout, filter, columns, sort, grouping. `apply_views()` creates missing views
@@ -221,7 +234,7 @@ for final stages (Offer, Rejected, Skipped).
 exact menu clicks for the user. `design_diff()` reports drift; the session brief runs it.
 Details: [Board internals](11-Board-internals.md).
 
-## 4.7 Committing and publishing
+## 4.8 Committing and publishing
 
 When the user agrees to a change, Claude commits to the private repo (`origin`). The
 **post-commit hook** (`.githooks/post-commit`, active because `git config core.hooksPath

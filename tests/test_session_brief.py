@@ -139,3 +139,12 @@ def test_docs_review_due_after_enough_code_changes():
     assert sb.docs_review_note(now, runner=lambda c, t: (True, files)) is None  # 9 code files: not yet
     note = sb.docs_review_note(now, runner=lambda c, t: (True, files + "\njobradar/board.py"))
     assert "docs review due: 10 code files" in note
+
+
+def test_docs_review_git_since_is_utc():
+    from datetime import datetime
+    now = datetime(2026, 9, 28, 12, 0)
+    sb.docs_review_note(now, runner=lambda c, t: (True, ""))   # writes the first stamp
+    seen = []
+    sb.docs_review_note(now, runner=lambda c, t: (seen.append(c), (True, ""))[1])
+    assert seen[0][2].endswith("+00:00")

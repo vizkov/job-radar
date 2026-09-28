@@ -66,7 +66,7 @@ main account, and set `JOBALERT_IMAP_USER` to the user's main address. Revoke th
 
 ## Setup (~30 minutes; Claude walks the user through it)
 
-The user-facing version is in [Your part](../wiki/The user's-part.md). The details:
+The user-facing version is in [Your part](../wiki/Your-part.md). The details:
 
 1. **Create alerts.**
    - LinkedIn: Jobs → search (e.g. "application security", location "United

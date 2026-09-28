@@ -21,8 +21,9 @@ projects; job-radar uses roughly 450–750.
 1. **Make your private copy.** job-radar's public project holds only code. Your search
    must live in a **private** copy that only you can see. Open Claude Code in an empty
    folder and say: *"Make me a private copy of https://github.com/vizkov/job-radar called
-   my-job-radar."* (The manual steps are in the [README](../../README.md).) Don't use
-   GitHub's "Fork" button: a fork of a public project can't be made private.
+   my-job-radar."* Claude creates the private repository on your GitHub account and
+   copies the code into it; there's nothing for you to type. Don't use GitHub's "Fork"
+   button: a fork of a public project can't be made private.
 2. **Open Claude Code in your copy and say "set this up for me".** Claude does the work
    and pauses when it needs you:
    1. **Your CV and preferences.** Paste or attach your CV; say which countries, job
@@ -30,8 +31,11 @@ projects; job-radar uses roughly 450–750.
       shows you the result to confirm nothing changed.
    2. **Let Claude manage your board.** Claude asks you to type
       `! gh auth refresh -s project` into Claude Code. The `!` runs it right there; it
-      opens your browser to approve. This lets `gh`, logged in as you, create and update
-      your GitHub Projects boards. It never leaves your computer. To take it back later:
+      opens your browser to approve. `gh` is GitHub's official command-line tool, already
+      logged in as you (that's how Claude saves to your repository). This adds the
+      **project** permission: reading and changing the GitHub Projects boards you have access
+      to, including organisation boards you can edit. It gives no access to anything outside
+      GitHub, and the login stays on your computer. To take it back later:
       GitHub → Settings → Applications → Authorized OAuth Apps → GitHub CLI → Revoke
       (this logs `gh` out entirely; log in again with `gh auth login` if you still need it).
    3. **One board setting.** After Claude creates your board, open it → **⋯ →
@@ -44,8 +48,9 @@ projects; job-radar uses roughly 450–750.
    5. **Stop the email flood.** On your repository page: **Watch → Participating and
       @mentions**. Otherwise GitHub emails you about every new job.
 3. **Optional: job-alert emails.** See below.
-4. **Optional: form filling.** Install Claude in Chrome. See "What Claude can do in your
-   browser" below.
+4. **Optional: form filling.** Install the Claude in Chrome extension. Like any extension
+   that can operate web pages, it asks Chrome for broad permissions when you install it;
+   read them there. How Claude limits what it does with them is below.
 
 The first run records everything currently open and puts only the strongest matches
 (Tier 1) on your board, so you don't start with hundreds of cards. After that, only new

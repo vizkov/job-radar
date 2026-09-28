@@ -228,7 +228,8 @@ def docs_review_note(now: datetime, runner=run) -> str | None:
         WORK.mkdir(exist_ok=True)
         LAST_DOCS_REVIEW.write_text(now.isoformat())
         return None
-    ok, out = runner(["git", "log", f"--since={stamp.isoformat()}", "--name-only", "--format="], 15)
+    # stamps are naive UTC; say so, or git reads them as local time
+    ok, out = runner(["git", "log", f"--since={stamp.isoformat()}+00:00", "--name-only", "--format="], 15)
     changed = {f for f in out.splitlines() if f.startswith(CODE_PATHS)} if ok else set()
     if len(changed) >= DOCS_REVIEW_AFTER_FILES:
         return (f"docs review due: {len(changed)} code files changed since the last one "
@@ -314,6 +315,15 @@ def health_checks(root: Path, now: datetime, rows: list[dict], scores: dict, las
 
 # ---------------------------------------------------------------- brief
 
+def stale_days(root: Path) -> int:
+    """board.stale_days from profile/config.json (else examples/), default 5."""
+    for cfg in (root / "profile" / "config.json", root / "examples" / "config.json"):
+        board = _read_json(cfg, {}).get("board", {}) if cfg.exists() else {}
+        if "stale_days" in board:
+            return int(board["stale_days"])
+    return 5
+
+
 def _age(posted: str, today: date) -> str:
     try:
         return f"{(today - date.fromisoformat(posted)).days}d ago"
@@ -324,7 +334,7 @@ def _age(posted: str, today: date) -> str:
 def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, items: list[dict] | None,
           board_note: str | None, fill_note: str | None, changes: list[dict], follow_ups: list[tuple[str, int]],
           run_note: str | None, updates: list[str] = (), unpublished: list[str] = (),
-          design_note: str | None = None) -> str:
+          design_note: str | None = None, docs_note: str | None = None) -> str:
     rows = read_matches(root)
     scores = read_scores(root)
     by_ref = {r.get("ref"): r for r in rows}
@@ -368,7 +378,8 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         closed = [i for i in items if "possibly-closed" in (i.get("labels") or []) and i.get("stage") in
                   (None, "", "New", "Shortlisted")]
         if closed:
-            lines.append(f"  - {len(closed)} cards look closed (not listed for 5+ days): suggest moving to Skipped")
+            lines.append(f"  - {len(closed)} cards look closed (not listed by any source for more than "
+                         f"{stale_days(root)} days): suggest moving to Skipped")
     for c in changes:
         r = by_ref.get(c["ref"], {})
         lines.append(f"- You moved {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)} "
@@ -382,7 +393,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
                      "about new capabilities in one line):")
         lines += [f"  - {u}" for u in updates[:8]]
     checks = health_checks(root, now, rows, scores, last_run, alert_row, run_note)
-    if (docs_note := docs_review_note(now)):
+    if docs_note:
         checks.append(docs_note)
     if design_note:
         checks.append(design_note)
@@ -416,7 +427,8 @@ def main() -> int:
                 fill_note = start_fill(now)
         updates, unpublished = template_status(since, run)
         print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, last_run_health(run),
-                    updates, unpublished, board_design_note() if items is not None else None))
+                    updates, unpublished, board_design_note() if items is not None else None,
+                    docs_review_note(now, run)))
         WORK.mkdir(exist_ok=True)
         LAST.write_text(now.isoformat())
     except Exception as e:  # never break a session

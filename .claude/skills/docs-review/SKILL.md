@@ -53,11 +53,16 @@ just a doc error) go to the user as a proposed fix unless trivially safe; say wh
   User-guide text addresses "you"; design text says "the user".
 - Keep the two audiences apart: step-by-step user instructions belong in docs/wiki;
   mechanisms belong in docs/design, linking to the guide rather than repeating it.
-- Check links (every relative `](…)` target exists) and run `pytest -q`.
+- Run `python tools/check_doc_links.py .` (every relative link and every `docs/…/*.md` path
+  resolves) and `pytest -q`.
 
 ## 4. Record and report
 
 - Write the current UTC time to `work/.last_docs_review`.
+  **Only a completed review writes this stamp.** Never set it by hand or when adding the
+  trigger: anything changed between the last real review and the stamp would become
+  invisible to the counter. (The one exception is the trigger's own first run on a fresh
+  copy, which writes it once to start counting.)
 - Commit (the post-commit hook publishes docs and the wiki mirror).
 - Tell the user: each reader's verdict in one line, what you fixed (grouped), what you
   rejected as not holding up, and any code issue that needs their decision.

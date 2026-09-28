@@ -142,9 +142,14 @@ _NUM = re.compile(r"\d+(?:[.,]\d+)?")
 _NAME = re.compile(r"(?<![.!?:;]\s)(?<!^)\b([A-Z][A-Za-z0-9+#]*(?:[./-][A-Za-z0-9+#]+)*)")
 
 
+def _in_text(term: str, text_norm: str) -> bool:
+    """Whole-word presence: "Go" must not count as present because the CV says "good"."""
+    return re.search(rf"(?<![\w+#]){re.escape(_norm(term))}(?![\w+#])", text_norm) is not None
+
+
 def new_names(text: str, career_text: str) -> list[str]:
     known = _norm(career_text)
-    return sorted({n for n in _NAME.findall(text.strip()) if _norm(n) not in known})
+    return sorted({n for n in _NAME.findall(text.strip()) if not _in_text(n, known)})
 SECTION_KINDS = {"P", "B", "E"}   # summary, experience, education lines may appear in résumé sections
 COVER_KINDS = {"C", "S"}          # cover-letter paragraphs come from cover blocks or STAR stories
 
@@ -216,10 +221,15 @@ def check_tailor(data: dict, career: Career) -> tuple[list[str], list[str]]:
     if (dupes := sorted({u for u in used if used.count(u) > 1})):
         errs.append(f"lines used twice: {dupes}")
     for i, sk in enumerate(data["skills"] if isinstance(data["skills"], list) else []):
-        if not isinstance(sk, str) or not sk.strip() or _norm(sk) not in _norm(career.raw_text):
+        if not isinstance(sk, str) or not sk.strip() or not _in_text(sk, _norm(career.raw_text)):
             errs.append(f"skills[{i}] {sk!r} doesn't appear in your career docs")
+    cover_used = []
     for i, c in enumerate(data["cover_letter"] if isinstance(data["cover_letter"], list) else []):
         check_line(f"cover_letter[{i}]", c, COVER_KINDS)
+        if isinstance(c, dict):
+            cover_used.append(str(c.get("source_id")))
+    if (dupes := sorted({u for u in cover_used if cover_used.count(u) > 1})):
+        errs.append(f"cover-letter paragraphs used twice: {dupes}")
     return errs, warns
 
 

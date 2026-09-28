@@ -287,7 +287,8 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False) -> str:
         url = (item.get("content") or {}).get("url")
         if url:
             gh("issue", "close", url)
-    return f"{ref}: " + ", ".join(f"{k}={v}" for k, v in values.items()) + (" (closed)" if close else "")
+    closed = close or values.get("Stage") in FINAL_STAGES
+    return f"{ref}: " + ", ".join(f"{k}={v}" for k, v in values.items()) + (" (closed)" if closed else "")
 
 
 # The board's views, as code: setup builds them and the session brief checks them, so every copy

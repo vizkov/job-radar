@@ -3,7 +3,7 @@
 Each new role becomes one GitHub issue in the private repo; the Project's built-in
 "Auto-add to project" workflow (filter `is:issue label:role`) puts it on the board.
 The daily workflow only has GITHUB_TOKEN, which can create issues but not edit a
-user-owned Project, so board *fields* (Status, Fit, …) are set later by Claude via
+user-owned Project, so board *fields* (Stage, Fit, …) are set later by Claude via
 the user's local `gh` login (tools/board_sync.py).
 
 A role's `ref` (16 hex chars) is the stable ID that links its issue, its row in

@@ -4,7 +4,8 @@ Each thing a source polls (ATS board, search query, careers page) is a unit with
 streak counter. A unit is bad on a run when it errors or returns zero raw results
 (before title filtering — a search that matched no AppSec roles today is fine, a
 search that returned nothing at all is not). After BROKEN_AFTER_RUNS bad runs in a
-row, a unit that has worked before is reported. A whole-source failure (crash or
+row, it is reported if it has worked before (zero results) or if it reports an error
+(errors count even on a unit that never worked). A whole-source failure (crash or
 timeout) is tracked as unit "*" and reported even if the source never worked.
 """
 from __future__ import annotations
@@ -36,6 +37,9 @@ def update_health(health: dict, results: list[SourceResult]) -> list[tuple[str, 
                 h["last_ok_count"], h["bad_streak"] = max(u.raw_count, 1), 0
                 continue
             h["bad_streak"] += 1
-            if h["bad_streak"] >= BROKEN_AFTER_RUNS and (h["last_ok_count"] > 0 or u.key == "*"):
+            # Zero results only counts for units that worked before (a board that never had jobs
+            # isn't broken). An explicit error counts regardless: a DKIM failure, a layout change
+            # or a robots.txt block can be wrong from the very first run.
+            if h["bad_streak"] >= BROKEN_AFTER_RUNS and (h["last_ok_count"] > 0 or u.key == "*" or u.error):
                 broken.append((res.source, h.get("label") or u.key, u.error or "returned 0 results"))
     return broken

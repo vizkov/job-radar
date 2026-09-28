@@ -32,7 +32,7 @@ login lacks the `project` scope: `gh auth refresh -s project`.
 | `<provider> emails failing DKIM` | Forwarding broke signatures, or spoofing | Check one message's headers (Gmail → Show original) before turning `require_dkim` off |
 | careers page: "page layout changed" | Site redesign | Update the selectors in `profile/careers_pages.yaml` |
 
-A unit is flagged after 2 bad runs in a row, and only if it has worked before
+A unit is flagged after 2 bad runs in a row: always if it reports an error; for zero results only if it has worked before
 (`jobradar/health.py`).
 
 ## A role I expected isn't there

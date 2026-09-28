@@ -114,3 +114,16 @@ def test_render_outputs(app):
     assert doc.sections[0]._sectPr.xpath("./w:cols[@w:num>1]") == []
     cover = (app / "cover_letter.md").read_text(encoding="utf-8")
     assert cover.startswith("Dear Hiring Manager,") and cover.rstrip().endswith("Alex Example")
+
+
+def test_names_and_skills_must_match_whole_words():
+    d = copy.deepcopy(GOOD)
+    d["skills"] = ["Ja"]  # "ja" appears inside "Java" in the example CV, but not as a word
+    assert any("skills[0]" in e for e in check(d)[0])
+    assert jd_check._in_text("Go", "wrote go services") and not jd_check._in_text("Go", "a good engineer")
+
+
+def test_cover_letter_paragraph_used_twice_is_rejected():
+    d = copy.deepcopy(GOOD)
+    d["cover_letter"].append(copy.deepcopy(d["cover_letter"][0]))
+    assert any("used twice" in e for e in check(d)[0])

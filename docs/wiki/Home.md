@@ -16,7 +16,8 @@ use it through **two things only**:
 2. **Your board.** A GitHub Project where every new role is a card. You (or Claude) move
    each card along: New → Shortlisted → Applied → Interview → Offer.
 
-You never run a script or edit a settings file.
+You don't write code or edit settings files. At most, you type one command Claude gives you
+and click a few settings on GitHub; [Your part](Your-part.md) lists every one.
 
 ## Read these, in order
 

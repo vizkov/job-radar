@@ -161,7 +161,8 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 | `update_health(health, results)` | Updates each unit's `bad_streak` / `last_ok_count` in place; returns every unit whose streak is at or over the threshold, so a broken unit is reported on **every** run until it recovers. |
 
 **Watch out**
-- A unit is reported only if it **has worked before** (`last_ok_count > 0`), except the
+- Zero results make a unit reportable only if it **has worked before** (`last_ok_count > 0`); an
+  explicit error always does (a DKIM failure or a robots.txt block can be wrong from the first run). Also the
   whole-source unit `*`. A board that never had jobs isn't "broken".
 - When a whole source fails, every unit it had before is marked bad too.
 
@@ -358,7 +359,7 @@ Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
 | `sync_roles(gh, max, sleep)` | Queue → issues, saving the queue after each (crash-safe). |
 | `_load`, `_remember_issue` | JSON read helper; record `ref → issue number`. |
 | `backfill_map(gh)` | Rebuild `issue_map.json` from every role issue's hidden marker. |
-| `sync_stale(gh)` | Add/remove `possibly-closed`. |
+| `sync_stale(gh)` | Add/remove `possibly-closed`. It also labels issues already closed (the issue map holds every ref); harmless, since closed cards are out of the working views. |
 | `log_stage(ref, field, value, by)` | Append to `data/pipeline_log.jsonl`. |
 | `sync_status(gh)` | Update or create-and-pin the "Radar status" issue. |
 | `gh_json`, `load_board`, `_read_fields`, `_save_board` | JSON output of gh; read `profile/board.json`; field and option IDs; save board.json. |
@@ -393,7 +394,8 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | Name | Is |
 |---|---|
 | `FOLLOW_UP_DAYS`, `REVIEW_EVERY_DAYS`, `GRACE` | 14, 7, 1 hour. |
-| `DOCS_REVIEW_AFTER_FILES`, `CODE_PATHS`, `docs_review_note()` | Suggest `docs-review` once 10 files under the code paths changed since `work/.last_docs_review` (first run only starts the count). |
+| `DOCS_REVIEW_AFTER_FILES`, `CODE_PATHS`, `LAST_DOCS_REVIEW`, `docs_review_note(now, runner)` | Suggest `docs-review` once 10 distinct files changed under `CODE_PATHS` (`radar.py`, `verify_boards.py`, `jobradar/`, `tools/`, `.claude/skills/`, `.github/workflows/`; docs and settings don't count) since `work/.last_docs_review`, per `git log --since` (the stamp is UTC and passed with `+00:00`). On a fresh copy the first call only writes the stamp. Called from `main()`. |
+| `stale_days(root)` | `board.stale_days` from the config, for the brief's "looks closed" line. |
 | `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
 | `_CONTROL`, `_REF` | Characters stripped by `safe()`; the ref marker in issue bodies. |
 | Other thresholds (in code) | Top 6 new Tier 1 roles listed; "unscored" = Tier 1 from the last 14 days; "fresh" = posted in the last 3 days; "no run completed for 2+ days" warning; a CV gap needs 3+ scored roles missing it. Follow-ups only apply to cards with a logged stage change. |
@@ -434,19 +436,7 @@ collapse whitespace; all comparisons use it), `_NUM` (numbers), `APPS`
 (`profile/applications/`). `cmd_tailor()` deletes any old `validated.sha256` **before**
 checking, so a failed check never leaves a stale stamp.
 
-The `tailored.json` contract:
-
-```text
-{"key": "<the role's ref: 16 hex characters>",
- "headline": "1-120 chars, no contact details, no names not in the career docs",
- "sections": [{"heading": "1-80 chars",
-               "bullets": [{"source_id": "P/B/E id", "text": "1-450 chars"}]}],
- "skills": ["each must appear in the career docs"],
- "cover_letter": [{"source_id": "C/S id", "text": "1-450 chars"}]}
-```
-
-Each `source_id` at most once. Heavy rewording (under 45% similar) only warns, and `S`
-items are exempt, since condensing a story is expected.
+The `score.json` and `tailored.json` contracts are on page 4, [4.3](04-Claude-session.md#43-scoring-a-role-score-roles) and [4.4](04-Claude-session.md#44-tailoring-an-application-tailor-application).
 
 **Watch out**: `_NAME`'s lookbehinds skip the first word of a sentence, which is
 capitalised anyway, so "Led the review" doesn't flag "Led" as a new name.
@@ -521,6 +511,12 @@ first line (via `ast`, without importing), `wrap()`, `paint(color)` (ANSI colour
 real terminal and without `NO_COLOR`), `main()`. Generated from the code, so it can't go
 out of date.
 
+### `tools/check_doc_links.py`: doc link checker (standard library only)
+
+Every relative Markdown link in `docs/`, `README.md`, `CLAUDE.md` and the skills must
+resolve (a target containing a space counts as broken), and every `docs/<folder>/<page>.md`
+path mentioned in code or config must exist. Exit 1 if not. Used by the `docs-review` skill.
+
 ### `tools/record_fixture.py`: capture a test fixture
 
 Fetches one live ATS board and saves up to 60 jobs (title, location, URL, IDs; no
@@ -557,3 +553,21 @@ is in [Architecture](02-Architecture.md). `examples/` has a public sample of eac
 4.1](04-Claude-session.md) for what each skill does and which tools it runs. When a
 capability changes, the rule in `CLAUDE.md` is to update `CLAUDE.md`, the skill and these
 docs in the same commit.
+
+## 5.8 Remaining module constants
+
+| Name | File | Is |
+|---|---|---|
+| `ISO_ALIASES`, `_TITLE_INCLUDE`, `_TITLE_EXCLUDE` | `common.py` | `UK` → `GB`; the compiled title filters |
+| `_TITLE`, `_SENIORITY` | `tiering.py` | Compiled (regex, weight) pairs from `config.json` → `tiering` |
+| `REG_DIR` | `sponsors.py` | `data/registers/` |
+| `_retry_after()` | `sources/_http.py` | Seconds from a `Retry-After` header, capped at 60; 0 for the date form |
+| `BundesagenturSource`, `JobTechSource`, `EuresSource`, `PAGE_SIZE` | `sources/*.py` | The search-source classes; results per page (50, 100, 50) |
+| `_get()` | `sources/jobtech.py` | One JobTech API call (phrase-quoting multi-word queries) |
+| `_PERIODS` | `sources/eures.py` | Allowed look-back windows: 1, 3, 7, 30 days |
+| `_ROLLUP` | `sources/ats.py` | Matches Workday's "N Locations" placeholder |
+| `META_FIELDS`, `MAX_CHARS` | `tools/jd_prep.py` | Role facts copied into `meta.json`; JD length cap (20,000) |
+| `CONTACT_FIELDS` | `tools/render_resume.py` | Front-matter keys shown in the CV header |
+| `UK_ROUTES`, `MIN_ROWS` | `tools/refresh_registers.py` | Visa routes kept from the UK register; minimum rows before overwriting |
+| `TARGETS`, `SLICE_WORDS`, `agg_board()` | `tools/build_candidates.py` | Targets file path; words stripped when generating name variants; aggregator slug → board URL |
+| `GUESS_ATS`, `OUT` | `tools/discover_boards.py` | ATS platforms tried with guessed slugs; `work/discovered_boards.csv` |

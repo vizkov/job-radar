@@ -49,7 +49,7 @@ Want another view, say "Tier 2 only" or "jobs whose ad may have been taken down"
 Claude. It adds the view to your board and saves it with your copy of job-radar, so it comes back if
 the board is ever rebuilt. (It changes only your board, nobody else's.)
 
-A card whose job ad seems to have disappeared (no source has listed it for 5 days) gets a
+A card whose job ad seems to have disappeared (no source has listed it for more than 5 days) gets a
 `possibly-closed` label, drops out of "Act now", and Claude suggests moving it to Skipped.
 
 That's the guide. Back to [Home](Home.md).

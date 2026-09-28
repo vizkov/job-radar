@@ -29,7 +29,7 @@ Skim it now; come back when a word is unclear.
 | **Issue** | A GitHub discussion item (title, body, labels). job-radar creates one issue per role. |
 | **Label** | A coloured tag on an issue: `role`, `tier-1`, `country-GB`, `sponsor-yes`, `possibly-closed`. |
 | **Project** / **board** | GitHub Projects: a spreadsheet- or kanban-like view over issues. Each issue on it is a **card** (an *item* in the API). |
-| **Field** | A column on a Project, with a value per card: *Stage* (a single-select), *Fit* (a number), *Posted* (a date). Fields belong to the Project; labels belong to the issue. |
+| **Field** | A column on a Project, with a value per card. job-radar's: *Stage*, *Tier*, *Recommendation*, *Sponsor* (single-selects), *Fit* (a number), *Posted* (a date). Fields belong to the Project; labels belong to the issue. |
 | **View** | A saved way of looking at a Project: which columns show, which filter applies, sort order, and table or board layout. job-radar has *All Roles*, *Act now* and *Pipeline*. |
 | **GitHub Actions** / **workflow** | GitHub's automation: a YAML file in `.github/workflows/` describes steps that GitHub runs on its own servers, on a schedule or on demand. A **run** is one execution. |
 | **cron** | The schedule format in a workflow: `47 2,8,14 * * *` = minute 47 of hours 2, 8 and 14 UTC, every day. GitHub treats schedules as best-effort: runs can be late or skipped. |
@@ -54,6 +54,13 @@ Skim it now; come back when a word is unclear.
 
 | Term | Meaning | Where in code |
 |---|---|---|
+| **ats-scrapers** | The third-party Python package that knows how to read each ATS's job list (Greenhouse, Workday…). The `ats` source is built on it. | `requirements.in`, `common.py: fetch_board()` |
+| **Digest** | The per-run Markdown report of new roles (`digests/<date>.md`), for Claude and for debugging. | `radar.py: render_digest()` |
+| **Radar status issue** | One pinned GitHub issue, rewritten each run with counts and source health (no job titles). It appears as a card on the board. | `radar.py: render_status()`, `board_sync.py: sync_status()` |
+| **REMOTE-EU** | A pseudo-country for "remote, Europe/EMEA/EU" locations; treated like a target country. | `common.py: _REMOTE_EUROPE` |
+| **Canary query** | A deliberately broad search each API source runs; if even that returns nothing, the API itself is probably broken. | `sources/search.py` |
+| **track_empty** | Per unit: whether zero results counts as a problem (False for narrow searches and quiet mailboxes). | `model.py: UnitStatus` |
+| **Design diff** | The difference between the board's actual views and the views defined in code (`VIEWS`). | `board_sync.py: design_diff()` |
 | **Source** / **adapter** | One place postings come from (`ats`, `bundesagentur`, `jobtech`, `eures`, `careers_page`, `alert_email`), and the code that reads it. Every adapter turns its input into `Posting` objects. | `jobradar/sources/` |
 | **Unit** | One thing a source polls: one ATS board, one search query, one careers page, one email provider. Health is tracked per unit. | `model.py: UnitStatus` |
 | **Target** | A company the user wants to work for, listed in `targets.tsv`. Roles at other companies are "outside your list" and dropped by default. | `profile/targets.tsv` |
@@ -70,7 +77,7 @@ Skim it now; come back when a word is unclear.
 | **Sponsor tag** | `yes` / `unknown` / `no`, plus the register entry it matched. | `sponsors.py: SponsorTag` |
 | **Board queue** | Roles chosen for the board, waiting to become issues (at most 40 per run). | `state/board_queue.json` |
 | **Payload** | One queued role: `{ref, title, body, labels}`, ready to become an issue. | `board.py: payload()` |
-| **Stale** / **possibly-closed** | A board role no source has listed for 5+ days. Its issue gets the `possibly-closed` label. | `board.py: stale_refs()` |
+| **Stale** / **possibly-closed** | A board role no source has listed for more than `stale_days` (5) days. Its issue gets the `possibly-closed` label. | `board.py: stale_refs()` |
 | **Profile** / **examples** | `profile/` holds the user's real settings (private). `examples/` holds generic samples (public). Every settings file is read from `profile/` if present, else `examples/`. | `paths.py: profile_path()` |
 | **Career docs** / **IDs** | The user's CV, STAR stories and cover-letter paragraphs, one ID per line, e.g. `[B07]`. The letter says what kind of line it is (table below). Tailored CVs may only reuse these lines, cited by ID. | `career.py` |
 | **Packet** | `work/jd/<ref>/packet.md`: a role's facts plus its JD wrapped as untrusted data, prepared for Claude to read. | `tools/jd_prep.py` |
@@ -83,7 +90,7 @@ Skim it now; come back when a word is unclear.
 |---|---|---|---|
 | `P` | Profile / summary line | `master_resume.md` | CV sections |
 | `B` | Experience bullet | `master_resume.md` | CV sections |
-| `K` | Skills line | `master_resume.md` | the checker's "is this skill mine?" text only |
+| `K` | Skills line | `master_resume.md` | nowhere directly; like every line, its words count as "in the career docs" for the skills and names checks |
 | `E` | Education / certification | `master_resume.md` | CV sections |
 | `S` | STAR story | `stories.md` | cover letter |
 | `C` | Cover-letter paragraph | `cover_blocks.md` | cover letter |

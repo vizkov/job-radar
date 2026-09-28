@@ -65,7 +65,8 @@ Why three places:
 | `.claude/` | `settings.json` (the SessionStart hook) and `skills/` (Claude's procedures) | public |
 | `CLAUDE.md` | Claude's operating manual for this repo | public |
 | `.githooks/` | The post-commit hook that publishes code to the template | public |
-| `docs/wiki/` | User guide (also mirrored to the GitHub Wiki tab) | public |
+| `docs/wiki/` | User guide: `Home.md`, `Your-part.md`, `Using-it.md`, `Board.md` (also mirrored to the GitHub Wiki tab) | public |
+| `docs/reviews.md` | Weekly system-review notes about the user's search | **private** (the one private file under `docs/`) |
 | `docs/design/` | These pages | public |
 | `examples/` | Generic sample settings and career docs, used when `profile/` doesn't have a file, and by the tests | public |
 | `tests/` | Offline tests and recorded fixtures | public |
@@ -123,7 +124,6 @@ doesn't match `PRIVATE`.
 | `data/matches.csv` | One row per new role ever found: ref, date, company, title, location, countries, url, source, posted, on_list, tier, score, score_reasons, uk/nl sponsor, also_on, ats, ats_slug, external_id | `radar.py: append_matches()` | `jd_prep.py`, `session_brief.py`, `board_sync.py` (Posted fallback), Claude |
 | `data/scores.jsonl` | One JSON line per scored role: fit_score, recommendation, blockers, missing requirements, summary, injection flag | `jd_check.py score` | `session_brief.py`, `jd_prep.py` (skip scored), `cv-review` |
 | `data/pipeline_log.jsonl` | Every stage change: `{ref, field, value, by: claude|board, at, from?}` | `board_sync.py set`, `session_brief.py` | `session_brief.py` (follow-ups) |
-| `docs/reviews.md` | One paragraph per weekly system review: findings and what was applied | Claude (`system-review` skill); private | Claude |
 | `data/pipeline_snapshot.json` | `{ref: stage}` at the last session start, to detect cards the user dragged | `session_brief.py` | `session_brief.py` |
 | `data/registers/uk_sponsors.csv`, `nl_sponsors.csv`, `meta.json` | UK and NL sponsor registers | `refresh_registers.py` (weekly workflow) | `sponsors.py` |
 | `data/candidates.csv` | Every candidate ATS board per target (from public indexes) | `build_candidates.py` | `verify_boards.py` |
@@ -135,12 +135,17 @@ doesn't match `PRIVATE`.
 
 ### Local only (never committed)
 
+These live only on the machine where they were made: a fresh clone or a second computer
+starts them from scratch (so both review timers reset).
+
 | File | Holds | Written by |
 |---|---|---|
 | `work/jd/<ref>/jd.txt`, `meta.json`, `packet.md` | A role's JD text, facts, and the packet Claude reads | `jd_prep.py` (or the user pastes `jd.txt`) |
 | `work/jd/<ref>/score.json` | Claude's fit assessment, before validation | Claude |
 | `work/discovered_boards.csv` | Proposed boards for uncovered targets | `discover_boards.py` |
 | `work/.last_session`, `.fill_started`, `board_fill.log` | Timestamps and logs for the session brief | `session_brief.py` |
+| `docs/reviews.md` (committed, private) | One paragraph per weekly system review: findings and what was applied | Claude (`system-review` skill) |
+| `.claude/settings.local.json` | Personal Claude Code settings; never copied to the template (`NEVER_COPY`) | the user / Claude Code |
 | `work/.last_docs_review` | When the last docs review happened | `session_brief.py` (first start), Claude (`docs-review` skill) |
 | `work/.last_review` | When the last weekly review happened | Claude, at the end of the `system-review` skill (no tool writes it) |
 | `.alert_mail/*.eml`, `_status.json` | This run's alert emails and fetch status | `fetch_alert_emails.py` |

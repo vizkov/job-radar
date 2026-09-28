@@ -51,7 +51,7 @@ errors become one-line notes, and it always exits 0.
 `main()`, in order:
 
 1. **No `profile/`?** Print "fresh copy, offer setup" and stop.
-2. **`pull()`**: `git pull --ff-only origin main`, to get what the scheduled runs committed.
+2. **`pull()`**: `git pull --ff-only origin main` (skipped if there's no `origin` remote), to get what the scheduled runs committed.
 3. **`board_items()`**: `gh project item-list` with the user's login; keeps cards labelled
    `role`. Each item arrives with its labels, its field values (`stage`, `tier`, `posted`…)
    and its issue body.
@@ -166,12 +166,26 @@ of the user's own lines** (`B07`) and may only select, reorder and lightly rewor
 
 **`jd_check.py tailor`** (`check_tailor()`) rejects: an unknown ID; a résumé section citing
 a story or a cover letter citing a CV bullet (`SECTION_KINDS`, `COVER_KINDS`); an ID used
-twice; any number not in the original line; any capitalised name or acronym not
-anywhere in the career docs (`new_names()`, which catches invented employers and tools);
+twice (in the sections, or in the cover letter); any number not in the original line; any capitalised name or acronym not
+anywhere in the career docs as a whole word (`new_names()`, which catches invented employers and tools; it can't catch a name the user mentioned elsewhere in a different context);
 any URL, email or phone number the user didn't write (`_planted()`); a skill not in the
-career docs. It warns when a line is reworded so much (under 45% similar) that it may no
+career docs as a whole word. It warns when a line is reworded so much (under 45% similar) that it may no
 longer say what the user did. If valid, it prints a before/after diff and writes
 `validated.sha256`, the SHA-256 of the exact file.
+
+The `tailored.json` contract:
+
+```text
+{"key": "<the role's ref: 16 hex characters>",
+ "headline": "1-120 chars, no contact details, no names not in the career docs",
+ "sections": [{"heading": "1-80 chars",
+               "bullets": [{"source_id": "P/B/E id", "text": "1-450 chars"}]}],
+ "skills": ["each must appear in the career docs"],
+ "cover_letter": [{"source_id": "C/S id", "text": "1-450 chars"}]}
+```
+
+Each `source_id` at most once, within the sections and within the cover letter. Heavy rewording (under 45% similar) only warns, and `S`
+items are exempt, since condensing a story is expected.
 
 **`render_resume.py`** refuses to run unless that hash matches the current file, so
 nothing edited after validation can be rendered. It writes `resume.docx` (one column,

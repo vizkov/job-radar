@@ -131,7 +131,8 @@ Only for **new** groups, so the expensive part stays small:
 
 `health.py` keeps a streak counter per unit (`"ats|https://…"`, `"eures|canary"`). A
 unit is **bad** this run if it errored, or if it returned zero raw results when zero isn't
-normal (`track_empty`). After 2 bad runs in a row, a unit that has worked before is
+normal (`track_empty`). After 2 bad runs in a row, a unit is reported if it reported an
+error, or (for zero results) if it has worked before. Such a unit is
 reported as "stopped returning results". A whole-source crash is tracked as unit `*` and
 reported even if the source never worked.
 
@@ -161,7 +162,7 @@ write state/seen.json, state/health.json
 append_matches(new, today)                              # data/matches.csv
 ```
 
-**Stale check.** A role on the board that no source has listed for `stale_days` (5) is
+**Stale check.** A role on the board that no source has listed for more than `stale_days` (5) days is
 probably closed. `stale_refs()` compares each board ref's last-seen date
 (`ref_last_seen()` hashes every content key in `seen.json` back to its ref) with the
 cutoff. It runs **only on healthy runs**: every source OK, and no more than

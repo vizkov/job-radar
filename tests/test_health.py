@@ -44,3 +44,11 @@ def test_error_unit():
     err = SourceResult("ats", units=[UnitStatus("b", ok=False, error="HTTP 404", label="b")])
     run(h, err)
     assert run(h, err) == [("ats", "b", "HTTP 404")]
+
+
+def test_error_is_reported_even_if_the_unit_never_worked():
+    h = {}
+    bad = SourceResult("alert_email", units=[UnitStatus("linkedin:rejected", ok=False, error="3 of 3 failed DKIM",
+                                                        label="linkedin DKIM", track_empty=False)])
+    run(h, bad)
+    assert run(h, bad) == [("alert_email", "linkedin DKIM", "3 of 3 failed DKIM")]

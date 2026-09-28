@@ -1,6 +1,7 @@
 """Job-alert email parser. Fixtures are SYNTHETIC (see fixtures/alert_email/make_fixtures.py)
 until real exported alerts are added."""
 import asyncio
+import json
 import email
 from email.policy import default
 from pathlib import Path
@@ -117,3 +118,21 @@ def test_missing_mail_folder_says_what_to_run(tmp_path):
 def test_adapter_never_touches_imap():
     import jobradar.sources.alert_email as mod
     assert "imaplib" not in open(mod.__file__, encoding="utf-8").read()
+
+
+def test_empty_mailbox_is_explained_not_silent(tmp_path):
+    (tmp_path / "_status.json").write_text(json.dumps({"ok": True, "fetched": 0, "mailbox": "[Gmail]/All Mail",
+        "providers": {"linkedin": {"from_domain": 0, "alert_senders": 0, "other_senders": {}},
+                      "indeed": {"from_domain": 0, "alert_senders": 0, "other_senders": {}}}}))
+    res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["linkedin", "indeed"]}).fetch())
+    unit = next(u for u in res.units if u.key == "mailbox:none")
+    assert not unit.ok and "no emails at all from linkedin, indeed" in unit.error and "All Mail" in unit.error
+
+
+def test_changed_alert_sender_is_named(tmp_path):
+    (tmp_path / "_status.json").write_text(json.dumps({"ok": True, "fetched": 0, "mailbox": "INBOX",
+        "providers": {"linkedin": {"from_domain": 4, "alert_senders": 0,
+                                   "other_senders": {"jobs-alerts@linkedin.com": 4}}}}))
+    res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["linkedin"]}).fetch())
+    unit = next(u for u in res.units if u.key == "linkedin:senders")
+    assert "jobs-alerts@linkedin.com" in unit.error and not any(u.key == "mailbox:none" for u in res.units)

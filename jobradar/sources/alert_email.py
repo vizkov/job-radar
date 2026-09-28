@@ -142,10 +142,12 @@ class AlertEmailSource:
         if not self.eml_dir.is_dir():
             raise RuntimeError(f"no fetched mail in {self.eml_dir.name}/ (run tools/fetch_alert_emails.py first)")
         status_file = self.eml_dir / "_status.json"
+        self.fetch_status = {}
         if status_file.exists():
             status = json.loads(status_file.read_text(encoding="utf-8"))
             if not status.get("ok"):
                 raise RuntimeError(f"mail fetch failed: {status.get('error') or 'unknown error'}")
+            self.fetch_status = status
         return [email.message_from_bytes(f.read_bytes(), policy=default_policy)
                 for f in sorted(self.eml_dir.glob("*.eml"))]
 
@@ -182,7 +184,28 @@ class AlertEmailSource:
         if foreign:
             out.units.append(UnitStatus("foreign", ok=False, track_empty=False, label="emails from unknown senders",
                                         error=f"{foreign} of {len(msgs)} emails ignored (unknown sender)"))
+        out.units += self._mailbox_units()
         return out
+
+    def _mailbox_units(self) -> list[UnitStatus]:
+        """What the fetcher saw in the mailbox (counts and sender addresses only), as health units, so
+        "no alert emails" is explained on the status card instead of looking like a quiet week."""
+        seen = (getattr(self, "fetch_status", {}) or {}).get("providers") or {}
+        units = []
+        wanted = [p.name for p in self.providers if p.name in seen]
+        if wanted and all(seen[n]["from_domain"] == 0 for n in wanted):
+            units.append(UnitStatus("mailbox:none", ok=False, track_empty=False, label="alert emails in the mailbox",
+                                    error=f"no emails at all from {', '.join(wanted)} in the last days (checked "
+                                          f"{self.fetch_status.get('mailbox') or 'the mailbox'}): alerts not set up, "
+                                          "paused, or going to a different mailbox"))
+        for n in wanted:
+            d = seen[n]
+            if d["from_domain"] and not d["alert_senders"] and d.get("other_senders"):
+                who = ", ".join(sorted(d["other_senders"], key=lambda a: -d["other_senders"][a])[:3])
+                units.append(UnitStatus(f"{n}:senders", ok=False, track_empty=False, label=f"{n} alert sender",
+                                        error=f"{d['from_domain']} {n} emails, none from a known alert sender "
+                                              f"(seen: {who}): the alert sender may have changed"))
+        return units
 
 
 register("alert_email")(AlertEmailSource)

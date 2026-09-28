@@ -34,6 +34,17 @@ status card's Sources table shows
 `FAILED: RuntimeError: JOBALERT_IMAP_USER / JOBALERT_IMAP_PASSWORD not set`. The other
 sources are unaffected.
 
+## Where it looks, and what it reports
+
+The fetcher reads Gmail's **All Mail** folder (found by its `\All` flag, so localised names such as
+"[Google Mail]/All Mail" work), falling back to the Inbox, so a filter or category that skips the
+Inbox can't hide alerts. Every run it also counts, per provider, **all** emails from that provider's
+domain and lists sender **addresses** (never contents) that aren't known alert senders. The log line
+and `_status.json` show it; `AlertEmailSource` turns it into status-card warnings:
+
+- *no emails at all from linkedin, indeed… : alerts not set up, paused, or going to a different mailbox*
+- *N linkedin emails, none from a known alert sender (seen: …): the alert sender may have changed*
+
 ## Why not python-jobspy?
 
 The original plan included an opt-in `python-jobspy` scraper for

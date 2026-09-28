@@ -336,6 +336,7 @@ share one link. So if an employer edits a job's title, it's reported as a new ro
 | `parse_text(p, body)` | Plain-text cards: a short paragraph followed by the job URL. |
 | `parse_html(p, body)` | HTML cards: from each job link, climb to the largest element containing only that job. |
 | `to_postings(msg, p)` | Text first, HTML as fallback; URL **rebuilt from the job ID**. |
+| `_mailbox_units()` | Turns the fetcher's per-provider counts into health units: nothing from any provider at all, or provider mail only from unknown sender addresses. |
 | `AlertEmailSource` | `_messages()` reads `.alert_mail/*.eml` and fails if `_status.json` says the fetch failed; `fetch()` drops unknown senders and DKIM failures, and reports per provider: jobs, rejected, and emails that yielded no jobs (layout change). |
 
 ---
@@ -456,7 +457,8 @@ unless `validated.sha256` matches the current `tailored.json`).
 
 ### `tools/fetch_alert_emails.py`: IMAP (standard library only)
 
-`fetch(host, user, password, mailbox, since, senders)`: IMAP over TLS, `select(readonly=
+`all_mail_name(m)`: Gmail's All Mail folder from `LIST` flags. `fetch(host, user, password, mailbox,
+since, senders, domains)`: IMAP over TLS; `mailbox="auto"` = All Mail else INBOX; `select(readonly=
 True)` (IMAP EXAMINE: nothing is marked read or deleted), `SEARCH SINCE … FROM …` per
 sender, `FETCH BODY.PEEK[]`. `main()`: clears old `.eml` files, reads the credentials
 from the environment, writes `<uid>.eml` files and `_status.json`, always exits 0, and

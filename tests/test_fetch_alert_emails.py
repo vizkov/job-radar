@@ -97,3 +97,34 @@ def test_runs_with_standard_library_only():
                         "and k.split('.')[0] not in ('jobradar', '__main__')]; print(mods)" % ROOT],
                        capture_output=True, text=True)
     assert r.returncode == 0 and r.stdout.strip() == "[]", (r.stdout, r.stderr)
+
+
+class GmailIMAP(FakeIMAP):
+    """Gmail-like: an All Mail folder, and LinkedIn mail from an alert sender plus another address."""
+
+    def list(self):
+        return "OK", [b'(\HasNoChildren) "/" "INBOX"', b'(\All \HasNoChildren) "/" "[Google Mail]/All Mail"']
+
+    def uid(self, cmd, *args):
+        FakeIMAP.calls.append(("uid", cmd) + args)
+        if cmd == "SEARCH":
+            who = args[-1]
+            return "OK", [b"7 9" if "jobalerts-noreply@linkedin.com" in who else b"7 9 11" if who == '"linkedin.com"' else b""]
+        if "HEADER.FIELDS" in args[-1]:
+            return "OK", [(b"11 (BODY[HEADER.FIELDS (FROM)] {40}", b"From: LinkedIn <messages-noreply@linkedin.com>\r\n")]
+        return "OK", [(b"7 (BODY[] {10}", RAW)]
+
+
+def test_all_mail_and_sender_diagnostics(tmp_path, monkeypatch, capsys):
+    monkeypatch.setattr(fae.imaplib, "IMAP4_SSL", GmailIMAP)
+    monkeypatch.setenv("JOBALERT_IMAP_USER", "alerts@example.com")
+    monkeypatch.setenv("JOBALERT_IMAP_PASSWORD", "app-password-123")
+    assert fae.main(["--out", str(tmp_path), "--providers", "linkedin"]) == 0
+    status = json.loads((tmp_path / "_status.json").read_text())
+    assert status["mailbox"] == "[Google Mail]/All Mail" and ("select", '"[Google Mail]/All Mail"', True) in FakeIMAP.calls
+    assert status["providers"]["linkedin"] == {"from_domain": 3, "alert_senders": 2,
+                                               "other_senders": {"messages-noreply@linkedin.com": 1}}
+    headers = [c for c in FakeIMAP.calls if c[:2] == ("uid", "FETCH") and "HEADER" in c[-1]]
+    assert headers and all("PEEK" in c[-1] for c in headers)          # addresses only, never marks read
+    out = capsys.readouterr().out
+    assert "messages-noreply@linkedin.com (1)" in out and "app-password-123" not in out

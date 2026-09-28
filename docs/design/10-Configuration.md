@@ -35,6 +35,15 @@ company the user doesn't track is ignored rather than putting it on the user's l
   manager), out-of-scope areas (soc, red team, cloud security, ai security, grc)
   and student roles (intern, thesis, werkstudent).
 
+## Permanent roles only (`employment_exclude`)
+
+A role is dropped when its title, or the employment type its ATS reports (`employment_type`,
+`commitment`), contains one of these keywords (same whole-word/`*` rules as titles): contract,
+fixed-term, temporary, interim, freelance, maternity cover, secondment, internship, and German,
+Dutch and Swedish equivalents. "Smart contract" is exempt. Sources without an employment type
+(public APIs, careers pages, alert emails) are filtered by title only; `score-roles` treats a
+contract stated only in the job description as a blocker.
+
 ## Countries
 
 `priority_countries` are always searched; `extra_countries` only when

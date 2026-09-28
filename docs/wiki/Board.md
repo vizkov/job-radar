@@ -30,11 +30,14 @@ Moving a role to Offer, Rejected or Skipped closes its issue.
 The issue behind each card has the link to the posting, the location, the sponsor match,
 when it was posted, where else it was found, and its **Role ID**.
 
-Once Claude has scored the role, the card also shows **why it got its Fit score**: a short
-summary, then what **matches** your CV, what only **partly** matches, what's **missing**, and
-any **blockers** (quoted from the ad itself). Fit is a judgement weighted by how much each
-requirement matters, not a percentage of requirements met; the breakdown shows what's behind
-it. If a role is re-scored, the breakdown is replaced, not added to.
+Once Claude has scored the role, the card also lists what **matches** your CV, what
+**partly** matches and what **doesn't match** (blockers first, quoted from the ad). Fit is a
+judgement weighted by how much each requirement matters, not a percentage of requirements
+met. If a role is re-scored, the list is replaced, not added to.
+
+Only **permanent** roles reach the board: contract, fixed-term, temporary, interim, freelance
+and internship roles are filtered out (by job title, and by the employment type where the
+job board reports it).
 
 ## Radar status card
 

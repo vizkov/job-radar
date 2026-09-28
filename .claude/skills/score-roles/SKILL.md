@@ -29,6 +29,8 @@ description: Score job descriptions against the user's CV (fit score, met/missin
    ```
    - `must_haves`: the JD's real requirements (not nice-to-haves), 3-10 of them. `evidence` = IDs of the
      user's lines that prove it; empty only when `met` is `no`.
+   - Permanent roles only: if the JD says the role is a contract, fixed-term, temporary, interim or
+     freelance position, add a blocker (`type: other`, quoting the ad) and recommend `skip`.
    - `blockers`: things that stop this user regardless of skill — security clearance, citizenship /
      right-to-work without sponsorship, a required language they don't list, on-site location they can't
      do. Take the user's location and visa needs from their profile (e.g. a C-block about

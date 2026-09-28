@@ -93,7 +93,9 @@ For every posting from every source:
    plus `REMOTE-EU`). If none are left, drop it. (Countries were worked out by the adapter,
    usually with `common.py: countries_for()`.)
 2. **Title.** `common.py: title_matches()`: drop it if any `title_exclude` keyword appears
-   (whole words), otherwise keep it only if a `title_include` keyword appears. Exception:
+   (whole words), otherwise keep it only if a `title_include` keyword appears. Then
+   **permanent only**: `not_permanent()` drops titles or ATS employment types saying contract,
+   fixed-term, temporary, interim, freelance or internship. Exception to the title rule:
    a "careers page changed" notice has no job title, so it always passes.
 3. **Company.** `matcher.resolve(p.company, p.company_hint)` looks the employer up in
    the target list (exact match after normalizing, or via an alias). ATS postings also

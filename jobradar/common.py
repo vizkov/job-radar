@@ -122,6 +122,21 @@ _TITLE_INCLUDE = keyword_re(CONFIG["title_include"])
 _TITLE_EXCLUDE = keyword_re(CONFIG["title_exclude"])
 
 
+# Permanent roles only: these mark contract, temporary or student work, in a title or in the
+# employment type an ATS reports. "Smart contract" (a security specialism) is not a contract type.
+DEFAULT_EMPLOYMENT_EXCLUDE = ["contract", "contractor", "temporary", "temp", "fixed-term", "fixed term", "ftc",
+                              "interim", "freelance*", "maternity cover", "parental leave cover", "secondment",
+                              "internship", "intern", "apprentice*", "working student", "werkstudent*",
+                              "befristet*", "tijdelijk*", "vikariat", "zeitarbeit", "praktik*"]
+_EMPLOYMENT_EXCLUDE = keyword_re(CONFIG.get("employment_exclude", DEFAULT_EMPLOYMENT_EXCLUDE))
+_SMART_CONTRACT = re.compile(r"smart[- ]contracts?", re.I)
+
+
+def not_permanent(text: str) -> bool:
+    """True when a title or employment-type text says contract / temporary / student work."""
+    return bool(_EMPLOYMENT_EXCLUDE.search(_SMART_CONTRACT.sub(" ", text or "")))
+
+
 def title_matches(title: str) -> bool:
     if _TITLE_EXCLUDE.search(title or ""):
         return False

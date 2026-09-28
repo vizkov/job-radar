@@ -29,7 +29,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from jobradar.board import enqueue, load_queue, payload, role_ref, save_queue, select_for_board, stale_refs
-from jobradar.common import CONFIG, ROOT, target_countries, title_matches
+from jobradar.common import CONFIG, ROOT, not_permanent, target_countries, title_matches
 from jobradar.dedupe import Group, group_postings
 from jobradar.health import BROKEN_AFTER_RUNS, update_health
 from jobradar.matching import default_matcher
@@ -58,6 +58,8 @@ def select(results: list[SourceResult], include_outside, matcher=None) -> tuple[
             # a hash-watched careers page has no job titles to filter; its change notice always passes
             if not countries or not (p.raw.get("page_changed") or title_matches(p.title)):
                 continue
+            if not_permanent(p.title) or not_permanent(p.raw.get("employment", "")):
+                continue  # permanent roles only (config.json: employment_exclude)
             p.countries = frozenset(countries)
             p.company_canonical = matcher.resolve(p.company, p.company_hint)
             if p.company_canonical is None and not outside_ok:

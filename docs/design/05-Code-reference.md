@@ -98,6 +98,7 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 | `job_countries(job)` | `countries_for()` for an ats-scrapers `Job`. |
 | `keyword_re(words)` | One regex for a keyword list: whole words, `*` suffix = prefix match. |
 | `title_matches(title)` | Exclude keywords veto; else any include keyword passes. |
+| `DEFAULT_EMPLOYMENT_EXCLUDE`, `not_permanent(text)` | Permanent roles only: true if a title or ATS employment type says contract, fixed-term, temporary, interim, freelance, internship… (`config.json` → `employment_exclude`). "Smart contract" is removed first so smart-contract security roles survive. |
 | `BoardResult` | One board fetch result: `url`, `ats`, `ok`, `error`, `jobs`. |
 | `fetch_board(ats, slug, url, sem)` | Fetch one board with ats-scrapers under a time cap and a concurrency semaphore; never raises. |
 | `fetch_many(boards, progress)` | Fetch many boards concurrently (`concurrency` from config); returns `url → BoardResult`. |

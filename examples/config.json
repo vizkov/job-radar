@@ -21,6 +21,12 @@
     "intern", "internship", "thesis", "student", "werkstudent*", "praktik*", "trainee", "apprentice*"
   ],
 
+  "employment_exclude": ["contract", "contractor", "temporary", "temp", "fixed-term", "fixed term", "ftc",
+                         "interim", "freelance*", "maternity cover", "parental leave cover", "secondment",
+                         "internship", "intern", "apprentice*", "working student", "werkstudent*",
+                         "befristet*", "tijdelijk*", "vikariat", "zeitarbeit", "praktik*"],
+  "_employment_comment": "Permanent roles only: a match in the title or in the employment type the ATS reports drops the role. \"Smart contract\" is exempt.",
+
   "tiering": {
     "_comment": "Score = best title keyword + seniority words + country + bonuses. score >= tier1_min_score is Tier 1. Keywords use the same whole-word/* rules as title_include.",
     "tier1_min_score": 6,

@@ -313,23 +313,20 @@ WORK_JD = ROOT / "work" / "jd"
 
 
 def fit_section(score: dict, scored_on: str = "") -> str:
-    """The card's "what fits, what doesn't" block, from a validated score.json.
-    Requirement texts were written from a third-party JD, so they're escaped like any job text."""
+    """The card's fit breakdown from a validated score.json: Matches / Partly / Doesn't match, with
+    blockers (quoted from the ad) under Doesn't match. Fit and Recommendation are already board fields,
+    so they aren't repeated. Requirement texts derive from a third-party JD and are escaped."""
     def group(met):
         return [f"- {md(m['requirement'])}" for m in score.get("must_haves", []) if m.get("met") == met]
-    lines = [FIT_START, f"### Fit {score['fit_score']} · {str(score['recommendation']).capitalize()}", "",
-             md(score.get("summary", "")), ""]
-    for heading, met in (("Matches", "yes"), ("Partly", "partial"), ("Missing", "no")):
-        if (items := group(met)):
+    blockers = [f"- {BLOCKER_NAMES.get(b['type'], b['type'])}: \"{md(b['quote'])}\"" for b in score.get("blockers", [])]
+    lines = [FIT_START]
+    for heading, items in (("Matches", group("yes")), ("Partly", group("partial")),
+                           ("Doesn't match", blockers + group("no"))):
+        if items:
             lines += [f"**{heading}**", *items, ""]
-    if score.get("blockers"):
-        lines += ["**Blockers**", *[f"- {BLOCKER_NAMES.get(b['type'], b['type'])}: \"{md(b['quote'])}\""
-                                    for b in score["blockers"]], ""]
     if score.get("injection_suspected"):
         lines += ["**Note:** this ad contains text aimed at AI tools; it was scored on its real content.", ""]
-    lines += ["_Fit is Claude's judgement of how well your CV covers the must-haves above, weighted by "
-              f"importance and reduced for blockers; it is not a percentage count.{' Scored ' + scored_on + '.' if scored_on else ''}_",
-              FIT_END]
+    lines.append(FIT_END)
     return "\n".join(lines)
 
 

@@ -169,17 +169,19 @@ SCORE = {"key": REF, "fit_score": 78, "recommendation": "apply", "summary": "Str
 
 
 def test_fit_section_groups_requirements_and_escapes_text():
-    s = bs.fit_section(SCORE, "2026-09-28")
-    assert "### Fit 78 · Apply" in s and "**Matches**\n- Web testing" in s and "**Missing**\n- Network testing" in s
-    assert "Language: \"Fluent German required\"" in s and "\[match\]" in s and "not a percentage count" in s
+    s = bs.fit_section({**SCORE, "must_haves": SCORE["must_haves"] + [
+        {"requirement": "Use [a link](http://x)", "met": "yes", "evidence": ["B02"]}]}, "2026-09-28")
+    assert "**Matches**\n- Web testing" in s and "**Partly**\n- Vendor management" in s
+    assert "**Doesn't match**\n- Language: \"Fluent German required\"\n- Network testing" in s
+    assert r"\[a link\]" in s and "### Fit" not in s and "percentage" not in s and "Strong" not in s
 
 
 def test_with_fit_inserts_once_replaces_later_and_drops_tier_line():
     body = "**Acme**\n\n- **Tier 1** (score 8: title+4 country+2)\n- Found on: ats\n\nRole ID: `x`\n<!-- m -->"
     once = bs.with_fit(body, bs.fit_section(SCORE))
-    assert "Tier 1" not in once and once.index("### Fit 78") < once.index("Role ID:")
-    twice = bs.with_fit(once, bs.fit_section({**SCORE, "fit_score": 60, "recommendation": "maybe"}))
-    assert twice.count(bs.FIT_START) == 1 and "### Fit 60 · Maybe" in twice and "Fit 78" not in twice
+    assert "Tier 1" not in once and once.index("**Matches**") < once.index("Role ID:")
+    twice = bs.with_fit(once, bs.fit_section({**SCORE, "must_haves": SCORE["must_haves"][:1]}))
+    assert twice.count(bs.FIT_START) == 1 and "Network testing" not in twice
 
 
 def test_gh_reads_utf8_not_the_windows_default(monkeypatch):

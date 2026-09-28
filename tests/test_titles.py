@@ -51,3 +51,13 @@ def test_students_excluded(title):
 @pytest.mark.parametrize("title", ["Penetrationstester (m/w/d)", "Ethical Hacker", "Pentestare till Knowit"])
 def test_native_language_titles(title):
     assert title_matches(title)
+
+
+def test_permanent_roles_only():
+    from jobradar.common import not_permanent
+    for t in ["Penetration Tester (Contract)", "AppSec Engineer - 12 month FTC", "Security Consultant, Fixed-term",
+              "Interim Head of AppSec", "Pentester (befristet)", "Temporary", "CONTRACTOR", "Internship"]:
+        assert not_permanent(t), t
+    for t in ["Smart Contract Security Engineer", "Senior Application Security Engineer", "Full-time",
+              "Internal Penetration Tester", "International Security Consultant", ""]:
+        assert not not_permanent(t), t

@@ -26,7 +26,10 @@ def job_to_posting(job, board: dict) -> Posting:
         url=str(job.url),
         external_id=ext,
         posted_at=getattr(job, "posted_at", None),
-        raw={"ats": board["ats"], "board": board["url"], "slug": board["slug"]},
+        raw={"ats": board["ats"], "board": board["url"], "slug": board["slug"],
+             # employment type as the ATS reports it ("Full-time", "Contract", …), for the permanent-only filter
+             "employment": " ".join(str(v) for v in (getattr(job, "employment_type", None),
+                                                      getattr(job, "commitment", None)) if v)},
         company_hint=tuple(board["companies"]),
     )
 

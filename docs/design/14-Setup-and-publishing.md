@@ -10,12 +10,12 @@ job-radar is meant to run as **two repos**:
 
 | Repo | Visibility | Contains |
 |---|---|---|
-| **Template** | public | Code, docs, tests, generic `examples/`, public sponsor registers |
-| **Your copy** | **private** | The same code **plus** `profile/` (your settings), `state/`, `digests/`, `data/matches.csv`, `boards.json` and the role issues |
+| **Template** | public | Code, docs, tests, generic `examples/`. Not the sponsor registers: each copy downloads its own (`refresh_registers.py`) |
+| **The user's copy** | **private** | The same code **plus** `profile/` (the user's settings), `state/`, `digests/`, `data/matches.csv`, `boards.json` and the role issues |
 
 Why: GitHub keeps secrets out of forks and copies, but everything else in a
 public repo is public, including the issues, committed digests and Actions logs.
-Your job search must only live in the private copy. (A fork of a public repo
+The user's job search must only live in the private copy. (A fork of a public repo
 can't be made private, so don't fork: clone and push to a new private repo.)
 
 Every workflow starts with a **privacy guard**: it asks the GitHub API whether the
@@ -23,10 +23,10 @@ repo is private and skips the real job if it isn't, with a warning. So the publi
 template never runs, and nor does an accidental public copy. To deliberately
 run in a public repo, set the repository variable `JOB_RADAR_ALLOW_PUBLIC=true`.
 
-## A. Your private copy
+## A. The user's private copy
 
 ```bash
-git clone https://github.com/<you>/job-radar.git my-job-radar   # the public template
+git clone https://github.com/vizkov/job-radar.git my-job-radar   # the public template
 cd my-job-radar
 git remote rename origin template          # future code updates come from here
 # create an EMPTY private repo on GitHub (no README), then:
@@ -35,18 +35,18 @@ git push -u origin main
 ```
 
 Then open **Claude Code** in that folder and say **"set this up for me"**.
-Claude follows the `setup` skill: it builds your profile from your CV and
-preferences, maps your target companies to job boards, fetches the sponsor
-registers, creates your Project board, optionally walks you through alert emails,
-and switches on the scheduled runs. It asks you only for what it can't do itself:
+Claude follows the `setup` skill: it builds the user's profile from the user's CV and
+preferences, maps the user's target companies to job boards, fetches the sponsor
+registers, creates the user's Project board, optionally walks the user through alert emails,
+and switches on the scheduled runs. It asks the user only for what it can't do itself:
 
-| You do | Why |
+| The user does | Why |
 |---|---|
-| Give it your CV, preferences and target companies | It converts them into `profile/` |
-| Run `gh auth refresh -s project` once (a browser login) | Lets Claude create and update your Project board |
+| Give it the user's CV, preferences and target companies | It converts them into `profile/` |
+| Run `gh auth refresh -s project` once (a browser login) | Lets Claude create and update the user's Project board |
 | Turn on the Project's **Auto-add to project** workflow (filter `is:issue label:role`) | GitHub has no command for this; it's two clicks |
 | Add the two alert-email secrets in GitHub's settings page (optional) | Secrets never pass through chat or files |
-| Set the repo's watch level to **Participating and @mentions** | Role cards then don't email you |
+| Set the repo's watch level to **Participating and @mentions** | Role cards then don't email the user |
 
 ### What Claude runs, for reference
 
@@ -74,8 +74,8 @@ become board cards. After that, only new roles appear.
 git pull template main
 ```
 
-The template never contains `profile/` or your run data, so this doesn't conflict
-with your settings.
+The template never contains `profile/` or the user's run data, so this doesn't conflict
+with the user's settings.
 
 ## B. Publishing the template (maintainer)
 
@@ -97,7 +97,7 @@ git config jobradar.templateDir ../job-radar-template
 
 After each commit, `.githooks/post-commit` publishes any changed public code (only paths on the
 allowlist in `tools/public_template.py`, never private ones), runs the tests in the template,
-pushes it and merges it back. A failure never blocks your commit; the session brief reports
+pushes it and merges it back. A failure never blocks the user's commit; the session brief reports
 unpublished code instead.
 
 The hook also mirrors `docs/wiki/` into the template's **Wiki tab** (links rewritten for the

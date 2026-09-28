@@ -52,7 +52,7 @@ Check in this order:
 
 - Tighten `title_include` ("security engineer" is broad at banks and MSPs) or add
   `title_exclude` words.
-- Turn off `include_outside_list`.
+- Turn off `include_outside_list` in `sources.yaml` (and `board.include_outside` in `config.json`); see [10](10-Configuration.md#two-different-include-outside-switches).
 - Raise `tier1_min_score` or lower title weights in `config.json` → `tiering`.
 
 ## Scoring or tailoring is rejected

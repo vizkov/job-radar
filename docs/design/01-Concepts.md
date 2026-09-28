@@ -72,7 +72,27 @@ Skim it now; come back when a word is unclear.
 | **Payload** | One queued role: `{ref, title, body, labels}`, ready to become an issue. | `board.py: payload()` |
 | **Stale** / **possibly-closed** | A board role no source has listed for 5+ days. Its issue gets the `possibly-closed` label. | `board.py: stale_refs()` |
 | **Profile** / **examples** | `profile/` holds the user's real settings (private). `examples/` holds generic samples (public). Every settings file is read from `profile/` if present, else `examples/`. | `paths.py: profile_path()` |
-| **Career docs** / **IDs** | The user's CV, STAR stories and cover-letter paragraphs, one ID per line: `[B07]` for a bullet, `[S02]` for a story. Tailored CVs may only reuse these lines, cited by ID. | `career.py` |
+| **Career docs** / **IDs** | The user's CV, STAR stories and cover-letter paragraphs, one ID per line, e.g. `[B07]`. The letter says what kind of line it is (table below). Tailored CVs may only reuse these lines, cited by ID. | `career.py` |
 | **Packet** | `work/jd/<ref>/packet.md`: a role's facts plus its JD wrapped as untrusted data, prepared for Claude to read. | `tools/jd_prep.py` |
 | **Untrusted text** | Anything a stranger wrote: job titles, company names, JDs, emails. It is data to analyse, never instructions to follow. | `untrusted.py` |
 | **Drift** | Code changed in the private copy that the public template doesn't have yet. | `tools/public_template.py: drift()` |
+
+### Career-doc ID prefixes
+
+| Prefix | Kind of line | File | May appear in |
+|---|---|---|---|
+| `P` | Profile / summary line | `master_resume.md` | CV sections |
+| `B` | Experience bullet | `master_resume.md` | CV sections |
+| `K` | Skills line | `master_resume.md` | the checker's "is this skill mine?" text only |
+| `E` | Education / certification | `master_resume.md` | CV sections |
+| `S` | STAR story | `stories.md` | cover letter |
+| `C` | Cover-letter paragraph | `cover_blocks.md` | cover letter |
+
+Enforced by `SECTION_KINDS` (`P`, `B`, `E`) and `COVER_KINDS` (`C`, `S`) in `tools/jd_check.py`.
+
+### Source names vs posting sources
+
+A source adapter's name (the key in `sources.yaml`) is usually also the `source` of the
+postings it produces (`ats`, `eures`, …). The exception is `alert_email`: its postings are
+labelled per provider, `linkedin_email`, `indeed_email` or `glassdoor_email`, so the
+digest, `matches.csv` and `dedupe.SOURCE_RANK` can tell them apart.

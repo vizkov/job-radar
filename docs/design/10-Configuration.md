@@ -4,23 +4,23 @@
 **Read first:** [2. Architecture, Settings](02-Architecture.md#settings-profile-falling-back-to-examples)  
 **Code:** `jobradar/paths.py` (where files are read from), `jobradar/common.py` (`CONFIG`), `examples/` (the samples)
 
-Your settings live in **`profile/`**, which exists only in your private copy.
+The user's settings live in **`profile/`**, which exists only in the user's private copy.
 Each file is read from `profile/` when it's there, otherwise from **`examples/`**
 (the generic samples that ship with the public template). To start, copy the
-files you want to change from `examples/` into `profile/`.
+files to change from `examples/` into `profile/`.
 
 | File (in `profile/`) | Holds |
 |---|---|
 | `config.json` | **All filter rules**: countries, title include/exclude, tier weights, sponsor-match thresholds, timeouts |
 | `sources.yaml` | Which sources run and how (YAML so risk notes can sit next to flags) |
-| `targets.tsv` | Your target companies |
+| `targets.tsv` | The user's target companies |
 | `aliases.csv` | Employer spellings that normalization can't fold into a target |
 | `overrides.csv` | Extra ATS careers URLs for `verify_boards.py` |
 | `careers_pages.yaml` | Careers pages without an ATS |
 | `sponsor_overrides.csv` | Pinned sponsor-register matches |
 
-Aliases only count when their `canonical` is one of your targets: an alias to a
-company you don't track is ignored rather than putting it on your list.
+Aliases only count when their `canonical` is one of the user's targets: an alias to a
+company the user doesn't track is ignored rather than putting it on the user's list.
 
 ## Titles (`config.json`)
 
@@ -31,7 +31,7 @@ company you don't track is ignored rather than putting it on your list.
 - Includes a few German/Swedish keywords (`penetrationstest*`,
   `anwendungssicherheit`, `applikationssäkerhet`) because public-portal ads often
   use local titles.
-- Excludes seniority you don't target (director, head of, vp, principal,
+- Excludes seniority the user doesn't target (director, head of, vp, principal,
   manager), out-of-scope areas (soc, red team, cloud security, ai security, grc)
   and student roles (intern, thesis, werkstudent).
 
@@ -49,7 +49,7 @@ A posting's employer is normalized (lower-case, accents and punctuation removed,
 legal suffixes like Ltd/LLP/GmbH/B.V./AG dropped, regional qualifiers like
 UK/NL/Cyber dropped) and looked up exactly. So "Deloitte LLP", "Deloitte UK" and
 "Deloitte Netherlands B.V." all become **Deloitte**. There is deliberately no
-fuzzy matching, because it would put strangers on your board.
+fuzzy matching, because it would put strangers on the user's board.
 
 When a target's postings land in "Outside your list" under another name, add a
 row to `profile/aliases.csv`:
@@ -64,11 +64,54 @@ PricewaterhouseCoopers,PwC UK Cyber
 Known limitation: short generic target names (Bird, Box, Bolt, Exact, Orange,
 Sky, Unity) match any employer with exactly that normalized name.
 
+## Two different "include outside" switches
+
+Employers not on `targets.tsv` are "outside your list". Two settings control them, in two
+different files, for two different outputs:
+
+| Setting | File | Controls |
+|---|---|---|
+| `include_outside_list` (top level, and per source) | `sources.yaml` | Whether `radar.py` keeps outsiders at all: they then appear in the digest's "Outside your list" section and in `matches.csv`. A per-source value overrides the top level (e.g. `eures.include_outside_list: true`). `--include-outside` on the command line forces it on for one run. |
+| `board.include_outside` | `config.json` | Whether kept outsiders also become **board cards**. Only matters if the first switch let them through. |
+
+## `sources.yaml` keys
+
+Every source takes `enabled` and `timeout_seconds` (a cap on the whole source). Then:
+
+| Source | Keys |
+|---|---|
+| `ats` | `boards_file` (default `boards.json`) |
+| `bundesagentur`, `jobtech`, `eures` | `queries`, `health_query` (the canary), `days` (look-back), `max_pages`; `eures` also `countries` |
+| `careers_page` | `pages_file` (default `careers_pages.yaml` via the profile), `respect_robots` (default true) |
+| `alert_email` | `providers`, `eml_dir` (default `.alert_mail`), `require_dkim` (default true) |
+
+## `careers_pages.yaml` keys (one entry per page)
+
+| Key | Mode | Meaning |
+|---|---|---|
+| `company`, `url` | all | Target name (as in `targets.tsv`) and the page to fetch |
+| `mode` | all | `selector` (default), `feed` or `hash` |
+| `default_location` | all | Used when the page gives no recognisable location |
+| `enabled` | all | Default true |
+| `render: js` | all | Needs a browser (Playwright, local only; errors in Actions) |
+| `tested` | all | Date the entry was last checked live (for humans) |
+| `item` | selector | CSS selector matching one job |
+| `title` | selector | Selector inside the item (default: the item's text) |
+| `link` | selector | Selector inside the item (default: first `<a>`), or `"#id"` to use `url#<item id>` for one-page listings |
+| `location` | selector | Selector inside the item (optional) |
+| `anchor` | selector | Something present even with zero jobs; missing = "page layout changed" error |
+| `expect_jobs` | selector/feed | True = zero jobs counts as broken |
+| `feed_url` | feed | Feed URL (default: `url`) |
+| `items_path` | feed (JSON) | Dotted path to the job list, e.g. `data.jobs` |
+| `fields` | feed (JSON) | Key names: `{title:, url:, location:, id:}` |
+| `container` | hash | Selector of the section to hash (default `body`) |
+| `ignore_patterns` | hash | Regexes removed before hashing (dates, counters) |
+
 ## Board (`config.json` → `board`)
 
 | Key | Default | Meaning |
 |---|---|---|
-| `enabled` | true | Queue new roles for the board at all |
+| `enabled` | true in `examples/`; **off if the key is missing** | Queue new roles for the board at all |
 | `tiers` | [1, 2] | Which tiers become cards |
 | `baseline_tiers` | [1] | Which tiers become cards on the very first run |
 | `include_outside` | false | Also make cards for employers not on the target list |
@@ -90,14 +133,4 @@ The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 
 ## Dependencies
 
-`requirements.in` lists direct dependencies; `requirements.txt` is the
-hash-locked result, installed with `--require-hashes` in CI. To change one:
-
-```bash
-pip install pip-tools
-pip-compile --generate-hashes --strip-extras --allow-unsafe -o requirements.txt requirements.in
-pip-compile --generate-hashes --strip-extras --allow-unsafe -o requirements-dev.txt requirements-dev.in
-```
-
-Review the upstream diff before bumping `ats-scrapers`: it's the main
-third-party code that runs against live sites in your workflow.
+See [7. Changing it](07-Changing-it.md#change-a-dependency).

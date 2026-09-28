@@ -20,7 +20,8 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
    Projects), so labels are its only way to attach data. At session start Claude runs
    `board_sync.py fill` with the user's local `gh` login (project scope): **Stage = New**,
    **Tier** and **Sponsor** from the labels, **Posted** from the issue body (else the day first
-   seen, from `data/matches.csv`), **Fit** / **Recommendation** from scores.
+   seen, from `data/matches.csv`). **Fit** and **Recommendation** are set separately, by
+   `jd_check.py score --board` when a role is scored.
 5. `board_sync.py stale` labels roles no source has listed for `stale_days` as
    `possibly-closed` (and removes the label if they come back).
 

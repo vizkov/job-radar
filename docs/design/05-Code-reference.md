@@ -20,6 +20,7 @@ only), `--include-outside` (keep employers not on the list).
 
 | Function | Does |
 |---|---|
+| `STATE`, `DIGESTS`, `DATA` | The `state/`, `digests/` and `data/` folders. |
 | `load(path, default)` | Reads a JSON file, or returns `default` if it doesn't exist. |
 | `select(results, include_outside, matcher)` | Country filter, title filter, company matching; returns kept postings and per-source match counts. `include_outside` is a bool or a per-source dict. |
 | `diff_seen(groups, seen, today)` | Returns groups none of whose keys are in `seen`; stamps all their keys with today. |
@@ -34,7 +35,7 @@ only), `--include-outside` (keep employers not on the list).
 **Watch out**
 - `baseline = not seen`: an empty `seen.json` means first run, which sends only
   `baseline_tiers` to the board. Deleting `seen.json` re-triggers baseline behaviour.
-- The stale check runs only when `healthy` (all sources OK, ≤10% units erroring) and not
+- The stale check runs only when `healthy` (all sources OK, at most `max(3, len(units)//10)` units erroring) and not
   with `--source`, so an outage or a partial test run can't mark roles closed.
 - `seen` pruning (120 days) happens before the stale check, so roles unseen that long
   count as stale.
@@ -137,10 +138,10 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 
 | Name | Is |
 |---|---|
-| `SOURCE_RANK` | Which source's link to prefer: ATS 0, careers page 1, public APIs 2–3, emails 4. |
+| `SOURCE_RANK` | Which source's link to prefer: ATS 0, careers page 1, public APIs 2–3, emails 4; any unknown source 9. |
 | `_GENDER` | Matches "(m/w/d)" style markers, removed from titles before comparing. |
 | `norm_title(title)` | Title without gender markers, lower-case, letters and digits only. |
-| `primary_country(countries)` | First country in priority order (then extras, then REMOTE-EU). |
+| `primary_country(countries)` | First country in priority order (then extras, then REMOTE-EU); anything else: the alphabetically first. |
 | `content_key(p)` | `c:<company>|<title>|<country>`; anonymous employers get a unique key. |
 | `Group` | Postings sharing a key; `best` (lowest source rank) and `also` (the other URLs). |
 | `group_postings(postings)` | Group by content key. |
@@ -157,7 +158,7 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 | Name | Is |
 |---|---|
 | `BROKEN_AFTER_RUNS` | 2: bad runs in a row before a unit is reported. |
-| `update_health(health, results)` | Updates each unit's `bad_streak` / `last_ok_count` in place; returns units that just crossed the threshold. |
+| `update_health(health, results)` | Updates each unit's `bad_streak` / `last_ok_count` in place; returns every unit whose streak is at or over the threshold, so a broken unit is reported on **every** run until it recovers. |
 
 **Watch out**
 - A unit is reported only if it **has worked before** (`last_ok_count > 0`), except the
@@ -311,11 +312,16 @@ default queries and paging. Specifics:
 | `parse_hash(html, page)` | Hash the listing section's text; the hash is the posting ID, so any change surfaces once as "Careers page changed". |
 | `_posting(...)` | Build a `Posting` with the page's company as hint. |
 | `render_js(url)` | Playwright, only if installed (local only). |
-| `CareersPageSource` | `load_pages()`, `allowed()` (robots.txt, cached per host; a 4xx robots file = no restrictions), `fetch_page()`, `fetch()` (one unit per page, 90 s cap each). |
+| `CareersPageSource` | `load_pages()`, `allowed()` (robots.txt per RFC 9309 via `robots_rules()`: 200 = follow the rules, 4xx = no rules, 5xx or unreachable = disallowed; cached per host), `fetch_page()`, `fetch()` (pages one after another, not in parallel; one unit per page, keyed by URL; 90 s cap each; 300 s for the whole source by default). |
+| `robots_rules(status, text)` | robots.txt per RFC 9309; also used by `jd_prep.py`. |
+| `PAGE_CHANGED`, `PARSERS` | The `raw` flag marking a hash-mode notice (it bypasses the title filter); mode → parser function. |
 
 **Watch out**: the `anchor` exists to tell "no openings" (anchor present, zero jobs) apart
 from "the site was redesigned and our selectors broke" (anchor missing). Both would
 otherwise look like an empty list.
+
+**Watch out**: selector postings use `external_id = url|title`, because several jobs can
+share one link. So if an employer edits a job's title, it's reported as a new role.
 
 ### `sources/alert_email.py`: parse saved alert emails
 
@@ -342,7 +348,8 @@ Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
 | Name | Is |
 |---|---|
 | Path constants | `QUEUE`, `ISSUE_MAP`, `STALE`, `FLAGGED`, `PIPELINE_LOG`, `STATUS_MD`, `MATCHES`, `BOARD_FILE`: every file it touches (tests redirect them all). |
-| `FIELDS` | The board's custom fields and their types/options. |
+| `FIELDS`, `DATE` | The board's custom fields and their types/options (`DATE` marks a date field). |
+| `STATUS_LABEL`, `SPACING_SECONDS` | `radar-status` (the status issue's label); 2 s between issue creations. |
 | `FINAL_STAGES` | Offer, Rejected, Skipped: setting one closes the issue. |
 | `LABEL_COLORS` | Label colours; anything else (country-XX) is blue. |
 | `Gh` | Runs `gh` with an argument list (no shell); `dry_run` prints instead. Tests replace it. |
@@ -372,7 +379,12 @@ Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
 **Watch out**: `setup_project()` resolves `@me` to the real login, because `gh project
 link` compares owner names literally and fails on `@me`. It saves `board.json` as soon as
 the Project exists, so a failure later (e.g. linking) doesn't create a duplicate Project on
-retry.
+retry. It refuses a repo whose owner isn't the Project's owner. It does **not** build views
+itself: the `setup-project` command runs `setup_project()` then `apply_views()`.
+
+**CLI flags**: `--repo OWNER/REPO` (setup-project), `--close` (set: also close the issue),
+`--dry-run` (print the `gh` commands; nothing changes and no stage changes are logged),
+`--max N` (roles: issues per run). `sync_roles()` takes the queue oldest first.
 
 ### `tools/session_brief.py`: the SessionStart hook (standard library only)
 
@@ -381,6 +393,9 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | Name | Is |
 |---|---|
 | `FOLLOW_UP_DAYS`, `REVIEW_EVERY_DAYS`, `GRACE` | 14, 7, 1 hour. |
+| `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
+| `_CONTROL`, `_REF` | Characters stripped by `safe()`; the ref marker in issue bodies. |
+| Other thresholds (in code) | Top 6 new Tier 1 roles listed; "unscored" = Tier 1 from the last 14 days; "fresh" = posted in the last 3 days; "no run completed for 2+ days" warning; a CV gap needs 3+ scored roles missing it. Follow-ups only apply to cards with a logged stage change. |
 | `safe(text, limit)` | Sanitise third-party text for the brief. |
 | `run(cmd, timeout)` | Run a command; `(ok, output)`; never raises. |
 | `_read_json`, `_read_stamp` | Tolerant file readers. |
@@ -405,14 +420,32 @@ nav/scripts), `_as_text()`, `via_scraper()` (ATS scraper's description), `public
 (Amazon's login-walled links → public page), `jsonld_description()`, `Fetcher` (`_allowed`
 robots cache, `fetch` the ordered fallbacks), `load_rows()`, `scored_refs()`, `select()`
 (which roles), `render_packet()`, `prepare()` (write `jd.txt`, `meta.json`, `packet.md`),
-`main()`.
+`main()`. The ATS scraper's text is used only if it's at least 200 characters; otherwise
+it falls back to the page. `--refresh` re-fetches even when `jd.txt` exists.
 
 ### `tools/jd_check.py`: validate Claude's output
 
 Walkthrough: [4.3 and 4.4](04-Claude-session.md). `check_score()`, `upsert_score()`,
 `cmd_score()`; `new_names()` (capitalised words and acronyms not in the career docs),
 `_planted()` (URLs/emails/phones the user didn't write), `check_tailor()` (with the inner
-`check_line()`), `_digest()`, `cmd_tailor()`, `main()`.
+`check_line()`), `_digest()`, `cmd_tailor()`, `main()`. Helpers: `_norm()` (lower-case,
+collapse whitespace; all comparisons use it), `_NUM` (numbers), `APPS`
+(`profile/applications/`). `cmd_tailor()` deletes any old `validated.sha256` **before**
+checking, so a failed check never leaves a stale stamp.
+
+The `tailored.json` contract:
+
+```text
+{"key": "<the role's ref: 16 hex characters>",
+ "headline": "1-120 chars, no contact details, no names not in the career docs",
+ "sections": [{"heading": "1-80 chars",
+               "bullets": [{"source_id": "P/B/E id", "text": "1-450 chars"}]}],
+ "skills": ["each must appear in the career docs"],
+ "cover_letter": [{"source_id": "C/S id", "text": "1-450 chars"}]}
+```
+
+Each `source_id` at most once. Heavy rewording (under 45% similar) only warns, and `S`
+items are exempt, since condensing a story is expected.
 
 **Watch out**: `_NAME`'s lookbehinds skip the first word of a sentence, which is
 capitalised anyway, so "Led the review" doesn't flag "Led" as a new name.
@@ -477,6 +510,8 @@ user review them before `--apply`.
 | `wiki_text(text, blob_base)` | Rewrite links for the GitHub Wiki. |
 | `mirror_wiki(template_dir)` | Copy `docs/wiki/` into the template's wiki repo. |
 | `check()` | Fail if this repo tracks any private file (run inside the template clone). |
+
+CLI: `export <dir>`, `check`, `drift` (print unpublished public files), `publish <dir> -m "msg"`, `autopublish`.
 
 ### `tools/manual.py`: the `man` page
 

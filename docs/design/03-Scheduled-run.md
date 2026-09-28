@@ -41,7 +41,7 @@ also why the public template never runs anything.
 | 8 | `board_sync.py status` | Update the pinned "Radar status" issue | ignored |
 | 9 | Commit state | `git add state digests data/matches.csv`, commit, then up to 3 tries of `git pull --rebase` + `git push` | run fails |
 
-Two details that matter:
+Three details that matter:
 
 - Actions are referenced by **commit SHA**, not version tag (`@11d5960…  # v4.4.0`). A
   tag can be moved by whoever controls the action; a SHA can't.
@@ -113,7 +113,9 @@ EURES, becomes one group.
 `diff_seen()` decides what's new. A group's keys are its content key plus every posting's
 `source:id`. If **none** of those keys is in `seen.json`, the group is new. Either way,
 all its keys get today's date in `seen.json`. (Checking IDs too means a role whose title
-was slightly edited is still recognised by its ATS ID.)
+was slightly edited is still recognised, as long as its ID doesn't include the title: ATS
+and API postings have stable IDs, but careers-page postings use `url|title`, so an edited
+title there shows up as a new role.)
 
 ### Enrich: `enrich()`
 
@@ -162,8 +164,11 @@ append_matches(new, today)                              # data/matches.csv
 **Stale check.** A role on the board that no source has listed for `stale_days` (5) is
 probably closed. `stale_refs()` compares each board ref's last-seen date
 (`ref_last_seen()` hashes every content key in `seen.json` back to its ref) with the
-cutoff. It runs **only on healthy runs**: every source OK and at most 10% of units
-erroring. Otherwise an outage would make every role look closed.
+cutoff. It runs **only on healthy runs**: every source OK, and no more than
+`max(3, 10% of units)` units erroring (so up to 3 errors are always tolerated). Otherwise
+an outage would make every role look closed. On an unhealthy run `stale_roles.json` is
+left as it was, and `board_sync.py stale` simply re-applies the previous report, which
+changes nothing.
 
 `append_matches()` adds one CSV row per new group. If the column list changed since the
 file was created (a new version added a column), it rewrites the file once with the

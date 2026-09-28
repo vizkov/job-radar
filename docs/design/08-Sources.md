@@ -30,7 +30,7 @@ Run times measured 2026-09-27 on a home connection.
 
 Polls every board in `boards.json` via the pinned `ats-scrapers` package.
 `verify_boards.py` builds `boards.json` from `data/candidates.csv` +
-`profile/overrides.csv`, keeping only boards that currently list jobs in your
+`profile/overrides.csv`, keeping only boards that currently list jobs in the user's
 target countries.
 
 **Coverage.** `data/coverage_report.csv` says, per target, whether a live board was
@@ -63,7 +63,7 @@ versions download the entire site, ~1M jobs for Bundesagentur).
   agencies (FERCHAU, Randstad, Akkodis) and non-target employers, with 1 on-list
   match per source. Their value is DE/SE/NL coverage in "Outside your list".
 - **EURES Netherlands hides employer names**, so those listings can never match
-  your list. `eures.include_outside_list: true` shows them (~50–80 in-scope NL
+  the user's list. `eures.include_outside_list: true` shows them (~50–80 in-scope NL
   roles a week when tested) without turning on outside-list for every source.
 - **What breaks:** these are unauthenticated public endpoints; the EURES one is
   the portal's own undocumented API and the most likely to change shape. A change
@@ -83,7 +83,7 @@ when the website is redesigned.
 
 Three modes:
 
-| Mode | Use when | You get |
+| Mode | Use when | Result |
 |---|---|---|
 | `selector` | The page lists jobs as repeated HTML blocks | Real postings (title, link, location), filtered like any other source |
 | `feed` | The site offers an RSS/Atom or JSON job feed | Same, more robust than selectors |

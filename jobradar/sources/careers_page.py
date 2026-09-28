@@ -128,6 +128,16 @@ def _posting(page, title, location, url, external_id) -> Posting:
 PARSERS = {"selector": parse_selector, "feed": parse_feed, "hash": parse_hash}
 
 
+def robots_rules(status: int, text: str) -> RobotFileParser | bool:
+    """RFC 9309: 200 = follow the rules; 4xx = no rules (allowed); anything else (5xx,
+    redirect loops) = assume everything is disallowed until the site answers properly."""
+    if status == 200:
+        rp = RobotFileParser()
+        rp.parse(text.splitlines())
+        return rp
+    return 400 <= status < 500
+
+
 async def render_js(url: str) -> str:
     try:
         from playwright.async_api import async_playwright
@@ -151,7 +161,7 @@ class CareersPageSource:
         self.timeout = float(cfg.get("timeout_seconds", 300))
         self.pages_file = ROOT / cfg["pages_file"] if cfg.get("pages_file") else profile_path("careers_pages.yaml")
         self.respect_robots = cfg.get("respect_robots", True)
-        self._robots: dict[str, RobotFileParser | None] = {}
+        self._robots: dict[str, RobotFileParser | bool] = {}  # parser, True = no rules, False = deny
 
     def load_pages(self) -> list[dict]:
         pages = yaml.safe_load(self.pages_file.read_text(encoding="utf-8")) or []
@@ -162,17 +172,13 @@ class CareersPageSource:
             return True
         host = "{0.scheme}://{0.netloc}".format(urlsplit(url))
         if host not in self._robots:
-            rp = None
             try:
                 r = await c.get(f"{host}/robots.txt", timeout=15)
-                if r.status_code == 200:  # RFC 9309: 4xx means no restrictions
-                    rp = RobotFileParser()
-                    rp.parse(r.text.splitlines())
+                self._robots[host] = robots_rules(r.status_code, r.text)
             except httpx.HTTPError:
-                pass
-            self._robots[host] = rp
+                self._robots[host] = False  # RFC 9309: unreachable robots.txt = assume disallowed
         rp = self._robots[host]
-        return rp is None or rp.can_fetch(_http.USER_AGENT, url)
+        return rp if isinstance(rp, bool) else rp.can_fetch(_http.USER_AGENT, url)
 
     async def fetch_page(self, c, page: dict) -> list[Posting]:
         if not await self.allowed(c, page["url"]):
@@ -196,11 +202,12 @@ class CareersPageSource:
                     postings = await asyncio.wait_for(self.fetch_page(c, page), timeout=90)
                     out.postings += postings
                     # a hash page always yields 1; selector/feed pages may legitimately list no jobs
-                    out.units.append(UnitStatus(page["company"], ok=True, raw_count=len(postings), label=label,
+                    # keyed by URL: two pages for one company must not share a health record
+                    out.units.append(UnitStatus(page["url"], ok=True, raw_count=len(postings), label=label,
                                                 track_empty=bool(page.get("expect_jobs", False))))
                 except Exception as e:
                     msg = "timeout after 90s" if isinstance(e, asyncio.TimeoutError) else f"{type(e).__name__}: {str(e)[:150]}"
-                    out.units.append(UnitStatus(page["company"], ok=False, error=msg, label=label))
+                    out.units.append(UnitStatus(page["url"], ok=False, error=msg, label=label))
         return out
 
 

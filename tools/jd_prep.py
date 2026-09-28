@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from jobradar.sources._http import USER_AGENT  # noqa: E402
 from jobradar.sources.ats import workday_detail_url  # noqa: E402
+from jobradar.sources.careers_page import robots_rules  # noqa: E402
 from jobradar.untrusted import UntrustedText  # noqa: E402
 
 MATCHES = ROOT / "data" / "matches.csv"
@@ -107,22 +108,18 @@ def jsonld_description(html: str) -> str | None:
 class Fetcher:
     def __init__(self, client: httpx.Client):
         self.c = client
-        self._robots: dict[str, RobotFileParser | None] = {}
+        self._robots: dict[str, RobotFileParser | bool] = {}
 
     def _allowed(self, url: str) -> bool:
         host = "{0.scheme}://{0.netloc}".format(urlsplit(url))
         if host not in self._robots:
-            rp = None
             try:
                 r = self.c.get(f"{host}/robots.txt", timeout=15)
-                if r.status_code == 200:
-                    rp = RobotFileParser()
-                    rp.parse(r.text.splitlines())
+                self._robots[host] = robots_rules(r.status_code, r.text)
             except httpx.HTTPError:
-                pass
-            self._robots[host] = rp
+                self._robots[host] = False  # unreachable robots.txt = assume disallowed (RFC 9309)
         rp = self._robots[host]
-        return rp is None or rp.can_fetch(USER_AGENT, url)
+        return rp if isinstance(rp, bool) else rp.can_fetch(USER_AGENT, url)
 
     def fetch(self, row: dict) -> tuple[str, str]:
         """Returns (status, text). status: ok:<how> or unavailable:<why>."""

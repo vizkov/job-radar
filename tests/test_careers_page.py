@@ -113,9 +113,18 @@ def test_source_isolates_pages_and_respects_robots(tmp_path):
     src = CareersPageSource({"pages_file": str(f)})
     src.pages_file = f
     res = asyncio.run(src.fetch())
-    by = {u.key: u for u in res.units}
+    by = {u.label.split(":")[0]: u for u in res.units}  # units are keyed by URL, labelled "Company: url"
+    assert all(u.key.startswith("https://") for u in res.units)
     assert by["MDSec"].ok and by["MDSec"].raw_count == 2
     assert not by["Blocked"].ok and "robots.txt" in by["Blocked"].error
     assert not by["Down"].ok and "500" in by["Down"].error
     assert not by["NeedsJS"].ok and "Playwright" in by["NeedsJS"].error
     assert len(res.postings) == 2
+
+
+def test_robots_rules_follow_rfc_9309():
+    from jobradar.sources.careers_page import robots_rules
+    assert robots_rules(404, "") is True          # no robots.txt: no rules
+    assert robots_rules(503, "") is False         # server error: assume disallowed
+    rp = robots_rules(200, "User-agent: *\nDisallow: /jobs")
+    assert not rp.can_fetch("x", "https://a.example/jobs/1") and rp.can_fetch("x", "https://a.example/")

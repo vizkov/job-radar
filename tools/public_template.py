@@ -10,7 +10,8 @@
 
 Private = your settings (profile/) and everything a run produces or derives from
 your targets: state, digests, matches, the board list and coverage reports.
-The template keeps code, docs, tests, examples/ and the public sponsor registers.
+The template keeps code, docs, tests and examples/. The sponsor registers are public data but
+are downloaded per copy (refresh_registers.py), so they're kept out to avoid merge conflicts.
 """
 from __future__ import annotations
 

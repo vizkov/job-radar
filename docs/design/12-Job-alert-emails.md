@@ -6,7 +6,7 @@
 
 job-radar never logs in to LinkedIn, Indeed or Glassdoor and never scrapes them.
 Their terms prohibit scraping, and GitHub Actions IPs get blocked quickly.
-Instead, each site emails you job alerts, and job-radar reads those emails.
+Instead, each site emails the user job alerts, and job-radar reads those emails.
 
 ```
 LinkedIn / Indeed / Glassdoor ──alert email──▶ your main Gmail
@@ -25,7 +25,7 @@ step of `radar.yml`. That step:
   (a test proves this) and saves the emails as files in `.alert_mail/` (never committed).
 
 `radar.py` then parses those files **without** the secret. A compromised
-dependency of the scrapers therefore never shares a process with your password.
+dependency of the scrapers therefore never shares a process with the user's password.
 The mailbox is opened read-only (IMAP `EXAMINE`, `BODY.PEEK[]`): nothing is
 marked read or deleted.
 
@@ -44,39 +44,41 @@ LinkedIn/Indeed/Glassdoor. It was dropped (2026-09-28) because:
 - Its last release was July 2025, and these scrapers break whenever the sites change.
 - It depends on `tls-client`, a prebuilt native library that fakes browser TLS
   fingerprints to get past bot detection.
-- Scraping these sites breaks their terms and risks your account.
+- Scraping these sites breaks their terms and risks the user's account.
 
 The providers' own alert emails cover the same postings without any of that.
 
 ## Why a dedicated mailbox
 
 A Gmail app password gives full IMAP and SMTP access to its account. If the
-GitHub secret ever leaked, an app password for your main account would expose
-all your mail, including password-reset emails for everything else. An app
+GitHub secret ever leaked, an app password for the user's main account would expose
+all the user's mail, including password-reset emails for everything else. An app
 password for a mailbox that only receives job alerts exposes job alerts.
 
-### Using your main Gmail instead
+### Using the user's main Gmail instead
 
 It works: the fetcher only searches for the providers' sender addresses, opens the
 mailbox read-only, and drops any email without a valid provider DKIM signature. The
-cost is the leak scenario above: that one GitHub secret would then unlock your whole
-mailbox. If you choose this, skip steps 2 and 4 below, create the app password on your
-main account, and set `JOBALERT_IMAP_USER` to your main address. Revoke the app password
-(Google Account → Security → App passwords) the day you stop using job-radar.
+cost is the leak scenario above: that one GitHub secret would then unlock the user's whole
+mailbox. If the user chooses this, skip steps 2 and 4 below, create the app password on the user's
+main account, and set `JOBALERT_IMAP_USER` to the user's main address. Revoke the app password
+(Google Account → Security → App passwords) the day they stop using job-radar.
 
-## Setup (~30 minutes)
+## Setup (~30 minutes; Claude walks the user through it)
+
+The user-facing version is in [Your part](../wiki/The user's-part.md). The details:
 
 1. **Create alerts.**
    - LinkedIn: Jobs → search (e.g. "application security", location "United
      Kingdom") → *Set alert*, daily. For a target company, filter the search by
      company first.
-   - Indeed: search on your country's Indeed (uk.indeed.com, nl.indeed.com, …)
+   - Indeed: search on the user's country's Indeed (uk.indeed.com, nl.indeed.com, …)
      → *Get new jobs for this search by email*.
    - Glassdoor: search → *Create job alert*.
 2. **Create the dedicated Gmail account** (e.g. `yourname.jobalerts@gmail.com`).
    Turn on 2-Step Verification (needed for app passwords).
 3. **Create an app password** for it: Google Account → Security → App passwords.
-4. **Forward alerts from your main Gmail.** Settings → Forwarding → add the
+4. **Forward alerts from the user's main Gmail.** Settings → Forwarding → add the
    dedicated address and confirm. Then create a filter:
    `from:(jobalerts-noreply@linkedin.com OR jobs-listings@linkedin.com OR indeed.com OR glassdoor.com)`
    → *Forward to* the dedicated address.
@@ -104,7 +106,7 @@ python radar.py --dry-run --source alert_email --include-outside
 
 ## How it defends against spoofed email
 
-Anyone can send email to your dedicated address pretending to be LinkedIn.
+Anyone can send email to the user's dedicated address pretending to be LinkedIn.
 
 - Only mail **from** a known provider's alert sender is read.
 - By default (`require_dkim: true`) the message must carry a passing DKIM result
@@ -131,11 +133,11 @@ before turning `require_dkim` off.
 - **A provider changes its email layout.** The parser reads the plain-text part
   first and falls back to the HTML part. If an alert yields no jobs, the status card
   flags "<provider> alert emails with no jobs".
-- **App password revoked** (e.g. you change that account's password): the
+- **App password revoked** (e.g. that account's password is changed): the
   source fails with an IMAP login error in the Sources table.
 - **Quiet weeks** with no alerts are normal and not flagged.
 
 > **The test fixtures are synthetic**, modelled on each provider's alert layout.
 > Export 2–3 real alerts per provider into `tests/fixtures/alert_email/`
-> (redact your address) and run `pytest tests/test_alert_email.py` before
+> (redact the user's address) and run `pytest tests/test_alert_email.py` before
 > relying on it. Indeed's layout in particular is a best guess.

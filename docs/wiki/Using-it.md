@@ -9,6 +9,10 @@ Not sure what's possible? Ask **"what can this do?"** or type `/manual`.
 
 ## Things you can say
 
+These are the common requests, not a menu: say what you want in your own words and Claude works
+out the rest. For the complete, always-current list of what the system can do, ask "what can this
+do?" or type `/manual` (it's generated from the system itself).
+
 ### Getting going
 
 | You say | Claude does |
@@ -21,6 +25,7 @@ Not sure what's possible? Ask **"what can this do?"** or type `/manual`.
 | You say | Claude does |
 |---|---|
 | "What's new?" / "How's my search going?" | Tells you the few roles most worth your time (freshest first), what's not yet scored, what's waiting on a reply, anything broken |
+| "Score this one" + a pasted job description | For LinkedIn, Indeed or Glassdoor roles, which Claude never opens: paste the description and it scores it like any other |
 | "Which of these fit me?" / "Is the Bridewell role worth it?" | Reads each job description and compares it with your CV: a Fit score, which requirements you meet (and the CV line that proves it), blockers such as security clearance or right to work, and Apply / Maybe / Skip. Puts Fit and Recommendation on the card |
 
 ### Applying
@@ -43,10 +48,14 @@ Not sure what's possible? Ask **"what can this do?"** or type `/manual`.
 
 | You say | Claude does |
 |---|---|
+| "Pause the radar" / "Resume the radar" | Stops or restarts the automatic searches; your board and data stay as they are |
+| "Add a view with only Tier 2 roles" | Adds it to your board and keeps it in your copy's design, so it comes back if the board is rebuilt |
+| "Undo that tuning change" | Puts a title rating back to what it was before Claude's automatic weekly adjustment |
 | "Stop showing DevSecOps roles" / "Add Checkmarx" / "Also look in Germany" | Changes your settings, shows you before/after numbers, saves when you agree |
 | "How do I strengthen my CV?" / "Which certs matter?" | Looks across your scored roles for requirements you keep missing and suggests what to add or evidence better |
 | (automatic) | Once a week, when enough roles are scored, Claude adjusts how job titles are rated (the Tier) using how those roles actually scored, one small step at a time. It tells you what changed at the start of your next session, and one sentence undoes it. Your title filters, countries and companies only change when you say so |
 | "What could be better?" | Reviews the system and proposes fixes and new job boards for you to approve (Claude also offers this weekly) |
+| "Are the docs still right?" | Two fresh AI readers go through the guide and the technical docs as newcomers; Claude checks what they flag against the system and fixes it (also offered automatically after big changes) |
 | "Is anything broken?" | Checks the runs and every source; fixes or explains |
 
 ## What Claude will not do

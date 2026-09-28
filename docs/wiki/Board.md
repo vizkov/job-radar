@@ -1,8 +1,10 @@
-# Board
+# 3. Board
+
+**This page:** how to read your board: its columns, views and the status card.
 
 Your GitHub Project is the dashboard: one card per role, plus a "Radar status" card.
-New cards arrive three times a day. How they get there:
-[Board internals](../design/Board-internals.md).
+New cards arrive three times a day. (How they get there, for the curious:
+[Board internals](../design/11-Board-internals.md).)
 
 ## Fields
 
@@ -41,3 +43,5 @@ and which sources stopped returning results. Counts only, no job titles.
 Want another view, say Tier 2 only (`tier:T2 -stage:Rejected,Skipped`) or cards whose listing may
 have closed (`label:possibly-closed`)? Ask Claude: it adds it to the board's design so every copy
 gets it. Filters can use labels even though the Labels column is hidden.
+
+That's the guide. Back to [Home](Home.md).

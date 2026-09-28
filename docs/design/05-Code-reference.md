@@ -1,8 +1,8 @@
 # 5. Code reference
 
-Every file, what it's for, what it reads and writes, and every function in one line.
-**Watch out** notes point at lines whose purpose isn't obvious from the code alone.
-Read pages 2–4 first; this page assumes you know the flow.
+**What this is:** Every file and every function, one line each, with **Watch out** notes on lines whose purpose isn't obvious.  
+**Read first:** pages [2](02-Architecture.md) to [4](04-Claude-session.md)  
+**Code:** all of it
 
 Files are grouped by where they run: the scheduled pipeline (5.1–5.3), tools (5.4),
 automation config (5.5), settings and career files (5.6), Claude's instructions (5.7).
@@ -171,7 +171,7 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 | `score(title, countries, on_list, sponsor, age_days)` | Best title keyword + all seniority words + best country + on-list bonus + sponsor bonus + freshness bonus; returns `(total, reasons)`. |
 | `tier(total)` | 1 if total ≥ `tier1_min_score`, else 2. |
 
-Worked examples: [Tiers and sponsorship](Tiers-and-sponsorship.md).
+Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
 
 ### `jobradar/sponsors.py`: UK/NL sponsor registers
 
@@ -511,7 +511,7 @@ actions by commit SHA, and retry their final push.
 
 ## 5.6 Settings and career files
 
-Every settings file is described in [Configuration](Configuration.md); where each is read
+Every settings file is described in [Configuration](10-Configuration.md); where each is read
 is in [Architecture](02-Architecture.md). `examples/` has a public sample of each, plus
 `examples/career/` showing the ID format with a fictional person.
 

@@ -1,4 +1,8 @@
-# Job-alert emails (LinkedIn, Indeed, Glassdoor)
+# 12. Job-alert emails
+
+**What this is:** How LinkedIn, Indeed and Glassdoor jobs get in without scraping those sites: their alert emails are read over IMAP, with the mailbox password isolated in one workflow step and every email checked for spoofing.  
+**Read first:** [3.1, the workflow file](03-Scheduled-run.md#31-the-workflow-file-radaryml)  
+**Code:** `tools/fetch_alert_emails.py`, `jobradar/alert_providers.py`, `jobradar/sources/alert_email.py`, `radar.yml` step 3
 
 job-radar never logs in to LinkedIn, Indeed or Glassdoor and never scrapes them.
 Their terms prohibit scraping, and GitHub Actions IPs get blocked quickly.

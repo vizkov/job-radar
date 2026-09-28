@@ -1,5 +1,9 @@
 # 4. A Claude session, step by step
 
+**What this is:** What happens when the user opens Claude Code: the session brief, the skills, scoring, tailoring, applying, tracking and publishing.  
+**Read first:** [3. A scheduled run](03-Scheduled-run.md)  
+**Code:** `CLAUDE.md`, `.claude/`, `tools/` (session_brief, board_sync, jd_prep, jd_check, render_resume, public_template)
+
 The scheduled run finds roles. Everything that needs judgement happens when the user
 opens Claude Code in their private copy. This page follows a session from the moment it
 opens.
@@ -180,7 +184,7 @@ for final stages (Offer, Rejected, Skipped).
 (GraphQL `createProjectV2View`) and corrects layout, filter and columns
 (`updateProjectV2View`). GitHub's API can't set sort or board grouping, so it prints the
 exact menu clicks for the user. `design_diff()` reports drift; the session brief runs it.
-Details: [Board internals](Board-internals.md).
+Details: [Board internals](11-Board-internals.md).
 
 ## 4.7 Committing and publishing
 

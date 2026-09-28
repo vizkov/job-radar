@@ -1,5 +1,9 @@
 # 3. A scheduled run, step by step
 
+**What this is:** What happens three times a day in GitHub Actions, followed through the code, then one real role's journey from a job board to a card.  
+**Read first:** [2. Architecture](02-Architecture.md)  
+**Code:** `.github/workflows/radar.yml`, `radar.py`, `jobradar/`, `tools/board_sync.py` (roles/stale/status)
+
 Three times a day (02:47, 08:47, 14:47 UTC) GitHub starts `.github/workflows/radar.yml`.
 This page follows one run from start to finish, through the actual code, then follows
 one real role all the way to the user's board.
@@ -44,7 +48,7 @@ Two details that matter:
 - Step 3 runs **before** step 4. At that moment no third-party Python package exists on
   the machine, and `-I -S` makes Python ignore any site-packages and startup hooks. So the
   only code that ever shares a process with the mailbox password is the standard library
-  plus two small files in this repo. See [Job-alert emails](Job-alert-emails.md).
+  plus two small files in this repo. See [Job-alert emails](12-Job-alert-emails.md).
 - Step 9 retries because the user may push from their machine while the run is going
   (GitHub rejects a push that isn't based on the latest commit).
 
@@ -79,7 +83,7 @@ failed `SourceResult` instead of crashing. **One broken source never stops the o
 
 Each adapter returns a `SourceResult`: a list of `Posting`s plus a list of `UnitStatus`es
 (one per board, query, page or email provider), which feed health tracking. What each
-adapter does is in [Sources](Sources.md) and the [code reference](05-Code-reference.md).
+adapter does is in [Sources](08-Sources.md) and the [code reference](05-Code-reference.md).
 
 ### Filter and match: `select()`
 

@@ -1,6 +1,9 @@
 # 1. Concepts
 
-Every term the other pages use, defined once. Grouped by the world it comes from.
+**What this is:** Every term the other pages use, defined once and grouped by the world it comes from.  
+**Read first:** nothing  
+**Code:** none: this page is vocabulary
+
 Skim it now; come back when a word is unclear.
 
 ## The job-search world

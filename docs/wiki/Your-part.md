@@ -1,4 +1,6 @@
-# Your part
+# 1. Your part
+
+**This page:** the few steps only you can do, and when.
 
 Claude does everything it can. These steps it can't, because they need your login,
 your judgement, or a page GitHub gives no command for. Claude tells you when each is
@@ -23,7 +25,7 @@ due and what to click.
    `JOBALERT_IMAP_USER` and `JOBALERT_IMAP_PASSWORD`.
 
 Never paste the password into chat or a file. Details and trade-offs:
-[Job-alert emails](../design/Job-alert-emails.md).
+[Job-alert emails](../design/12-Job-alert-emails.md).
 
 ## Every so often
 
@@ -34,3 +36,5 @@ Never paste the password into chat or a file. Details and trade-offs:
 | A LinkedIn/Indeed/Glassdoor role needs scoring | Paste the job description (Claude never opens those sites) |
 | Claude sets up or changes a board view | Sometimes one click: GitHub's API can't set a view's sort or board columns, so Claude tells you exactly which menu item to pick |
 | Claude proposes config changes, new job boards or fixes | Say yes or no |
+
+**Next:** [2. Using it](Using-it.md)

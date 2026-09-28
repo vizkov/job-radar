@@ -1,4 +1,10 @@
-# Setup
+# 14. Setup and publishing
+
+**What this is:** The two-repo model (public template, private copy), what first-time setup does, and how code changes reach the public template automatically.  
+**Read first:** [2. Architecture](02-Architecture.md)  
+**Code:** `.claude/skills/setup/`, `tools/public_template.py`, `.githooks/post-commit`
+
+## The two repos
 
 job-radar is meant to run as **two repos**:
 
@@ -106,11 +112,8 @@ Before every manual push to the template, check nothing private is tracked:
 python tools/public_template.py check    # fails if profile/, state/, digests/, boards.json, … are tracked
 ```
 
-It treats these as private: `profile/`, `state/`, `digests/`, `data/matches.csv`,
-`boards.json`, `data/candidates.csv`, `data/coverage_report.csv`,
-`data/verified_boards.csv` (those four are derived from your targets), and
-`data/registers/` (public data, but refreshed in each copy, so shipping it would
-cause merge conflicts).
+The authoritative lists are `PUBLIC` and `PRIVATE` in `tools/public_template.py`; the
+folder-by-folder view is in [2. Architecture](02-Architecture.md#folders).
 
 After the first publish, develop in the private copy: `publish` (or the post-commit hook)
 copies changed public files into the template clone as a normal new commit, so the
@@ -118,12 +121,6 @@ template's history is never rewritten. Other copies pick changes up with `git pu
 
 ## Workflows
 
-| Workflow | When | What |
-|---|---|---|
-| `radar.yml` | 3x daily: 02:47, 08:47, 14:47 UTC (08:17, 14:17, 20:17 IST) | fetch alert mail, poll sources, add role cards, update status, commit |
-| `verify.yml` | 1st of month | re-verify ATS boards, commit `boards.json` |
-| `registers.yml` | Mondays 04:23 UTC | refresh UK/NL sponsor registers, commit if changed |
-
-All three run behind the privacy guard, share one concurrency group (their
-commits never race), and run with `--quiet` so the digest and your target list
-stay out of the Actions logs.
+The three scheduled workflows (radar 3x a day, verify monthly, registers weekly) are
+described in [3. A scheduled run](03-Scheduled-run.md). All three run behind the privacy
+guard, share one concurrency group so their commits never race, and run with `--quiet`.

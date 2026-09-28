@@ -1,4 +1,8 @@
-# Board internals
+# 11. Board internals
+
+**What this is:** How a role becomes a card, why data travels as labels first and fields later, and how the board's views are kept identical in every copy.  
+**Read first:** [3.3](03-Scheduled-run.md#33-after-radarpy-board_syncpy-in-actions) and [4.2](04-Claude-session.md#42-session-start-toolssession_briefpy)  
+**Code:** `jobradar/board.py`, `tools/board_sync.py`, `profile/board.json`
 
 What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is how it works.
 

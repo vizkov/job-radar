@@ -1,5 +1,9 @@
 # 2. Architecture
 
+**What this is:** The whole system on one page: the three places code runs, what each folder holds, and every data file with who writes and reads it.  
+**Read first:** [1. Concepts](01-Concepts.md)  
+**Code:** the whole repo, at folder level
+
 ## The whole system on one page
 
 job-radar is a set of Python scripts plus instructions for Claude, living in one git

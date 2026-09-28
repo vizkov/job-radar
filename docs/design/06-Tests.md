@@ -1,5 +1,9 @@
 # 6. Tests
 
+**What this is:** How the test suite is organised, the three rules every test follows, and what each test file checks.  
+**Read first:** [5. Code reference](05-Code-reference.md)  
+**Code:** `tests/`, `tests/conftest.py`, `tests/fixtures/`
+
 ```bash
 pip install --require-hashes -r requirements-dev.txt   # once
 pytest                                                 # ~10 s, fully offline

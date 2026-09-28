@@ -1,4 +1,8 @@
-# Sources
+# 8. Sources
+
+**What this is:** Where roles come from: the six adapters, what each costs to run, what breaks, and how to add a company or a careers page.  
+**Read first:** [3. A scheduled run](03-Scheduled-run.md)  
+**Code:** `jobradar/sources/`, `verify_boards.py`, `boards.json`, `profile/sources.yaml`, `profile/careers_pages.yaml`, `profile/overrides.csv`
 
 How the adapters are built is in the [code reference](05-Code-reference.md#53-jobradarsources-the-adapters); this page is about
 running them. All sources are configured in `sources.yaml`. Each has `enabled`, a
@@ -18,7 +22,7 @@ python radar.py --dry-run --source <name> [--include-outside]
 | `jobtech` | on | ~10 s | none | Sweden's public employment service |
 | `eures` | on | ~1–2 min | none | EU portal: NL, IE, CH, SE (no UK; DE via bundesagentur) |
 | `careers_page` | on | ~10 s for 5 pages | none | Company careers pages without an ATS (`profile/careers_pages.yaml`) |
-| `alert_email` | off in `examples/`; on once the secrets exist | not measured yet | Gmail app password (dedicated mailbox safer) | LinkedIn / Indeed / Glassdoor alert emails; see [Job-alert emails](Job-alert-emails.md) |
+| `alert_email` | off in `examples/`; on once the secrets exist | not measured yet | Gmail app password (dedicated mailbox safer) | LinkedIn / Indeed / Glassdoor alert emails; see [Job-alert emails](12-Job-alert-emails.md) |
 
 Run times measured 2026-09-27 on a home connection.
 
@@ -28,6 +32,12 @@ Polls every board in `boards.json` via the pinned `ats-scrapers` package.
 `verify_boards.py` builds `boards.json` from `data/candidates.csv` +
 `profile/overrides.csv`, keeping only boards that currently list jobs in your
 target countries.
+
+**Coverage.** `data/coverage_report.csv` says, per target, whether a live board was
+found. Most large employers are covered by their ATS; the gaps are usually banks and
+insurers with custom portals, and small consultancies. For those: a careers page
+(`careers_page`), job-alert emails (`alert_email`), or `tools/discover_boards.py`, which
+proposes boards to add.
 
 - **Add a company's board:** put `company,careers_url` in `profile/overrides.csv`
   (Greenhouse/Lever/Ashby/Workday/SmartRecruiters/Personio/Recruitee/Teamtailor/

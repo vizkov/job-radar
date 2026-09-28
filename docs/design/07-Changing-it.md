@@ -1,5 +1,9 @@
 # 7. Changing it
 
+**What this is:** Step-by-step recipes for the common changes: a source, a setting, a board field or view, a skill, a tool, a dependency.  
+**Read first:** pages [1](01-Concepts.md) to [6](06-Tests.md)  
+**Code:** whichever the recipe touches
+
 Recipes for the common changes. After any code change: run `pytest`, update `CLAUDE.md`,
 the matching skill and these docs in the same commit (the rule in `CLAUDE.md`), then
 commit. In the maintainer's copy the post-commit hook publishes to the template.
@@ -29,7 +33,7 @@ commit. In the maintainer's copy the post-commit hook publishes to the template.
 1. Read it with `CONFIG.get("key", default)` (or from the source's own config dict), so
    existing profiles without it keep working.
 2. Add it with a comment to `examples/config.json` (or `sources.yaml`).
-3. Document it in [Configuration](Configuration.md).
+3. Document it in [Configuration](10-Configuration.md).
 
 ## Add a board field
 

@@ -1,6 +1,8 @@
-# Troubleshooting
+# 15. Troubleshooting
 
-Symptom → where to look → fix. Claude's `health` skill follows this page.
+**What this is:** Symptom → where to look → fix. Claude's `health` skill follows this page.  
+**Read first:** [3](03-Scheduled-run.md) and [4](04-Claude-session.md)  
+**Code:** `jobradar/health.py`, `digests/status.md`, `.claude/skills/health/`
 
 ## No new cards on the board
 

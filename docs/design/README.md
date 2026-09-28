@@ -21,21 +21,22 @@ reference.
 | 6 | [Tests](06-Tests.md) | How the tests are organised, what each covers, how they stay offline and isolated |
 | 7 | [Changing it](07-Changing-it.md) | Recipes: add a source, a setting, a board field or view, a skill, a dependency |
 
-## Deep dives (read when you need them)
+## Deep dives (8–15: read when you need them)
 
-| Page | Covers |
-|---|---|
-| [Sources](Sources.md) | Each place roles come from: what it costs, what breaks, how to add one |
-| [Tiers and sponsorship](Tiers-and-sponsorship.md) | The fit score and the UK/NL visa-sponsor match, with worked examples |
-| [Configuration](Configuration.md) | Every settings file in `profile/` |
-| [Board internals](Board-internals.md) | Issues → cards, labels vs fields, views as code |
-| [Job-alert emails](Job-alert-emails.md) | LinkedIn/Indeed/Glassdoor alerts: the secret isolation and anti-spoofing |
-| [Security model](Security-model.md) | Threats and the defence for each |
-| [Setup and publishing](Setup.md) | Public template vs private copy, first-time setup, auto-publishing |
-| [Troubleshooting](Troubleshooting.md) | Symptoms → causes → fixes |
+| # | Page | Covers |
+|---|---|---|
+| 8 | [Sources](08-Sources.md) | Each place roles come from: what it costs, what breaks, how to add one |
+| 9 | [Tiers and sponsorship](09-Tiers-and-sponsorship.md) | The fit score and the UK/NL visa-sponsor match, with worked examples |
+| 10 | [Configuration](10-Configuration.md) | Every settings file in `profile/` |
+| 11 | [Board internals](11-Board-internals.md) | Issues → cards, labels vs fields, views as code |
+| 12 | [Job-alert emails](12-Job-alert-emails.md) | LinkedIn/Indeed/Glassdoor alerts: the secret isolation and anti-spoofing |
+| 13 | [Security model](13-Security-model.md) | Threats and the defence for each |
+| 14 | [Setup and publishing](14-Setup-and-publishing.md) | Public template vs private copy, first-time setup, auto-publishing |
+| 15 | [Troubleshooting](15-Troubleshooting.md) | Symptoms → causes → fixes |
 
 ## Conventions in these pages
 
+- Every page opens with **What this is**, **Read first** and **Code** (the files it covers).
 - Paths are relative to the repo root: `tools/board_sync.py`, `profile/config.json`.
 - `function()` names are given with their file the first time: `radar.py: select()`.
 - **"Private"** means the file exists only in the user's private copy and is never

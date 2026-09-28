@@ -1,4 +1,8 @@
-# Tiers and sponsorship
+# 9. Tiers and sponsorship
+
+**What this is:** The two automatic labels every new role gets: a rule-based fit **tier** (1 or 2) and, for UK and Dutch roles, a **visa-sponsor** signal. No AI is involved in either.  
+**Read first:** [3.2, Enrich](03-Scheduled-run.md#enrich-enrich)  
+**Code:** `jobradar/tiering.py`, `jobradar/sponsors.py`, `tools/refresh_registers.py`, `profile/config.json` → `tiering`, `profile/sponsor_overrides.csv`
 
 Every new role gets a **fit tier** and, for UK and Dutch roles, a
 **visa-sponsor signal**. Both are simple rules, with no LLM involved.

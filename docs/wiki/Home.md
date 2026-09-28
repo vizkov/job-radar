@@ -1,38 +1,56 @@
 # job-radar
 
-job-radar is a job-search assistant for AppSec / product security / pentest /
-security-consulting roles in Europe. You use it through **two interfaces**:
+**This page:** what job-radar is, the words you'll see, and what to read next.
 
-1. **Claude**: you talk to it in Claude Code, in your private copy of this repo. It
-   acts as your recruitment consultant and runs everything for you: setup,
-   briefings, fit scoring, tailored CVs and cover letters, tracking, tuning, fixes.
-2. **Your GitHub Projects board**: every new role appears as a card, and you (or
-   Claude) move it through New → Shortlisted → Applied → Interview → Offer.
+job-radar is a job-search assistant for AppSec, product security, pentest and
+security-consulting roles in Europe. It watches the job boards of the companies you want
+to work for, three times a day, and puts every new matching role on a board for you. You
+use it through **two things only**:
 
-You never run a script or edit a config file. This wiki covers only what **you**
-see and do; how the system works inside is in [docs/design](../design/README.md),
-which is Claude's reference (and a maintainer's).
+1. **Claude.** You talk to it in Claude Code, in your private copy of this project. It
+   acts as your recruitment consultant and does all the operating for you: setup,
+   briefings, judging how well a role fits you, tailored CVs and cover letters,
+   tracking, tuning the search, fixing what breaks.
+2. **Your board.** A GitHub Project where every new role is a card. You (or Claude) move
+   each card along: New → Shortlisted → Applied → Interview → Offer.
 
-## Pages
+You never run a script or edit a settings file.
 
-| Page | What it covers |
+## Read these, in order
+
+| # | Page | What you'll learn |
+|---|---|---|
+| 1 | [Your part](Your-part.md) | The handful of steps only you can do (a login, a secret, two board clicks) |
+| 2 | [Using it](Using-it.md) | What to say to Claude, what happens without you, what it costs, where your data is |
+| 3 | [Board](Board.md) | How to read your board: the columns, the views, the status card |
+
+Curious how it works inside? That's [docs/design](../design/README.md), written for
+developers and for Claude.
+
+## Words you'll see
+
+| Word | Means |
 |---|---|
-| [Using it](Using-it.md) | What to say to Claude, what happens without you, costs, where your data lives |
-| [Board](Board.md) | Reading the board: fields, cards, the Radar status card, extra views |
-| [Your part](Your-part.md) | The few steps only you can do (logins, secrets, two board clicks) |
+| **Card** | One job on your board. Behind each card is a GitHub issue with the details and the link to apply. |
+| **Stage** | Where you are with a job: New, Shortlisted, Applied, Interview, Offer, Rejected or Skipped. |
+| **Tier** | A quick automatic rating from the job title, seniority, country and company. **Tier 1** = strongest match to what you're looking for; Tier 2 = worth a look. |
+| **Fit** | Claude's 0–100 judgement of how well your CV matches the job description, set when you ask it to score roles. |
+| **Recommendation** | Claude's call after scoring: Apply, Maybe or Skip. |
+| **Sponsor** | Whether the employer appears on the UK or Dutch register of companies licensed to sponsor work visas. A match means they *can* sponsor, not that they will for this role. |
+| **Posted** | When the employer posted the job. Newer is better: early applications do better. |
+| **Role ID** | A 16-character code on each card. Mention it (or just the company and role) and Claude finds everything about that job. |
+| **Target companies** | The list of employers you want. Roles elsewhere are ignored unless you ask otherwise. |
 
 ## The picture
 
 ```
- GitHub Actions, 3x a day: 08:17, 14:17, 20:17 IST (no one involved)
-   → scan company job boards, EU job portals, careers pages, your alert emails
-   → keep roles at your target companies → tier + visa-sponsor tag
-   → one card per new role on your board                 ◀── you look, drag cards
-                                                              ▲
- You ──talk──▶ CLAUDE (Claude Code, your Pro subscription) ───┘ sets Stage / Fit / …
+ 3x a day, on GitHub's servers (no one involved)
+   → check your target companies' job boards, public job portals, your job-alert emails
+   → keep matching roles → rate them → one card per new role on your board
+                                                        ▲            ◀── you look, drag cards
+ You ──talk──▶ CLAUDE (your Claude subscription) ───────┘ fills in Fit, Stage, …
                briefs you, scores fit, tailors CVs, fills forms for you to submit,
                tunes the search, fixes what breaks
 ```
 
-Every role has a short **Role ID** (16 characters, shown on its card). Mention a
-company and role, or the ID, and Claude finds everything about it.
+**Next:** [1. Your part](Your-part.md)

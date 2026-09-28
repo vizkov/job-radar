@@ -1,4 +1,8 @@
-# Configuration
+# 10. Configuration
+
+**What this is:** Every settings file in `profile/`, key by key. Claude edits these for the user; this page is what each key means.  
+**Read first:** [2. Architecture, Settings](02-Architecture.md#settings-profile-falling-back-to-examples)  
+**Code:** `jobradar/paths.py` (where files are read from), `jobradar/common.py` (`CONFIG`), `examples/` (the samples)
 
 Your settings live in **`profile/`**, which exists only in your private copy.
 Each file is read from `profile/` when it's there, otherwise from **`examples/`**
@@ -72,13 +76,13 @@ Sky, Unity) match any employer with exactly that normalized name.
 | `stale_days` | 5 | Days unlisted before a card gets `possibly-closed` |
 
 The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
-`tools/board_sync.py` ([Board internals](Board-internals.md)).
+`tools/board_sync.py` ([Board internals](11-Board-internals.md)).
 
 ## Other `config.json` keys
 
 | Key | Meaning |
 |---|---|
-| `tiering` | Score weights and `tier1_min_score`; see [Tiers and sponsorship](Tiers-and-sponsorship.md) |
+| `tiering` | Score weights and `tier1_min_score`; see [Tiers and sponsorship](09-Tiers-and-sponsorship.md) |
 | `sponsorship.fuzzy_yes` / `fuzzy_unknown` | Fuzzy name-match thresholds (0–100) for the sponsor registers |
 | `board_timeout_seconds` | Time cap per ATS board fetch (180) |
 | `concurrency` | ATS boards fetched at once (6) |

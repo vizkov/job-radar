@@ -69,6 +69,8 @@ def payload(g: Group) -> dict:
         labels.append(f"country-{cc}")
     if (s := sponsor_status(g)):
         labels.append(f"sponsor-{s}")
+    if "fresh" in g.tags.get("reasons", []):
+        labels.append("fresh")
     return {"ref": ref, "title": title, "body": "\n".join(lines), "labels": labels}
 
 
@@ -78,6 +80,28 @@ def select_for_board(new: list[Group], cfg: dict, baseline: bool) -> list[Group]
     tiers = set(cfg.get("baseline_tiers", [1]) if baseline else cfg.get("tiers", [1, 2]))
     return [g for g in new if g.tags.get("tier") in tiers
             and (g.best.company_canonical or cfg.get("include_outside", False))]
+
+
+def ref_last_seen(seen: dict) -> dict[str, str]:
+    """ref -> last date the role was seen on any source (from seen.json's content keys)."""
+    out: dict[str, str] = {}
+    for key, day in seen.items():
+        if key.startswith("c:"):
+            ref = role_ref(key)
+            if day > out.get(ref, ""):
+                out[ref] = day
+    return out
+
+
+def stale_refs(board_refs, seen: dict, today: str, days: int) -> tuple[list[str], list[str]]:
+    """(refs not seen for `days`+ days, refs seen again today). Roles pruned from
+    seen.json (unseen for 120 days) count as stale."""
+    from datetime import date, timedelta
+    cutoff = (date.fromisoformat(today) - timedelta(days=days)).isoformat()
+    last = ref_last_seen(seen)
+    stale = sorted(r for r in board_refs if last.get(r, "") < cutoff)
+    alive = sorted(r for r in board_refs if last.get(r) == today)
+    return stale, alive
 
 
 def load_queue(path: Path) -> list[dict]:

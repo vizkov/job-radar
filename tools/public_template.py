@@ -27,6 +27,9 @@ PRIVATE = [
     "data/coverage_report.csv",
     "data/verified_boards.csv",
     "data/scores.jsonl",          # your fit scores
+    "data/pipeline_log.jsonl",    # your application stage history
+    "data/pipeline_snapshot.json",
+    "docs/reviews.md",            # weekly system-review notes about your search
     "work/*",                     # fetched job descriptions and Claude's drafts
     ".alert_mail/*",              # fetched alert emails
     "data/registers/*",           # public data, but refreshed weekly in your copy: shipping it would

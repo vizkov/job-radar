@@ -98,3 +98,9 @@ def test_curated_target_name_beats_vague_source_name():
     s = Sponsors(uk, NL)
     # the ATS reports just "Starling"; "Group" is stripped, so "Starling" alone would hit the wrong firm
     assert s.tag("Starling", "Starling Bank")["uk"].matched == "STARLING BANK LIMITED"
+
+
+def test_fresh_roles_get_a_bonus():
+    base = score("Pentester", {"GB"}, False, {}, age_days=None)[0]
+    assert score("Pentester", {"GB"}, False, {}, age_days=1) == (base + 1, ["title+4", "country+2", "fresh"])
+    assert score("Pentester", {"GB"}, False, {}, age_days=10)[0] == base

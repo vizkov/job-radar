@@ -72,3 +72,12 @@ def test_status_has_counts_but_no_job_titles():
     assert "Waiting to be added to the board:** 1" in s and "HTTP 404" in s
     b = radar.render_status("2026-09-28", True, groups, [], [], Counter(), queued=1)
     assert "First run (baseline)" in b
+
+
+def test_stale_refs_from_seen():
+    from jobradar.board import stale_refs
+    k_old, k_new = "c:acme|pentester|GB", "c:acme|appsec|GB"
+    seen = {k_old: "2026-09-20", k_new: "2026-09-28", "ats:x": "2026-09-28"}
+    refs = [role_ref(k_old), role_ref(k_new), "f" * 16]      # last one was pruned from seen.json
+    stale, alive = stale_refs(refs, seen, "2026-09-28", 5)
+    assert stale == sorted([role_ref(k_old), "f" * 16]) and alive == [role_ref(k_new)]

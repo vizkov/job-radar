@@ -28,7 +28,7 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from jobradar.board import enqueue, load_queue, payload, role_ref, save_queue, select_for_board
+from jobradar.board import enqueue, load_queue, payload, role_ref, save_queue, select_for_board, stale_refs
 from jobradar.common import CONFIG, ROOT, target_countries, title_matches
 from jobradar.dedupe import Group, group_postings
 from jobradar.health import BROKEN_AFTER_RUNS, update_health
@@ -89,7 +89,8 @@ def enrich(new: list[Group], sponsors=None) -> None:
     for g in new:
         p = g.best
         sp = sponsors.tag(p.company, p.company_canonical)
-        total, reasons = fit_score(p.title, p.countries, bool(p.company_canonical), sp)
+        age = (date.today() - p.posted_at.date()).days if p.posted_at else None
+        total, reasons = fit_score(p.title, p.countries, bool(p.company_canonical), sp, age_days=age)
         g.tags = {"sponsor": sp, "score": total, "tier": fit_tier(total), "reasons": reasons}
 
 
@@ -280,6 +281,14 @@ def main(argv=None):
     (DIGESTS / "latest.md").write_text(digest, encoding="utf-8")
     (DIGESTS / "status.md").write_text(status_md, encoding="utf-8")
     save_queue(STATE / "board_queue.json", queue)
+    # Roles on the board that no source has listed for a while are probably closed. Skipped on
+    # runs where a source failed or many units errored, so an outage can't "close" everything.
+    issue_map = load(STATE / "issue_map.json", {})
+    units = [u for r in results for u in r.units]
+    healthy = all(r.ok for r in results) and sum(not u.ok for u in units) <= max(3, len(units) // 10)
+    if issue_map and healthy and not args.source:
+        stale, alive = stale_refs(issue_map, seen, today, int(CONFIG.get("board", {}).get("stale_days", 5)))
+        (STATE / "stale_roles.json").write_text(json.dumps({"stale": stale, "alive": alive}, indent=1))
     (STATE / "seen.json").write_text(json.dumps(seen, indent=0, sort_keys=True))
     (STATE / "health.json").write_text(json.dumps(health, indent=0, sort_keys=True))
     append_matches(new, today)

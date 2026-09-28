@@ -21,12 +21,17 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "I applied to …", "got an interview with …", "rejected by …", "not interested in …" | `track` |
 | "stop showing …", "add company …", "also look in Germany", "too much noise" | `tune-radar` |
 | "is anything broken?", "why no new roles?", a source failing in the status issue | `health` |
+| brief says "weekly system review due", "what could be better?" | `system-review` |
+| brief shows CV gaps, "how do I strengthen my CV?", "which certs matter?" | `cv-review` |
+| a card reaches Interview, "I have an interview with …" | `interview-prep` |
 
 ## Session start
 
-A SessionStart hook (`tools/session_brief.py`) pulls the latest data, reads the board, starts
-filling new cards' fields in the background, and puts a "job-radar session brief" in your
-context. Start from it; don't redo those steps. If it says the pull failed, tell the user.
+A SessionStart hook (`tools/session_brief.py`) pulls the latest data, reads the board (logging
+stage changes the user made by dragging cards), starts filling new cards' fields in the
+background, runs health checks, and puts a "job-radar session brief" in your context. Start
+from it; don't redo those steps. Mention health items briefly and offer the matching skill;
+prioritise the freshest Tier 1 roles, since applying early matters to this user.
 
 ## How the machinery fits together
 

@@ -39,12 +39,16 @@ def load_candidates():
             company = (r.get("company") or "").strip()
             if not url or not company:
                 continue
-            resolved = resolve_careers_url(url)
-            if not resolved:
-                print(f"! override for {company}: can't detect ATS from {url} (custom careers site)")
-                continue
-            ats = resolved.ats.value if hasattr(resolved.ats, "value") else str(resolved.ats)
-            slug = url if ats in ("workday", "phenom", "oracle") else resolved.slug
+            # optional explicit ats/slug columns, for boards the URL detector doesn't recognise
+            ats, slug = (r.get("ats") or "").strip(), (r.get("slug") or "").strip()
+            if not (ats and slug):
+                resolved = resolve_careers_url(url)
+                if not resolved:
+                    print(f"! override for {company}: can't detect ATS from {url} "
+                          "(custom careers site; set the ats and slug columns if you know them)")
+                    continue
+                ats = resolved.ats.value if hasattr(resolved.ats, "value") else str(resolved.ats)
+                slug = url if ats in ("workday", "phenom", "oracle") else resolved.slug
             rows = [x for x in rows if not (x["company"] == company and not x["board_url"])]
             rows.append({"company": company, "offices": "", "status": "override", "source": "override",
                          "ats": ats, "scraper_slug": slug, "board_url": url, "board_name": company})

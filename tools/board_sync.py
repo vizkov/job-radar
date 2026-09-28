@@ -2,6 +2,8 @@
 
     python tools/board_sync.py roles  [--dry-run] [--max N]   # queued new roles -> one issue each
     python tools/board_sync.py status [--dry-run]             # create/update the pinned "Radar status" issue
+    python tools/board_sync.py stale  [--dry-run]             # label roles no longer listed as possibly-closed
+    python tools/board_sync.py backfill-map                   # rebuild role -> issue number map
 
 Local only (your `gh` login needs the project scope: gh auth refresh -s project):
     python tools/board_sync.py setup-project --repo OWNER/REPO   # create the Project + fields, link the repo
@@ -17,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -28,6 +31,10 @@ sys.path.insert(0, str(ROOT))
 from jobradar.paths import profile_path  # noqa: E402
 
 QUEUE = ROOT / "state" / "board_queue.json"
+ISSUE_MAP = ROOT / "state" / "issue_map.json"        # role ref -> issue number
+STALE = ROOT / "state" / "stale_roles.json"          # written by radar.py
+FLAGGED = ROOT / "state" / "stale_flagged.json"      # refs currently labelled possibly-closed
+PIPELINE_LOG = ROOT / "data" / "pipeline_log.jsonl"  # every stage change, with a date
 STATUS_MD = ROOT / "digests" / "status.md"
 STATUS_LABEL = "radar-status"
 BOARD_FILE = ROOT / "profile" / "board.json"   # project coordinates, written by setup-project
@@ -40,7 +47,8 @@ FIELDS = {  # name -> single-select options, or None for a number field
 }
 FINAL_STAGES = {"Offer", "Rejected", "Skipped"}
 LABEL_COLORS = {"role": "0E8A16", "tier-1": "B60205", "tier-2": "FBCA04", "sponsor-yes": "0E8A16",
-                "sponsor-unknown": "C5DEF5", "sponsor-no": "D93F0B", STATUS_LABEL: "5319E7"}
+                "sponsor-unknown": "C5DEF5", "sponsor-no": "D93F0B", STATUS_LABEL: "5319E7",
+                "fresh": "FBCA04", "possibly-closed": "BFD4F2"}
 SPACING_SECONDS = 2.0  # GitHub throttles bursts of issue creation
 
 
@@ -84,7 +92,9 @@ def sync_roles(gh: Gh, max_per_run: int, sleep=time.sleep) -> tuple[int, int]:
             args = ["issue", "create", "--title", p["title"], "--body-file", path]
             for label in p["labels"]:
                 args += ["--label", label]
-            gh(*args)
+            url = gh(*args)
+            if url and not gh.dry_run:
+                _remember_issue(p["ref"], url)
         finally:
             Path(path).unlink(missing_ok=True)
         created += 1
@@ -94,11 +104,69 @@ def sync_roles(gh: Gh, max_per_run: int, sleep=time.sleep) -> tuple[int, int]:
     return created, len(queue) - created
 
 
+def _load(path: Path, default):
+    return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
+
+
+def _remember_issue(ref: str, url: str) -> None:
+    m = _load(ISSUE_MAP, {})
+    m[ref] = int(url.rstrip("/").rsplit("/", 1)[-1])
+    ISSUE_MAP.write_text(json.dumps(m, indent=1, sort_keys=True), encoding="utf-8")
+
+
+def backfill_map(gh: Gh) -> str:
+    """Rebuild state/issue_map.json from the role issues' hidden markers."""
+    issues = json.loads(gh("issue", "list", "--label", "role", "--state", "all", "--limit", "2000",
+                           "--json", "number,body") or "[]")
+    m = _load(ISSUE_MAP, {})
+    for i in issues:
+        if (hit := re.search(r"job-radar:ref=([0-9a-f]{16})", i.get("body") or "")):
+            m[hit.group(1)] = i["number"]
+    if not gh.dry_run:
+        ISSUE_MAP.parent.mkdir(parents=True, exist_ok=True)
+        ISSUE_MAP.write_text(json.dumps(m, indent=1, sort_keys=True), encoding="utf-8")
+    return f"issue map: {len(m)} roles"
+
+
+def sync_stale(gh: Gh) -> str:
+    """Label board roles no source has listed recently as possibly-closed; unlabel if they return."""
+    report = _load(STALE, {})
+    m, flagged = _load(ISSUE_MAP, {}), set(_load(FLAGGED, []))
+    added = removed = 0
+    to_flag = [r for r in report.get("stale", []) if r in m and r not in flagged]
+    if to_flag:
+        ensure_labels(gh, {"possibly-closed"})
+    for ref in to_flag:
+        gh("issue", "edit", str(m[ref]), "--add-label", "possibly-closed")
+        flagged.add(ref)
+        added += 1
+    for ref in report.get("alive", []):
+        if ref in flagged and ref in m:
+            gh("issue", "edit", str(m[ref]), "--remove-label", "possibly-closed")
+            flagged.discard(ref)
+            removed += 1
+    if not gh.dry_run:
+        FLAGGED.write_text(json.dumps(sorted(flagged), indent=1), encoding="utf-8")
+    return f"possibly-closed: +{added} / -{removed} (now {len(flagged)})"
+
+
+def log_stage(ref: str, field: str, value: str, by: str) -> None:
+    from datetime import datetime, timezone
+    PIPELINE_LOG.parent.mkdir(parents=True, exist_ok=True)
+    with open(PIPELINE_LOG, "a", encoding="utf-8") as fh:
+        fh.write(json.dumps({"ref": ref, "field": field, "value": value, "by": by,
+                             "at": datetime.now(timezone.utc).isoformat(timespec="seconds")}) + "\n")
+
+
 def sync_status(gh: Gh) -> str:
     """Edit the open "Radar status" issue, or create and pin it."""
     if not STATUS_MD.exists():
         return "no digests/status.md (run radar.py first)"
-    path = _body_file(STATUS_MD.read_text(encoding="utf-8"))
+    text = STATUS_MD.read_text(encoding="utf-8")
+    # radar.py writes the status before `roles` opens the cards; report what's actually left
+    left = len(json.loads(QUEUE.read_text(encoding="utf-8"))) if QUEUE.exists() else 0
+    text = re.sub(r"(\*\*Waiting to be added to the board:\*\*) \d+", rf"\g<1> {left}", text)
+    path = _body_file(text)
     try:
         number = gh("issue", "list", "--label", STATUS_LABEL, "--state", "open", "--limit", "1",
                     "--json", "number", "--jq", ".[0].number")
@@ -203,6 +271,8 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False) -> str:
         return f"no board card for {ref} yet (it's created by the daily run; see state/board_queue.json)"
     for name, value in values.items():
         _edit(gh, board, item["id"], name, value)
+        if not gh.dry_run and name in ("Stage", "Recommendation"):
+            log_stage(ref, name, str(value), "claude")
     if close or values.get("Stage") in FINAL_STAGES:
         url = (item.get("content") or {}).get("url")
         if url:
@@ -233,7 +303,7 @@ def fill_new(gh: Gh) -> str:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("what", choices=["roles", "status", "setup-project", "fill", "set"])
+    ap.add_argument("what", choices=["roles", "status", "setup-project", "fill", "set", "stale", "backfill-map"])
     ap.add_argument("args", nargs="*", help="set: <ref> Field=Value …")
     ap.add_argument("--repo", help="setup-project: OWNER/REPO of your private copy")
     ap.add_argument("--close", action="store_true", help="set: also close the role's issue")
@@ -255,6 +325,10 @@ def main(argv=None) -> int:
         print(setup_project(gh, args.repo))
     elif args.what == "fill":
         print(fill_new(gh))
+    elif args.what == "stale":
+        print(sync_stale(gh))
+    elif args.what == "backfill-map":
+        print(backfill_map(gh))
     else:
         if len(args.args) < 2 or not all("=" in a for a in args.args[1:]):
             ap.error("usage: set <ref> Field=Value [Field=Value …]")

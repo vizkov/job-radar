@@ -5,6 +5,7 @@ score = best-matching title keyword weight
       + best target-country weight
       + on_target_list bonus (employer is in targets.tsv)
       + sponsor_yes bonus (licensed sponsor in the posting's UK/NL country)
+      + fresh_bonus when the role was posted within fresh_days
 Tier 1 when score >= tier1_min_score, else Tier 2.
 """
 from __future__ import annotations
@@ -16,7 +17,8 @@ _TITLE = [(keyword_re([k]), w) for k, w in (_CFG.get("title_keywords") or {}).it
 _SENIORITY = [(keyword_re([k]), w) for k, w in (_CFG.get("seniority_keywords") or {}).items()]
 
 
-def score(title: str, countries, on_list: bool, sponsor: dict | None = None) -> tuple[int, list[str]]:
+def score(title: str, countries, on_list: bool, sponsor: dict | None = None,
+          age_days: int | None = None) -> tuple[int, list[str]]:
     """Returns (score, reasons); reasons go to data/matches.csv to make tuning debuggable."""
     reasons, total = [], 0
     t = max(((w, rx.pattern) for rx, w in _TITLE if rx.search(title or "")), default=(0, ""))
@@ -42,6 +44,10 @@ def score(title: str, countries, on_list: bool, sponsor: dict | None = None) -> 
     if any(getattr(s, "status", "") == "yes" for s in relevant):
         total += _CFG.get("sponsor_yes", 0)
         reasons.append("sponsor")
+    # fresher listings get a nudge: applying in the first few days matters
+    if age_days is not None and age_days <= _CFG.get("fresh_days", 3):
+        total += _CFG.get("fresh_bonus", 0)
+        reasons.append("fresh")
     return total, reasons
 
 

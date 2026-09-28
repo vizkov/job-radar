@@ -2,7 +2,7 @@ name: job-radar
 
 on:
   schedule:
-    - cron: "47 2 * * *"      # 02:47 UTC = 08:17 IST, daily
+    - cron: "47 2,8,14 * * *"  # 08:17, 14:17, 20:17 IST: fresher listings, earlier applications
   workflow_dispatch: {}
 
 permissions: {}   # granted per job below
@@ -71,6 +71,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python tools/board_sync.py roles
+
+      - name: Flag roles that are no longer listed
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python tools/board_sync.py stale
 
       - name: Update the Radar status issue
         continue-on-error: true

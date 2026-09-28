@@ -35,7 +35,9 @@
                            "junior": -2, "associate": -1, "graduate": -3, "entry level": -3},
     "country": {"GB": 2, "NL": 2, "IE": 2, "CH": 1, "DE": 1, "SE": 1, "REMOTE-EU": 1},
     "on_target_list": 1,
-    "sponsor_yes": 1
+    "sponsor_yes": 1,
+    "fresh_days": 3,
+    "fresh_bonus": 1
   },
 
   "sponsorship": {
@@ -50,7 +52,8 @@
     "tiers": [1, 2],
     "baseline_tiers": [1],
     "include_outside": false,
-    "max_per_run": 40
+    "max_per_run": 40,
+    "stale_days": 5
   },
 
   "board_timeout_seconds": 180,

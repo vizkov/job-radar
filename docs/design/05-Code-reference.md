@@ -96,7 +96,7 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 | `_NON_EUROPE` | US/Canada/Australia markers, including `, CA`-style state codes. |
 | `target_countries()` | Priority countries, plus extra countries if enabled. |
 | `all_europe()` | Priority + extra countries. |
-| `countries_for(iso, location)` | Countries a posting is in: the source's ISO code, extended with country/city names from the text. |
+| `countries_for(iso, location)` | Countries a posting is in: the source's ISO code, extended with country/city names from the text; `OUTSIDE-EUROPE` for places clearly outside Europe that name no known country ("Sunnyvale, CA"). |
 | `job_countries(job)` | `countries_for()` for an ats-scrapers `Job`. |
 | `keyword_re(words)` | One regex for a keyword list: whole words, `*` suffix = prefix match. |
 | `title_matches(title)` | Exclude keywords veto; else any include keyword passes. |

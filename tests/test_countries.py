@@ -13,9 +13,9 @@ from jobradar.common import countries_for
     (None, "London; Amsterdam", {"GB", "NL"}),
     (None, "Remote - EMEA", {"REMOTE-EU"}),
     # US/Canada false positives the old substring matcher produced
-    (None, "Cambridge, MA", set()),
+    (None, "Cambridge, MA", {"OUTSIDE-EUROPE"}),   # never GB, never a target
     (None, "Durham, NC, United States", {"US"}),   # named, never a target
-    (None, "Reading, PA", set()),
+    (None, "Reading, PA", {"OUTSIDE-EUROPE"}),
     (None, "London, ON, Canada", {"CA"}),          # not GB: the city is ignored outside Europe
     ("US", "Cambridge, MA", {"US"}),
     ("US", "Cambridge", {"US"}),                          # non-European ISO beats the text
@@ -31,7 +31,7 @@ def test_countries(iso, loc, expected):
 
 
 @pytest.mark.parametrize("loc,expected", [
-    ("Sydney, New South Wales, AUS", set()),   # seen live on an Amazon board
+    ("Sydney, New South Wales, AUS", {"OUTSIDE-EUROPE"}),   # seen live on an Amazon board
     ("Cardiff, Wales, United Kingdom", {"GB"}),
     ("London, England, GBR", {"GB"}),
     ("Dublin, IRL", {"IE"}),

@@ -103,6 +103,8 @@ def countries_for(country_iso: str | None, location: str | None) -> set[str]:
             for c, rx in _CITY_RE.items():
                 if rx.search(loc):
                     found.add(c)
+        if non_europe and not found:
+            found.add("OUTSIDE-EUROPE")  # e.g. "Sunnyvale, CA": clearly not Europe, country not named
     if _REMOTE_EUROPE.search(loc):
         found.add("REMOTE-EU")
     return found

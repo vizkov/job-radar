@@ -140,3 +140,17 @@ def test_greenhouse_role_uses_job_api_when_company_page_fails(work, monkeypatch)
     folder, status = jd_prep.prepare(r, fetcher())
     assert status == "ok: greenhouse api" and api.called and not page.called
     assert "<p>" not in (folder / "jd.txt").read_text(encoding="utf-8")
+
+
+@respx.mock
+def test_apple_role_uses_job_api(work, monkeypatch):
+    monkeypatch.setattr(jd_prep, "via_scraper", lambda r: None)
+    respx.get("https://jobs.apple.com/api/v1/jobDetails/200670798").mock(return_value=httpx.Response(200, json={
+        "res": {"jobSummary": "Security Engineering & Architecture. " * 5, "description": "Find vulnerabilities.",
+                "minimumQualifications": "<ul><li>5 years of security research</li></ul>"}}))
+    page = respx.get(url__regex=r"https://jobs\.apple\.com/en-us/.*").mock(return_value=httpx.Response(200, text=""))
+    r = row("6" * 16, "https://jobs.apple.com/en-us/details/200670798/x") | {"ats": "apple", "ats_slug": "apple",
+                                                                            "external_id": "apple:200670798"}
+    folder, status = jd_prep.prepare(r, fetcher())
+    assert status == "ok: apple api" and not page.called
+    assert "5 years of security research" in (folder / "jd.txt").read_text(encoding="utf-8")

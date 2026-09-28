@@ -437,7 +437,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 ### `tools/jd_prep.py`: fetch job descriptions
 
 Walkthrough: [4.3](04-Claude-session.md). Functions: `html_to_text()` (main text, no
-nav/scripts), `_as_text()`, `via_scraper()` (ATS scraper's description), `greenhouse_detail_url()` (Greenhouse's per-job API), `public_url()`
+nav/scripts), `_as_text()`, `via_scraper()` (ATS scraper's description), `job_api()` (public per-job APIs for Greenhouse and Apple), `public_url()`
 (Amazon's login-walled links → public page), `jsonld_description()`, `Fetcher` (`_allowed`
 robots cache, `fetch` the ordered fallbacks), `load_rows()`, `scored_refs()`, `select()`
 (which roles), `render_packet()`, `prepare()` (write `jd.txt`, `meta.json`, `packet.md`),

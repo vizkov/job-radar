@@ -86,12 +86,29 @@ def via_scraper(row: dict) -> str | None:
     return _as_text(desc) if desc else None
 
 
-def greenhouse_detail_url(row: dict) -> str | None:
-    """Greenhouse's public per-job API, for roles the radar found on a Greenhouse board."""
-    ext = row.get("external_id") or ""
-    if row.get("ats") != "greenhouse" or not row.get("ats_slug") or not ext.startswith("greenhouse:"):
+def _greenhouse_text(data: dict) -> str:
+    return _as_text(html.unescape(data.get("content") or ""))
+
+
+def _apple_text(data: dict) -> str:
+    info = data.get("res") or data
+    parts = [info.get(k) or "" for k in ("jobSummary", "description", "minimumQualifications",
+                                          "preferredQualifications")]
+    return _as_text("\n\n".join(p for p in parts if p))
+
+
+def job_api(row: dict) -> tuple[str, str, callable] | None:
+    """A public per-job API for ATSs whose scraper has no per-job description: (name, url, to_text).
+    Companies' own pages for these are often JavaScript-only or rate-limited."""
+    ats, slug, ext = row.get("ats"), row.get("ats_slug"), row.get("external_id") or ""
+    job_id = ext.split(":", 1)[1] if ext.startswith(f"{ats}:") else ""
+    if not job_id:
         return None
-    return f"https://boards-api.greenhouse.io/v1/boards/{row['ats_slug']}/jobs/{ext.split(':', 1)[1]}"
+    if ats == "greenhouse" and slug:
+        return "greenhouse", f"https://boards-api.greenhouse.io/v1/boards/{slug}/jobs/{job_id}", _greenhouse_text
+    if ats == "apple":
+        return "apple", f"https://jobs.apple.com/api/v1/jobDetails/{job_id}", _apple_text
+    return None
 
 
 def public_url(url: str) -> str:
@@ -141,15 +158,13 @@ class Fetcher:
                 return f"ok: {row['ats']} scraper", text
         except Exception:  # scraper quirks: fall back to the page
             pass
-        if (api := greenhouse_detail_url(row)):
-            # The Greenhouse scraper only has descriptions from its board listing, so ask the public job API;
-            # companies' own career pages often wrap Greenhouse and rate-limit or render with JavaScript.
+        if (api := job_api(row)):
+            name, api_url, to_text = api
             try:
-                r = self.c.get(api, headers={"Accept": "application/json"})
+                r = self.c.get(api_url, headers={"Accept": "application/json"})
                 r.raise_for_status()
-                text = _as_text(html.unescape(r.json().get("content") or ""))
-                if len(text) >= 200:
-                    return "ok: greenhouse api", text
+                if len(text := to_text(r.json())) >= 200:
+                    return f"ok: {name} api", text
             except (httpx.HTTPError, ValueError):
                 pass
         if not self._allowed(url):

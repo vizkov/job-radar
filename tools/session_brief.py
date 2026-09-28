@@ -210,8 +210,9 @@ def board_design_note() -> str | None:
     except Exception:
         return None
     if diffs:
-        return ("board design differs from the public template (" + "; ".join(diffs[:3]) +
-                "): if the change is deliberate, offer `board_sync.py publish-board`; if not, offer to fix the view")
+        return ("board views differ from the design in code (" + "; ".join(diffs[:3]) + "): if the user changed "
+                "them on purpose, offer to update VIEWS in tools/board_sync.py (publishes to every copy); "
+                "otherwise offer `board_sync.py views` to restore them")
     return None
 
 

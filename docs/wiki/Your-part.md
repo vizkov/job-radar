@@ -32,5 +32,5 @@ Never paste the password into chat or a file. Details and trade-offs:
 | Claude has a tailored CV or cover letter ready | Read it: Claude only reuses your own lines, but you're the one sending it |
 | Claude has filled an application form (`apply-assist`) | Check each page; **you** click Submit |
 | A LinkedIn/Indeed/Glassdoor role needs scoring | Paste the job description (Claude never opens those sites) |
-| You want a board view changed (columns, sort) | Change it in the Project and **Save view**: GitHub has no API for view layout. Claude then publishes the design |
+| Claude sets up or changes a board view | Sometimes one click: GitHub's API can't set a view's sort or board columns, so Claude tells you exactly which menu item to pick |
 | Claude proposes config changes, new job boards or fixes | Say yes or no |

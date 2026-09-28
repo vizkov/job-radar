@@ -9,8 +9,8 @@ Local only (your `gh` login needs the project scope: gh auth refresh -s project)
     python tools/board_sync.py setup-project --repo OWNER/REPO   # create the Project + fields, link the repo
     python tools/board_sync.py fill                              # set Stage/Tier/Sponsor on new cards from labels
     python tools/board_sync.py set <ref> Stage=Applied [Fit=72 …] [--close]
-    python tools/board_sync.py design-diff                       # your board's views/fields vs the public template
-    python tools/board_sync.py publish-board                     # refresh the public template from your board
+    python tools/board_sync.py views                             # create/update the board's views (VIEWS)
+    python tools/board_sync.py design-diff                       # how the board's views differ from VIEWS
 
 In GitHub Actions `gh` uses GITHUB_TOKEN (issues: write). Issues labelled `role`
 are pulled onto the Project board by its built-in "Auto-add to project" workflow.
@@ -210,22 +210,16 @@ def _save_board(gh: Gh, board: dict) -> None:
         BOARD_FILE.write_text(json.dumps(board, indent=1), encoding="utf-8")
 
 
-def setup_project(gh: Gh, repo: str, title: str = "Job search", owner: str = "@me",
-                  template: str | None = None) -> str:
+def setup_project(gh: Gh, repo: str, title: str = "Job search", owner: str = "@me") -> str:
     """Create (or adopt) the Project, add job-radar's fields, link the repo. Safe to re-run:
     board.json is saved as soon as the Project exists, and an existing Project with the
-    same title is reused instead of creating a duplicate. With `template` ("owner/number" of a
-    public board template), the new Project is a copy of it: same views and fields, no items."""
+    same title is reused instead of creating a duplicate. Views come from VIEWS (apply_views)."""
     board = load_board()
     if board is None:
         if owner == "@me":  # `gh project link` compares owner names literally, so resolve @me
             owner = gh("api", "user", "--jq", ".login") or owner
         existing_projects = gh_json(gh, "project", "list", "--owner", owner, "--format", "json").get("projects", [])
         proj = next((p for p in existing_projects if p.get("title") == title and not p.get("closed")), None)
-        if proj is None and template:
-            src_owner, _, src_number = template.partition("/")
-            proj = gh_json(gh, "project", "copy", src_number, "--source-owner", src_owner,
-                           "--target-owner", owner, "--title", title, "--format", "json")
         if proj is None:
             proj = gh_json(gh, "project", "create", "--owner", owner, "--title", title, "--format", "json")
         board = {"owner": owner, "number": str(proj["number"]), "id": proj["id"], "url": proj.get("url", "")}
@@ -296,73 +290,96 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False) -> str:
     return f"{ref}: " + ", ".join(f"{k}={v}" for k, v in values.items()) + (" (closed)" if close else "")
 
 
-DESIGN_QUERY = """query($login:String!,$n:Int!){user(login:$login){projectV2(number:$n){
- views(first:20){nodes{name layout filter fields(first:40){nodes{... on ProjectV2FieldCommon{name}}}
+# The board's views, as code: setup builds them and the session brief checks them, so every copy
+# gets the same board. GitHub's API sets name, layout, filter and columns; it can't set sort or
+# board grouping, so those are reported as one-time clicks (`sort`, `group`).
+VIEWS = [
+    {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "",
+     "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted"],
+     "sort": [("Fit", "DESC")], "group": []},
+    {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "tier:T1 stage:New,Shortlisted -label:possibly-closed",
+     "fields": ["Title", "Stage", "Fit", "Recommendation", "Sponsor", "Posted"],
+     "sort": [("Posted", "DESC")], "group": []},
+    {"name": "Pipeline", "layout": "BOARD_LAYOUT", "filter": "",
+     "fields": ["Title", "Tier", "Fit", "Recommendation", "Sponsor", "Posted"],
+     "sort": [], "group": ["Stage"]},
+]
+API_KEYS = ("layout", "filter", "fields")   # what apply_views can set
+CLICK_KEYS = ("sort", "group")             # what only the Project UI can set
+
+DESIGN_QUERY = """query($login:String!,$n:Int!){user(login:$login){projectV2(number:$n){id
+ views(first:20){nodes{id name layout filter fields(first:40){nodes{... on ProjectV2FieldCommon{name}}}
   verticalGroupByFields(first:3){nodes{... on ProjectV2FieldCommon{name}}}
-  sortByFields(first:3){nodes{direction field{... on ProjectV2FieldCommon{name}}}}}}
- fields(first:50){nodes{... on ProjectV2FieldCommon{name dataType} ... on ProjectV2SingleSelectField{options{name}}}}}}}"""
+  sortByFields(first:3){nodes{direction field{... on ProjectV2FieldCommon{name}}}}}}}}}"""
 
 
-def design(gh: Gh, owner: str, number: str) -> dict:
-    """The board's design (views + custom fields), comparable across projects. Items are ignored."""
+def views(gh: Gh, owner: str, number: str) -> list[dict]:
+    """The board's views in VIEWS' shape, plus each view's node id."""
     data = gh_json(gh, "api", "graphql", "-f", f"query={DESIGN_QUERY}", "-f", f"login={owner}", "-F", f"n={number}")
-    proj = data["data"]["user"]["projectV2"]
-    views = [{"name": v["name"], "layout": v["layout"], "filter": v["filter"] or "",
-              "fields": [f.get("name") for f in v["fields"]["nodes"]],
-              "group": [f.get("name") for f in v["verticalGroupByFields"]["nodes"]],
-              "sort": [(s["field"].get("name"), s["direction"]) for s in v["sortByFields"]["nodes"]]}
-             for v in proj["views"]["nodes"]]
-    fields = {f["name"]: [o["name"] for o in f.get("options", [])] for f in proj["fields"]["nodes"]
-              if f.get("name") in FIELDS}
-    return {"views": views, "fields": fields}
+    return [{"id": v["id"], "name": v["name"], "layout": v["layout"], "filter": v["filter"] or "",
+             "fields": [f.get("name") for f in v["fields"]["nodes"]],
+             "group": [f.get("name") for f in v["verticalGroupByFields"]["nodes"]],
+             "sort": [(s["field"].get("name"), s["direction"]) for s in v["sortByFields"]["nodes"]]}
+            for v in data["data"]["user"]["projectV2"]["views"]["nodes"]]
+
+
+def _click_steps(spec: dict, have: dict) -> list[str]:
+    steps = []
+    if spec["sort"] and have.get("sort") != spec["sort"]:
+        field, direction = spec["sort"][0]
+        steps.append(f"'{spec['name']}': View menu -> Sort by -> {field} ({'descending' if direction == 'DESC' else 'ascending'}) -> Save view")
+    if spec["group"] and have.get("group") != spec["group"]:
+        steps.append(f"'{spec['name']}': View menu -> Column by -> {spec['group'][0]} -> Save view")
+    return steps
 
 
 def design_diff(gh: Gh) -> list[str]:
-    """Differences between your board's design and the public board template ([] = in sync)."""
+    """How your board's views differ from VIEWS ([] = in sync). Extra views of your own are fine."""
     board = load_board()
-    cfg = json.loads(profile_path("config.json").read_text(encoding="utf-8")).get("board", {})
-    if not board or not cfg.get("template"):
+    if not board:
         return []
-    t_owner, _, t_num = cfg["template"].partition("/")
-    mine, theirs = design(gh, board["owner"], board["number"]), design(gh, t_owner, t_num)
+    have = {v["name"]: v for v in views(gh, board["owner"], board["number"])}
     diffs = []
-    mv, tv = {v["name"]: v for v in mine["views"]}, {v["name"]: v for v in theirs["views"]}
-    for name in sorted(set(mv) | set(tv)):
-        if name not in tv:
-            diffs.append(f"view '{name}' is only on your board")
-        elif name not in mv:
-            diffs.append(f"view '{name}' is only on the template")
-        elif mv[name] != tv[name]:
-            changed = [k for k in mv[name] if mv[name][k] != tv[name][k]]
-            diffs.append(f"view '{name}' differs ({', '.join(changed)})")
-    if mine["fields"] != theirs["fields"]:
-        diffs.append("custom fields or their options differ")
+    for spec in VIEWS:
+        v = have.get(spec["name"])
+        if v is None:
+            diffs.append(f"view '{spec['name']}' is missing")
+            continue
+        changed = [k for k in API_KEYS if v[k] != spec[k]] + [k for k in CLICK_KEYS if spec[k] and v[k] != spec[k]]
+        if changed:
+            diffs.append(f"view '{spec['name']}' differs ({', '.join(changed)})")
     return diffs
 
 
-def publish_board(gh: Gh, examples_config: Path) -> str:
-    """Refresh the public board template from your board: new empty public copy, old one closed,
-    board.template updated in your config and in examples/config.json (published with the code)."""
+def apply_views(gh: Gh) -> str:
+    """Create or update the board's views to match VIEWS; returns what's left to click."""
     board = load_board()
     if not board:
         return "board not set up yet"
-    prof = profile_path("config.json")
-    old = json.loads(prof.read_text(encoding="utf-8")).get("board", {}).get("template", "")
-    copy = gh_json(gh, "project", "copy", board["number"], "--source-owner", board["owner"], "--target-owner",
-                   board["owner"], "--title", "job-radar board template", "--format", "json")
-    number = str(copy["number"])
-    gh("project", "edit", number, "--owner", board["owner"], "--visibility", "PUBLIC", "--description",
-       "Board design for job-radar (https://github.com/vizkov/job-radar): fields and views only, no items. "
-       "Copied by tools/board_sync.py setup-project.")
-    new = f"{board['owner']}/{number}"
-    for cfg_path in (prof, examples_config):
-        if cfg_path.exists() and old:
-            text = cfg_path.read_text(encoding="utf-8")
-            cfg_path.write_text(text.replace(f'"template": "{old}"', f'"template": "{new}"'), encoding="utf-8")
-    if old and old != new:
-        o_owner, _, o_num = old.partition("/")
-        gh("project", "close", o_num, "--owner", o_owner)
-    return f"board template now {new} (was {old or 'unset'}); commit to publish the config change"
+    fields = _read_fields(gh, board["owner"], board["number"])
+    have = {v["name"]: v for v in views(gh, board["owner"], board["number"])}
+    changed, clicks = [], []
+    for spec in VIEWS:
+        ids = [fields[n]["id"] for n in spec["fields"] if n in fields]
+        cfg = "configuration:{visibleFieldIds:[" + ",".join(json.dumps(i) for i in ids) + "]}"
+        v = have.get(spec["name"])
+        if v is None:
+            out = gh_json(gh, "api", "graphql", "-f", "query=mutation{createProjectV2View(input:{projectId:"
+                          f"{json.dumps(board['id'])},name:{json.dumps(spec['name'])},layout:{spec['layout']},{cfg}}})"
+                          "{projectV2View{id}}}")
+            v = {"id": out["data"]["createProjectV2View"]["projectV2View"]["id"], "filter": "", "fields": [],
+                 "layout": spec["layout"]}
+            changed.append(f"created '{spec['name']}'")
+        if any(v.get(k) != spec[k] for k in API_KEYS):
+            gh("api", "graphql", "-f", "query=mutation{updateProjectV2View(input:{viewId:"
+               f"{json.dumps(v['id'])},layout:{spec['layout']},filter:{json.dumps(spec['filter'])},{cfg}}})"
+               "{projectV2View{id}}}")
+            changed.append(f"updated '{spec['name']}'")
+        clicks += _click_steps(spec, v)
+    msg = "; ".join(changed) or "views already match"
+    if clicks:
+        msg += "\nOne-time clicks GitHub's API can't do:\n  " + "\n  ".join(clicks)
+    return msg
 
 
 POSTED_RE = re.compile(r"^- Posted: (\d{4}-\d{2}-\d{2})$", re.M)
@@ -416,7 +433,7 @@ def fill_new(gh: Gh) -> str:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("what", choices=["roles", "status", "setup-project", "fill", "set", "stale", "backfill-map",
-                                     "design-diff", "publish-board"])
+                                     "design-diff", "views"])
     ap.add_argument("args", nargs="*", help="set: <ref> Field=Value …")
     ap.add_argument("--repo", help="setup-project: OWNER/REPO of your private copy")
     ap.add_argument("--close", action="store_true", help="set: also close the role's issue")
@@ -435,8 +452,8 @@ def main(argv=None) -> int:
     elif args.what == "setup-project":
         if not args.repo:
             ap.error("setup-project needs --repo OWNER/REPO")
-        cfg = json.loads(profile_path("config.json").read_text(encoding="utf-8")).get("board", {})
-        print(setup_project(gh, args.repo, template=cfg.get("template")))
+        print(setup_project(gh, args.repo))
+        print(apply_views(gh))
     elif args.what == "fill":
         print(fill_new(gh))
     elif args.what == "stale":
@@ -444,9 +461,9 @@ def main(argv=None) -> int:
     elif args.what == "backfill-map":
         print(backfill_map(gh))
     elif args.what == "design-diff":
-        print("\n".join(design_diff(gh)) or "board design matches the public template")
-    elif args.what == "publish-board":
-        print(publish_board(gh, ROOT / "examples" / "config.json"))
+        print("\n".join(design_diff(gh)) or "board views match VIEWS")
+    elif args.what == "views":
+        print(apply_views(gh))
     else:
         if len(args.args) < 2 or not all("=" in a for a in args.args[1:]):
             ap.error("usage: set <ref> Field=Value [Field=Value …]")

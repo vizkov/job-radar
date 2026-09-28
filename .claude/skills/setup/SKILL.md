@@ -22,9 +22,9 @@ plain language; do the typing yourself.
    `python tools/build_candidates.py` then `python verify_boards.py --quiet`. Report coverage from
    `data/coverage_report.csv`: which targets have no board, and offer careers pages / alerts for those.
 4. **Board.** Ask the user to run `gh auth refresh -s project` (a browser login — suggest typing
-   `! gh auth refresh -s project` here). Then `python tools/board_sync.py setup-project --repo OWNER/REPO`. It copies the public board
-   template (`board.template` in config.json, default `vizkov/3`): the Stage/Tier/Fit/Recommendation/
-   Sponsor fields and the All Roles + Pipeline views, with no items.
+   `! gh auth refresh -s project` here). Then `python tools/board_sync.py setup-project --repo OWNER/REPO`. It creates the fields and the
+   views defined in `VIEWS` (tools/board_sync.py), then prints the sort/grouping clicks the API can't do:
+   relay those to the user.
    Walk them through the one manual step it prints (Project → Workflows → Auto-add, filter
    `is:issue label:role`), and optionally "Item closed → Done".
 5. **Alert emails (optional).** Explain why a dedicated Gmail is needed (docs/design/Job-alert-emails.md),

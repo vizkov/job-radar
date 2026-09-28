@@ -133,15 +133,6 @@ def test_repo_of_another_owner_rejected(board_file):
         bs.setup_project(FakeProjectGh(), "someoneelse/repo")
 
 
-def test_setup_copies_public_board_template(board_file):
-    gh = FakeProjectGh(fields=[{"id": "F_Stage", "name": "Stage", "options": [{"id": "o", "name": "New"}]}])
-    bs.setup_project(gh, "me/my-job-radar", template="vizkov/3")
-    assert ("project", "copy", "3", "--source-owner", "vizkov", "--target-owner", "me",
-            "--title", "Job search", "--format", "json") in gh.calls
-    assert not any(c[:2] == ("project", "create") for c in gh.calls)
-    assert json.loads(board_file.read_text())["number"] == "9"
-
-
 def test_posted_date_from_body_else_first_seen():
     assert bs.posted_date("x\n- Posted: 2026-09-20\ny", {}) == "2026-09-20"
     body = f"no date\n<!-- job-radar:ref={REF} -->"

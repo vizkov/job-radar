@@ -26,18 +26,17 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
 ## Setup
 
 `setup` skill: after `gh auth refresh -s project`, `tools/board_sync.py setup-project`
-creates the Project (copying the board template), fields, and links the repo. The
-Auto-add workflow is the manual step (see [Your part](../wiki/Your-part.md)).
+creates the Project and fields, links the repo, then builds the views. The Auto-add
+workflow is a manual step (see [Your part](../wiki/Your-part.md)).
 
-## Board template (for new copies)
+## Views as code
 
-The design lives in a public, empty Project (`board.template` in `config.json`, currently
-https://github.com/users/vizkov/projects/3). `setup-project` copies it, so a new user gets
-the same fields and views. GitHub doesn't copy the repo-specific Auto-add workflow.
+The views are defined in `VIEWS` in `tools/board_sync.py`: name, layout, filter, visible
+columns, sort and board grouping. `board_sync.py views` creates or updates the board to
+match (GraphQL `createProjectV2View` / `updateProjectV2View`), so every copy gets the same
+board. The API sets name, layout, filter and columns, but **not sort or grouping**: for those
+it prints the exact menu clicks for the user, once per view.
 
-When the board's design changes, the session brief notices (`board_sync.py design-diff`)
-and Claude offers `board_sync.py publish-board`: it copies the board's design (never its
-cards) to a new public Project, closes the old one and updates `board.template` in
-`profile/config.json` and `examples/config.json`; the next commit publishes the latter.
-GitHub has no API to edit a view's columns, and Claude in Chrome view saves did not persist
-when tried (2026-09-28), so view edits are the user's.
+The session brief runs `design-diff`. If the user changed a view on purpose, Claude updates
+`VIEWS` (the commit publishes it to the template, so new copies get it); if not, it offers
+`board_sync.py views` to restore it. Extra views the user adds are left alone.

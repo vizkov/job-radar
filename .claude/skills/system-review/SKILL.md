@@ -33,6 +33,6 @@ apply**: code or config changes happen only after the user says yes.
    "code change".
 4. **Apply only what the user approves.** Commit to the private repo; the post-commit hook publishes
    code changes to the public template. Approved boards: `discover_boards.py --apply`, then
-   `gh workflow run verify-boards`. Approved board-design changes: `board_sync.py publish-board`. Run `pytest`.
+   `gh workflow run verify-boards`. Approved board-view changes: edit `VIEWS` in tools/board_sync.py, then `board_sync.py views`. Run `pytest`.
 5. **Record the review:** write the current UTC time to `work/.last_review` and append a one-paragraph
    summary to `docs/reviews.md` in the private repo (date, findings, what was applied), then commit.

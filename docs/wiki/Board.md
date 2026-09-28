@@ -32,14 +32,12 @@ and which sources stopped returning results. Counts only, no job titles.
 
 ## Views
 
-**All Roles** (table, sorted by Fit) and **Pipeline** (board grouped by Stage). Filtered
-views make daily use faster (View → New view, type the filter, **Save view**):
+| View | What it's for |
+|---|---|
+| **Act now** | Tier 1 roles you haven't acted on, newest first. Start here: applying early matters |
+| **All Roles** | Everything, best fit first |
+| **Pipeline** | A board with one column per Stage; drag cards as things happen |
 
-| View | Layout | Filter |
-|---|---|---|
-| Act now | Table, sort Fit ↓ | `tier:T1 stage:New,Shortlisted -label:possibly-closed` |
-| Tier 2 | Table, sort Fit ↓ | `tier:T2 -stage:Rejected,Skipped` |
-| In progress | Board by Stage | `stage:Applied,Interview,Offer` |
-| Clean-up | Table | `label:possibly-closed` |
-
-Filters can use labels even when the Labels column is hidden.
+Want another view, say Tier 2 only (`tier:T2 -stage:Rejected,Skipped`) or cards whose listing may
+have closed (`label:possibly-closed`)? Ask Claude: it adds it to the board's design so every copy
+gets it. Filters can use labels even though the Labels column is hidden.

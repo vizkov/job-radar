@@ -53,8 +53,7 @@
     "baseline_tiers": [1],
     "include_outside": false,
     "max_per_run": 40,
-    "stale_days": 5,
-    "template": "vizkov/3"
+    "stale_days": 5
   },
 
   "board_timeout_seconds": 180,

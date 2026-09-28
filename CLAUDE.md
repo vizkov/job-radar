@@ -47,8 +47,9 @@ prioritise the freshest Tier 1 roles, since applying early matters to this user.
   `tools/board_sync.py`, `tools/jd_prep.py`, `tools/jd_check.py`, `tools/render_resume.py`,
   `tools/refresh_registers.py`, `tools/build_candidates.py`, `tools/public_template.py`,
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
-- Board design: `tools/board_sync.py design-diff` compares your board's views/fields with the
-  public board template; `publish-board` refreshes the template. The session brief flags drift.
+- Board views are code (`VIEWS` in `tools/board_sync.py`): `board_sync.py views` builds/restores
+  them, `design-diff` shows drift (the session brief checks it). Sort and board grouping can't be set
+  by API: relay the clicks it prints. To change a view for good, edit `VIEWS` and commit.
 - User guide: `docs/wiki/`. Design reference (yours): `docs/design/`.
 
 ## Rules you must follow

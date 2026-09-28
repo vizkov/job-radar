@@ -352,6 +352,7 @@ Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
 | Path constants | `QUEUE`, `ISSUE_MAP`, `STALE`, `FLAGGED`, `PIPELINE_LOG`, `STATUS_MD`, `MATCHES`, `BOARD_FILE`: every file it touches (tests redirect them all). |
 | `FIELDS`, `DATE` | The board's custom fields and their types/options (`DATE` marks a date field). |
 | `STATUS_LABEL`, `SPACING_SECONDS` | `radar-status` (the status issue's label); 2 s between issue creations. |
+| `REGISTER_TO_SPONSOR` | Register label → provisional Sponsor value: yes → Licensed, unknown → Unclear, no → Unlikely. |
 | `FINAL_STAGES` | Offer, Rejected, Skipped: setting one closes the issue. |
 | `LABEL_COLORS` | Label colours; anything else (country-XX) is blue. |
 | `Gh` | Runs `gh` with an argument list (no shell), reading its output as UTF-8 (Windows' default code page would garble text written back to GitHub); `dry_run` prints instead. Tests replace it. |
@@ -399,6 +400,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 |---|---|
 | `FOLLOW_UP_DAYS`, `REVIEW_EVERY_DAYS`, `GRACE` | 14, 7, 1 hour. |
 | `DOCS_REVIEW_AFTER_FILES`, `CODE_PATHS`, `LAST_DOCS_REVIEW`, `docs_review_note(now, runner)` | Suggest `docs-review` once 10 distinct files changed under `CODE_PATHS` (`radar.py`, `verify_boards.py`, `jobradar/`, `tools/`, `.claude/skills/`, `.github/workflows/`; docs and settings don't count) since `work/.last_docs_review`, per `git log --since` (the stamp is UTC and passed with `+00:00`). On a fresh copy the first call only writes the stamp. Called from `main()`. |
+| `calibration_notes(now)`, `LAST_CALIBRATION` | Run `calibrate.apply` at most weekly; report each change with its undo command and a reminder to commit the config. |
 | `referral_notes(now)` | Asks unanswered after `referrals.wait_days`, as health notes (at most 5). |
 | `stale_days(root)` | `board.stale_days` from the config, for the brief's "looks closed" line. |
 | `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
@@ -531,6 +533,30 @@ out of date.
 | `ask`, `result`, `route`, `main` | The CLI: log each step, update the card |
 
 **Watch out**: a second ask after someone already referred leaves the field at *Referred* (the ask is still logged and commented).
+
+### `tools/sponsorship.py`: checked sponsorship verdicts (standard library only)
+
+| Name | Is |
+|---|---|
+| `WORK`, `LOG` | `work/jd/`, `data/sponsorship.jsonl` |
+| `VERDICTS`, `KINDS`, `WEB_KINDS`, `BANNED` | Verdict → Sponsor option; evidence kinds; kinds that need a URL; domains never accepted |
+| `check(data, ref, jd_text)` | Validate a record: fields, verdict, country code, summary length, 1–6 evidence items, verbatim ad quotes, http(s) non-banned URLs, `confirmed` backed by ad/company page, `no` backed by an ad quote |
+| `visa_section(data)`, `with_visa(body, section)`, `VISA_START`, `VISA_END` | The card's escaped sponsorship block, inserted or replaced in place |
+| `upsert`, `company_records(company)` | Log one verdict per role; earlier verdicts for the same employer (loose name match) |
+| `record(ref, board)`, `main` | CLI `record <ref> [--board]` and `company "<name>"` |
+
+### `tools/calibrate.py`: automatic tier tuning (standard library only)
+
+| Name | Is |
+|---|---|
+| `MIN_TOTAL`, `MIN_PER`, `MAX_WEIGHT`, `LOWER_IF`, `RAISE_IF`, `COOLDOWN` | 30 scored roles overall, 5 per keyword, weights 0..5, lower when average Fit < 45 and ≥70% skip, raise when ≥ 70 and ≥60% apply, one change per keyword per 7 days |
+| `_kw_re`, `best_keyword(title, kw)` | Which title keyword set a role's weight (same rule as `tiering.score`) |
+| `weights()`, `stats()`, `proposals(now)`, `config_path()` | Current weights; per-keyword n / average Fit / skip and apply rates; changes the evidence supports; the config file edited |
+| `set_weight(keyword, value)` | Edit one weight in `config.json` in place, keeping layout and comments |
+| `apply(dry_run, now)`, `revert(keyword)`, `describe(c)` | Apply and log; undo the last automatic change; one-line description for the brief |
+
+**Watch out**: only `tiering.title_keywords` weights ever change automatically; include/exclude lists,
+countries and everything else remain the user's decision.
 
 ### `tools/check_doc_links.py`: doc link checker (standard library only)
 

@@ -39,7 +39,7 @@ developers and for Claude.
 | **Tier** | A quick automatic rating, worked out by rules (no AI) from the job title, seniority, country, company, visa sponsorship and how fresh the ad is. **Tier 1** = strongest match to what you're looking for; **Tier 2** = worth a look. There's no Tier 3: roles that don't match your titles and countries at all never reach the board. |
 | **Fit** | Claude's 0–100 judgement of how well your CV matches the job description, set when you ask it to score roles. |
 | **Recommendation** | Claude's call after scoring: Apply, Maybe or Skip. |
-| **Sponsor** | Whether the employer appears on the UK or Dutch register of companies licensed to sponsor work visas. A match means they *can* sponsor, not that they will for this role. |
+| **Sponsor** | Will the employer sponsor your work visa for this job? It starts as a register check (**Licensed** = on the UK/Dutch list of employers allowed to sponsor, which means *can*, not *will*). When Claude researches a role it becomes **Confirmed**, **Likely**, **Unlikely** or **No**, with the evidence on the card. |
 | **Referral** | Whether someone has referred you for the job: Finding contact, Asked, Referred, No route, or Not needed. You ask; Claude drafts the message and keeps track. |
 | **Posted** | When the employer posted the job. Some sources don't say; then it's the day job-radar first found it, which is usually within hours. Newer is better: early applications do better. |
 | **Role ID** | A 16-character code on each card. Mention it (or just the company and role) and Claude finds everything about that job. |

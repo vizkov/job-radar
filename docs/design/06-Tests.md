@@ -66,6 +66,8 @@ alerts (address redacted) would make those tests stronger.
 | `test_career.py` | `career`, `manual` | Parsing, contact tokens, comments ignored, duplicate IDs, missing CV message; manual lists everything; colour only when asked |
 | `test_session_brief.py` | `tools/session_brief` | Counts and freshness, health checks, quiet alert emails, drag logging and follow-ups, hostile titles neutralised, gh/git via fakes, system updates, missed-run restart |
 | `test_public_template.py` | `tools/public_template` | Code is public; private or unknown paths never published; renames; wiki link rewriting |
+| `test_sponsorship.py` | `tools/sponsorship` | Valid verdict passes; non-verbatim quotes, banned sources, unbacked confirmed/no, bad verdicts rejected; card block escaped and replaced in place |
+| `test_calibrate.py` | `tools/calibrate` | No change below the evidence threshold; one bounded step down or up; layout kept; cooldown; revert |
 | `test_referrals.py` | `tools/referrals` | Contacts found loosely and in the user's order; ask/result logged and put on the card; unanswered asks after the wait |
 | `test_docs_cover_code.py` | the overview docs | Every board field is in Concepts and the user guide's Board page; every skill in CLAUDE.md and page 4; every tool in the code reference; every config key in Configuration |
 | `test_check_doc_links.py` | `tools/check_doc_links` | The repo's docs have no broken links; a link with a space or a missing target is caught |

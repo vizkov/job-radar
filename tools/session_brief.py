@@ -34,6 +34,7 @@ WORK = ROOT / "work"
 LAST = WORK / ".last_session"
 LAST_REVIEW = WORK / ".last_review"
 LAST_DOCS_REVIEW = WORK / ".last_docs_review"
+LAST_CALIBRATION = WORK / ".last_calibration"
 FILL_LOCK = WORK / ".fill_started"
 SNAPSHOT = ROOT / "data" / "pipeline_snapshot.json"
 PIPELINE_LOG = ROOT / "data" / "pipeline_log.jsonl"
@@ -237,6 +238,24 @@ def docs_review_note(now: datetime, runner=run) -> str | None:
     return None
 
 
+def calibration_notes(now: datetime) -> list[str]:
+    """Weekly automatic tier tuning (tools/calibrate.py): apply what the Fit scores support, and say so."""
+    stamp = _read_stamp(LAST_CALIBRATION)
+    if stamp and now - stamp < timedelta(days=7):
+        return []
+    try:
+        sys.path.insert(0, str(ROOT / "tools"))
+        import calibrate  # stdlib-only
+        changes = calibrate.apply(now=now.replace(tzinfo=timezone.utc))
+    except Exception:
+        return []
+    WORK.mkdir(exist_ok=True)
+    LAST_CALIBRATION.write_text(now.isoformat())
+    return [f"auto-tuned the tier rules: {calibrate.describe(c)}. Tell the user in one line; undo with "
+            f"`python tools/calibrate.py revert \"{c['keyword']}\"`. Commit profile/config.json and "
+            "data/calibration_log.jsonl so the scheduled runs use it" for c in changes]
+
+
 def referral_notes(now: datetime) -> list[str]:
     """Referral asks with no answer after referrals.wait_days: suggest one follow-up or applying directly."""
     try:
@@ -408,6 +427,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
     if docs_note:
         checks.append(docs_note)
     checks += referral_notes(now)
+    checks += calibration_notes(now)
     if design_note:
         checks.append(design_note)
     if unpublished:

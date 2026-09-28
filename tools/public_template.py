@@ -37,7 +37,9 @@ PRIVATE = [
     "data/pipeline_log.jsonl",    # your application stage history
     "data/pipeline_snapshot.json",
     "data/usage_log.jsonl",
-    "data/referrals.jsonl",       # who you asked for referrals, and what they said       # how much Claude usage scoring batches took
+    "data/referrals.jsonl",
+    "data/sponsorship.jsonl",     # checked sponsorship verdicts for your roles
+    "data/calibration_log.jsonl", # automatic tier-weight changes from your scores       # who you asked for referrals, and what they said       # how much Claude usage scoring batches took
     "docs/reviews.md",            # weekly system-review notes about your search
     "work/*",                     # fetched job descriptions and Claude's drafts
     ".alert_mail/*",              # fetched alert emails

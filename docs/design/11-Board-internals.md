@@ -45,6 +45,8 @@ Claude adds to it later:
   Doesn't match (blockers first, quoted), between `<!-- job-radar:fit -->` markers, replaced on a
   re-score. `board_sync.py refresh-bodies` updates existing cards (and removed the tier line older
   cards carried).
+- **Visa sponsorship block** (`tools/sponsorship.py record --board`): verdict, summary and up to 4
+  evidence lines with links, between `<!-- job-radar:visa -->` markers.
 - **Comments** with the user's reasons (`board_sync.py set … --note`) and each referral step
   (`tools/referrals.py`).
 

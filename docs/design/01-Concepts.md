@@ -74,6 +74,8 @@ Skim it now; come back when a word is unclear.
 | **Baseline** | The very first run (empty `seen.json`). Everything open is recorded, but only Tier 1 goes to the board so the user doesn't start with hundreds of cards. | `board.py: select_for_board()` |
 | **Score** / **tier** | A rule-based number from title keywords, seniority, country, list membership, sponsor status and freshness. Tier 1 if score ≥ 6, else Tier 2. No AI involved. | `tiering.py` |
 | **Fit** | A different, AI-judged score (0–100): Claude compares the JD with the user's CV. Set on the board as the *Fit* field. | `tools/jd_check.py` |
+| **Sponsorship verdict** | Claude's checked answer to "will this employer sponsor this role for this user?": confirmed, likely, licensed, unclear, unlikely, no, with evidence (ad quotes, register, company pages). Replaces the register-only value on the Sponsor field. | `tools/sponsorship.py`, `sponsorship-check` skill |
+| **Calibration** | Weekly automatic adjustment of tier title-keyword weights from Fit scores: one step, bounded, logged, reversible. | `tools/calibrate.py` |
 | **Sponsor tag** | `yes` / `unknown` / `no`, plus the register entry it matched. | `sponsors.py: SponsorTag` |
 | **Board queue** | Roles chosen for the board, waiting to become issues (at most 40 per run). | `state/board_queue.json` |
 | **Payload** | One queued role: `{ref, title, body, labels}`, ready to become an issue. | `board.py: payload()` |

@@ -14,6 +14,10 @@ Glassdoor (the user does any searching and tells you); never invent anything abo
 message. `profile/network.csv` holds names of the user's friends and colleagues: it is private
 and never leaves their repo.
 
+## 0. Will they sponsor?
+If the card's Sponsor is Licensed, Unclear or Unlikely (not yet checked), run `sponsorship-check` first:
+don't spend a referral on a role that can't sponsor the user.
+
 ## 1. Who do they know there?
 - Role: find its ref in `data/matches.csv` (or the card's Role ID) and the company.
 - `python tools/referrals.py contacts "<company>"` lists people already in `profile/network.csv`,

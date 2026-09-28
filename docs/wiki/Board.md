@@ -14,7 +14,7 @@ New cards arrive three times a day. (How they get there, for the curious:
 | Tier | T1, T2 | Worked out automatically when the role is found; Claude copies it onto the card |
 | Fit | 0-100 | Claude, after scoring |
 | Recommendation | Apply, Maybe, Skip | Claude, after scoring |
-| Sponsor | Yes, Unknown, No | Claude (UK/NL register match; a name match, not a promise) |
+| Sponsor | Confirmed, Likely, Licensed, Unclear, Unlikely, No | Starts as a **register match only** (Licensed, Unclear or Unlikely): the employer holds a UK/NL sponsor licence, which says it *can* sponsor, not that it will. When Claude checks a role (the ad, the country's rules, the company's own pages), it sets **Confirmed**, **Likely**, **Unlikely** or **No** and adds the evidence, with links, to the card |
 | Referral | Finding contact, Asked, Referred, No route, Not needed | Claude, as you tell it about referral asks (each step is also a comment on the card) |
 | Posted | date | When the employer posted it; if the source doesn't say, the day job-radar first found it. Sort by it to apply early |
 
@@ -30,6 +30,9 @@ Moving a role to Offer, Rejected or Skipped closes its issue.
 
 The issue behind each card has the link to the posting, the location, the sponsor match,
 when it was posted, where else it was found, and its **Role ID**.
+
+Once Claude has checked sponsorship, the card shows a short **Visa sponsorship** note with the
+evidence and links.
 
 Once Claude has scored the role, the card also lists what **matches** your CV, what
 **partly** matches and what **doesn't match** (blockers first, quoted from the ad). Fit is a

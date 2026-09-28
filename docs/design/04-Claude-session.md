@@ -27,6 +27,7 @@ The skills, and the tools each one runs:
 | `consultant-brief` | "what's new?" | reads the session brief, `board_sync.py fill` if needed |
 | `score-roles` | "which of these fit me?" | `jd_prep.py`, then Claude writes `score.json`, then `jd_check.py score --board` |
 | `tailor-application` | "tailor my CV for X" | Claude writes `tailored.json`, `jd_check.py tailor`, `render_resume.py` |
+| `sponsorship-check` | "will they sponsor?", roles recommended apply/maybe | reads the ad, applies country rules, checks registers, WebSearch/WebFetch on company pages (never LinkedIn/Indeed/Glassdoor); `tools/sponsorship.py record --board` |
 | `referrals` | "who do I know at …", a role recommended apply, an unanswered ask in the brief | `tools/referrals.py contacts/ask/result/route/pending`; drafts in `profile/applications/<folder>/outreach.md` |
 | `apply-assist` | "help me apply to X" | Claude in Chrome; a Sonnet subagent types approved values; the user submits |
 | `track` | "I applied to X" | `board_sync.py set <ref> Stage=Applied` |
@@ -77,7 +78,8 @@ errors become one-line notes, and it always exits 0.
     freshest first), unscored Tier 1 roles, score counts, board stage counts, cards that
     look closed, cards the user moved, follow-ups due, system updates, and health notes
     from `health_checks()`: missing career docs, alert emails failing or silent, runs not
-    completing, weekly review due, recurring CV gaps; and `docs_review_note()`: a docs
+    completing, weekly review due, recurring CV gaps; `calibration_notes()`: weekly automatic tier tuning (`tools/calibrate.py apply`), reported with
+    an undo line; `referral_notes()`; and `docs_review_note()`: a docs
     review is due once 10+ code files changed since the last one.
 11. Writes `work/.last_session` with the current time.
 
@@ -196,6 +198,17 @@ nothing edited after validation can be rendered. It writes `resume.docx` (one co
 standard headings, no tables or images, which applicant tracking systems parse
 reliably), `resume.md` and `cover_letter.md`. Name and contact details come only from
 `master_resume.md`'s front matter.
+
+## 4.4b Sponsorship (`sponsorship-check`)
+
+The Sponsor field starts from the register (Licensed / Unclear / Unlikely, via
+`board_sync.REGISTER_TO_SPONSOR`). For roles worth pursuing, Claude reads the ad (verbatim quotes),
+applies the destination country's rules (GB/NL need a licensed employer; IE/DE/SE depend on
+willingness; CH is quota-limited), and researches the company's own pages. It writes
+`work/jd/<ref>/sponsorship.json`; `tools/sponsorship.py record <ref> --board` rejects unbacked
+verdicts (`confirmed` needs the ad or the company's page; `no` needs an ad quote; ad quotes must be
+verbatim; banned domains refused), logs it to `data/sponsorship.jsonl`, sets the field and writes a
+"Visa sponsorship" block on the card between `<!-- job-radar:visa -->` markers.
 
 ## 4.5 Referrals (`referrals`)
 

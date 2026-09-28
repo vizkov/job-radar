@@ -44,7 +44,8 @@ description: Score job descriptions against the user's CV (fit score, met/missin
 5. **Validate:** `python tools/jd_check.py score <ref> --board`. If it prints INVALID, fix the JSON
    (usually a non-verbatim quote or a wrong ID) and re-run. Never weaken the content to pass.
    `--board` sets Fit and Recommendation on the card and writes the fit breakdown (matches / partly / missing / blockers) into the issue; if it says the board or card isn't ready, carry on.
-   For roles recommended `apply`, offer the `referrals` step before tailoring: the user asks for a referral
+   For roles recommended `apply` or `maybe`, run `sponsorship-check` next (a role that won't sponsor isn't
+   worth a referral), then offer the `referrals` step before tailoring: the user asks for a referral
    before applying.
 6. **Log usage (while measuring, see step 0).** Ask the user for `/usage` again, then append one line
    to `data/usage_log.jsonl`:

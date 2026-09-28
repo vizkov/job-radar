@@ -17,6 +17,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "what's new?", "how's my search going?", "anything good this week?" | `consultant-brief` |
 | "which of these fit me?", "score the new roles", "is this one worth it?" | `score-roles` |
 | "tailor my CV for …", "prep my application for …", "write a cover letter for …" | `tailor-application` |
+| "will they sponsor?", a role recommended apply/maybe before referrals | `sponsorship-check` (ad + country rules + register + web research; verdict with evidence on the card) |
 | a role is shortlisted or "apply", "who do I know at …", "X referred me", brief lists an unanswered ask | `referrals` (asked before applying; the user sends every message) |
 | "fill in the application for …", "help me apply to …" | `apply-assist` (Chrome; the user approves every page and submits) |
 | "I applied to …", "got an interview with …", "rejected by …", "not interested in …" | `track` |
@@ -84,5 +85,6 @@ prioritise the freshest Tier 1 roles, since applying early matters to this user.
    `python tools/public_template.py publish <template clone> -m "…"` by hand.
    Never push private files to `template`. When you add or change a capability, update this
    file, the matching skill and the wiki in the same change, so future sessions know about it.
-8. Be honest about uncertainty: a sponsor tag is a legal-entity match, a fit score is a
+8. Be honest about uncertainty: a register match (Sponsor = Licensed) is a legal-entity match, not a
+   promise to sponsor; only `sponsorship-check` sets Confirmed/Likely/No, with evidence; a fit score is a
    judgement, a board field may not be set yet. Say so.

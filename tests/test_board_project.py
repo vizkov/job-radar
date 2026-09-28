@@ -106,7 +106,7 @@ def test_fill_sets_new_cards_only(board_file):
     gh.items = [item(), item(stage="Applied"), {"id": "X", "labels": ["radar-status"], "content": {}}]
     assert bs.fill_new(gh).startswith("filled 1 new cards")
     opts = [c[-1] for c in gh.calls if c[:2] == ("project", "item-edit") and "--date" not in c]
-    assert opts == ["O_Stage_New", "O_Tier_T1", "O_Sponsor_Yes"]
+    assert opts == ["O_Stage_New", "O_Tier_T1", "O_Sponsor_Licensed"]  # register match = Licensed, not "Yes"
 
 
 def test_existing_project_is_adopted_not_duplicated(board_file):

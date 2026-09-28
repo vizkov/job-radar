@@ -50,10 +50,13 @@ FIELDS = {  # name -> single-select options, None for a number field, or DATE
     "Tier": ["T1", "T2"],
     "Fit": None,
     "Recommendation": ["Apply", "Maybe", "Skip"],
-    "Sponsor": ["Yes", "Unknown", "No"],
+    # Register match gives Licensed / Unclear / Unlikely automatically; Confirmed / Likely / No need the
+    # sponsorship-check skill (tools/sponsorship.py), which looks at the ad, the country and the company.
+    "Sponsor": ["Confirmed", "Likely", "Licensed", "Unclear", "Unlikely", "No"],
     "Posted": DATE,  # when the employer posted it (else when the radar first saw it): sort for freshness
     "Referral": ["Finding contact", "Asked", "Referred", "No route", "Not needed"],  # tools/referrals.py
 }
+REGISTER_TO_SPONSOR = {"yes": "Licensed", "unknown": "Unclear", "no": "Unlikely"}  # label -> Sponsor field
 FINAL_STAGES = {"Offer", "Rejected", "Skipped"}
 LABEL_COLORS = {"role": "0E8A16", "tier-1": "B60205", "tier-2": "FBCA04", "sponsor-yes": "0E8A16",
                 "sponsor-unknown": "C5DEF5", "sponsor-no": "D93F0B", STATUS_LABEL: "5319E7",
@@ -519,7 +522,7 @@ def fill_new(gh: Gh) -> str:
         if item.get("stage"):
             continue
         tier = next((l.split("-")[1] for l in labels if l.startswith("tier-")), None)
-        sponsor = next((l.split("-")[1].capitalize() for l in labels if l.startswith("sponsor-")), None)
+        sponsor = next((REGISTER_TO_SPONSOR.get(l.split("-", 1)[1]) for l in labels if l.startswith("sponsor-")), None)
         _edit(gh, board, item["id"], "Stage", "New")
         if tier:
             _edit(gh, board, item["id"], "Tier", f"T{tier}")

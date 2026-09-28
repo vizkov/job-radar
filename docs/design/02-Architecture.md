@@ -126,6 +126,8 @@ doesn't match `PRIVATE`.
 | `data/scores.jsonl` | One JSON line per scored role: fit_score, recommendation, blockers, missing requirements, summary, injection flag | `jd_check.py score` | `session_brief.py`, `jd_prep.py` (skip scored), `cv-review` |
 | `data/pipeline_log.jsonl` | Every stage change: `{ref, field, value, by: claude|board, at, from?, note?}` | `board_sync.py set`, `session_brief.py` | `session_brief.py` (follow-ups) |
 | `data/referrals.jsonl` | Every referral ask and answer: `{ref, person, relation?, channel?, status: asked|referred|declined|no_reply|finding|none|not_needed, note, at}` | `tools/referrals.py` | `tools/referrals.py`, `session_brief.py` (reminders) |
+| `data/sponsorship.jsonl` | One checked sponsorship verdict per role, with evidence and URLs | `tools/sponsorship.py record` | `sponsorship.py company` (reuse), Claude |
+| `data/calibration_log.jsonl` | Every automatic tier-weight change: keyword, from, to, evidence, time; reverts too | `tools/calibrate.py` | `calibrate.py` (cooldown, revert) |
 | `data/usage_log.jsonl` | Per scoring batch: roles, JD characters, the user's `/usage` before and after (to put a real cost figure in the guide) | Claude (`score-roles`, first 3 batches) | Claude |
 | `data/pipeline_snapshot.json` | `{ref: stage}` at the last session start, to detect cards the user dragged | `session_brief.py` | `session_brief.py` |
 | `data/registers/uk_sponsors.csv`, `nl_sponsors.csv`, `meta.json` | UK and NL sponsor registers | `refresh_registers.py` (weekly workflow) | `sponsors.py` |
@@ -145,6 +147,8 @@ starts them from scratch (so both review timers reset).
 |---|---|---|
 | `work/jd/<ref>/jd.txt`, `meta.json`, `packet.md` | A role's JD text, facts, and the packet Claude reads | `jd_prep.py` (or the user pastes `jd.txt`) |
 | `work/jd/<ref>/score.json` | Claude's fit assessment, before validation | Claude |
+| `work/jd/<ref>/sponsorship.json` | Claude's sponsorship verdict and evidence, before validation | Claude |
+| `work/.last_calibration` | When calibration last ran | `session_brief.py` |
 | `work/discovered_boards.csv` | Proposed boards for uncovered targets | `discover_boards.py` |
 | `work/.last_session`, `.fill_started`, `board_fill.log` | Timestamps and logs for the session brief | `session_brief.py` |
 | `docs/reviews.md` (committed, private) | One paragraph per weekly system review: findings and what was applied | Claude (`system-review` skill) |

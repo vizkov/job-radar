@@ -30,6 +30,11 @@ name the source reported):
 | `unknown (<candidates>)` | Several entities fit ("Barclays Bank PLC / Barclays Execution Services"), a spelling is close but not certain (fuzzy 86–93), or the employer is anonymous |
 | `no` | Nothing close in the register |
 
+**The register is only the first step.** On the board it appears as *Licensed*, *Unclear* or
+*Unlikely*. The `sponsorship-check` skill turns that into a checked verdict for the specific role
+(Confirmed, Likely, Unlikely, No) from the ad's own words, the destination country's rules and the
+company's pages, with evidence and links on the card ([4](04-Claude-session.md)).
+
 **Always read the register name in brackets.** The signal is about legal
 entities, and a group can sponsor through a subsidiary with a different name
 (that shows as `no`). A short, generic brand can hit an unrelated company.
@@ -75,6 +80,11 @@ Tier 1 when the score ≥ `tier1_min_score` (6). Examples:
 | Penetration Tester, Amsterdam, on list | 4+2+1 = 7 | 1 |
 | Security Engineer, Berlin, on list | 1+1+1 = 3 | 2 |
 | Junior Pentester, Stockholm, not on list | 4−2+1 = 3 | 2 |
+
+**Automatic tuning.** Once 30 roles are scored, `tools/calibrate.py` (run weekly by the session
+brief) lowers a title keyword's weight by one when roles matching it keep scoring Skip, or raises
+it when they keep scoring Apply (at least 5 such roles; weights stay 0–5; one change per keyword
+per week). Each change is logged and reported with an undo command.
 
 `data/matches.csv` has `tier`, `score` and `score_reasons` columns, so you can
 see why a role landed where it did and adjust the weights.

@@ -26,6 +26,9 @@ _COUNTRY_NAMES = {
     "FR": ["france"], "ES": ["spain", "españa"], "IT": ["italy", "italia"], "DK": ["denmark"],
     "FI": ["finland"], "NO": ["norway"], "AT": ["austria"], "BE": ["belgium"], "LU": ["luxembourg"],
     "PT": ["portugal"], "EE": ["estonia"], "LT": ["lithuania"], "PL": ["poland"],
+    # Outside Europe: never targets, but naming them lets the status card say where dropped listings were.
+    "IN": ["india"], "US": ["united states", "united states of america"], "CA": ["canada"],
+    "AU": ["australia"], "SG": ["singapore"], "AE": ["united arab emirates", "uae"], "IL": ["israel"],
 }
 _CITY_NAMES = {
     "GB": ["london", "manchester", "edinburgh", "glasgow", "cambridge", "bristol", "reading", "leeds",
@@ -44,6 +47,9 @@ _CITY_NAMES = {
     "IT": ["milan", "milano", "rome"], "DK": ["copenhagen", "aarhus"], "FI": ["helsinki", "espoo"],
     "NO": ["oslo"], "AT": ["vienna", "wien"], "BE": ["brussels"], "PT": ["lisbon", "porto"],
     "EE": ["tallinn"], "LT": ["vilnius"], "PL": ["krakow", "kraków", "warsaw"],
+    "IN": ["bengaluru", "bangalore", "hyderabad", "pune", "chennai", "mumbai", "gurugram", "gurgaon", "noida",
+           "new delhi", "delhi", "kolkata"],
+    "SG": ["singapore"], "AE": ["dubai", "abu dhabi"],
 }
 
 

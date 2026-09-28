@@ -58,7 +58,7 @@ def test_workday_rollup_resolved_from_detail():
             return await resolve_workday_rollups(ps, c)
     assert asyncio.run(go()) == 1
     assert rollup.location == "United States - Boston Office | Canada - Ottawa Local"
-    assert rollup.countries == frozenset()  # really US + Canada: correctly dropped
+    assert rollup.countries == frozenset({"US", "CA"})  # named, not targets: correctly dropped
 
 
 @respx.mock

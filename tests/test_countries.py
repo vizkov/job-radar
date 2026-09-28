@@ -14,9 +14,9 @@ from jobradar.common import countries_for
     (None, "Remote - EMEA", {"REMOTE-EU"}),
     # US/Canada false positives the old substring matcher produced
     (None, "Cambridge, MA", set()),
-    (None, "Durham, NC, United States", set()),
+    (None, "Durham, NC, United States", {"US"}),   # named, never a target
     (None, "Reading, PA", set()),
-    (None, "London, ON, Canada", set()),
+    (None, "London, ON, Canada", {"CA"}),          # not GB: the city is ignored outside Europe
     ("US", "Cambridge, MA", {"US"}),
     ("US", "Cambridge", {"US"}),                          # non-European ISO beats the text
     # substring false positives

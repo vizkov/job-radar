@@ -22,6 +22,7 @@ only), `--include-outside` (keep employers not on the list).
 |---|---|
 | `STATE`, `DIGESTS`, `DATA` | The `state/`, `digests/` and `data/` folders. |
 | `load(path, default)` | Reads a JSON file, or returns `default` if it doesn't exist. |
+| `UNRECOGNISED` | Per source, up to 5 sample location texts in which no country was found; listed in the digest so missing places can be added. |
 | `DROP_REASONS`, `drop_lines(results, matched, dropped)` | Why a listing was dropped (country, title, employment, company), and one status line per source: found → dropped by reason → kept. |
 | `select(results, include_outside, matcher, dropped)` | Country filter, title filter, company matching; returns kept postings and per-source match counts. `include_outside` is a bool or a per-source dict. |
 | `diff_seen(groups, seen, today)` | Returns groups none of whose keys are in `seen`; stamps all their keys with today. |
@@ -90,7 +91,7 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 | Name | Is |
 |---|---|
 | `CONFIG` | `config.json`, loaded once at import. |
-| `_COUNTRY_NAMES`, `_CITY_NAMES` | Words that identify a country in location text (country names and known cities). |
+| `_COUNTRY_NAMES`, `_CITY_NAMES` | Words that identify a country in location text (country names and known cities). Also a few non-European countries (India, US, Canada, Australia, Singapore, UAE, Israel): never targets, but named so the status card can say where dropped listings were. |
 | `_REMOTE_EUROPE` | "remote … Europe/EMEA/EU" → `REMOTE-EU`. |
 | `_NON_EUROPE` | US/Canada/Australia markers, including `, CA`-style state codes. |
 | `target_countries()` | Priority countries, plus extra countries if enabled. |

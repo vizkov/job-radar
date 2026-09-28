@@ -138,3 +138,20 @@ def test_stage_changes_are_logged(state):
     bs.log_stage("a" * 16, "Stage", "Applied", "claude")
     rec = json.loads(bs.PIPELINE_LOG.read_text().splitlines()[0])
     assert (rec["ref"], rec["value"], rec["by"]) == ("a" * 16, "Applied", "claude") and rec["at"]
+
+
+def test_promote_queues_recorded_roles_not_on_the_board():
+    head = "ref,date,company,title,location,countries,url,source,posted,on_list,tier,score,score_reasons,uk_sponsor,nl_sponsor,also_on\n"
+    bs.MATCHES.write_text(head
+        + "aaaaaaaaaaaaaaaa,2026-09-28,Apple,Vulnerability Response Engineer,London,GB,https://jobs.apple.com/x,ats,2026-09-14,yes,2,4,r,yes (Apple Europe Ltd),no,\n"
+        + "bbbbbbbbbbbbbbbb,2026-09-28,Acme,AppSec,London,GB,https://acme.example/1,ats,,yes,1,9,r,no,no,\n", encoding="utf-8")
+    bs.ISSUE_MAP.write_text(json.dumps({"bbbbbbbbbbbbbbbb": 7}), encoding="utf-8")
+    msg = bs.promote(["aaaaaaaaaaaaaaaa", "bbbbbbbbbbbbbbbb", "cccccccccccccccc"])
+    assert msg.startswith("queued 1 card") and "bbbbbbbbbbbbbbbb" in msg and "cccccccccccccccc" in msg
+    q = json.loads(bs.QUEUE.read_text(encoding="utf-8"))
+    assert [p["ref"] for p in q] == ["a" * 16]
+    p = q[0]
+    assert p["title"] == "Apple — Vulnerability Response Engineer (GB)"
+    assert p["labels"] == ["role", "tier-2", "country-GB", "sponsor-yes"]
+    assert "<!-- job-radar:ref=aaaaaaaaaaaaaaaa -->" in p["body"] and "- Posted: 2026-09-14" in p["body"]
+    assert bs.promote(["aaaaaaaaaaaaaaaa"]).startswith("queued 0")  # already queued: no duplicate card

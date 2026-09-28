@@ -206,6 +206,7 @@ Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
 | `primary_country(g)` | The best posting's primary country. |
 | `sponsor_status(g)` | The UK tag for GB roles, NL tag for NL roles, else none. |
 | `payload(g)` | `{ref, title, body, labels}` for one role. |
+| `row_payload(row)` | The same issue payload rebuilt from a `matches.csv` row, for `board_sync.py promote`. |
 | `select_for_board(new, cfg, baseline)` | New groups in the configured tiers, on the list (unless `include_outside`). |
 | `ref_last_seen(seen)` | `ref → last date seen`, from the content keys in `seen.json`. |
 | `stale_refs(board_refs, seen, today, days)` | `(stale refs, refs seen today)`. |
@@ -378,6 +379,7 @@ Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
 | `_items`, `find_item(gh, board, ref)` | All cards; the card whose body has this ref's marker. |
 | `_edit(gh, board, item, field, value)` | Set one field (single-select by option ID, date, or number). |
 | `FIT_START`, `FIT_END`, `fit_section(score, scored_on)`, `with_fit(body, section)`, `set_fit_section(gh, ref, score, scored_on)` | The card's fit breakdown from a validated `score.json` (third-party-derived text escaped with `md()`), inserted before the Role ID line or replacing the previous block between the markers. |
+| `promote(refs)` | CLI `promote`: queue cards for recorded roles not on the board (skips ones already carded or queued); `roles` opens them. |
 | `TIER_LINE`, `refresh_bodies(gh)` | CLI `refresh-bodies`: remove the tier-arithmetic line older cards carried, and add or refresh fit breakdowns for every scored role from `work/jd/<ref>/score.json`. |
 | `set_role_fields(gh, ref, values, close, note)` | Set fields on a role's card, log stage changes (with the note), comment the note on the issue, close on final stages. |
 | `VIEWS`, `API_KEYS`, `CLICK_KEYS` | The board's views as data; what the API can set; what needs a click. |

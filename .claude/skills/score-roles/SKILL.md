@@ -44,6 +44,10 @@ description: Score job descriptions against the user's CV (fit score, met/missin
 5. **Validate:** `python tools/jd_check.py score <ref> --board`. If it prints INVALID, fix the JSON
    (usually a non-verbatim quote or a wrong ID) and re-run. Never weaken the content to pass.
    `--board` sets Fit and Recommendation on the card and writes the fit breakdown (matches / partly / missing / blockers) into the issue; if it says the board or card isn't ready, carry on.
+   "No board card yet" on an `apply`/`maybe` role (usually Tier 2 found on the radar's first run, which only
+   carded Tier 1): `python tools/board_sync.py promote <ref> …`, then `board_sync.py roles`, then re-run
+   `jd_check.py score <ref> --board`. Skips aren't carded. If GitHub says "rate limit exceeded" with quota
+   left, it's the secondary limit: score without `--board` and apply the board updates later in one pass.
    For roles recommended `apply` or `maybe`, run `sponsorship-check` next (a role that won't sponsor isn't
    worth a referral), then offer the `referrals` step before tailoring: the user asks for a referral
    before applying.

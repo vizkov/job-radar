@@ -51,6 +51,10 @@ Claude adds to it later:
   Doesn't match (blockers first, quoted), between `<!-- job-radar:fit -->` markers, replaced on a
   re-score. `board_sync.py refresh-bodies` updates existing cards (and removed the tier line older
   cards carried).
+- **Promoting a recorded role** (`board_sync.py promote <ref> …`, then `roles`): roles that are in
+  `matches.csv` but never got a card (the first run cards only `baseline_tiers`) are queued from their
+  CSV row by `board.row_payload()`, the same title, body, marker and labels a radar run would give them.
+  Claude does this for Tier 2 roles that score apply or maybe.
 - **Visa sponsorship block** (`tools/sponsorship.py record --board`): verdict, summary and up to 4
   evidence lines with links, between `<!-- job-radar:visa -->` markers.
 - **Comments** with the user's reasons (`board_sync.py set … --note`) and each referral step

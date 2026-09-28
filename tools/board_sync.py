@@ -118,6 +118,27 @@ def sync_roles(gh: Gh, max_per_run: int, sleep=time.sleep) -> tuple[int, int]:
     return created, len(queue) - created
 
 
+def promote(refs: list[str]) -> str:
+    """Queue cards for roles that are in matches.csv but not on the board; `roles` then opens them."""
+    import csv
+    from jobradar.board import row_payload
+    on_board = set(_load(ISSUE_MAP, {}))
+    queue = _load(QUEUE, [])
+    queued = {p["ref"] for p in queue}
+    rows = {r["ref"]: r for r in csv.DictReader(MATCHES.open(encoding="utf-8"))}
+    added, skipped = [], []
+    for ref in refs:
+        if ref in on_board or ref in queued or ref not in rows:
+            skipped.append(ref)
+            continue
+        queue.append(row_payload(rows[ref]))
+        queued.add(ref)
+        added.append(ref)
+    QUEUE.write_text(json.dumps(queue, indent=1, ensure_ascii=False), encoding="utf-8")
+    return f"queued {len(added)} card(s)" + (f"; skipped (on the board, queued or unknown): {', '.join(skipped)}"
+                                            if skipped else "")
+
+
 def _load(path: Path, default):
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else default
 
@@ -535,8 +556,8 @@ def fill_new(gh: Gh) -> str:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("what", choices=["roles", "status", "setup-project", "fill", "set", "stale", "backfill-map",
-                                     "design-diff", "views", "refresh-bodies"])
-    ap.add_argument("args", nargs="*", help="set: <ref> Field=Value …")
+                                     "design-diff", "views", "refresh-bodies", "promote"])
+    ap.add_argument("args", nargs="*", help="set: <ref> Field=Value …; promote: <ref> … (then run roles)")
     ap.add_argument("--repo", help="setup-project: OWNER/REPO of your private copy")
     ap.add_argument("--close", action="store_true", help="set: also close the role's issue")
     ap.add_argument("--note", default="", help="set: the reason, logged and posted as a comment on the issue")
@@ -567,6 +588,8 @@ def main(argv=None) -> int:
         print("\n".join(design_diff(gh)) or "board views match VIEWS")
     elif args.what == "views":
         print(apply_views(gh))
+    elif args.what == "promote":
+        print(promote(args.args))
     elif args.what == "refresh-bodies":
         print(refresh_bodies(gh))
     else:

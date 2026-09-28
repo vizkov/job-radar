@@ -72,6 +72,32 @@ def payload(g: Group) -> dict:
     return {"ref": ref, "title": title, "body": "\n".join(lines), "labels": labels}
 
 
+def row_payload(row: dict) -> dict:
+    """The same issue as payload(), rebuilt from a data/matches.csv row: for roles that were recorded but
+    never put on the board (e.g. Tier 2 roles found on the first run), promoted later on request."""
+    cc = _primary([c for c in (row.get("countries") or "").split(",") if c])
+    company = row.get("company") or "(employer not disclosed)"
+    lines = [f"**{md(company)}** — {md(row.get('location') or '') or cc}", "",
+             f"[Open the job posting]({md_url(row.get('url') or '')})", ""]
+    status = None
+    for code, col, label in (("GB", "uk_sponsor", "UK sponsor"), ("NL", "nl_sponsor", "NL sponsor")):
+        if code in (row.get("countries") or "") and row.get(col):
+            lines.append(f"- {label}: {md(row[col])}")
+            if code == cc:
+                status = row[col].split()[0]
+    if row.get("posted"):
+        lines.append(f"- Posted: {row['posted'][:10]}")
+    lines.append(f"- Found on: {row.get('source') or ''}")
+    if row.get("also_on"):
+        lines.append(f"- Also on: {md(row['also_on'])}")
+    lines += ["", f"Role ID: `{row['ref']}`", MARKER.format(ref=row["ref"])]
+    labels = ["role", f"tier-{row.get('tier') or 2}"] + ([f"country-{cc}"] if cc else [])
+    if status in ("yes", "unknown", "no"):
+        labels.append(f"sponsor-{status}")
+    return {"ref": row["ref"], "title": _plain(f"{company} — {row.get('title', '')} ({cc})", 200),
+            "body": "\n".join(lines), "labels": labels}
+
+
 def select_for_board(new: list[Group], cfg: dict, baseline: bool) -> list[Group]:
     if not cfg.get("enabled", False):
         return []

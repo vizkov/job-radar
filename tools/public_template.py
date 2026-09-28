@@ -15,6 +15,7 @@ The template keeps code, docs, tests, examples/ and the public sponsor registers
 from __future__ import annotations
 
 import fnmatch
+import re
 import shutil
 import subprocess
 import sys
@@ -135,8 +136,41 @@ def autopublish() -> None:
                                  text=True).stdout.strip()
         publish(template_dir, f"{subject}\n\n(auto-published from a private job-radar copy)")
         subprocess.run(["git", "pull", "-q", "--no-rebase", "--no-edit", "template", "main"], cwd=ROOT)
+        mirror_wiki(template_dir)
     except BaseException as e:  # includes SystemExit from failed tests
         print(f"job-radar autopublish skipped: {e}")
+
+
+def wiki_text(text: str, blob_base: str) -> str:
+    """docs/wiki page -> GitHub Wiki page: sibling links drop .md, links into the repo become absolute."""
+    text = re.sub(r"\]\((?:\.\./)+([^)]+)\)",lambda m: f"]({blob_base}/docs/{m.group(1)})", text)
+    return re.sub(r"\]\(([A-Za-z0-9-]+)\.md(#[^)]*)?\)", lambda m: f"]({m.group(1)}{m.group(2) or ''})", text)
+
+
+def mirror_wiki(template_dir: Path) -> None:
+    """Copy docs/wiki/ (the source of truth) into the template's GitHub Wiki tab, for browsing.
+    No-op until the wiki exists (GitHub creates its git repo when the first page is saved in the UI)."""
+    url = subprocess.run(["git", "remote", "get-url", "origin"], cwd=template_dir, capture_output=True,
+                         text=True).stdout.strip()
+    if not url.endswith(".git"):
+        return
+    wiki_dir = template_dir.parent / (template_dir.name + ".wiki")
+    if not (wiki_dir / ".git").exists():
+        if subprocess.run(["git", "clone", "-q", url[:-4] + ".wiki.git", str(wiki_dir)],
+                          capture_output=True).returncode != 0:
+            return
+    subprocess.run(["git", "pull", "-q"], cwd=wiki_dir, capture_output=True)
+    blob_base = url[:-4] + "/blob/main"
+    for page in (ROOT / "docs" / "wiki").glob("*.md"):
+        (wiki_dir / page.name).write_text(wiki_text(page.read_text(encoding="utf-8"), blob_base), encoding="utf-8")
+    for old in wiki_dir.glob("*.md"):
+        if not (ROOT / "docs" / "wiki" / old.name).exists():
+            old.unlink()
+    subprocess.run(["git", "add", "-A"], cwd=wiki_dir, check=True)
+    if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=wiki_dir).returncode != 0:
+        subprocess.run(["git", "commit", "-q", "-m", "Mirror docs/wiki"], cwd=wiki_dir, check=True)
+        subprocess.run(["git", "push", "-q"], cwd=wiki_dir, check=True)
+        print("wiki tab updated from docs/wiki")
 
 
 def check() -> None:

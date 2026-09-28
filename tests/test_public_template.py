@@ -26,3 +26,10 @@ def test_private_or_unknown_never_published(path):
 def test_status_paths_keeps_both_sides_of_a_rename():
     lines = ["R  docs/wiki/Setup.md -> docs/design/Setup.md", " M tools/manual.py", '?? "docs/a b.md"']
     assert pt.status_paths(lines) == {"docs/wiki/Setup.md", "docs/design/Setup.md", "tools/manual.py", "docs/a b.md"}
+
+
+def test_wiki_text_rewrites_links():
+    src = "[Board](Board.md) · [Sec](../design/Security-model.md#secrets) · [x](Using-it.md#costs) · https://a.b/c.md"
+    out = pt.wiki_text(src, "https://github.com/o/r/blob/main")
+    assert out == ("[Board](Board) · [Sec](https://github.com/o/r/blob/main/docs/design/Security-model.md#secrets)"
+                   " · [x](Using-it#costs) · https://a.b/c.md")

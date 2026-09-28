@@ -94,6 +94,12 @@ allowlist in `tools/public_template.py`, never private ones), runs the tests in 
 pushes it and merges it back. A failure never blocks your commit; the session brief reports
 unpublished code instead.
 
+The hook also mirrors `docs/wiki/` into the template's **Wiki tab** (links rewritten for the
+wiki). `docs/wiki/` stays the source of truth: it's versioned with the code, reaches every
+copy, and is what Claude reads. GitHub only creates a wiki's git repo when its first page is
+saved, so the maintainer clicks **Wiki → Create the first page → Save** once; until then the
+mirror does nothing.
+
 Before every manual push to the template, check nothing private is tracked:
 
 ```bash

@@ -9,6 +9,8 @@ Local only (your `gh` login needs the project scope: gh auth refresh -s project)
     python tools/board_sync.py setup-project --repo OWNER/REPO   # create the Project + fields, link the repo
     python tools/board_sync.py fill                              # set Stage/Tier/Sponsor on new cards from labels
     python tools/board_sync.py set <ref> Stage=Applied [Fit=72 …] [--close]
+    python tools/board_sync.py design-diff                       # your board's views/fields vs the public template
+    python tools/board_sync.py publish-board                     # refresh the public template from your board
 
 In GitHub Actions `gh` uses GITHUB_TOKEN (issues: write). Issues labelled `role`
 are pulled onto the Project board by its built-in "Auto-add to project" workflow.
@@ -286,6 +288,75 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False) -> str:
     return f"{ref}: " + ", ".join(f"{k}={v}" for k, v in values.items()) + (" (closed)" if close else "")
 
 
+DESIGN_QUERY = """query($login:String!,$n:Int!){user(login:$login){projectV2(number:$n){
+ views(first:20){nodes{name layout filter fields(first:40){nodes{... on ProjectV2FieldCommon{name}}}
+  verticalGroupByFields(first:3){nodes{... on ProjectV2FieldCommon{name}}}
+  sortByFields(first:3){nodes{direction field{... on ProjectV2FieldCommon{name}}}}}}
+ fields(first:50){nodes{... on ProjectV2FieldCommon{name dataType} ... on ProjectV2SingleSelectField{options{name}}}}}}}"""
+
+
+def design(gh: Gh, owner: str, number: str) -> dict:
+    """The board's design (views + custom fields), comparable across projects. Items are ignored."""
+    data = gh_json(gh, "api", "graphql", "-f", f"query={DESIGN_QUERY}", "-f", f"login={owner}", "-F", f"n={number}")
+    proj = data["data"]["user"]["projectV2"]
+    views = [{"name": v["name"], "layout": v["layout"], "filter": v["filter"] or "",
+              "fields": [f.get("name") for f in v["fields"]["nodes"]],
+              "group": [f.get("name") for f in v["verticalGroupByFields"]["nodes"]],
+              "sort": [(s["field"].get("name"), s["direction"]) for s in v["sortByFields"]["nodes"]]}
+             for v in proj["views"]["nodes"]]
+    fields = {f["name"]: [o["name"] for o in f.get("options", [])] for f in proj["fields"]["nodes"]
+              if f.get("name") in FIELDS}
+    return {"views": views, "fields": fields}
+
+
+def design_diff(gh: Gh) -> list[str]:
+    """Differences between your board's design and the public board template ([] = in sync)."""
+    board = load_board()
+    cfg = json.loads(profile_path("config.json").read_text(encoding="utf-8")).get("board", {})
+    if not board or not cfg.get("template"):
+        return []
+    t_owner, _, t_num = cfg["template"].partition("/")
+    mine, theirs = design(gh, board["owner"], board["number"]), design(gh, t_owner, t_num)
+    diffs = []
+    mv, tv = {v["name"]: v for v in mine["views"]}, {v["name"]: v for v in theirs["views"]}
+    for name in sorted(set(mv) | set(tv)):
+        if name not in tv:
+            diffs.append(f"view '{name}' is only on your board")
+        elif name not in mv:
+            diffs.append(f"view '{name}' is only on the template")
+        elif mv[name] != tv[name]:
+            changed = [k for k in mv[name] if mv[name][k] != tv[name][k]]
+            diffs.append(f"view '{name}' differs ({', '.join(changed)})")
+    if mine["fields"] != theirs["fields"]:
+        diffs.append("custom fields or their options differ")
+    return diffs
+
+
+def publish_board(gh: Gh, examples_config: Path) -> str:
+    """Refresh the public board template from your board: new empty public copy, old one closed,
+    board.template updated in your config and in examples/config.json (published with the code)."""
+    board = load_board()
+    if not board:
+        return "board not set up yet"
+    prof = profile_path("config.json")
+    old = json.loads(prof.read_text(encoding="utf-8")).get("board", {}).get("template", "")
+    copy = gh_json(gh, "project", "copy", board["number"], "--source-owner", board["owner"], "--target-owner",
+                   board["owner"], "--title", "job-radar board template", "--format", "json")
+    number = str(copy["number"])
+    gh("project", "edit", number, "--owner", board["owner"], "--visibility", "PUBLIC", "--description",
+       "Board design for job-radar (https://github.com/vizkov/job-radar): fields and views only, no items. "
+       "Copied by tools/board_sync.py setup-project.")
+    new = f"{board['owner']}/{number}"
+    for cfg_path in (prof, examples_config):
+        if cfg_path.exists() and old:
+            text = cfg_path.read_text(encoding="utf-8")
+            cfg_path.write_text(text.replace(f'"template": "{old}"', f'"template": "{new}"'), encoding="utf-8")
+    if old and old != new:
+        o_owner, _, o_num = old.partition("/")
+        gh("project", "close", o_num, "--owner", o_owner)
+    return f"board template now {new} (was {old or 'unset'}); commit to publish the config change"
+
+
 def fill_new(gh: Gh) -> str:
     """Cards the daily run added have labels but no field values (it can't edit Projects)."""
     board = load_board()
@@ -309,7 +380,8 @@ def fill_new(gh: Gh) -> str:
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("what", choices=["roles", "status", "setup-project", "fill", "set", "stale", "backfill-map"])
+    ap.add_argument("what", choices=["roles", "status", "setup-project", "fill", "set", "stale", "backfill-map",
+                                     "design-diff", "publish-board"])
     ap.add_argument("args", nargs="*", help="set: <ref> Field=Value …")
     ap.add_argument("--repo", help="setup-project: OWNER/REPO of your private copy")
     ap.add_argument("--close", action="store_true", help="set: also close the role's issue")
@@ -336,6 +408,10 @@ def main(argv=None) -> int:
         print(sync_stale(gh))
     elif args.what == "backfill-map":
         print(backfill_map(gh))
+    elif args.what == "design-diff":
+        print("\n".join(design_diff(gh)) or "board design matches the public template")
+    elif args.what == "publish-board":
+        print(publish_board(gh, ROOT / "examples" / "config.json"))
     else:
         if len(args.args) < 2 or not all("=" in a for a in args.args[1:]):
             ap.error("usage: set <ref> Field=Value [Field=Value …]")

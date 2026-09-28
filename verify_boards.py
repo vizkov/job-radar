@@ -37,10 +37,12 @@ def load_candidates():
         for r in csv.DictReader(open(ov, encoding="utf-8")):
             url = (r.get("careers_url") or "").strip()
             company = (r.get("company") or "").strip()
-            if not url or not company:
-                continue
             # optional explicit ats/slug columns, for boards the URL detector doesn't recognise
+            # (and for boards found by tools/discover_boards.py, which have no careers URL)
             ats, slug = (r.get("ats") or "").strip(), (r.get("slug") or "").strip()
+            if not company or not (url or (ats and slug)):
+                continue
+            url = url or f"{ats}:{slug}"
             if not (ats and slug):
                 resolved = resolve_careers_url(url)
                 if not resolved:

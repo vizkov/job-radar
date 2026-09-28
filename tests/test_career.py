@@ -37,3 +37,15 @@ def test_duplicate_ids_rejected(tmp_path):
 def test_missing_resume_says_what_to_do(tmp_path):
     with pytest.raises(FileNotFoundError, match="examples/career"):
         load_career(tmp_path)
+
+
+def test_manual_lists_every_skill_and_tool(capsys):
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+    import manual
+    assert manual.main([]) == 0
+    out = capsys.readouterr().out
+    skills = sorted(p.parent.name for p in (Path(manual.ROOT) / ".claude" / "skills").glob("*/SKILL.md"))
+    assert skills and all(f"  {s}\n" in out for s in skills)
+    assert "tools/jd_prep.py" in out and "WHAT YOU CAN ASK FOR" in out

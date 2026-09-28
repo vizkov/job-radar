@@ -202,6 +202,19 @@ def template_status(since: datetime, runner=run) -> tuple[list[str], list[str]]:
     return updates, unpublished
 
 
+def board_design_note() -> str | None:
+    try:
+        sys.path.insert(0, str(ROOT / "tools"))
+        import board_sync  # stdlib-only
+        diffs = board_sync.design_diff(board_sync.Gh())
+    except Exception:
+        return None
+    if diffs:
+        return ("board design differs from the public template (" + "; ".join(diffs[:3]) +
+                "): if the change is deliberate, offer `board_sync.py publish-board`; if not, offer to fix the view")
+    return None
+
+
 def last_run_health(runner=run) -> str | None:
     ok, out = runner(["gh", "run", "list", "--workflow", "job-radar", "--limit", "1",
                       "--json", "conclusion,status,createdAt"], 20)
@@ -263,7 +276,8 @@ def _age(posted: str, today: date) -> str:
 
 def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, items: list[dict] | None,
           board_note: str | None, fill_note: str | None, changes: list[dict], follow_ups: list[tuple[str, int]],
-          run_note: str | None, updates: list[str] = (), unpublished: list[str] = ()) -> str:
+          run_note: str | None, updates: list[str] = (), unpublished: list[str] = (),
+          design_note: str | None = None) -> str:
     rows = read_matches(root)
     scores = read_scores(root)
     by_ref = {r.get("ref"): r for r in rows}
@@ -321,6 +335,8 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
                      "about new capabilities in one line):")
         lines += [f"  - {u}" for u in updates[:8]]
     checks = health_checks(root, now, rows, scores, last_run, alert_row, run_note)
+    if design_note:
+        checks.append(design_note)
     if unpublished:
         checks.append(f"{len(unpublished)} code file(s) changed here but not in the public template "
                       f"({', '.join(unpublished[:4])}{'…' if len(unpublished) > 4 else ''}): offer to publish them "
@@ -351,7 +367,7 @@ def main() -> int:
                 fill_note = start_fill(now)
         updates, unpublished = template_status(since, run)
         print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, last_run_health(run),
-                    updates, unpublished))
+                    updates, unpublished, board_design_note() if items is not None else None))
         WORK.mkdir(exist_ok=True)
         LAST.write_text(now.isoformat())
     except Exception as e:  # never break a session

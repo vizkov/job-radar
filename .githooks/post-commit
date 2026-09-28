@@ -1,0 +1,12 @@
+#!/bin/sh
+# job-radar: after each commit in a private copy, publish changed public code to the
+# public template (tests + private-file check gate it), then merge the template back.
+# No-op unless `git config jobradar.templateDir <path to a template clone>` is set.
+cd "$(git rev-parse --show-toplevel)" || exit 0
+for py in .venv/Scripts/python .venv/bin/python python3 python; do
+  if command -v "$py" >/dev/null 2>&1 || [ -x "$py" ]; then
+    "$py" tools/public_template.py autopublish
+    exit 0
+  fi
+done
+exit 0

@@ -24,6 +24,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | brief says "weekly system review due", "what could be better?" | `system-review` |
 | brief shows CV gaps, "how do I strengthen my CV?", "which certs matter?" | `cv-review` |
 | a card reaches Interview, "I have an interview with …" | `interview-prep` |
+| "what can this do?", "man", "help", "what am I missing?" | `manual` (runs `tools/manual.py`) |
 
 ## Session start
 
@@ -44,7 +45,10 @@ prioritise the freshest Tier 1 roles, since applying early matters to this user.
   (`profile/applications/<folder>/`).
 - Tools you run (all have `--help`): `radar.py`, `verify_boards.py`,
   `tools/board_sync.py`, `tools/jd_prep.py`, `tools/jd_check.py`, `tools/render_resume.py`,
-  `tools/refresh_registers.py`, `tools/build_candidates.py`, `tools/public_template.py`.
+  `tools/refresh_registers.py`, `tools/build_candidates.py`, `tools/public_template.py`,
+  `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
+- Board design: `tools/board_sync.py design-diff` compares your board's views/fields with the
+  public board template; `publish-board` refreshes the template. The session brief flags drift.
 - Wiki with details: `docs/wiki/`.
 
 ## Rules you must follow
@@ -69,9 +73,11 @@ prioritise the freshest Tier 1 roles, since applying early matters to this user.
    and `work/` are private. Never push them to the public template (remote `template`);
    run `python tools/public_template.py check` before any push there.
 7. Commit the user's changes to their private repo (`origin`) with a clear message after
-   they agree to a change. **Code changes must also reach the public template** so it stays
-   current: after committing, run `python tools/public_template.py publish <template clone> -m "…"`
-   (copies only non-private files, tests, checks, pushes), then `git pull template main`.
+   they agree to a change. **Code changes reach the public template automatically**: the
+   `.githooks/post-commit` hook runs `tools/public_template.py autopublish`, which copies only
+   allowlisted, non-private files to the template clone (`git config jobradar.templateDir`), runs
+   the tests there, pushes, and merges back. If the brief reports unpublished code, run
+   `python tools/public_template.py publish <template clone> -m "…"` by hand.
    Never push private files to `template`. When you add or change a capability, update this
    file, the matching skill and the wiki in the same change, so future sessions know about it.
 8. Be honest about uncertainty: a sponsor tag is a legal-entity match, a fit score is a

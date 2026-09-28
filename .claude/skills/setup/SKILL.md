@@ -30,8 +30,11 @@ plain language; do the typing yourself.
 5. **Alert emails (optional).** Explain why a dedicated Gmail is needed (docs/wiki/Job-alert-emails.md),
    guide them through alerts, forwarding filter and app password, and adding the two secrets in the GitHub
    UI themselves. Never ask them to paste the password into chat or a file.
-6. **Go live.** Commit `profile/`, `data/`, `boards.json`; push to `origin`; enable Actions
+6. **Template sync (only if this user also maintains a public template).** `git config core.hooksPath
+   .githooks` and `git config jobradar.templateDir <path to template clone>`; after that every commit
+   publishes code changes. Skip for a normal user: the hook does nothing without `jobradar.templateDir`.
+7. **Go live.** Commit `profile/`, `data/`, `boards.json`; push to `origin`; enable Actions
    (`gh workflow enable` for radar, verify-boards, sponsor-registers); run the first one:
    `gh workflow run job-radar`. The first run is a baseline: Tier 1 roles go to the board.
-7. **Wrap up.** Tell them: from now on they just talk to you and watch the board; suggest they set the
+8. **Wrap up.** Tell them: from now on they just talk to you and watch the board; suggest they set the
    repo's watch level to "Participating and @mentions" so role issues don't email them.

@@ -3,6 +3,7 @@
     python tools/public_template.py export <dest>   # copy a clean template tree to <dest>
     python tools/public_template.py check           # fail if this git repo tracks private files
     python tools/public_template.py drift           # code in this private copy not yet in the template
+    python tools/public_template.py autopublish     # what .githooks/post-commit runs after each commit
     python tools/public_template.py publish <template-clone-dir> -m "message"
                                                     # copy that code to a clone of the template, test,
                                                     # check, commit, push; then: git pull template main
@@ -42,8 +43,20 @@ PRIVATE = [
 NEVER_COPY = [".git/*", ".venv/*", ".claude/settings.local.json", "*/__pycache__/*", "__pycache__/*", ".pytest_cache/*", "atss/*", "agg/*"]
 
 
+# Only these paths are ever published. A new kind of file (private or not) stays private
+# until someone deliberately adds it here: safer than relying on PRIVATE alone.
+PUBLIC = [".claude/skills/*", ".claude/settings.json", ".github/*", ".githooks/*", "jobradar/*", "tools/*",
+          "tests/*", "docs/wiki/*", "examples/*", "CLAUDE.md", "README.md", "radar.py", "verify_boards.py",
+          "requirements*.in", "requirements*.txt", "pytest.ini", ".gitignore", ".gitattributes"]
+
+
 def is_private(rel: str) -> bool:
     return any(fnmatch.fnmatch(rel, pat) for pat in PRIVATE)
+
+
+def is_public(rel: str) -> bool:
+    return (any(fnmatch.fnmatch(rel, pat) for pat in PUBLIC) and not is_private(rel)
+            and not any(fnmatch.fnmatch(rel, n) for n in NEVER_COPY))
 
 
 def export(dest: Path) -> None:
@@ -72,7 +85,7 @@ def drift(fetch: bool = True) -> list[str]:
     dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"], cwd=ROOT,
                            capture_output=True, text=True).stdout.splitlines()
     paths = set(r.stdout.split()) | {line[3:].strip().strip('"') for line in dirty}
-    return sorted(p for p in paths if p and not is_private(p) and not any(fnmatch.fnmatch(p, n) for n in NEVER_COPY))
+    return sorted(p for p in paths if p and is_public(p))
 
 
 def publish(template_dir: Path, message: str) -> None:
@@ -98,6 +111,24 @@ def publish(template_dir: Path, message: str) -> None:
     print(f"published {len(files)} files: {', '.join(files)}\nnow run: git pull template main")
 
 
+def autopublish() -> None:
+    """Run by .githooks/post-commit: publish public code changes, then merge the template back.
+    Never raises: a commit must not fail because publishing did."""
+    try:
+        cfg = subprocess.run(["git", "config", "jobradar.templateDir"], cwd=ROOT, capture_output=True, text=True)
+        template_dir = Path(cfg.stdout.strip()) if cfg.stdout.strip() else None
+        if not template_dir or not (template_dir / ".git").exists():
+            return  # not configured (e.g. someone else's copy): silently skip
+        if not drift():
+            return
+        subject = subprocess.run(["git", "log", "-1", "--format=%s"], cwd=ROOT, capture_output=True,
+                                 text=True).stdout.strip()
+        publish(template_dir, f"{subject}\n\n(auto-published from a private job-radar copy)")
+        subprocess.run(["git", "pull", "-q", "--no-rebase", "--no-edit", "template", "main"], cwd=ROOT)
+    except BaseException as e:  # includes SystemExit from failed tests
+        print(f"job-radar autopublish skipped: {e}")
+
+
 def check() -> None:
     tracked = subprocess.run(["git", "ls-files"], cwd=ROOT, capture_output=True, text=True, check=True).stdout.split()
     leaks = [t for t in tracked if is_private(t)]
@@ -113,6 +144,8 @@ if __name__ == "__main__":
         export(Path(sys.argv[2]).resolve())
     elif len(sys.argv) == 2 and sys.argv[1] == "check":
         check()
+    elif len(sys.argv) == 2 and sys.argv[1] == "autopublish":
+        autopublish()
     elif len(sys.argv) == 2 and sys.argv[1] == "drift":
         print("\n".join(drift()) or "no unpublished code changes")
     elif len(sys.argv) == 5 and sys.argv[1] == "publish" and sys.argv[3] == "-m":

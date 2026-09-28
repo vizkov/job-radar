@@ -8,6 +8,7 @@ for what you ask. You don't need to know the skill names.
 
 | You say | Claude does |
 |---|---|
+| "What can this do?" / "man" | Prints the manual: every skill (what you can ask for) and every tool, generated from the code so it is never out of date. In Claude Code you can also type `/manual` |
 | "Set this up for me" | Builds your profile from your CV and preferences, maps your target companies to job boards, creates the Project board, optionally sets up alert emails, switches on the daily run |
 | "What's new?" / "How's my search going?" | Pulls the latest data, tells you the 3-5 roles most worth your time, what's unscored, what's waiting on a reply, anything broken |
 | "Which of these fit me?" / "Is the Bridewell role worth it?" | Fetches each job description, compares it with your CV: fit score, requirements met/missing (with your evidence), blockers such as security clearance or right-to-work, and a recommendation. Puts Fit and Recommendation on the card |

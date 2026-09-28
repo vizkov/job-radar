@@ -82,7 +82,19 @@ git init -b main && git add . && git commit -m "job-radar template"
 # push to a PUBLIC repo; Settings → tick "Template repository" if you like
 ```
 
-Before every push to the template, check nothing private is tracked:
+To keep the template current automatically, point git at the shipped hook and the template clone:
+
+```bash
+git config core.hooksPath .githooks
+git config jobradar.templateDir ../job-radar-template
+```
+
+After each commit, `.githooks/post-commit` publishes any changed public code (only paths on the
+allowlist in `tools/public_template.py`, never private ones), runs the tests in the template,
+pushes it and merges it back. A failure never blocks your commit; the session brief reports
+unpublished code instead.
+
+Before every manual push to the template, check nothing private is tracked:
 
 ```bash
 python tools/public_template.py check    # fails if profile/, state/, digests/, boards.json, … are tracked

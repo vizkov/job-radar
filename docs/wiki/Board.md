@@ -69,9 +69,12 @@ fields and both views but no cards. `tools/board_sync.py setup-project` copies i
 (`board.template` in `config.json`), so a new user gets the same views in one step.
 GitHub doesn't copy the repo-specific **Auto-add** workflow; that one click stays manual.
 
-When you change your board's design (fields or views), refresh the template: create a new
-copy with `gh project copy <your board number> --source-owner <you> --target-owner <you>
---title "job-radar board template"`, make it public, and update `board.template`.
+When you change your board's design (fields or views), the session brief notices
+(`tools/board_sync.py design-diff`) and Claude offers to refresh the template with
+`tools/board_sync.py publish-board`: it copies your board's design (no cards) to a new public
+Project, closes the old one and updates `board.template` in your config and in
+`examples/config.json`, which the next commit publishes. GitHub has no API to edit a view's
+columns, so a copy is the only way to carry a view change across.
 Copying never includes your cards.
 
 ## More views worth adding

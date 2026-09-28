@@ -40,7 +40,7 @@ developers and for Claude.
 | **Fit** | Claude's 0–100 judgement of how well your CV matches the job description, set when you ask it to score roles. |
 | **Recommendation** | Claude's call after scoring: Apply, Maybe or Skip. |
 | **Sponsor** | Will the employer sponsor your work visa for this job? It starts as a register check (**Licensed** = on the UK/Dutch list of employers allowed to sponsor, which means *can*, not *will*). When Claude researches a role it becomes **Confirmed**, **Likely**, **Unlikely** or **No**, with the evidence on the card. |
-| **Referral** | Whether someone has referred you for the job: Finding contact, Asked, Referred, No route, or Not needed. You ask; Claude drafts the message and keeps track. |
+| **Referral** | Whether someone has referred you for the job: Finding contact, Asked, Referred, No route, or Not needed. You ask the people you know; Claude drafts only notes to recruiters or hiring managers, and keeps track. |
 | **Posted** | When the employer posted the job. Some sources don't say; then it's the day job-radar first found it, which is usually within hours. Newer is better: early applications do better. |
 | **Role ID** | A 16-character code on each card. Mention it (or just the company and role) and Claude finds everything about that job. |
 | **Target companies** | The list of employers you want. Roles at other employers are left off your board, wherever they were found, unless you ask otherwise. |

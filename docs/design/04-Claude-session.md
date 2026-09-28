@@ -215,11 +215,12 @@ verbatim; banned domains refused), logs it to `data/sponsorship.jsonl`, sets the
 
 ## 4.5 Referrals (`referrals`)
 
-The user asks for a referral **before** applying, in their order: friends and family, their
-network, then recruiters and hiring managers. `tools/referrals.py contacts "<company>"` lists the
-people they've told Claude about (`profile/network.csv`, loosely matched by company); Claude asks
-for more, drafts each message in `profile/applications/<folder>/outreach.md` from the user's own
-lines, and the user sends it. `referrals.py ask/result/route` log every step to
+The user asks for a referral **before** applying: people they know first, then strangers
+(recruiters, HR, hiring and team managers). `tools/referrals.py contacts "<company>"` lists the
+people they've named for that company (`profile/network.csv`, names only, loosely matched by
+company). The user writes to people they know themselves; Claude only hands over the role titles,
+links and job IDs. For strangers Claude drafts a note in `profile/applications/<folder>/outreach.md`
+from the user's own lines, and the user sends it. `referrals.py ask/result/route` log every step to
 `data/referrals.jsonl`, set the card's **Referral** field (Finding contact, Asked, Referred, No
 route, Not needed) and comment the step on the issue. The session brief's `referral_notes()` lists
 asks unanswered after `referrals.wait_days` (default 4): one follow-up, or apply directly.

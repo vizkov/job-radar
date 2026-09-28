@@ -534,7 +534,7 @@ out of date.
 | Name | Is |
 |---|---|
 | `NETWORK`, `LOG` | `profile/network.csv`, `data/referrals.jsonl` |
-| `RELATIONS` | The user's ask order: friend_family, connection, recruiter, hiring_manager |
+| `RELATIONS`, `RELATION_NAMES` | `known` (default: someone the user knows; no draft) or a stranger, `recruiter` / `hiring_manager` (drafts) |
 | `RESULTS`, `ROUTES` | Answer → board value (only *referred* sets one); route status → board value |
 | `wait_days()` | `config.json` → `referrals.wait_days` (default 4) |
 | `contacts(company)` | People at a company, loosely matched (whole-word prefix either way), in ask order |

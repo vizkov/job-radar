@@ -31,7 +31,7 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
 
 | Risk | Defence | Where |
 |---|---|---|
-| Names and contact routes of the user's friends and colleagues get published | Kept only in `profile/network.csv` and `data/referrals.jsonl`, both private (never on the publish allowlist) | `tools/public_template.py` |
+| Names of people who help the user get published | Kept only in `profile/network.csv` and `data/referrals.jsonl`, both private (never on the publish allowlist) | `tools/public_template.py` |
 | Claude contacts them | Claude only drafts; the user sends every message. No lookups on LinkedIn/Indeed/Glassdoor | `referrals` skill, `CLAUDE.md` rules 3–4 |
 
 ### 2. The mailbox password leaks

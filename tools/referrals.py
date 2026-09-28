@@ -1,17 +1,18 @@
 """Referrals: who the user can ask at a company, and what happened with each ask. Standard library only.
 
-    python tools/referrals.py contacts "<company>"      # people in profile/network.csv there, in ask order
-    python tools/referrals.py ask <ref> --person "Name" --relation friend_family [--channel "WhatsApp"] [--note "…"]
+    python tools/referrals.py contacts "<company>"      # people in profile/network.csv who can help there
+    python tools/referrals.py ask <ref> --person "Name" [--relation recruiter|hiring_manager] [--channel "…"] [--note "…"]
     python tools/referrals.py result <ref> --person "Name" --status referred|declined|no_reply [--note "…"]
     python tools/referrals.py route <ref> --status finding|none|not_needed [--note "…"]
     python tools/referrals.py pending [--days N]        # asks with no answer for N+ days (default: config)
 
-The user's plan, in order: friends and family, then their network (connections), then recruiters and
-hiring managers. Claude drafts every message; the user sends it. Nothing here contacts anyone.
+The user's plan, in order: people they know (family, friends, their network), then strangers
+(recruiters, hiring managers). The user messages people they know in their own words; Claude drafts only
+messages to strangers. Nothing here contacts anyone.
 
-Contacts live in profile/network.csv (private: names of the user's friends and colleagues):
-    name,relation,company,role,how_to_reach,notes,added
-relation is one of RELATIONS. Every ask and result is appended to data/referrals.jsonl (private), and
+profile/network.csv (private) holds only who can help where, as the user told it:  name,company,added
+(one row per person per company; nothing about how they're related or what they do). Every ask and
+result is appended to data/referrals.jsonl (private), and
 the board's Referral field plus a comment on the role's issue are updated (tools/board_sync.py).
 """
 from __future__ import annotations
@@ -31,12 +32,11 @@ from jobradar.paths import profile_path  # noqa: E402
 
 NETWORK = ROOT / "profile" / "network.csv"
 LOG = ROOT / "data" / "referrals.jsonl"
-RELATIONS = ["friend_family", "connection", "recruiter", "hiring_manager"]   # the order to ask in
-RELATION_NAMES = {"friend_family": "friend/family", "connection": "connection", "recruiter": "recruiter",
-                  "hiring_manager": "hiring manager"}
+RELATIONS = ["known", "recruiter", "hiring_manager"]   # someone the user knows, or a stranger (drafts only for these)
+RELATION_NAMES = {"known": "", "recruiter": "recruiter", "hiring_manager": "hiring manager"}
 RESULTS = {"referred": "Referred", "declined": None, "no_reply": None}          # result -> board value
 ROUTES = {"finding": "Finding contact", "none": "No route", "not_needed": "Not needed"}
-NETWORK_FIELDS = ["name", "relation", "company", "role", "how_to_reach", "notes", "added"]
+NETWORK_FIELDS = ["name", "company", "added"]
 
 
 def wait_days() -> int:
@@ -48,7 +48,7 @@ def wait_days() -> int:
 
 
 def contacts(company: str, network: Path | None = None) -> list[dict]:
-    """People at `company`, in the user's ask order. Loose on purpose (whole-word prefix either way, so
+    """People who can help at `company`. Loose on purpose (whole-word prefix either way, so
     "Amazon UK Services Ltd" is found for "Amazon"): a wrong suggestion costs a question, a miss costs a referral."""
     network = network or NETWORK
     if not network.exists():
@@ -60,8 +60,7 @@ def contacts(company: str, network: Path | None = None) -> list[dict]:
         return bool(key and o) and (o == key or o.startswith(key + " ") or key.startswith(o + " "))
     with open(network, encoding="utf-8", newline="") as fh:
         rows = [r for r in csv.DictReader(fh) if same(r.get("company", ""))]
-    rank = {r: i for i, r in enumerate(RELATIONS)}
-    return sorted(rows, key=lambda r: rank.get(r.get("relation", ""), len(RELATIONS)))
+    return rows  # in the order the user told Claude
 
 
 def records(log: Path | None = None) -> list[dict]:
@@ -114,12 +113,13 @@ def _board(ref: str, value: str | None, note: str, gh=None) -> str:
     return board_sync.set_role_fields(gh, ref, values, note=note)
 
 
-def ask(ref: str, person: str, relation: str, channel: str = "", note: str = "", gh=None) -> str:
+def ask(ref: str, person: str, relation: str = "known", channel: str = "", note: str = "", gh=None) -> str:
     if relation not in RELATIONS:
         raise SystemExit(f"relation must be one of {', '.join(RELATIONS)}")
     _append({"ref": ref, "person": person, "relation": relation, "channel": channel, "status": "asked", "note": note})
     already = any(r["ref"] == ref and r.get("status") == "referred" for r in records())
-    text = f"Referral: asked {person} ({RELATION_NAMES[relation]}){' via ' + channel if channel else ''}." + (f" {note}" if note else "")
+    who = f"{person} ({RELATION_NAMES[relation]})" if RELATION_NAMES[relation] else person
+    text = f"Referral: asked {who}{' via ' + channel if channel else ''}." + (f" {note}" if note else "")
     return _board(ref, None if already else "Asked", text, gh)
 
 
@@ -143,7 +143,7 @@ def main(argv=None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     c = sub.add_parser("contacts"); c.add_argument("company")
     a = sub.add_parser("ask"); a.add_argument("ref"); a.add_argument("--person", required=True)
-    a.add_argument("--relation", required=True, choices=RELATIONS); a.add_argument("--channel", default="")
+    a.add_argument("--relation", default="known", choices=RELATIONS); a.add_argument("--channel", default="")
     a.add_argument("--note", default="")
     r = sub.add_parser("result"); r.add_argument("ref"); r.add_argument("--person", required=True)
     r.add_argument("--status", required=True, choices=list(RESULTS)); r.add_argument("--note", default="")
@@ -153,7 +153,7 @@ def main(argv=None) -> int:
     args = ap.parse_args(argv)
     if args.cmd == "contacts":
         people = contacts(args.company)
-        print("\n".join(f"{x['relation']:15} {x['name']} — {x.get('role', '')} ({x.get('how_to_reach', '')})"
+        print("\n".join(f"{x['name']}"
                         for x in people) or f"no contacts at {args.company} in {NETWORK.relative_to(ROOT)}")
     elif args.cmd == "ask":
         print(ask(args.ref, args.person, args.relation, args.channel, args.note))
@@ -163,7 +163,7 @@ def main(argv=None) -> int:
         print(route(args.ref, args.status, args.note))
     else:
         rows = pending(args.days if args.days is not None else wait_days())
-        print("\n".join(f"{r['ref']}  {r['person']} ({RELATION_NAMES.get(r.get('relation', ''), '')}), asked "
+        print("\n".join(f"{r['ref']}  {r['person']}, asked "
                         f"{r['days']} days ago" for r in rows) or "no unanswered asks")
     return 0
 

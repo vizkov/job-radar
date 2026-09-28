@@ -20,6 +20,7 @@ Every gh call passes arguments as a list (no shell), and all text goes in via
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import re
 import subprocess
@@ -39,18 +40,21 @@ FLAGGED = ROOT / "state" / "stale_flagged.json"      # refs currently labelled p
 PIPELINE_LOG = ROOT / "data" / "pipeline_log.jsonl"  # every stage change, with a date
 STATUS_MD = ROOT / "digests" / "status.md"
 STATUS_LABEL = "radar-status"
+MATCHES = ROOT / "data" / "matches.csv"
 BOARD_FILE = ROOT / "profile" / "board.json"   # project coordinates, written by setup-project
-FIELDS = {  # name -> single-select options, or None for a number field
+DATE = "DATE"
+FIELDS = {  # name -> single-select options, None for a number field, or DATE
     "Stage": ["New", "Shortlisted", "Applied", "Interview", "Offer", "Rejected", "Skipped"],
     "Tier": ["T1", "T2"],
     "Fit": None,
     "Recommendation": ["Apply", "Maybe", "Skip"],
     "Sponsor": ["Yes", "Unknown", "No"],
+    "Posted": DATE,  # when the employer posted it (else when the radar first saw it): sort for freshness
 }
 FINAL_STAGES = {"Offer", "Rejected", "Skipped"}
 LABEL_COLORS = {"role": "0E8A16", "tier-1": "B60205", "tier-2": "FBCA04", "sponsor-yes": "0E8A16",
                 "sponsor-unknown": "C5DEF5", "sponsor-no": "D93F0B", STATUS_LABEL: "5319E7",
-                "fresh": "FBCA04", "possibly-closed": "BFD4F2"}
+                "possibly-closed": "BFD4F2"}
 SPACING_SECONDS = 2.0  # GitHub throttles bursts of issue creation
 
 
@@ -231,8 +235,10 @@ def setup_project(gh: Gh, repo: str, title: str = "Job search", owner: str = "@m
         if name in existing:
             continue
         args = ["project", "field-create", board["number"], "--owner", board["owner"], "--name", name]
-        args += ["--data-type", "NUMBER"] if options is None else \
-                ["--data-type", "SINGLE_SELECT", "--single-select-options", ",".join(options)]
+        if options is None or options == DATE:
+            args += ["--data-type", "NUMBER" if options is None else "DATE"]
+        else:
+            args += ["--data-type", "SINGLE_SELECT", "--single-select-options", ",".join(options)]
         gh(*args)
     repo_owner, _, repo_name = repo.partition("/")
     if repo_owner and repo_name and repo_owner.lower() != board["owner"].lower():
@@ -265,6 +271,8 @@ def _edit(gh: Gh, board: dict, item_id: str, name: str, value) -> None:
         if option is None:
             raise ValueError(f"{name} must be one of: {', '.join(FIELDS.get(name) or field['options'])}")
         args += ["--single-select-option-id", option]
+    elif FIELDS.get(name) == DATE:
+        args += ["--date", str(value)[:10]]
     else:
         args += ["--number", str(float(value))]
     gh(*args)
@@ -357,15 +365,42 @@ def publish_board(gh: Gh, examples_config: Path) -> str:
     return f"board template now {new} (was {old or 'unset'}); commit to publish the config change"
 
 
+POSTED_RE = re.compile(r"^- Posted: (\d{4}-\d{2}-\d{2})$", re.M)
+REF_RE = re.compile(r"job-radar:ref=([0-9a-f]{16})")
+
+
+def posted_date(body: str, first_seen: dict[str, str]) -> str | None:
+    """The posting date from the issue body, else the day the radar first saw the role."""
+    if m := POSTED_RE.search(body or ""):
+        return m.group(1)
+    ref = REF_RE.search(body or "")
+    return (first_seen.get(ref.group(1)) or None) if ref else None
+
+
+def _first_seen() -> dict[str, str]:
+    if not MATCHES.exists():
+        return {}
+    with open(MATCHES, encoding="utf-8") as fh:
+        return {r["ref"]: (r.get("posted") or r.get("date") or "")[:10] for r in csv.DictReader(fh) if r.get("ref")}
+
+
 def fill_new(gh: Gh) -> str:
-    """Cards the daily run added have labels but no field values (it can't edit Projects)."""
+    """Cards the scheduled run added have labels but no field values (it can't edit Projects)."""
     board = load_board()
     if board is None:
         return "board not set up yet"
-    done = 0
+    done = dated = 0
+    seen = None
     for item in _items(gh, board):
         labels = set(item.get("labels") or [])
-        if "role" not in labels or item.get("stage"):
+        if "role" not in labels:
+            continue
+        if "Posted" in board["fields"] and not item.get("posted"):
+            seen = _first_seen() if seen is None else seen
+            if (day := posted_date((item.get("content") or {}).get("body") or "", seen)):
+                _edit(gh, board, item["id"], "Posted", day)
+                dated += 1
+        if item.get("stage"):
             continue
         tier = next((l.split("-")[1] for l in labels if l.startswith("tier-")), None)
         sponsor = next((l.split("-")[1].capitalize() for l in labels if l.startswith("sponsor-")), None)
@@ -375,7 +410,7 @@ def fill_new(gh: Gh) -> str:
         if sponsor:
             _edit(gh, board, item["id"], "Sponsor", sponsor)
         done += 1
-    return f"filled {done} new cards"
+    return f"filled {done} new cards, dated {dated}"
 
 
 def main(argv=None) -> int:

@@ -104,8 +104,8 @@ def test_not_set_up(board_file):
 def test_fill_sets_new_cards_only(board_file):
     gh, _ = setup(board_file)
     gh.items = [item(), item(stage="Applied"), {"id": "X", "labels": ["radar-status"], "content": {}}]
-    assert bs.fill_new(gh) == "filled 1 new cards"
-    opts = [c[-1] for c in gh.calls if c[:2] == ("project", "item-edit")]
+    assert bs.fill_new(gh).startswith("filled 1 new cards")
+    opts = [c[-1] for c in gh.calls if c[:2] == ("project", "item-edit") and "--date" not in c]
     assert opts == ["O_Stage_New", "O_Tier_T1", "O_Sponsor_Yes"]
 
 
@@ -140,3 +140,20 @@ def test_setup_copies_public_board_template(board_file):
             "--title", "Job search", "--format", "json") in gh.calls
     assert not any(c[:2] == ("project", "create") for c in gh.calls)
     assert json.loads(board_file.read_text())["number"] == "9"
+
+
+def test_posted_date_from_body_else_first_seen():
+    assert bs.posted_date("x\n- Posted: 2026-09-20\ny", {}) == "2026-09-20"
+    body = f"no date\n<!-- job-radar:ref={REF} -->"
+    assert bs.posted_date(body, {REF: "2026-09-25"}) == "2026-09-25"
+    assert bs.posted_date(body, {}) is None
+
+
+def test_fill_dates_every_undated_role_card(board_file):
+    gh, _ = setup(board_file)
+    dated = item(stage="Applied")
+    dated["content"]["body"] = "- Posted: 2026-09-21\n" + dated["content"]["body"]
+    gh.items = [dated, {**item(stage="New"), "posted": "2026-09-01"}]
+    assert bs.fill_new(gh).endswith("dated 1")
+    dates = [c for c in gh.calls if c[:2] == ("project", "item-edit") and "--date" in c]
+    assert len(dates) == 1 and dates[0][-1] == "2026-09-21"

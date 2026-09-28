@@ -50,7 +50,7 @@ def payload(g: Group) -> dict:
     p, tier, score = g.best, g.tags.get("tier", 2), g.tags.get("score", "")
     ref, cc = role_ref(g.key), primary_country(g)
     company = p.company_canonical or p.company or "(employer not disclosed)"
-    title = _plain(f"[T{tier}] {company} — {p.title} ({cc})", 200)
+    title = _plain(f"{company} — {p.title} ({cc})", 200)  # tier is a board field and a label, not title text
     lines = [f"**{md(company)}** — {md(p.location) or cc}", "",
              f"[Open the job posting]({md_url(p.url)})", "",
              f"- **Tier {tier}** (score {score}: {md(' '.join(g.tags.get('reasons', [])))})"]
@@ -69,8 +69,6 @@ def payload(g: Group) -> dict:
         labels.append(f"country-{cc}")
     if (s := sponsor_status(g)):
         labels.append(f"sponsor-{s}")
-    if "fresh" in g.tags.get("reasons", []):
-        labels.append("fresh")
     return {"ref": ref, "title": title, "body": "\n".join(lines), "labels": labels}
 
 

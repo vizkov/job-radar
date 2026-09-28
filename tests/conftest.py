@@ -27,7 +27,7 @@ def _isolate_tool_state(tmp_path, monkeypatch):
     if str(tools) not in _sys.path:
         _sys.path.insert(0, str(tools))
     import board_sync
-    for attr in ("QUEUE", "STATUS_MD", "ISSUE_MAP", "STALE", "FLAGGED", "PIPELINE_LOG", "BOARD_FILE"):
+    for attr in ("QUEUE", "STATUS_MD", "ISSUE_MAP", "STALE", "FLAGGED", "PIPELINE_LOG", "BOARD_FILE", "MATCHES"):
         monkeypatch.setattr(board_sync, attr, tmp_path / f"_iso_{attr.lower()}")
     import jd_check, jd_prep
     monkeypatch.setattr(jd_check, "SCORES", tmp_path / "_iso_scores.jsonl")

@@ -112,3 +112,20 @@ def test_system_updates_and_unpublished_code(tmp_path):
     text = brief(root, updates=["Freshness, closed-posting detection"], unpublished=["tools/radar.py"])
     assert "System updated since last session" in text and "Freshness, closed-posting detection" in text
     assert "1 code file(s) changed here but not in the public template (tools/radar.py)" in text
+
+
+def test_missed_scheduled_run_is_restarted():
+    from datetime import datetime, timezone
+    calls = []
+
+    def runner(cmd, timeout):
+        calls.append(cmd)
+        if cmd[1:3] == ["run", "list"]:
+            return True, '[{"conclusion": "success", "status": "completed", "createdAt": "2026-09-28T07:03:18Z"}]'
+        return True, ""
+    now = datetime(2026, 9, 28, 10, 50, tzinfo=timezone.utc)  # 08:47 slot + 1 h grace has passed
+    note = sb.last_run_health(runner, now)
+    assert "08:47 UTC" in note and ["gh", "workflow", "run", "job-radar"] in calls
+    calls.clear()  # 09:30: the 08:47 run may just be late
+    assert sb.last_run_health(runner, datetime(2026, 9, 28, 9, 30, tzinfo=timezone.utc)) is None
+    assert ["gh", "workflow", "run", "job-radar"] not in calls

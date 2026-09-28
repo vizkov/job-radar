@@ -8,14 +8,15 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
    the ones for the board in `state/board_queue.json`: Tier 1 and 2 at companies on
    the list (`profile/config.json` → `board`).
 2. `tools/board_sync.py roles` opens one **issue** per queued role in the private
-   repo, labelled `role`, `tier-1|2`, `country-XX`, `sponsor-yes|unknown|no` (and `fresh`).
+   repo, labelled `role`, `tier-1|2`, `country-XX`, `sponsor-yes|unknown|no`.
    Up to 40 per run, 2 seconds apart (GitHub throttles bursts); the rest wait.
 3. The Project's built-in **Auto-add to project** workflow (filter `is:issue label:role`)
    puts each issue on the board.
 4. The run can't edit Project fields (its built-in token has no access to user-owned
    Projects), so labels are its only way to attach data. At session start Claude runs
    `board_sync.py fill` with the user's local `gh` login (project scope): **Stage = New**,
-   **Tier** and **Sponsor** from the labels, **Fit** / **Recommendation** from scores.
+   **Tier** and **Sponsor** from the labels, **Posted** from the issue body (else the day first
+   seen, from `data/matches.csv`), **Fit** / **Recommendation** from scores.
 5. `board_sync.py stale` labels roles no source has listed for `stale_days` as
    `possibly-closed` (and removes the label if they come back).
 

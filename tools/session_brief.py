@@ -215,7 +215,22 @@ def board_design_note() -> str | None:
     return None
 
 
-def last_run_health(runner=run) -> str | None:
+GRACE = timedelta(hours=1)  # GitHub often starts scheduled runs late
+
+
+def last_due_slot(now: datetime, workflow: Path = ROOT / ".github" / "workflows" / "radar.yml") -> datetime | None:
+    """The latest scheduled start (from radar.yml's cron) that should have run by now, allowing GRACE."""
+    m = re.search(r'cron:\s*"(\d+) ([\d,]+) \* \* \*"', workflow.read_text(encoding="utf-8")) if workflow.exists() else None
+    if not m:
+        return None
+    minute, hours = int(m.group(1)), [int(h) for h in m.group(2).split(",")]
+    cutoff = now - GRACE
+    slots = [datetime(d.year, d.month, d.day, h, minute, tzinfo=timezone.utc)
+             for d in (cutoff.date() - timedelta(days=1), cutoff.date()) for h in hours]
+    return max((t for t in slots if t <= cutoff), default=None)
+
+
+def last_run_health(runner=run, now: datetime | None = None, workflow: Path | None = None) -> str | None:
     ok, out = runner(["gh", "run", "list", "--workflow", "job-radar", "--limit", "1",
                       "--json", "conclusion,status,createdAt"], 20)
     if not ok or not out:
@@ -223,6 +238,17 @@ def last_run_health(runner=run) -> str | None:
     runs = json.loads(out)
     if runs and runs[0].get("conclusion") not in (None, "", "success"):
         return f"the last scheduled job-radar run ended '{runs[0]['conclusion']}' ({runs[0].get('createdAt', '')[:16]})"
+    # GitHub schedules are best-effort and sometimes skipped. If the last due slot passed with
+    # no run, start one now rather than let listings go stale (applying early matters).
+    created = runs[0].get("createdAt", "") if runs else ""
+    if created and runs[0].get("status") == "completed":
+        now = now or datetime.now(timezone.utc)
+        slot = last_due_slot(now, workflow) if workflow else last_due_slot(now)
+        started = datetime.fromisoformat(created.replace("Z", "+00:00"))
+        if slot and started < slot:
+            triggered, _ = runner(["gh", "workflow", "run", "job-radar"], 20)
+            return (f"GitHub skipped the {slot:%H:%M} UTC scheduled run (last run {started:%d %b %H:%M} UTC); "
+                    + ("started one now, new roles in ~6 min" if triggered else "couldn't start one: check `gh auth`"))
     return None
 
 

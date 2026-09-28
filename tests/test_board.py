@@ -21,7 +21,7 @@ def G(title, company, countries, tier, canonical=True, url="https://x.example/1"
 def test_payload_title_labels_and_marker():
     g = G("Senior Penetration Tester", "Bridewell", {"GB"}, 1, sponsor={"uk": SponsorTag("yes", "Bridewell Consulting Limited")})
     p = payload(g)
-    assert p["title"] == "[T1] Bridewell — Senior Penetration Tester (GB)"
+    assert p["title"] == "Bridewell — Senior Penetration Tester (GB)"
     assert p["labels"] == ["role", "tier-1", "country-GB", "sponsor-yes"]
     assert MARKER_RE.search(p["body"]).group(1) == p["ref"] == role_ref(g.key)
     assert "UK sponsor: yes (Bridewell Consulting Limited)" in p["body"]

@@ -13,6 +13,7 @@ New cards arrive three times a day. How they get there:
 | Fit | 0-100 | Claude, after scoring |
 | Recommendation | Apply, Maybe, Skip | Claude, after scoring |
 | Sponsor | Yes, Unknown, No | Claude (UK/NL register match; a name match, not a promise) |
+| Posted | date | Claude: when the employer posted it, or when the radar first saw it. Sort by it to apply early |
 
 Cards that arrived since your last Claude session may have empty fields: the scheduled
 run can't write Project fields, so Claude fills them when you next open a session.

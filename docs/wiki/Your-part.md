@@ -91,7 +91,8 @@ Only when you ask it to help with an application. Claude works in tabs it opens 
 for the task, on the employer's own application site. You approve the answers for every
 page before they're typed. It never answers questions about visas, salary, diversity or
 consent for you, never logs in or creates accounts for you (you do that in the tab), and
-never clicks the final Submit. It won't touch LinkedIn, Indeed or Glassdoor at all.
+never clicks the final Submit. It won't touch LinkedIn, Indeed or Glassdoor applications at all (the
+only LinkedIn use is the opt-in contact lookup for referrals).
 
 ## Every so often
 

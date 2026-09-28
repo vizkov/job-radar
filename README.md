@@ -17,7 +17,8 @@ You use it through **two interfaces**:
 ## What it will never do
 
 - Log in to LinkedIn or any job portal with your credentials, or scrape LinkedIn, Indeed
-  or Glassdoor. Their own alert emails are read instead.
+  or Glassdoor. Their own alert emails are read instead. (One opt-in exception you can switch
+  on: looking up a recruiter or hiring manager on LinkedIn for one role you're applying to.)
 - Submit an application, or email or message anyone. It can pre-fill a form for you to
   check; you click Submit.
 - Invent experience. Tailored CVs only reuse your own lines, and code checks that.

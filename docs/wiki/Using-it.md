@@ -33,6 +33,7 @@ do?" or type `/manual` (it's generated from the system itself).
 | You say | Claude does |
 |---|---|
 | "Will Amazon sponsor my visa for this role?" | Checks what the ad says (and quotes it), applies that country's visa rules, checks the UK/Dutch registers, and looks at the company's own careers pages. Sets the card's Sponsor column to Confirmed, Likely, Unlikely or No, with the evidence and links on the card. Done automatically for roles recommended Apply or Maybe, before any referral ask |
+| "Who should I contact at N26?" (when you're applying) | If you know nobody there, Claude looks for the likely hiring manager and a recruiter: first on public pages, then on LinkedIn. By default it gives you the LinkedIn search links to open. If you've switched on the LinkedIn lookup, it reads the search results in your logged-in Chrome instead: for that one role, only when you ask, read-only (it never connects or messages). LinkedIn's terms ban any automated access, so that setting puts your account at some risk; it's off unless you turn it on. It suggests one person of each kind and drafts the notes for you to send |
 | "Who do I know at Amazon?" / "I asked Priya" / "Priya referred me" | Before you apply, Claude checks who you've said can help at that company and suggests one person per role. You message people you know yourself; Claude gives you the role links and job IDs to pass on. Only for strangers (recruiters, HR, hiring managers) does it draft the message, from your own CV lines, for you to send. Every ask is tracked on the card's **Referral** column. If nobody answers within 4 days (you can change that), it suggests one follow-up or applying directly |
 | "Tailor my CV for the MDSec role" | Builds a CV and cover letter from **your own** CV lines, picked and reordered for that job; a checker makes sure nothing was invented. You get a plain Word CV that applicant tracking systems read reliably, a Markdown copy (for a styled version), a cover letter, and a list of what changed |
 | "Help me apply to the Fortinet role" | Opens the application form in your Chrome and fills it in from your CV and profile, page by page. You approve every page's answers, and **you** press Submit. Questions about visas, salary or diversity are always asked, never guessed |
@@ -63,7 +64,9 @@ do?" or type `/manual` (it's generated from the system itself).
 
 - Submit an application, or email or message anyone for you. It prepares; you send.
 - Add experience, skills, numbers or links you don't have. The checker rejects it.
-- Open LinkedIn, Indeed or Glassdoor pages. It asks you to paste those job descriptions.
+- Open LinkedIn, Indeed or Glassdoor pages. It asks you to paste those job descriptions. The only
+  exception is one you can switch on: finding a recruiter or hiring manager on LinkedIn for one role
+  you're about to apply to (see "Who should I contact" above).
 - Ask for passwords in chat. Secrets go in GitHub's settings page, which you fill in yourself.
 
 ## What happens without you

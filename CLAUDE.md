@@ -73,7 +73,11 @@ chose this; `scoring.auto_per_session` in config.json sets how many, 0 turns it 
    `apply-assist` you may pre-fill application forms in the user's Chrome, page by page after
    they approve the exact values; the final Submit is always the user's click.
 4. **Never fetch LinkedIn, Indeed or Glassdoor pages** (their terms prohibit scraping).
-   Ask the user to paste those job descriptions.
+   Ask the user to paste those job descriptions. One exception, opt-in: if
+   `referrals.linkedin_lookup` is true in `profile/config.json` (the user's own decision, knowing
+   LinkedIn's terms ban automated access), the `referrals` skill may use Claude in Chrome, in the
+   user's logged-in browser, to look up people at **one** company for **one** role the user is about
+   to apply to, when they ask. Read-only: search results only, no connecting, messaging or following.
 5. **Secrets never go in files, commits or chat.** The Gmail app password lives only in
    GitHub Actions secrets; walk the user through adding it in the GitHub UI.
 6. **Privacy:** `profile/`, `state/`, `digests/`, `data/matches.csv`, `data/scores.jsonl`

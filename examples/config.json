@@ -69,7 +69,9 @@
 
   "referrals": {
     "_comment": "Days to wait for a reply to a referral ask before the session brief suggests a follow-up or applying directly.",
-    "wait_days": 4
+    "wait_days": 4,
+    "_linkedin_comment": "true: when you are about to apply to one role and ask, Claude in Chrome may read LinkedIn people-search results in your logged-in browser to find a recruiter or hiring manager. Read-only, never connects or messages. LinkedIn's terms ban automated access; this is your risk to accept. false: Claude gives you search links to open yourself.",
+    "linkedin_lookup": false
   },
 
   "board_timeout_seconds": 180,

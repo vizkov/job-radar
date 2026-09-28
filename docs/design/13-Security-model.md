@@ -10,7 +10,12 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
 
 - Log in to LinkedIn or any job portal with the user's credentials.
 - Scrape LinkedIn, Indeed or Glassdoor (their terms forbid it; their alert emails are
-  read instead). `jd_prep.py` refuses those domains in code (`NEVER_FETCH`).
+  read instead). `jd_prep.py` refuses those domains in code (`NEVER_FETCH`). One opt-in
+  exception (`referrals.linkedin_lookup`, off by default): when the user is about to apply to one
+  role and asks, Claude in Chrome may read LinkedIn people-search results in the user's own
+  logged-in browser to find a recruiter or hiring manager. Read-only, a few searches, never
+  connects or messages. It still breaches LinkedIn's terms (any automated access); the user
+  accepted that risk for their own account.
 - Submit an application. `apply-assist` may pre-fill a form in the user's Chrome, page
   by page after they approve the values; the final Submit is always the user's click.
 - Email or message anyone on the user's behalf.

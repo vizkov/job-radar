@@ -145,6 +145,7 @@ The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 | Key | Default | Meaning |
 |---|---|---|
 | `wait_days` | 4 | Days an ask may go unanswered before the session brief suggests one follow-up or applying directly |
+| `linkedin_lookup` | false | true lets the `referrals` skill use Claude in Chrome, in the user's logged-in browser, to read LinkedIn people-search results for **one** company when the user is about to apply to one role and asks. Read-only, at most 3 searches; never connects or messages. LinkedIn's terms ban automated access, so this is the user's risk to accept. false: Claude gives search links for the user to open |
 
 Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 

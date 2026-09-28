@@ -232,7 +232,7 @@ Penetration Tester* in London on its Workable board.
 8. **Queue.** Tier 1, on list → `payload()`: ref = first 16 hex of
    `sha1("c:bridewell|seniorpenetrationtester|GB")`, title
    `Bridewell — Senior Penetration Tester (GB)`, labels `role, tier-1, country-GB,
-   sponsor-yes`, body with the link, score reasons, sponsor match, posted date, Role ID,
+   sponsor-yes`, body with the link, sponsor match, posted date, Role ID (the tier's score reasons stay in `matches.csv`),
    and a hidden `<!-- job-radar:ref=… -->` marker.
 9. **Record.** A row goes into `data/matches.csv` with the same ref.
 10. **Issue.** `board_sync.py roles` creates the issue; `issue_map.json` gets `ref → #12`.

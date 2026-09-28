@@ -129,9 +129,11 @@ def cmd_score(ref: str, board: bool) -> int:
           + (" (blockers: " + ", ".join(record["blockers"]) + ")" if record["blockers"] else "")
           + (" [injection suspected]" if data["injection_suspected"] else ""))
     if board:
-        from board_sync import Gh, set_role_fields  # tools/ is on sys.path when run as a script
-        print(set_role_fields(Gh(), ref, {"Fit": str(data["fit_score"]),
-                                          "Recommendation": data["recommendation"].capitalize()}))
+        from board_sync import Gh, set_fit_section, set_role_fields  # tools/ is on sys.path as a script
+        gh = Gh()
+        print(set_role_fields(gh, ref, {"Fit": str(data["fit_score"]),
+                                        "Recommendation": data["recommendation"].capitalize()}))
+        print(set_fit_section(gh, ref, data, record["scored_at"][:10]))
     return 0
 
 

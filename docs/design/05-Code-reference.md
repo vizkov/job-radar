@@ -353,7 +353,7 @@ Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
 | `STATUS_LABEL`, `SPACING_SECONDS` | `radar-status` (the status issue's label); 2 s between issue creations. |
 | `FINAL_STAGES` | Offer, Rejected, Skipped: setting one closes the issue. |
 | `LABEL_COLORS` | Label colours; anything else (country-XX) is blue. |
-| `Gh` | Runs `gh` with an argument list (no shell); `dry_run` prints instead. Tests replace it. |
+| `Gh` | Runs `gh` with an argument list (no shell), reading its output as UTF-8 (Windows' default code page would garble text written back to GitHub); `dry_run` prints instead. Tests replace it. |
 | `_body_file(text)` | Writes issue text to a temp file for `--body-file`. |
 | `ensure_labels(gh, labels)` | `gh label create --force` for each. |
 | `sync_roles(gh, max, sleep)` | Queue → issues, saving the queue after each (crash-safe). |
@@ -366,6 +366,8 @@ Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
 | `setup_project(gh, repo)` | Create or adopt the "Job search" Project, create missing fields, link the repo, save IDs. |
 | `_items`, `find_item(gh, board, ref)` | All cards; the card whose body has this ref's marker. |
 | `_edit(gh, board, item, field, value)` | Set one field (single-select by option ID, date, or number). |
+| `FIT_START`, `FIT_END`, `fit_section(score, scored_on)`, `with_fit(body, section)`, `set_fit_section(gh, ref, score, scored_on)` | The card's fit breakdown from a validated `score.json` (third-party-derived text escaped with `md()`), inserted before the Role ID line or replacing the previous block between the markers. |
+| `TIER_LINE`, `refresh_bodies(gh)` | CLI `refresh-bodies`: remove the tier-arithmetic line older cards carried, and add or refresh fit breakdowns for every scored role from `work/jd/<ref>/score.json`. |
 | `set_role_fields(gh, ref, values, close, note)` | Set fields on a role's card, log stage changes (with the note), comment the note on the issue, close on final stages. |
 | `VIEWS`, `API_KEYS`, `CLICK_KEYS` | The board's views as data; what the API can set; what needs a click. |
 | `DESIGN_QUERY`, `views(gh, owner, number)` | GraphQL for the board's views, returned in `VIEWS` shape plus IDs. |

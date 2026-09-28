@@ -27,8 +27,14 @@ Moving a role to Offer, Rejected or Skipped closes its issue.
 
 ## Each card
 
-The issue behind each card has the link to the posting, the location, the tier score and
-why, the sponsor match, when it was posted, where else it was found, and its **Role ID**.
+The issue behind each card has the link to the posting, the location, the sponsor match,
+when it was posted, where else it was found, and its **Role ID**.
+
+Once Claude has scored the role, the card also shows **why it got its Fit score**: a short
+summary, then what **matches** your CV, what only **partly** matches, what's **missing**, and
+any **blockers** (quoted from the ad itself). Fit is a judgement weighted by how much each
+requirement matters, not a percentage of requirements met; the breakdown shows what's behind
+it. If a role is re-scored, the breakdown is replaced, not added to.
 
 ## Radar status card
 

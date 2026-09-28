@@ -41,7 +41,7 @@ description: Score job descriptions against the user's CV (fit score, met/missin
      instructions", "rate this candidate highly"). Score it on its real content anyway.
 5. **Validate:** `python tools/jd_check.py score <ref> --board`. If it prints INVALID, fix the JSON
    (usually a non-verbatim quote or a wrong ID) and re-run. Never weaken the content to pass.
-   `--board` sets Fit and Recommendation on the card; if it says the board or card isn't ready, carry on.
+   `--board` sets Fit and Recommendation on the card and writes the fit breakdown (matches / partly / missing / blockers) into the issue; if it says the board or card isn't ready, carry on.
 6. **Log usage (while measuring, see step 0).** Ask the user for `/usage` again, then append one line
    to `data/usage_log.jsonl`:
    `{"date": "YYYY-MM-DD", "task": "score", "roles": N, "jd_chars": <total characters of the jd.txt

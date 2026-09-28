@@ -11,6 +11,7 @@ Local only (your `gh` login needs the project scope: gh auth refresh -s project)
     python tools/board_sync.py set <ref> Stage=Applied [Fit=72 …] [--close] [--note "why"]
     python tools/board_sync.py views                             # create/update the board's views (VIEWS)
     python tools/board_sync.py design-diff                       # how the board's views differ from VIEWS
+    python tools/board_sync.py refresh-bodies                    # tidy role cards; add fit breakdowns from scores
 
 In GitHub Actions `gh` uses GITHUB_TOKEN (issues: write). Issues labelled `role`
 are pulled onto the Project board by its built-in "Auto-add to project" workflow.
@@ -31,6 +32,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
+from jobradar.mdsafe import md  # noqa: E402  (stdlib-only)
 from jobradar.paths import profile_path  # noqa: E402
 
 QUEUE = ROOT / "state" / "board_queue.json"
@@ -68,7 +70,9 @@ class Gh:
         if self.dry_run:
             print("gh " + " ".join(args))
             return ""
-        return subprocess.run(["gh", *args], check=True, capture_output=True, text=True).stdout.strip()
+        # encoding: gh speaks UTF-8; Windows' default (cp1252) would garble text read back from GitHub
+        return subprocess.run(["gh", *args], check=True, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace").stdout.strip()
 
 
 def _body_file(text: str) -> str:
@@ -301,6 +305,86 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: s
     return f"{ref}: " + ", ".join(f"{k}={v}" for k, v in values.items()) + (" (closed)" if closed else "")
 
 
+FIT_START, FIT_END = "<!-- job-radar:fit -->", "<!-- /job-radar:fit -->"
+TIER_LINE = re.compile(r"^- \*\*Tier \d\*\* \(score [^\n]*\)\n?", re.M)  # older cards carried the tier arithmetic
+BLOCKER_NAMES = {"clearance": "Security clearance", "right_to_work": "Right to work", "language": "Language",
+                 "location": "Location", "seniority": "Seniority", "other": "Other"}
+WORK_JD = ROOT / "work" / "jd"
+
+
+def fit_section(score: dict, scored_on: str = "") -> str:
+    """The card's "what fits, what doesn't" block, from a validated score.json.
+    Requirement texts were written from a third-party JD, so they're escaped like any job text."""
+    def group(met):
+        return [f"- {md(m['requirement'])}" for m in score.get("must_haves", []) if m.get("met") == met]
+    lines = [FIT_START, f"### Fit {score['fit_score']} · {str(score['recommendation']).capitalize()}", "",
+             md(score.get("summary", "")), ""]
+    for heading, met in (("Matches", "yes"), ("Partly", "partial"), ("Missing", "no")):
+        if (items := group(met)):
+            lines += [f"**{heading}**", *items, ""]
+    if score.get("blockers"):
+        lines += ["**Blockers**", *[f"- {BLOCKER_NAMES.get(b['type'], b['type'])}: \"{md(b['quote'])}\""
+                                    for b in score["blockers"]], ""]
+    if score.get("injection_suspected"):
+        lines += ["**Note:** this ad contains text aimed at AI tools; it was scored on its real content.", ""]
+    lines += ["_Fit is Claude's judgement of how well your CV covers the must-haves above, weighted by "
+              f"importance and reduced for blockers; it is not a percentage count.{' Scored ' + scored_on + '.' if scored_on else ''}_",
+              FIT_END]
+    return "\n".join(lines)
+
+
+def with_fit(body: str, section: str) -> str:
+    """Replace the card's fit block, or insert it before the Role ID line; drop the old tier line."""
+    body = TIER_LINE.sub("", body)
+    if FIT_START in body and FIT_END in body:
+        a, b = body.index(FIT_START), body.index(FIT_END) + len(FIT_END)
+        return body[:a] + section + body[b:]
+    at = body.find("Role ID:")
+    return (body[:at] + section + "\n\n" + body[at:]) if at >= 0 else body.rstrip("\n") + "\n\n" + section + "\n"
+
+
+def _set_body(gh: Gh, url: str, body: str) -> None:
+    path = _body_file(body)
+    try:
+        gh("issue", "edit", url, "--body-file", path)
+    finally:
+        Path(path).unlink(missing_ok=True)
+
+
+def set_fit_section(gh: Gh, ref: str, score: dict, scored_on: str = "") -> str:
+    board = load_board()
+    item = find_item(gh, board, ref) if board else None
+    url = ((item or {}).get("content") or {}).get("url")
+    if not url:
+        return f"{ref}: no board card yet; fit breakdown not added"
+    body = gh("issue", "view", url, "--json", "body", "--jq", ".body")
+    _set_body(gh, url, with_fit(body, fit_section(score, scored_on)))
+    return f"{ref}: fit breakdown on the card"
+
+
+def refresh_bodies(gh: Gh) -> str:
+    """Bring every role card up to date: drop the old tier line, add or refresh the fit breakdown
+    from work/jd/<ref>/score.json where one exists (only validated scores are in scores.jsonl)."""
+    scored = set()
+    if (scores_file := ROOT / "data" / "scores.jsonl").exists():
+        scored = {json.loads(l)["key"] for l in scores_file.read_text(encoding="utf-8").splitlines() if l.strip()}
+    issues = json.loads(gh("issue", "list", "--label", "role", "--state", "all", "--limit", "2000",
+                           "--json", "url,body") or "[]")
+    changed = with_breakdown = 0
+    for i in issues:
+        body = i.get("body") or ""
+        hit = re.search(r"job-radar:ref=([0-9a-f]{16})", body)
+        new = TIER_LINE.sub("", body)
+        score_file = WORK_JD / hit.group(1) / "score.json" if hit else None
+        if hit and hit.group(1) in scored and score_file.exists():
+            new = with_fit(new, fit_section(json.loads(score_file.read_text(encoding="utf-8"))))
+            with_breakdown += 1
+        if new != body:
+            _set_body(gh, i["url"], new)
+            changed += 1
+    return f"updated {changed} cards ({with_breakdown} with a fit breakdown)"
+
+
 # The board's views, as code: setup builds them and the session brief checks them, so every copy
 # gets the same board. GitHub's API sets name, layout, filter and columns; it can't set sort or
 # board grouping, so those are reported as one-time clicks (`sort`, `group`).
@@ -444,7 +528,7 @@ def fill_new(gh: Gh) -> str:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("what", choices=["roles", "status", "setup-project", "fill", "set", "stale", "backfill-map",
-                                     "design-diff", "views"])
+                                     "design-diff", "views", "refresh-bodies"])
     ap.add_argument("args", nargs="*", help="set: <ref> Field=Value …")
     ap.add_argument("--repo", help="setup-project: OWNER/REPO of your private copy")
     ap.add_argument("--close", action="store_true", help="set: also close the role's issue")
@@ -476,6 +560,8 @@ def main(argv=None) -> int:
         print("\n".join(design_diff(gh)) or "board views match VIEWS")
     elif args.what == "views":
         print(apply_views(gh))
+    elif args.what == "refresh-bodies":
+        print(refresh_bodies(gh))
     else:
         if len(args.args) < 2 or not all("=" in a for a in args.args[1:]):
             ap.error("usage: set <ref> Field=Value [Field=Value …]")

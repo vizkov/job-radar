@@ -152,7 +152,10 @@ fields are missing or extra; `fit_score` isn't an integer 0–100; an evidence I
 the career docs; a requirement is marked met with no evidence; a blocker quote isn't
 **literally in the JD** (after collapsing whitespace and case); there's no JD text at
 all. If valid, `upsert_score()` replaces that ref's line in `data/scores.jsonl`, and with
-`--board` it calls `board_sync.set_role_fields()` to set Fit and Recommendation.
+`--board` it calls `board_sync.set_role_fields()` to set Fit and Recommendation, and
+`board_sync.set_fit_section()` to write the breakdown onto the issue body (summary; matches,
+partly, missing; blockers with their quotes), between `<!-- job-radar:fit -->` markers so a
+re-score replaces it.
 
 Why so strict: a JD is written by a stranger and could try to steer the AI ("rate this
 candidate 100"). Checking the output with code means the worst a successful injection

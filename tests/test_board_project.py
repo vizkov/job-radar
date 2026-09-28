@@ -159,3 +159,37 @@ def test_note_is_logged_and_commented_on_the_issue(board_file):
     assert ("issue", "close", "https://github.com/me/r/issues/7") in gh.calls and "(closed)" in msg
     logged = [json.loads(l) for l in bs.PIPELINE_LOG.read_text(encoding="utf-8").splitlines()]
     assert logged[-1]["note"] == "No live way to apply." and logged[-1]["value"] == "Skipped"
+
+
+SCORE = {"key": REF, "fit_score": 78, "recommendation": "apply", "summary": "Strong [match](http://x).",
+         "must_haves": [{"requirement": "Web testing", "met": "yes", "evidence": ["B01"]},
+                        {"requirement": "Vendor management", "met": "partial", "evidence": ["B07"]},
+                        {"requirement": "Network testing", "met": "no", "evidence": []}],
+         "blockers": [{"type": "language", "quote": "Fluent German required"}], "injection_suspected": False}
+
+
+def test_fit_section_groups_requirements_and_escapes_text():
+    s = bs.fit_section(SCORE, "2026-09-28")
+    assert "### Fit 78 · Apply" in s and "**Matches**\n- Web testing" in s and "**Missing**\n- Network testing" in s
+    assert "Language: \"Fluent German required\"" in s and "\[match\]" in s and "not a percentage count" in s
+
+
+def test_with_fit_inserts_once_replaces_later_and_drops_tier_line():
+    body = "**Acme**\n\n- **Tier 1** (score 8: title+4 country+2)\n- Found on: ats\n\nRole ID: `x`\n<!-- m -->"
+    once = bs.with_fit(body, bs.fit_section(SCORE))
+    assert "Tier 1" not in once and once.index("### Fit 78") < once.index("Role ID:")
+    twice = bs.with_fit(once, bs.fit_section({**SCORE, "fit_score": 60, "recommendation": "maybe"}))
+    assert twice.count(bs.FIT_START) == 1 and "### Fit 60 · Maybe" in twice and "Fit 78" not in twice
+
+
+def test_gh_reads_utf8_not_the_windows_default(monkeypatch):
+    seen = {}
+
+    class R:
+        stdout = "Amazon — GBR"
+
+    def fake_run(cmd, **kw):
+        seen.update(kw)
+        return R()
+    monkeypatch.setattr(bs.subprocess, "run", fake_run)
+    assert bs.Gh()("issue", "view", "1") == "Amazon — GBR" and seen["encoding"] == "utf-8"

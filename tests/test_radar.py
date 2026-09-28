@@ -129,6 +129,7 @@ def test_drop_reasons_are_counted_per_source():
     dropped = Counter()
     kept, matched = radar.select([res], include_outside=False, matcher=m, dropped=dropped)
     assert len(kept) == 1 and dropped == Counter({("alert_email", "company"): 1, ("alert_email", "title"): 1,
-                                                  ("alert_email", "country"): 1, ("alert_email", "employment"): 1})
+                                                  ("alert_email", "country"): 1, ("alert_email", "employment"): 1,
+                                                  ("alert_email", "where:US"): 1})
     line = radar.drop_lines([res], matched, dropped)[0]
-    assert line.startswith("- **alert_email**: 5 found →") and "1 outside your countries" in line and "**1 kept**" in line
+    assert line.startswith("- **alert_email**: 5 found →") and "1 outside your countries (US 1)" in line and "**1 kept**" in line

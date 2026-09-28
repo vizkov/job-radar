@@ -64,6 +64,7 @@ def select(results: list[SourceResult], include_outside, matcher=None,
             countries = p.countries & tgt
             if not countries:
                 dropped[(res.source, "country")] += 1
+                dropped[(res.source, "where:" + (",".join(sorted(p.countries)) or "location not recognised"))] += 1
                 continue
             # a hash-watched careers page has no job titles to filter; its change notice always passes
             if not (p.raw.get("page_changed") or title_matches(p.title)):
@@ -193,6 +194,10 @@ def drop_lines(results: list[SourceResult], matched: Counter, dropped: Counter) 
         if not found:
             continue
         why = [f"{dropped[(r.source, k)]} {label}" for k, label in DROP_REASONS.items() if dropped[(r.source, k)]]
+        where = sorted(((n, k[1][6:]) for k, n in dropped.items() if k[0] == r.source and k[1].startswith("where:")),
+                       reverse=True)[:3]
+        if where and why:
+            why[0] += " (" + ", ".join(f"{place} {n}" for n, place in where) + ")"
         out.append(f"- **{r.source}**: {found} found" + (" → " + " · ".join(why) if why else "")
                    + f" · **{matched[r.source]} kept**")
     return out

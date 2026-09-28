@@ -34,7 +34,7 @@ and which sources stopped returning results. Counts only, no job titles.
 
 | View | What it's for |
 |---|---|
-| **Act now** | Tier 1 roles you haven't acted on, newest first. Start here: applying early matters |
+| **Act now** | Tier 1 roles posted in the last 14 days that you haven't acted on or ruled out, newest first. Start here: applying early matters |
 | **All Roles** | Everything, best fit first |
 | **Pipeline** | A board with one column per Stage; drag cards as things happen |
 

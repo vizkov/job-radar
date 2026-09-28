@@ -65,4 +65,4 @@ def test_apply_creates_missing_view_and_lists_clicks_for_sort_and_group():
     assert '"F_Fit"' in creates[0][3] and "TABLE_LAYOUT" in creates[0][3]
     assert "Sort by -> Fit (descending)" in out and "Column by -> Stage" in out
     filters = [c[3] for c in gh.calls if c[:2] == ("api", "graphql") and "updateProjectV2View" in c[3]]
-    assert any('filter:"tier:T1 stage:New,Shortlisted -label:possibly-closed"' in f for f in filters)
+    assert any("posted:>=@today-14d" in f for f in filters)

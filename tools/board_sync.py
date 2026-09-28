@@ -297,7 +297,7 @@ VIEWS = [
     {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "",
      "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted"],
      "sort": [("Fit", "DESC")], "group": []},
-    {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "tier:T1 stage:New,Shortlisted -label:possibly-closed",
+    {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "tier:T1 stage:New,Shortlisted -label:possibly-closed -recommendation:Skip posted:>=@today-14d",
      "fields": ["Title", "Stage", "Fit", "Recommendation", "Sponsor", "Posted"],
      "sort": [("Posted", "DESC")], "group": []},
     {"name": "Pipeline", "layout": "BOARD_LAYOUT", "filter": "",

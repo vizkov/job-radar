@@ -53,7 +53,7 @@ do?" or type `/manual` (it's generated from the system itself).
 | "Undo that tuning change" | Puts a title rating back to what it was before Claude's automatic weekly adjustment |
 | "Stop showing DevSecOps roles" / "Add Checkmarx" / "Also look in Germany" | Changes your settings, shows you before/after numbers, saves when you agree |
 | "How do I strengthen my CV?" / "Which certs matter?" | Looks across your scored roles for requirements you keep missing and suggests what to add or evidence better |
-| (automatic) | At the start of each session, when you send your first message, Claude first scores up to 8 of the freshest unscored Tier 1 roles (about 4% of a session), then answers you. Say "don't auto-score" or ask Claude to change the number |
+| (automatic) | At the start of each session, when you send your first message, Claude first scores up to 8 of the freshest unscored Tier 1 roles (2–4% of a session), then answers you. Say "don't auto-score" or ask Claude to change the number |
 | (automatic) | Once a week, when enough roles are scored, Claude adjusts how job titles are rated (the Tier) using how those roles actually scored, one small step at a time. It tells you what changed at the start of your next session, and one sentence undoes it. Your title filters, countries and companies only change when you say so |
 | "What could be better?" | Reviews the system and proposes fixes and new job boards for you to approve (Claude also offers this weekly) |
 | "Are the docs still right?" | Two fresh AI readers go through the guide and the technical docs as newcomers; Claude checks what they flag against the system and fixes it (also offered automatically after big changes) |
@@ -80,9 +80,9 @@ sit down, or just look at the board.
 Nothing beyond your Claude subscription (Claude Pro or Max; there's no separate API bill).
 Claude's work counts toward your plan's normal usage limits. Briefings and tracking are
 light; scoring means reading each job description in full, and tailoring is heavier still.
-We haven't measured exact figures yet: for your first three scoring batches Claude asks you to
-type `/usage` before and after, and then adds a real figure here. Until then, score in batches
-(the freshest roles first). If you
+Measured on Claude Pro (three scoring batches, 45 roles): scoring costs **0.25–0.5% of a
+session per role**, so 10% of a session scores roughly 20–40 roles. Large batches are cheaper per
+role (31 roles took 8%; batches of 6–8 took 3–4%). Score the freshest roles first. If you
 reach your limit, pick up where you left off when it resets: nothing is lost. The automatic runs use about 15–25 minutes a day of GitHub Actions, within the free
 plan's 2,000 minutes a month for private repos.
 

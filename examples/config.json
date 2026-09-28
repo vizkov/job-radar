@@ -63,7 +63,7 @@
   },
 
   "scoring": {
-    "_comment": "Roles Claude scores automatically at the start of each session (freshest unscored Tier 1 first), before answering. 0 = only when asked. Each role costs roughly 0.5% of a session.",
+    "_comment": "Roles Claude scores automatically at the start of each session (freshest unscored Tier 1 first), before answering. 0 = only when asked. Each role costs 0.25-0.5% of a session (measured on Pro).",
     "auto_per_session": 8
   },
 

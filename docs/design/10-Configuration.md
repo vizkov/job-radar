@@ -138,7 +138,7 @@ The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 
 | Key | Default | Meaning |
 |---|---|---|
-| `auto_per_session` | 8 | Roles Claude scores automatically at the start of each session, before answering the user's first message: the freshest unscored Tier 1 roles on the list, skipping cards already closed or skipped. 0 = only when asked. About 0.5% of a session per role |
+| `auto_per_session` | 8 | Roles Claude scores automatically at the start of each session, before answering the user's first message: the freshest unscored Tier 1 roles on the list, skipping cards already closed or skipped. 0 = only when asked. 0.25–0.5% of a session per role (measured) |
 
 ## Referrals (`config.json` → `referrals`)
 

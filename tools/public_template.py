@@ -80,12 +80,22 @@ def drift(fetch: bool = True) -> list[str]:
     """Non-private files changed on this branch since it last merged the template."""
     if fetch:
         subprocess.run(["git", "fetch", "-q", "template"], cwd=ROOT, capture_output=True, timeout=60)
-    r = subprocess.run(["git", "diff", "--name-only", "template/main...HEAD"], cwd=ROOT,
+    # --no-renames: a moved file must show under its old path too, or publish never deletes it there
+    r = subprocess.run(["git", "diff", "--name-only", "--no-renames", "template/main...HEAD"], cwd=ROOT,
                        capture_output=True, text=True)
     dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"], cwd=ROOT,
                            capture_output=True, text=True).stdout.splitlines()
-    paths = set(r.stdout.split()) | {line[3:].strip().strip('"') for line in dirty}
+    paths = set(r.stdout.splitlines()) | status_paths(dirty)
     return sorted(p for p in paths if p and is_public(p))
+
+
+def status_paths(lines: list[str]) -> set[str]:
+    """Paths from `git status --porcelain`; a rename ("R  old -> new") yields both."""
+    out = set()
+    for line in lines:
+        for part in line[3:].split(" -> "):
+            out.add(part.strip().strip('"'))
+    return out
 
 
 def publish(template_dir: Path, message: str) -> None:

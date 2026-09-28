@@ -9,6 +9,7 @@ it stays current whenever a capability is added or changed; there's nothing to u
 from __future__ import annotations
 
 import ast
+import os
 import re
 import sys
 from pathlib import Path
@@ -56,19 +57,29 @@ def wrap(text: str, width: int = 96, indent: str = "      ") -> str:
     return "\n".join(indent + l for l in lines)
 
 
-def main(argv=None) -> int:
+def paint(color: bool):
+    """ANSI colours only for a real terminal (never when Claude reads the output); NO_COLOR disables."""
+    def c(code: str, text: str) -> str:
+        return f"[{code}m{text}[0m" if color else text
+    return c
+
+
+def main(argv=None, color: bool | None = None) -> int:
     args = argv if argv is not None else sys.argv[1:]
+    if color is None:
+        color = sys.stdout.isatty() and not os.environ.get("NO_COLOR")
+    c = paint(color)
     out = []
     if not args:
-        out += ["JOB-RADAR MANUAL", "", INTRO, ""]
-    out += ["WHAT YOU CAN ASK FOR (skills; Claude picks the right one from what you say)", ""]
+        out += [c("1;36", "JOB-RADAR MANUAL"), "", INTRO, ""]
+    out += [c("1;33", "WHAT YOU CAN ASK FOR") + " (skills; Claude picks the right one from what you say)", ""]
     for name, desc in skills():
-        out += [f"  {name}", wrap(desc), ""]
+        out += ["  " + c("1;32", name), wrap(desc), ""]
     if not args:
-        out += ["TOOLS CLAUDE RUNS FOR YOU (you never need to)", ""]
-        out += [f"  {path:32} {first}" for path, first in tools()]
+        out += [c("1;33", "TOOLS CLAUDE RUNS FOR YOU") + " (you never need to)", ""]
+        out += ["  " + c("36", f"{path:32}") + f" {first}" for path, first in tools()]
         wiki = sorted(p.stem for p in (ROOT / "docs" / "wiki").glob("*.md"))
-        out += ["", "MORE DETAIL", f"  Your guide, docs/wiki/: {', '.join(wiki)}; how it works inside: docs/design/",
+        out += ["", c("1;33", "MORE DETAIL"), f"  Your guide, docs/wiki/: {', '.join(wiki)}; how it works inside: docs/design/",
                 "  Board: your GitHub Project (views: All Roles table, Pipeline board)."]
     print("\n".join(out))
     return 0

@@ -49,3 +49,14 @@ def test_manual_lists_every_skill_and_tool(capsys):
     skills = sorted(p.parent.name for p in (Path(manual.ROOT) / ".claude" / "skills").glob("*/SKILL.md"))
     assert skills and all(f"  {s}\n" in out for s in skills)
     assert "tools/jd_prep.py" in out and "WHAT YOU CAN ASK FOR" in out
+
+
+def test_manual_colour_only_when_asked(capsys):
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+    import manual
+    manual.main([], color=False)
+    assert "\033[" not in capsys.readouterr().out
+    manual.main([], color=True)
+    assert "\033[1;36mJOB-RADAR MANUAL" in capsys.readouterr().out

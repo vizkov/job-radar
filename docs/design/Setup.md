@@ -106,16 +106,15 @@ It treats these as private: `profile/`, `state/`, `digests/`, `data/matches.csv`
 `data/registers/` (public data, but refreshed in each copy, so shipping it would
 cause merge conflicts).
 
-After the first publish, make code changes in a clone of the template repo and
-push them there; your private copy picks them up with `git pull template main`.
-Don't develop in the private copy and re-export: that rewrites the template's
-history.
+After the first publish, develop in the private copy: `publish` (or the post-commit hook)
+copies changed public files into the template clone as a normal new commit, so the
+template's history is never rewritten. Other copies pick changes up with `git pull template main`.
 
 ## Workflows
 
 | Workflow | When | What |
 |---|---|---|
-| `radar.yml` | daily 02:47 UTC (08:17 IST) | poll sources, commit state, open issue |
+| `radar.yml` | 3x daily: 02:47, 08:47, 14:47 UTC (08:17, 14:17, 20:17 IST) | fetch alert mail, poll sources, add role cards, update status, commit |
 | `verify.yml` | 1st of month | re-verify ATS boards, commit `boards.json` |
 | `registers.yml` | Mondays 04:23 UTC | refresh UK/NL sponsor registers, commit if changed |
 

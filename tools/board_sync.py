@@ -130,12 +130,26 @@ def _read_fields(gh: Gh, owner: str, number: str) -> dict:
     return fields
 
 
+def _save_board(gh: Gh, board: dict) -> None:
+    if not gh.dry_run:
+        BOARD_FILE.parent.mkdir(parents=True, exist_ok=True)
+        BOARD_FILE.write_text(json.dumps(board, indent=1), encoding="utf-8")
+
+
 def setup_project(gh: Gh, repo: str, title: str = "Job search", owner: str = "@me") -> str:
-    """Create the Project with job-radar's fields and link it to the repo. Idempotent on fields."""
+    """Create (or adopt) the Project, add job-radar's fields, link the repo. Safe to re-run:
+    board.json is saved as soon as the Project exists, and an existing Project with the
+    same title is reused instead of creating a duplicate."""
     board = load_board()
     if board is None:
-        proj = gh_json(gh, "project", "create", "--owner", owner, "--title", title, "--format", "json")
+        if owner == "@me":  # `gh project link` compares owner names literally, so resolve @me
+            owner = gh("api", "user", "--jq", ".login") or owner
+        existing_projects = gh_json(gh, "project", "list", "--owner", owner, "--format", "json").get("projects", [])
+        proj = next((p for p in existing_projects if p.get("title") == title and not p.get("closed")), None)
+        if proj is None:
+            proj = gh_json(gh, "project", "create", "--owner", owner, "--title", title, "--format", "json")
         board = {"owner": owner, "number": str(proj["number"]), "id": proj["id"], "url": proj.get("url", "")}
+        _save_board(gh, board)
     existing = _read_fields(gh, board["owner"], board["number"])
     for name, options in FIELDS.items():
         if name in existing:
@@ -144,11 +158,13 @@ def setup_project(gh: Gh, repo: str, title: str = "Job search", owner: str = "@m
         args += ["--data-type", "NUMBER"] if options is None else \
                 ["--data-type", "SINGLE_SELECT", "--single-select-options", ",".join(options)]
         gh(*args)
-    gh("project", "link", board["number"], "--owner", board["owner"], "--repo", repo)
+    repo_owner, _, repo_name = repo.partition("/")
+    if repo_owner and repo_name and repo_owner.lower() != board["owner"].lower():
+        raise ValueError(f"repo {repo} isn't owned by the project owner {board['owner']}")
+    gh("project", "link", board["number"], "--owner", board["owner"], "--repo", repo_name or repo)
     board["fields"] = _read_fields(gh, board["owner"], board["number"])
-    if not gh.dry_run:
-        BOARD_FILE.parent.mkdir(parents=True, exist_ok=True)
-        BOARD_FILE.write_text(json.dumps(board, indent=1), encoding="utf-8")
+    board["repo"] = repo
+    _save_board(gh, board)
     return (f"project {board.get('url') or board['number']} ready. One manual step (GitHub has no CLI for it): "
             "open the project -> ... -> Workflows -> 'Auto-add to project' -> filter  is:issue label:role  -> On.")
 

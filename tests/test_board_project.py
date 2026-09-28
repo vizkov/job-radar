@@ -15,13 +15,18 @@ REF = "e3a8ef9df1405cdf"
 class FakeProjectGh:
     dry_run = False
 
-    def __init__(self, fields=None, items=None):
+    def __init__(self, fields=None, items=None, projects=None):
         self.calls = []
+        self.projects = projects or []
         self.fields = fields if fields is not None else []
         self.items = items or []
 
     def __call__(self, *args):
         self.calls.append(args)
+        if args[:2] == ("api", "user"):
+            return "me"
+        if args[:2] == ("project", "list"):
+            return json.dumps({"projects": self.projects})
         if args[:2] == ("project", "create"):
             return json.dumps({"number": 3, "id": "PVT_1", "url": "https://github.com/users/me/projects/3"})
         if args[:2] == ("project", "field-create"):
@@ -53,7 +58,7 @@ def test_setup_creates_fields_links_repo_and_saves(board_file):
     gh, msg = setup(board_file)
     created = [c[c.index("--name") + 1] for c in gh.calls if c[:2] == ("project", "field-create")]
     assert created == list(bs.FIELDS)
-    assert ("project", "link", "3", "--owner", "@me", "--repo", "me/my-job-radar") in gh.calls
+    assert ("project", "link", "3", "--owner", "me", "--repo", "my-job-radar") in gh.calls  # @me resolved
     saved = json.loads(board_file.read_text())
     assert saved["number"] == "3" and saved["fields"]["Stage"]["options"]["applied"] == "O_Stage_Applied"
     assert "Auto-add to project" in msg and "label:role" in msg
@@ -100,3 +105,27 @@ def test_fill_sets_new_cards_only(board_file):
     assert bs.fill_new(gh) == "filled 1 new cards"
     opts = [c[-1] for c in gh.calls if c[:2] == ("project", "item-edit")]
     assert opts == ["O_Stage_New", "O_Tier_T1", "O_Sponsor_Yes"]
+
+
+def test_existing_project_is_adopted_not_duplicated(board_file):
+    gh = FakeProjectGh(projects=[{"number": 2, "id": "PVT_2", "title": "Job search", "closed": False,
+                                  "url": "https://github.com/users/me/projects/2"}])
+    bs.setup_project(gh, "me/my-job-radar")
+    assert not any(c[:2] == ("project", "create") for c in gh.calls)
+    assert json.loads(board_file.read_text())["number"] == "2"
+
+
+def test_board_saved_even_if_link_fails(board_file):
+    class LinkFails(FakeProjectGh):
+        def __call__(self, *args):
+            if args[:2] == ("project", "link"):
+                raise RuntimeError("link failed")
+            return super().__call__(*args)
+    with pytest.raises(RuntimeError):
+        bs.setup_project(LinkFails(), "me/my-job-radar")
+    assert json.loads(board_file.read_text())["number"] == "3"   # re-run won't create a second project
+
+
+def test_repo_of_another_owner_rejected(board_file):
+    with pytest.raises(ValueError, match="isn't owned"):
+        bs.setup_project(FakeProjectGh(), "someoneelse/repo")

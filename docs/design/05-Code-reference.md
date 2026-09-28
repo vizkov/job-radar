@@ -393,6 +393,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | Name | Is |
 |---|---|
 | `FOLLOW_UP_DAYS`, `REVIEW_EVERY_DAYS`, `GRACE` | 14, 7, 1 hour. |
+| `DOCS_REVIEW_AFTER_FILES`, `CODE_PATHS`, `docs_review_note()` | Suggest `docs-review` once 10 files under the code paths changed since `work/.last_docs_review` (first run only starts the count). |
 | `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
 | `_CONTROL`, `_REF` | Characters stripped by `safe()`; the ref marker in issue bodies. |
 | Other thresholds (in code) | Top 6 new Tier 1 roles listed; "unscored" = Tier 1 from the last 14 days; "fresh" = posted in the last 3 days; "no run completed for 2+ days" warning; a CV gap needs 3+ scored roles missing it. Follow-ups only apply to cards with a logged stage change. |

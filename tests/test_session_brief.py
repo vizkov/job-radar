@@ -129,3 +129,13 @@ def test_missed_scheduled_run_is_restarted():
     calls.clear()  # 09:30: the 08:47 run may just be late
     assert sb.last_run_health(runner, datetime(2026, 9, 28, 9, 30, tzinfo=timezone.utc)) is None
     assert ["gh", "workflow", "run", "job-radar"] not in calls
+
+
+def test_docs_review_due_after_enough_code_changes():
+    from datetime import datetime
+    now = datetime(2026, 9, 28, 12, 0)
+    assert sb.docs_review_note(now, runner=lambda c, t: (True, "")) is None   # first time: start counting
+    files = "\n".join([f"tools/t{i}.py" for i in range(9)] + ["docs/wiki/Home.md", "profile/config.json"])
+    assert sb.docs_review_note(now, runner=lambda c, t: (True, files)) is None  # 9 code files: not yet
+    note = sb.docs_review_note(now, runner=lambda c, t: (True, files + "\njobradar/board.py"))
+    assert "docs review due: 10 code files" in note

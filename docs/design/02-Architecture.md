@@ -141,6 +141,7 @@ doesn't match `PRIVATE`.
 | `work/jd/<ref>/score.json` | Claude's fit assessment, before validation | Claude |
 | `work/discovered_boards.csv` | Proposed boards for uncovered targets | `discover_boards.py` |
 | `work/.last_session`, `.fill_started`, `board_fill.log` | Timestamps and logs for the session brief | `session_brief.py` |
+| `work/.last_docs_review` | When the last docs review happened | `session_brief.py` (first start), Claude (`docs-review` skill) |
 | `work/.last_review` | When the last weekly review happened | Claude, at the end of the `system-review` skill (no tool writes it) |
 | `.alert_mail/*.eml`, `_status.json` | This run's alert emails and fetch status | `fetch_alert_emails.py` |
 

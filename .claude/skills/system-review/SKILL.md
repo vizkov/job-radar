@@ -24,7 +24,8 @@ apply**: code or config changes happen only after the user says yes.
    - career docs: missing files, and `cv-review` findings if there are 5+ scores;
    - new boards: run `python tools/discover_boards.py --limit 40` and list what it found in
      `work/discovered_boards.csv` (a slug guess can hit a same-name company: check the titles look right);
-   - board design: `python tools/board_sync.py design-diff`.
+   - board design: `python tools/board_sync.py design-diff`;
+   - docs: if this week's fixes changed how the system works, suggest the `docs-review` skill.
    Ask it to return a table: finding, evidence (numbers), impact on the user's search, proposed fix, effort.
 2. **Check the proposals yourself** against the code before presenting them: a fix must name the file and
    the change. Drop anything speculative.

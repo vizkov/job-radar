@@ -10,7 +10,8 @@ What it does, in order:
   3. reads the Projects board via `gh`; logs stage changes you made by dragging cards
      (data/pipeline_log.jsonl) and flags applications with no movement for 14+ days
   4. starts `board_sync.py fill` in the background if new cards lack fields
-  5. runs health checks: career docs, alert emails, scheduled runs, weekly review due
+  5. runs health checks: career docs, alert emails, scheduled runs, weekly review due,
+     docs review due (after enough code changes)
   6. prints a short brief; Claude Code adds stdout to the session context
 
 Job titles and company names are third-party text. They are shortened,
@@ -32,11 +33,14 @@ ROOT = Path(__file__).resolve().parent.parent
 WORK = ROOT / "work"
 LAST = WORK / ".last_session"
 LAST_REVIEW = WORK / ".last_review"
+LAST_DOCS_REVIEW = WORK / ".last_docs_review"
 FILL_LOCK = WORK / ".fill_started"
 SNAPSHOT = ROOT / "data" / "pipeline_snapshot.json"
 PIPELINE_LOG = ROOT / "data" / "pipeline_log.jsonl"
 FOLLOW_UP_DAYS = 14
 REVIEW_EVERY_DAYS = 7
+DOCS_REVIEW_AFTER_FILES = 10   # code files changed since the last docs review
+CODE_PATHS = ("radar.py", "verify_boards.py", "jobradar/", "tools/", ".claude/skills/", ".github/workflows/")
 _CONTROL = re.compile(r"[\x00-\x1f\x7f<>`]")
 _REF = re.compile(r"job-radar:ref=([0-9a-f]{16})")
 
@@ -216,6 +220,22 @@ def board_design_note() -> str | None:
     return None
 
 
+def docs_review_note(now: datetime, runner=run) -> str | None:
+    """Suggest the docs-review skill once enough code changed since the last one. The first
+    time (no stamp yet) it only starts counting, so a fresh copy isn't nagged."""
+    stamp = _read_stamp(LAST_DOCS_REVIEW)
+    if stamp is None:
+        WORK.mkdir(exist_ok=True)
+        LAST_DOCS_REVIEW.write_text(now.isoformat())
+        return None
+    ok, out = runner(["git", "log", f"--since={stamp.isoformat()}", "--name-only", "--format="], 15)
+    changed = {f for f in out.splitlines() if f.startswith(CODE_PATHS)} if ok else set()
+    if len(changed) >= DOCS_REVIEW_AFTER_FILES:
+        return (f"docs review due: {len(changed)} code files changed since the last one "
+                f"({stamp:%Y-%m-%d}); offer the docs-review skill")
+    return None
+
+
 GRACE = timedelta(hours=1)  # GitHub often starts scheduled runs late
 
 
@@ -362,6 +382,8 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
                      "about new capabilities in one line):")
         lines += [f"  - {u}" for u in updates[:8]]
     checks = health_checks(root, now, rows, scores, last_run, alert_row, run_note)
+    if (docs_note := docs_review_note(now)):
+        checks.append(docs_note)
     if design_note:
         checks.append(design_note)
     if unpublished:

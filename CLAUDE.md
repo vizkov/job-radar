@@ -25,6 +25,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | brief shows CV gaps, "how do I strengthen my CV?", "which certs matter?" | `cv-review` |
 | a card reaches Interview, "I have an interview with …" | `interview-prep` |
 | "what can this do?", "man", "help", "what am I missing?" | `manual` (runs `tools/manual.py`) |
+| brief says "docs review due", "are the docs still right?", after a big change | `docs-review` (two cold-reading subagents) |
 
 ## Session start
 

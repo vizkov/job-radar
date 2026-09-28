@@ -33,5 +33,5 @@ def _isolate_tool_state(tmp_path, monkeypatch):
     monkeypatch.setattr(jd_check, "SCORES", tmp_path / "_iso_scores.jsonl")
     monkeypatch.setattr(jd_prep, "SCORES", tmp_path / "_iso_scores.jsonl")
     import session_brief
-    for attr in ("WORK", "LAST", "LAST_REVIEW", "FILL_LOCK", "SNAPSHOT", "PIPELINE_LOG"):
+    for attr in ("WORK", "LAST", "LAST_REVIEW", "LAST_DOCS_REVIEW", "FILL_LOCK", "SNAPSHOT", "PIPELINE_LOG"):
         monkeypatch.setattr(session_brief, attr, tmp_path / f"_iso_sb_{attr.lower()}")

@@ -35,6 +35,7 @@ The skills, and the tools each one runs:
 | `cv-review` | "how do I strengthen my CV?" | reads `scores.jsonl` "missing" requirements vs career docs |
 | `interview-prep` | "I have an interview with X" | reads the JD packet, STAR stories |
 | `manual` | "what can this do?", `/manual` | `tools/manual.py` |
+| `docs-review` | brief says a docs review is due | two read-only subagents read `docs/design` and `docs/wiki` cold; Claude verifies their findings against the code, then fixes |
 
 ## 4.2 Session start: `tools/session_brief.py`
 
@@ -75,7 +76,8 @@ errors become one-line notes, and it always exits 0.
     freshest first), unscored Tier 1 roles, score counts, board stage counts, cards that
     look closed, cards the user moved, follow-ups due, system updates, and health notes
     from `health_checks()`: missing career docs, alert emails failing or silent, runs not
-    completing, weekly review due, recurring CV gaps.
+    completing, weekly review due, recurring CV gaps; and `docs_review_note()`: a docs
+    review is due once 10+ code files changed since the last one.
 11. Writes `work/.last_session` with the current time.
 
 Every job title and company name in the brief passes through `safe()`: control

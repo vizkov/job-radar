@@ -9,7 +9,7 @@ Work through these in order, asking only what you need. Check each step before m
 plain language; do the typing yourself.
 
 1. **Repo.** Confirm this is a **private** repo (`gh repo view --json visibility`). If it's the public
-   template, stop and explain the private-copy steps in docs/wiki/Setup.md (clone, `git remote rename
+   template, stop and explain the private-copy steps in docs/design/Setup.md (clone, `git remote rename
    origin template`, new private `origin`). Install: `python -m venv .venv`, then
    `pip install --require-hashes -r requirements.txt -r requirements-career.txt`.
 2. **Profile.** `mkdir profile` and copy `examples/*` into it. Interview the user:
@@ -18,7 +18,7 @@ plain language; do the typing yourself.
    - their CV → `profile/career/master_resume.md` in the ID format (see `examples/career/`). If they paste
      or attach a CV, convert it yourself: one ID per bullet, contact details in the front matter, and show
      them the result to confirm nothing was changed. Same for STAR stories and cover-letter paragraphs.
-3. **Data.** `python tools/refresh_registers.py`; clone `atss/` and `agg/` (docs/wiki/Setup.md) and run
+3. **Data.** `python tools/refresh_registers.py`; clone `atss/` and `agg/` (docs/design/Setup.md) and run
    `python tools/build_candidates.py` then `python verify_boards.py --quiet`. Report coverage from
    `data/coverage_report.csv`: which targets have no board, and offer careers pages / alerts for those.
 4. **Board.** Ask the user to run `gh auth refresh -s project` (a browser login — suggest typing
@@ -27,7 +27,7 @@ plain language; do the typing yourself.
    Sponsor fields and the All Roles + Pipeline views, with no items.
    Walk them through the one manual step it prints (Project → Workflows → Auto-add, filter
    `is:issue label:role`), and optionally "Item closed → Done".
-5. **Alert emails (optional).** Explain why a dedicated Gmail is needed (docs/wiki/Job-alert-emails.md),
+5. **Alert emails (optional).** Explain why a dedicated Gmail is needed (docs/design/Job-alert-emails.md),
    guide them through alerts, forwarding filter and app password, and adding the two secrets in the GitHub
    UI themselves. Never ask them to paste the password into chat or a file.
 6. **Template sync (only if this user also maintains a public template).** `git config core.hooksPath

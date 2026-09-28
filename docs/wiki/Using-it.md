@@ -50,4 +50,4 @@ normal Pro usage limits. The scheduled runs use free GitHub Actions minutes (abo
 - Every role ever found: `data/matches.csv`; fit scores: `data/scores.jsonl`
 - Fetched job descriptions (not committed): `work/jd/<Role ID>/`
 
-All of it stays in your private repo. See [Security model](Security-model.md).
+All of it stays in your private repo. See [Security model](../design/Security-model.md).

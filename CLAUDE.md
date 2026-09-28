@@ -49,7 +49,7 @@ prioritise the freshest Tier 1 roles, since applying early matters to this user.
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
 - Board design: `tools/board_sync.py design-diff` compares your board's views/fields with the
   public board template; `publish-board` refreshes the template. The session brief flags drift.
-- Wiki with details: `docs/wiki/`.
+- User guide: `docs/wiki/`. Design reference (yours): `docs/design/`.
 
 ## Rules you must follow
 

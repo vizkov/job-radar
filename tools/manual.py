@@ -68,7 +68,7 @@ def main(argv=None) -> int:
         out += ["TOOLS CLAUDE RUNS FOR YOU (you never need to)", ""]
         out += [f"  {path:32} {first}" for path, first in tools()]
         wiki = sorted(p.stem for p in (ROOT / "docs" / "wiki").glob("*.md"))
-        out += ["", "MORE DETAIL", f"  Wiki pages in docs/wiki/: {', '.join(wiki)}",
+        out += ["", "MORE DETAIL", f"  Your guide, docs/wiki/: {', '.join(wiki)}; how it works inside: docs/design/",
                 "  Board: your GitHub Project (views: All Roles table, Pipeline board)."]
     print("\n".join(out))
     return 0

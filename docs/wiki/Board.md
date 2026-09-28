@@ -1,86 +1,38 @@
 # Board
 
 Your GitHub Project is the dashboard: one card per role, plus a "Radar status" card.
-
-## How roles become cards
-
-1. The daily run records every new matching role in `data/matches.csv` and queues
-   the ones for the board in `state/board_queue.json`: Tier 1 and 2 at companies on
-   your list (`profile/config.json` → `board`).
-2. `tools/board_sync.py roles` opens one **issue** per queued role in your private
-   repo, labelled `role`, `tier-1|2`, `country-XX` and `sponsor-yes|unknown|no`.
-   It creates up to 40 per run, 2 seconds apart (GitHub throttles bursts); the rest
-   wait for the next run.
-3. The Project's built-in **Auto-add to project** workflow (filter
-   `is:issue label:role`) puts each issue on the board.
-4. The daily run can't edit Project fields (its built-in token has no access to
-   user-owned Projects). When you next talk to Claude, it fills **Stage = New**,
-   **Tier** and **Sponsor** from the labels, and **Fit** / **Recommendation** once a
-   role is scored.
-
-**First run:** the baseline records every open role (about 130 for the author's
-targets) but only puts **Tier 1** on the board, so you don't start with a wall of cards.
+New cards arrive three times a day. How they get there:
+[Board internals](../design/Board-internals.md).
 
 ## Fields
 
 | Field | Values | Set by |
 |---|---|---|
 | Stage | New, Shortlisted, Applied, Interview, Offer, Rejected, Skipped | Claude (from what you tell it), or you by dragging |
-| Tier | T1, T2 | Claude, from the card's label |
+| Tier | T1, T2 | Claude, from the role's tier |
 | Fit | 0-100 | Claude, after scoring |
 | Recommendation | Apply, Maybe, Skip | Claude, after scoring |
-| Sponsor | Yes, Unknown, No | Claude, from the label (UK/NL register match) |
+| Sponsor | Yes, Unknown, No | Claude (UK/NL register match; a name match, not a promise) |
 
-Moving a role to Offer, Rejected or Skipped closes its issue; the Project's
-"Item closed → Done" workflow, if you turn it on, moves it out of the way.
+Cards that arrived since your last Claude session may have empty fields: the scheduled
+run can't write Project fields, so Claude fills them when you next open a session.
+
+Moving a role to Offer, Rejected or Skipped closes its issue.
 
 ## Each card
 
-Title `[T1] Company — Role (GB)`. The issue body has the link to the posting, the
-location, the tier score and why, the sponsor match, when it was posted, where
-else it was found, and its **Role ID**. Job titles and company names are escaped,
-so a malicious job ad can't inject links or formatting.
+The issue behind each card has the link to the posting, the location, the tier score and
+why, the sponsor match, when it was posted, where else it was found, and its **Role ID**.
 
-## The Radar status card
+## Radar status card
 
-One pinned issue, edited every run: roles found today, how many are waiting for
-the board, and a table of sources with any that stopped returning results. It
-contains counts only, no job titles.
+One pinned issue, edited every run: roles found, how many are waiting for the board,
+and which sources stopped returning results. Counts only, no job titles.
 
-## Notifications
+## Views
 
-Set the repo's watch level to **Participating and @mentions**. Role issues then
-don't email you; the board and Claude replace the old daily email.
-
-## Setup
-
-Claude does it (`setup`): after you run `gh auth refresh -s project` once, it runs
-`tools/board_sync.py setup-project`, which creates the Project and fields and
-links the repo. One step has no command-line equivalent: in the Project, open
-**⋯ → Workflows → Auto-add to project**, set the filter `is:issue label:role`
-and turn it on. The GitHub free plan may limit how many auto-add workflows a
-Project can have; this setup needs one.
-
-## Board template (for new copies)
-
-The board design lives in a public, empty Project:
-https://github.com/users/vizkov/projects/3 ("job-radar board template"). It has the five
-fields and both views but no cards. `tools/board_sync.py setup-project` copies it
-(`board.template` in `config.json`), so a new user gets the same views in one step.
-GitHub doesn't copy the repo-specific **Auto-add** workflow; that one click stays manual.
-
-When you change your board's design (fields or views), the session brief notices
-(`tools/board_sync.py design-diff`) and Claude offers to refresh the template with
-`tools/board_sync.py publish-board`: it copies your board's design (no cards) to a new public
-Project, closes the old one and updates `board.template` in your config and in
-`examples/config.json`, which the next commit publishes. GitHub has no API to edit a view's
-columns, so a copy is the only way to carry a view change across.
-Copying never includes your cards.
-
-## More views worth adding
-
-All Roles and Pipeline already show every tier. Filtered views make daily use faster
-(View → New view, then type the filter in the filter bar and **Save view**):
+**All Roles** (table, sorted by Fit) and **Pipeline** (board grouped by Stage). Filtered
+views make daily use faster (View → New view, type the filter, **Save view**):
 
 | View | Layout | Filter |
 |---|---|---|
@@ -89,4 +41,4 @@ All Roles and Pipeline already show every tier. Filtered views make daily use fa
 | In progress | Board by Stage | `stage:Applied,Interview,Offer` |
 | Clean-up | Table | `label:possibly-closed` |
 
-Tier 2 cards start arriving from the next scheduled run (the first run only added Tier 1).
+Filters can use labels even when the Labels column is hidden.

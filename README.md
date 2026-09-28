@@ -72,8 +72,8 @@ Enable/disable and tune each in `profile/sources.yaml`. Test one live without to
 python radar.py --dry-run --source <name> [--include-outside]
 ```
 
-Per-source setup and failure modes: [docs/wiki/Sources.md](docs/wiki/Sources.md).
-Alert-email setup: [docs/wiki/Job-alert-emails.md](docs/wiki/Job-alert-emails.md).
+Per-source setup and failure modes: [docs/design/Sources.md](docs/design/Sources.md).
+Alert-email setup: [docs/design/Job-alert-emails.md](docs/design/Job-alert-emails.md).
 
 **Not built, on purpose:** anything that logs in to LinkedIn or another portal,
 auto-apply, and scraping LinkedIn/Indeed/Glassdoor (e.g. python-jobspy). The
@@ -106,7 +106,7 @@ to forks or clones, but nothing else is protected.
   `export <dir>` builds a clean template tree.
 
 Don't fork (a fork of a public repo can't be private): clone and push to a new
-private repo. Steps: [docs/wiki/Setup.md](docs/wiki/Setup.md).
+private repo. Steps: [docs/design/Setup.md](docs/design/Setup.md).
 
 ## Setup
 
@@ -122,7 +122,7 @@ python radar.py --dry-run           # full run, nothing written
 ```
 
 Or just open Claude Code in your private copy and say **"set this up for me"**: it
-does all of the above with you (docs/wiki/Setup.md).
+does all of the above with you (docs/design/Setup.md).
 
 | Workflow | When | What |
 |---|---|---|
@@ -136,8 +136,8 @@ All three share one concurrency group, so their commits never race.
 
 - `profile/config.json`: the single source of filter truth: countries, title
   include/exclude (whole-word; `*` for prefixes), tier weights, sponsor-match
-  thresholds. See [Configuration](docs/wiki/Configuration.md) and
-  [Tiers and sponsorship](docs/wiki/Tiers-and-sponsorship.md).
+  thresholds. See [Configuration](docs/design/Configuration.md) and
+  [Tiers and sponsorship](docs/design/Tiers-and-sponsorship.md).
 - `profile/aliases.csv`: employer spellings that should count as a target.
 - `profile/overrides.csv`: extra ATS careers URLs (re-run `verify_boards.py`).
 - `profile/careers_pages.yaml`: careers pages without an ATS.
@@ -184,4 +184,4 @@ installed with `--require-hashes`; GitHub Actions are pinned to commit SHAs.
   future LLM step must follow `jobradar/untrusted.py`.
 - Review the upstream diff before bumping `ats-scrapers`.
 
-More: [docs/wiki/Security-model.md](docs/wiki/Security-model.md).
+More: [docs/design/Security-model.md](docs/design/Security-model.md).

@@ -22,7 +22,7 @@ Steps:
 2. **Show the effect before committing:** `python radar.py --dry-run --quiet` for counts, or without
    `--quiet` to list what would appear. For title changes, compare roles gained/lost in the digest.
 3. New target company: `python tools/build_candidates.py` (needs `atss/` and `agg/` clones — see
-   docs/wiki/Setup.md) then `python verify_boards.py --quiet`; report whether a board was found. If not,
+   docs/design/Setup.md) then `python verify_boards.py --quiet`; report whether a board was found. If not,
    look for a careers page and offer to add it.
 4. Run `pytest -q` if you touched anything beyond these data files.
 5. Tell the user what changed and the before/after numbers; commit to `origin` when they agree.

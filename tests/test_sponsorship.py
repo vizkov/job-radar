@@ -28,7 +28,10 @@ def test_rejections():
         {"kind": "company_page", "text": "x", "url": "https://www.linkedin.com/company/acme"}]), REF, JD))
     assert any("'confirmed' needs" in e for e in sp.check(rec(verdict="confirmed", evidence=[
         {"kind": "register", "text": "on the register"}]), REF, JD))
-    assert any("'no' needs" in e for e in sp.check(rec(verdict="no"), REF, JD))
+    assert any("'no' needs" in e for e in sp.check(rec(verdict="no", evidence=[
+        {"kind": "register", "text": "not on the register"}]), REF, JD))
+    assert sp.check(rec(verdict="no", evidence=[{"kind": "company_page", "text": "policy: no sponsorship",
+                                                  "url": "https://acme.example/visas"}]), REF, JD) == []
     assert any("verdict must be" in e for e in sp.check(rec(verdict="yes"), REF, JD))
 
 

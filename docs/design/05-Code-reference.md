@@ -540,7 +540,7 @@ out of date.
 |---|---|
 | `WORK`, `LOG` | `work/jd/`, `data/sponsorship.jsonl` |
 | `VERDICTS`, `KINDS`, `WEB_KINDS`, `BANNED` | Verdict → Sponsor option; evidence kinds; kinds that need a URL; domains never accepted |
-| `check(data, ref, jd_text)` | Validate a record: fields, verdict, country code, summary length, 1–6 evidence items, verbatim ad quotes, http(s) non-banned URLs, `confirmed` backed by ad/company page, `no` backed by an ad quote |
+| `check(data, ref, jd_text)` | Validate a record: fields, verdict, country code, summary length, 1–6 evidence items, verbatim ad quotes, http(s) non-banned URLs, `confirmed` and `no` each backed by the ad or the company's own page |
 | `visa_section(data)`, `with_visa(body, section)`, `VISA_START`, `VISA_END` | The card's escaped sponsorship block, inserted or replaced in place |
 | `upsert`, `company_records(company)` | Log one verdict per role; earlier verdicts for the same employer (loose name match) |
 | `record(ref, board)`, `main` | CLI `record <ref> [--board]` and `company "<name>"` |

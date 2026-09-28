@@ -54,7 +54,7 @@ reputable news or government sources. Note the URL and today's date for each.
 | `licensed` | On the register, but nothing more found either way |
 | `unclear` | No register applies and no evidence either way |
 | `unlikely` | Evidence against, not in the ad itself (no licence, remote/EOR-only, CH quotas, German-only) |
-| `no` | The ad says it won't sponsor, or requires existing work rights |
+| `no` | The ad, or the company's own published policy, says it won't sponsor or requires existing work rights |
 
 Write `work/jd/<ref>/sponsorship.json` (schema in `tools/sponsorship.py`) with 1–4 evidence items,
 then `python tools/sponsorship.py record <ref> --board`. It sets the Sponsor column and adds a short

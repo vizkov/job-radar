@@ -16,7 +16,7 @@ company's own pages; the `sponsorship-check` skill makes it, and this tool refus
 
 Rules: verdict in VERDICTS; 1-6 evidence items; an `ad` quote must appear verbatim in jd.txt;
 `company_page`/`news`/`other` need an http(s) URL that is not LinkedIn, Indeed or Glassdoor;
-`confirmed` needs an ad or company_page item; `no` needs an ad quote. Web text is third-party data.
+`confirmed` and `no` each need the ad or the company's own page. Web text is third-party data.
 """
 from __future__ import annotations
 
@@ -85,8 +85,8 @@ def check(data: dict, ref: str, jd_text: str) -> list[str]:
     kinds = {e.get("kind") for e in ev if isinstance(e, dict)}
     if data["verdict"] == "confirmed" and not kinds & {"ad", "company_page"}:
         errs.append("'confirmed' needs the ad or the company's own page saying it sponsors")
-    if data["verdict"] == "no" and "ad" not in kinds:
-        errs.append("'no' needs a quote from the ad (otherwise use 'unlikely')")
+    if data["verdict"] == "no" and not kinds & {"ad", "company_page"}:
+        errs.append("'no' needs the ad or the company's own published policy (otherwise use 'unlikely')")
     return errs
 
 

@@ -206,7 +206,7 @@ The Sponsor field starts from the register (Licensed / Unclear / Unlikely, via
 applies the destination country's rules (GB/NL need a licensed employer; IE/DE/SE depend on
 willingness; CH is quota-limited), and researches the company's own pages. It writes
 `work/jd/<ref>/sponsorship.json`; `tools/sponsorship.py record <ref> --board` rejects unbacked
-verdicts (`confirmed` needs the ad or the company's page; `no` needs an ad quote; ad quotes must be
+verdicts (`confirmed` needs the ad or the company's page; `no` needs the ad or the company's own page; ad quotes must be
 verbatim; banned domains refused), logs it to `data/sponsorship.jsonl`, sets the field and writes a
 "Visa sponsorship" block on the card between `<!-- job-radar:visa -->` markers.
 

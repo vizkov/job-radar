@@ -36,6 +36,7 @@ PRIVATE = [
     "data/scores.jsonl",          # your fit scores
     "data/pipeline_log.jsonl",    # your application stage history
     "data/pipeline_snapshot.json",
+    "data/usage_log.jsonl",       # how much Claude usage scoring batches took
     "docs/reviews.md",            # weekly system-review notes about your search
     "work/*",                     # fetched job descriptions and Claude's drafts
     ".alert_mail/*",              # fetched alert emails

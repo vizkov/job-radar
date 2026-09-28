@@ -67,7 +67,9 @@ sit down, or just look at the board.
 Nothing beyond your Claude subscription (Claude Pro or Max; there's no separate API bill).
 Claude's work counts toward your plan's normal usage limits. Briefings and tracking are
 light; scoring means reading each job description in full, and tailoring is heavier still.
-We haven't measured exact figures, so score in batches (the freshest roles first). If you
+We haven't measured exact figures yet: for your first three scoring batches Claude asks you to
+type `/usage` before and after, and then adds a real figure here. Until then, score in batches
+(the freshest roles first). If you
 reach your limit, pick up where you left off when it resets: nothing is lost. The automatic runs use about 15–25 minutes a day of GitHub Actions, within the free
 plan's 2,000 minutes a month for private repos.
 

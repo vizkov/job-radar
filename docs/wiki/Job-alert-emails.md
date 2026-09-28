@@ -51,6 +51,15 @@ GitHub secret ever leaked, an app password for your main account would expose
 all your mail, including password-reset emails for everything else. An app
 password for a mailbox that only receives job alerts exposes job alerts.
 
+### Using your main Gmail instead
+
+It works: the fetcher only searches for the providers' sender addresses, opens the
+mailbox read-only, and drops any email without a valid provider DKIM signature. The
+cost is the leak scenario above: that one GitHub secret would then unlock your whole
+mailbox. If you choose this, skip steps 2 and 4 below, create the app password on your
+main account, and set `JOBALERT_IMAP_USER` to your main address. Revoke the app password
+(Google Account → Security → App passwords) the day you stop using job-radar.
+
 ## Setup (~30 minutes)
 
 1. **Create alerts.**

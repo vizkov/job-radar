@@ -16,6 +16,10 @@ for what you ask. You don't need to know the skill names.
 | "I applied to Starling" / "Got an interview with Fortinet" / "Rejected by X" | Moves the card to Applied / Interview / Rejected (final stages also close it) |
 | "Stop showing DevSecOps roles" / "Add Checkmarx" / "Also look in Germany" | Changes your settings, shows you before/after numbers, saves when you agree |
 | "Is anything broken?" | Checks the status, the workflow runs and each source; fixes or explains |
+| "Help me apply to the Fortinet role" | Opens the application form in Chrome and fills it from your profile and tailored CV, page by page; you check each page and press Submit yourself |
+| "How do I strengthen my CV?" / "Which certs matter?" | Looks across your fit scores for requirements you keep missing and suggests what to add or evidence better |
+| "I have an interview with Starling" | Prepares likely questions mapped to your STAR stories, and gaps to prepare for |
+| "What could be better?" (or when the brief says a weekly review is due) | Reviews sources, coverage, noise and freshness; proposes fixes and new job boards for you to approve |
 
 ## What Claude will not do
 
@@ -26,16 +30,18 @@ for what you ask. You don't need to know the skill names.
 
 ## What happens without you
 
-Every morning the GitHub Action finds new roles and adds them to the board as
-**New** cards (Tier 1 and 2 at companies on your list). Scoring and tailoring
+Three times a day (08:17, 14:17, 20:17 IST) the GitHub Action finds new roles and adds
+them to the board as **New** cards (Tier 1 and 2 at companies on your list); fresh
+listings rank higher because applying early matters. When you open Claude Code, a
+session brief is ready: new roles, cards you moved, follow-ups due, anything broken. Scoring and tailoring
 happen when you ask, because they use your Claude subscription rather than an
 API key. Say "what's new?" when you sit down, or just look at the board.
 
 ## Costs
 
 Nothing beyond your Claude Pro subscription. Claude's work counts toward your
-normal Pro usage limits. The daily run uses free GitHub Actions minutes (about
-5-8 minutes a day).
+normal Pro usage limits. The scheduled runs use free GitHub Actions minutes (about
+15-25 minutes a day).
 
 ## Your data
 

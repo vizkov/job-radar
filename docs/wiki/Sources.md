@@ -17,7 +17,7 @@ python radar.py --dry-run --source <name> [--include-outside]
 | `jobtech` | on | ~10 s | none | Sweden's public employment service |
 | `eures` | on | ~1–2 min | none | EU portal: NL, IE, CH, SE (no UK; DE via bundesagentur) |
 | `careers_page` | on | ~10 s for 5 pages | none | Company careers pages without an ATS (`profile/careers_pages.yaml`) |
-| `alert_email` | on (needs secrets) | not measured yet | Gmail app password (dedicated mailbox) | LinkedIn / Indeed / Glassdoor alert emails; see [Job-alert emails](Job-alert-emails.md) |
+| `alert_email` | on (needs secrets) | not measured yet | Gmail app password (dedicated mailbox safer) | LinkedIn / Indeed / Glassdoor alert emails; see [Job-alert emails](Job-alert-emails.md) |
 
 Run times measured 2026-09-27 on a home connection.
 

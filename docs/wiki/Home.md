@@ -29,7 +29,7 @@ explain what happens underneath, for when you're curious or something breaks.
 ## How it fits together
 
 ```
- GitHub Actions, daily 08:17 IST (no one involved)
+ GitHub Actions, 3x a day: 08:17, 14:17, 20:17 IST (no one involved)
    fetch alert mail (stdlib-only step: the only place the Gmail password exists)
    → scan ATS boards, EU job portals, careers pages, alert mail
    → filter (country, title) → match your target companies → dedupe → tier + sponsor tag

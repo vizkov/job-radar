@@ -9,10 +9,16 @@ roles in Europe. It has **two interfaces**:
 2. **A GitHub Projects board**: every new role appears as a card that moves from New →
    Shortlisted → Applied → Interview → Offer.
 
-Underneath, a daily GitHub Action scans company job boards, careers pages, EU public job
+Underneath, a GitHub Action (three times a day) scans company job boards, careers pages, EU public job
 portals and (optionally) LinkedIn/Indeed/Glassdoor alert emails, keeps new roles at your
 target companies, tiers them, tags UK/NL visa-sponsor status and puts them on the board.
 Scoring and tailoring run in Claude Code on your Claude subscription; **no API key**.
+
+Also, without being asked: each Claude Code session starts with a brief (new roles,
+stage changes you made on the board, follow-ups due, broken sources, weekly review due).
+Claude can fill application forms in Chrome for you to check and submit
+(`apply-assist`), proposes job boards for targets with none (`tools/discover_boards.py`),
+and lists everything it can do on request (`/manual`).
 
 Start here: [docs/wiki/Home.md](docs/wiki/Home.md) · what to say to Claude:
 [docs/wiki/Using-it.md](docs/wiki/Using-it.md).
@@ -55,7 +61,7 @@ Claude tailors CV from your own lines ─▶ jd_check.py tailor (no invented con
 | `jobtech`: Swedish public job service | on | ~15 s | nothing | API change → canary query flagged |
 | `eures`: EU portal (NL, IE, CH, SE) | on | ~1 min | nothing | Undocumented endpoint, most likely to change shape |
 | `careers_page`: sites without an ATS (5 security consultancies in the examples) | on | ~15 s | nothing | Site redesign → "page layout changed" or empty page flagged |
-| `alert_email`: LinkedIn / Indeed / Glassdoor alert emails | on (needs secrets) | not measured | Gmail app password for a dedicated mailbox (GitHub secret) | Provider changes its email layout → flagged |
+| `alert_email`: LinkedIn / Indeed / Glassdoor alert emails | on (needs secrets) | not measured | Gmail app password (GitHub secret); a dedicated mailbox is safer | Provider changes its email layout → flagged |
 
 \*Measured 2026-09-28. Sources run concurrently, so a full run takes about as
 long as `ats`, ~4–5 minutes.
@@ -120,7 +126,7 @@ does all of the above with you (docs/wiki/Setup.md).
 
 | Workflow | When | What |
 |---|---|---|
-| `radar.yml` | daily 02:47 UTC (08:17 IST) | fetch alert mail, poll sources, add role cards, update status, commit |
+| `radar.yml` | 3x daily: 08:17, 14:17, 20:17 IST | fetch alert mail, poll sources, add role cards, update status, commit |
 | `verify.yml` | 1st of month | re-verify ATS boards |
 | `registers.yml` | Mondays | refresh UK/NL sponsor registers |
 
@@ -141,7 +147,7 @@ All three share one concurrency group, so their commits never race.
 
 ```bash
 pip install --require-hashes -r requirements-dev.txt
-pytest          # offline, ~3 s; always runs against examples/
+pytest          # offline, ~10 s; always runs against examples/
 ```
 
 Adapters are tested against responses recorded under `tests/fixtures/`. The
@@ -167,8 +173,8 @@ installed with `--require-hashes`; GitHub Actions are pinned to commit SHAs.
 ## Security notes
 
 - The daily workflow uses only the built-in `GITHUB_TOKEN` (contents + issues write on
-  this repo). The optional alert-email source adds one secret: an app password for a
-  mailbox that only holds job alerts. It reaches only a standard-library-only fetch
+  this repo). The optional alert-email source adds one secret: a Gmail app password
+  (ideally for a mailbox that only holds job alerts). It reaches only a standard-library-only fetch
   step that runs before any third-party package is installed.
 - Claude's output is checked too: fit-score blockers must quote the job ad verbatim,
   and a tailored CV may only use your own lines (by ID) with no new numbers, links or

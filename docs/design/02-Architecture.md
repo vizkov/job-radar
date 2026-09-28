@@ -164,6 +164,7 @@ starts them from scratch (so both review timers reset).
 | Company ATS APIs (via `ats-scrapers`) | Job lists and descriptions | none (public) |
 | Bundesagentur, JobTech, EURES APIs | Job search | none / published public key |
 | Company careers pages | Job lists | none; robots.txt respected |
+| Reed Jobs API | UK job search | free API key, GitHub secret `REED_API_KEY`, radar step only |
 | Gmail IMAP | Alert emails | app password, GitHub secret, one workflow step only |
 | gov.uk content API, ind.nl | Sponsor registers | none |
 | GitHub (issues, Projects, Actions, GraphQL) | Board, scheduling | GITHUB_TOKEN in Actions; the user's `gh` login locally |

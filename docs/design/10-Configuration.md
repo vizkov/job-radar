@@ -94,6 +94,7 @@ Every source takes `enabled` and `timeout_seconds` (a cap on the whole source). 
 |---|---|
 | `ats` | `boards_file` (default `boards.json`) |
 | `bundesagentur`, `jobtech`, `eures` | `queries`, `health_query` (the canary), `days` (look-back), `max_pages`; `eures` also `countries` |
+| `reed` | `queries`, `health_query`, `max_pages`, `location` (default "United Kingdom"); key from the `REED_API_KEY` environment variable |
 | `careers_page` | `pages_file` (default `careers_pages.yaml` via the profile), `respect_robots` (default true) |
 | `alert_email` | `providers`, `eml_dir` (default `.alert_mail`), `require_dkim` (default true) |
 

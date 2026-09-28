@@ -16,7 +16,7 @@ from jobradar.matching import normalize
 from jobradar.model import Posting
 
 # Canonical apply link comes from the most authoritative source present.
-SOURCE_RANK = {"ats": 0, "careers_page": 1, "bundesagentur": 2, "jobtech": 2, "eures": 3,
+SOURCE_RANK = {"ats": 0, "careers_page": 1, "bundesagentur": 2, "jobtech": 2, "reed": 3, "eures": 3,
                "linkedin_email": 4, "indeed_email": 4, "glassdoor_email": 4}
 
 _GENDER = re.compile(r"\(\s*[mwfdx]{1,2}\s*(?:/\s*[mwfdx*]{1,2}\s*){1,3}\)|\b[mwfd]/[mwfd]/[mwfdx]\b", re.I)

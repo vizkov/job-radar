@@ -78,6 +78,13 @@ What happens with it: three times a day GitHub's servers log in to that mailbox
 anything read, move or delete it. Emails that fail the sender's security signature are
 ignored. **Never paste the password into Claude or a file.**
 
+## Optional: Reed (UK job board)
+
+1. Register for a free API key at **reed.co.uk/developers** (your own Reed account).
+2. Add it as a repository secret named `REED_API_KEY` (Settings → Secrets and variables → Actions),
+   the same way as the mail secrets. Never paste it into Claude.
+3. Tell Claude it's added; it switches the Reed source on. The key only allows searching jobs.
+
 ## What Claude can do in your browser
 
 Only when you ask it to help with an application. Claude works in tabs it opens itself

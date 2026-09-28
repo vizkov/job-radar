@@ -306,6 +306,12 @@ default queries and paging. Specifics:
   in EURES and DE is skipped because it mirrors Bundesagentur; region lists can contain
   `null`, which `parse()` filters.
 
+### `sources/reed.py`: reed.co.uk (UK)
+
+`parse(job)` (one API result → `Posting`; `dd/mm/yyyy` dates; a bare town is read as GB), `ReedSource`
+(`_auth()` = HTTP Basic with the key as username, error if unset; `_page`, `search`, `count` with
+`permanent=true`, UK location).
+
 ### `sources/careers_page.py`: hand-made careers pages
 
 | Name | Is |

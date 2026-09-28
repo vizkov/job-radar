@@ -1,0 +1,7 @@
+{"results": [
+ {"jobId": 51234567, "employerId": 111, "employerName": "Bridewell", "jobTitle": "Senior Penetration Tester",
+  "locationName": "Reading", "minimumSalary": 70000, "maximumSalary": 85000, "currency": "GBP",
+  "date": "25/09/2026", "jobUrl": "https://www.reed.co.uk/jobs/senior-penetration-tester/51234567"},
+ {"jobId": 51234568, "employerId": 222, "employerName": "Reed Technology", "jobTitle": "Application Security Engineer",
+  "locationName": "London", "date": "27/09/2026", "jobUrl": "https://www.reed.co.uk/jobs/application-security-engineer/51234568"}],
+ "totalResults": 2}

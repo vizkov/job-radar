@@ -17,7 +17,7 @@ from jobradar.paths import profile_path
 from jobradar.model import Source, SourceResult
 
 _FACTORIES: dict[str, Callable[[dict], Source]] = {}
-_MODULES = ["ats", "bundesagentur", "jobtech", "eures", "careers_page", "alert_email"]  # adapter modules under jobradar.sources, imported lazily
+_MODULES = ["ats", "bundesagentur", "jobtech", "eures", "reed", "careers_page", "alert_email"]  # adapter modules under jobradar.sources, imported lazily
 
 
 def register(name: str):

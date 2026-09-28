@@ -21,6 +21,7 @@ python radar.py --dry-run --source <name> [--include-outside]
 | `bundesagentur` | on | ~10 s | none (public key) | Germany's public employment service |
 | `jobtech` | on | ~10 s | none | Sweden's public employment service |
 | `eures` | on | ~1–2 min | none | EU portal: NL, IE, CH, SE (no UK; DE via bundesagentur) |
+| `reed` | off until the key exists | not measured yet | free API key (GitHub secret `REED_API_KEY`) | reed.co.uk, UK job board, official API, permanent roles only; many listings are agency-posted |
 | `careers_page` | on | ~10 s for 5 pages | none | Company careers pages without an ATS (`profile/careers_pages.yaml`) |
 | `alert_email` | off in `examples/`; on once the secrets exist | not measured yet | Gmail app password (dedicated mailbox safer) | LinkedIn / Indeed / Glassdoor alert emails; see [Job-alert emails](12-Job-alert-emails.md) |
 
@@ -68,6 +69,16 @@ versions download the entire site, ~1M jobs for Bundesagentur).
 - **What breaks:** these are unauthenticated public endpoints; the EURES one is
   the portal's own undocumented API and the most likely to change shape. A change
   shows up as query errors plus a flagged canary.
+
+## reed — reed.co.uk (UK)
+
+Reed's official Jobs API (`jobradar/sources/reed.py`), searched with the same kind of title queries,
+UK only, `permanent=true`. Needs a free key from reed.co.uk/developers, stored as the GitHub secret
+`REED_API_KEY` and passed to the radar step (a search-only key, so it isn't isolated like the mailbox
+password). Without it the source fails with "REED_API_KEY not set"; keep it disabled until the secret
+exists. **Expect agency postings**: the agency then shows as the employer, so most won't match the target
+list; judge its value by its line on the status card. The test fixture is synthetic, built from the API
+documentation, until a real response is recorded.
 
 ## careers_page — companies without an ATS
 

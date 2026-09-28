@@ -60,6 +60,17 @@ sources:
     # Set true to see them (~50-80 in-scope NL roles a week when tested) in "Outside your list".
     include_outside_list: false
 
+  reed:
+    # UK (reed.co.uk official Jobs API). Needs a free API key as the GitHub secret REED_API_KEY;
+    # turn on once it exists. Permanent roles only. Many listings are agency-posted (the agency shows
+    # as the employer), so expect few matches to your list: check its line on the status card.
+    enabled: false
+    timeout_seconds: 300
+    max_pages: 2          # 100 per page
+    health_query: security
+    queries: [application security, appsec, product security, penetration tester, security consultant,
+              security engineer, devsecops, threat modelling]
+
   # --- Company careers pages without an ATS ---------------------------------
   careers_page:
     # Pages and selectors live in careers_pages.yaml (one request per page per run,

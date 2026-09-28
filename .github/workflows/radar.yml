@@ -63,6 +63,8 @@ jobs:
 
       - id: radar
         run: python radar.py --quiet   # counts only: keep the digest out of Actions logs
+        env:
+          REED_API_KEY: ${{ secrets.REED_API_KEY }}   # search-only key; empty if not set (reed stays off)
 
       # New roles -> one issue each (labelled `role`); the Project's "Auto-add to project"
       # workflow puts them on the board. Capped per run; the rest stay queued in state/.

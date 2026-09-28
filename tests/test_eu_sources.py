@@ -78,3 +78,24 @@ def test_one_failing_query_keeps_the_rest():
     bad = [u for u in res.units if not u.ok]
     assert [u.key for u in bad] == ["q:AppSec"] and "403" in bad[0].error
     assert res.postings
+
+
+@respx.mock
+def test_reed_permanent_uk_search_with_key(monkeypatch):
+    from jobradar.sources.reed import API, ReedSource
+    monkeypatch.setenv("REED_API_KEY", "test-key")
+    body = json.loads((FX / "reed.json").read_text())
+    route = respx.get(API).mock(return_value=httpx.Response(200, json=body))
+    res = asyncio.run(ReedSource({"queries": ["application security"], "max_pages": 1}).fetch())
+    req = route.calls[0].request
+    assert req.url.params["permanent"] == "true" and req.url.params["locationName"] == "United Kingdom"
+    assert req.headers["authorization"].startswith("Basic ")
+    p = next(p for p in res.postings if p.company == "Bridewell")
+    assert p.countries == frozenset({"GB"}) and p.posted_at.day == 25 and p.url.endswith("/51234567")
+
+
+def test_reed_without_key_fails_clearly(monkeypatch):
+    from jobradar.sources.reed import ReedSource
+    monkeypatch.delenv("REED_API_KEY", raising=False)
+    res = asyncio.run(ReedSource({"queries": ["appsec"]}).fetch())
+    assert not res.ok and "REED_API_KEY not set" in res.error

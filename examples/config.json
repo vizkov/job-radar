@@ -62,6 +62,11 @@
     "stale_days": 5
   },
 
+  "scoring": {
+    "_comment": "Roles Claude scores automatically at the start of each session (freshest unscored Tier 1 first), before answering. 0 = only when asked. Each role costs roughly 0.5% of a session.",
+    "auto_per_session": 8
+  },
+
   "referrals": {
     "_comment": "Days to wait for a reply to a referral ask before the session brief suggests a follow-up or applying directly.",
     "wait_days": 4

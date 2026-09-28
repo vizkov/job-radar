@@ -53,6 +53,7 @@ do?" or type `/manual` (it's generated from the system itself).
 | "Undo that tuning change" | Puts a title rating back to what it was before Claude's automatic weekly adjustment |
 | "Stop showing DevSecOps roles" / "Add Checkmarx" / "Also look in Germany" | Changes your settings, shows you before/after numbers, saves when you agree |
 | "How do I strengthen my CV?" / "Which certs matter?" | Looks across your scored roles for requirements you keep missing and suggests what to add or evidence better |
+| (automatic) | At the start of each session, when you send your first message, Claude first scores up to 8 of the freshest unscored Tier 1 roles (about 4% of a session), then answers you. Say "don't auto-score" or ask Claude to change the number |
 | (automatic) | Once a week, when enough roles are scored, Claude adjusts how job titles are rated (the Tier) using how those roles actually scored, one small step at a time. It tells you what changed at the start of your next session, and one sentence undoes it. Your title filters, countries and companies only change when you say so |
 | "What could be better?" | Reviews the system and proposes fixes and new job boards for you to approve (Claude also offers this weekly) |
 | "Are the docs still right?" | Two fresh AI readers go through the guide and the technical docs as newcomers; Claude checks what they flag against the system and fixes it (also offered automatically after big changes) |

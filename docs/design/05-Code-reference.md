@@ -410,6 +410,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `FOLLOW_UP_DAYS`, `REVIEW_EVERY_DAYS`, `GRACE` | 14, 7, 1 hour. |
 | `DOCS_REVIEW_AFTER_FILES`, `CODE_PATHS`, `LAST_DOCS_REVIEW`, `docs_review_note(now, runner)` | Suggest `docs-review` once 10 distinct files changed under `CODE_PATHS` (`radar.py`, `verify_boards.py`, `jobradar/`, `tools/`, `.claude/skills/`, `.github/workflows/`; docs and settings don't count) since `work/.last_docs_review`, per `git log --since` (the stamp is UTC and passed with `+00:00`). On a fresh copy the first call only writes the stamp. Called from `main()`. |
 | `calibration_notes(now)`, `LAST_CALIBRATION` | Run `calibrate.apply` at most weekly; report each change with its undo command and a reminder to commit the config. |
+| `auto_score_count(root)`, `auto_score_pick(rows, scored, items, n)`, `start_prep(refs)` | How many roles to score automatically; which (freshest unscored Tier 1, not closed/skipped); fetch their JDs in the background. |
 | `referral_notes(now)` | Asks unanswered after `referrals.wait_days`, as health notes (at most 5). |
 | `stale_days(root)` | `board.stale_days` from the config, for the brief's "looks closed" line. |
 | `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |

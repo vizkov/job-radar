@@ -84,7 +84,11 @@ errors become one-line notes, and it always exits 0.
     completing, weekly review due, recurring CV gaps; `calibration_notes()`: weekly automatic tier tuning (`tools/calibrate.py apply`), reported with
     an undo line; `referral_notes()`; and `docs_review_note()`: a docs
     review is due once 10+ code files changed since the last one.
-11. Writes `work/.last_session` with the current time.
+11. **Auto-score:** `auto_score_pick()` chooses up to `scoring.auto_per_session` freshest unscored Tier 1
+    roles; `start_prep()` fetches their job descriptions in the background (the virtualenv's Python, no
+    Claude usage), and the brief's **AUTO-SCORE** line tells Claude to score them before answering the
+    user's first message (`CLAUDE.md`, Session start). Claude can't act before the user types.
+12. Writes `work/.last_session` with the current time.
 
 Every job title and company name in the brief passes through `safe()`: control
 characters, angle brackets and backticks are replaced by spaces, and the length is

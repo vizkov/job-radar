@@ -165,3 +165,15 @@ def test_cards_closed_on_the_board_are_synced(monkeypatch):
     skipped, ask = sb.closed_cards(items, datetime(2026, 9, 28), gh=object())
     assert skipped == ["a" * 16] and ask == ["b" * 16]
     assert edits == [("I1", "Stage", "Skipped")] and logged == [("a" * 16, "Skipped", "board", "closed on the board")]
+
+
+def test_auto_score_picks_freshest_unscored_tier1_not_skipped():
+    rows = [{"ref": "a" * 16, "tier": "1", "on_list": "yes", "posted": "2026-09-20"},
+            {"ref": "b" * 16, "tier": "1", "on_list": "yes", "posted": "2026-09-27"},
+            {"ref": "c" * 16, "tier": "1", "on_list": "yes", "posted": "2026-09-28"},   # skipped on the board
+            {"ref": "d" * 16, "tier": "2", "on_list": "yes", "posted": "2026-09-28"},   # tier 2
+            {"ref": "e" * 16, "tier": "1", "on_list": "yes", "posted": "2026-09-28"}]   # already scored
+    items = [{"stage": "Skipped", "content": {"body": "<!-- job-radar:ref=" + "c" * 16 + " -->"}}]
+    pick = sb.auto_score_pick(rows, {"e" * 16: {}}, items, 8)
+    assert [r["ref"] for r in pick] == ["b" * 16, "a" * 16]
+    assert sb.auto_score_pick(rows, {}, items, 1)[0]["ref"] in ("e" * 16, "b" * 16)

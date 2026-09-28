@@ -218,6 +218,50 @@ def start_fill(now: datetime) -> str:
     return "started in the background (log: work/board_fill.log)"
 
 
+def auto_score_count(root: Path) -> int:
+    """config.json -> scoring.auto_per_session (default 8; 0 turns automatic scoring off)."""
+    for cfg in (root / "profile" / "config.json", root / "examples" / "config.json"):
+        if cfg.exists():
+            return int(_read_json(cfg, {}).get("scoring", {}).get("auto_per_session", 8))
+    return 0
+
+
+def auto_score_pick(rows: list[dict], scored: dict, items: list[dict] | None, n: int) -> list[dict]:
+    """The freshest unscored Tier 1 roles on the list, skipping cards the user already closed or skipped."""
+    done = set()
+    for i in items or []:
+        hit = _REF.search((i.get("content") or {}).get("body") or "")
+        if hit and (i.get("stage") in ("Skipped", "Rejected", "Offer") or i.get("status") == "Done"):
+            done.add(hit.group(1))
+    todo = [r for r in rows if str(r.get("tier")) == "1" and r.get("on_list") == "yes"
+            and r.get("ref") not in scored and r.get("ref") not in done]
+    seen, out = set(), []
+    for r in sorted(todo, key=lambda r: (r.get("posted") or r.get("date") or ""), reverse=True):
+        if r["ref"] not in seen:
+            seen.add(r["ref"])
+            out.append(r)
+    return out[:n]
+
+
+def start_prep(refs: list[str]) -> str:
+    """Fetch the job descriptions in the background (no Claude usage), so scoring starts faster."""
+    venv = ROOT / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+    if not refs or not venv.exists():
+        return ""
+    WORK.mkdir(exist_ok=True)
+    log = open(WORK / "jd_prep.log", "a", encoding="utf-8")
+    kwargs = {"cwd": ROOT, "stdout": log, "stderr": log, "stdin": subprocess.DEVNULL}
+    if os.name == "nt":
+        kwargs["creationflags"] = 0x00000008 | 0x00000200
+    else:
+        kwargs["start_new_session"] = True
+    args = [str(venv), str(ROOT / "tools" / "jd_prep.py")]
+    for r in refs:
+        args += ["--ref", r]
+    subprocess.Popen(args, **kwargs)
+    return "job descriptions being fetched in the background (log: work/jd_prep.log)"
+
+
 def template_status(since: datetime, runner=run) -> tuple[list[str], list[str]]:
     """(template commit subjects since `since`, private code files not yet published)."""
     ok, remotes = runner(["git", "remote"], 10)
@@ -394,7 +438,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
           board_note: str | None, fill_note: str | None, changes: list[dict], follow_ups: list[tuple[str, int]],
           run_note: str | None, updates: list[str] = (), unpublished: list[str] = (),
           design_note: str | None = None, docs_note: str | None = None,
-          closed_now: tuple[list[str], list[str]] = ((), ())) -> str:
+          closed_now: tuple[list[str], list[str]] = ((), ()), start_background: bool = False) -> str:
     rows = read_matches(root)
     scores = read_scores(root)
     by_ref = {r.get("ref"): r for r in rows}
@@ -422,6 +466,14 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append(f"  - {safe(r.get('company'), 30)} — {safe(r.get('title'))} ({safe(r.get('countries'), 12)}) "
                      f"· posted {_age(r.get('posted', ''), now.date())} · UK sponsor "
                      f"{safe(r.get('uk_sponsor'), 40) or '-'} · ref {r.get('ref', '')}")
+    auto_n = auto_score_count(root)
+    pick = auto_score_pick(rows, scores, items, auto_n) if auto_n else []
+    if pick:
+        prep = start_prep([r["ref"] for r in pick]) if start_background else ""
+        lines.append(f"- AUTO-SCORE (config scoring.auto_per_session={auto_n}): before answering the user's first "
+                     "message, run score-roles on these refs, freshest first, then answer them; say so in one line, "
+                     "and skip it only if they ask for something urgent: " + ", ".join(r["ref"] for r in pick)
+                     + (f" ({prep})" if prep else ""))
     lines.append(f"- Unscored Tier 1 roles (last 14 days): {len(unscored_t1)}, of which {len(fresh_unscored)} "
                  "posted in the last 3 days (score and apply to these first)")
     if scores:
@@ -504,7 +556,7 @@ def main() -> int:
         updates, unpublished = template_status(since, run)
         print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, last_run_health(run),
                     updates, unpublished, board_design_note() if items is not None else None,
-                    docs_review_note(now, run), (closed_skipped, closed_ask)))
+                    docs_review_note(now, run), (closed_skipped, closed_ask), start_background=True))
         WORK.mkdir(exist_ok=True)
         LAST.write_text(now.isoformat())
     except Exception as e:  # never break a session

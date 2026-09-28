@@ -134,6 +134,12 @@ Every source takes `enabled` and `timeout_seconds` (a cap on the whole source). 
 The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 `tools/board_sync.py` ([Board internals](11-Board-internals.md)).
 
+## Scoring (`config.json` → `scoring`)
+
+| Key | Default | Meaning |
+|---|---|---|
+| `auto_per_session` | 8 | Roles Claude scores automatically at the start of each session, before answering the user's first message: the freshest unscored Tier 1 roles on the list, skipping cards already closed or skipped. 0 = only when asked. About 0.5% of a session per role |
+
 ## Referrals (`config.json` → `referrals`)
 
 | Key | Default | Meaning |

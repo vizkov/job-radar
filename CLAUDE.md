@@ -35,7 +35,9 @@ A SessionStart hook (`tools/session_brief.py`) pulls the latest data, reads the 
 stage changes the user made by dragging cards), starts filling new cards' fields in the
 background, runs health checks, and puts a "job-radar session brief" in your context. Start
 from it; don't redo those steps. Mention health items briefly and offer the matching skill;
-prioritise the freshest Tier 1 roles, since applying early matters to this user.
+prioritise the freshest Tier 1 roles, since applying early matters to this user. If the brief has an
+**AUTO-SCORE** line, run `score-roles` on those refs before answering the user's first message (they
+chose this; `scoring.auto_per_session` in config.json sets how many, 0 turns it off), then answer.
 
 ## How the machinery fits together
 

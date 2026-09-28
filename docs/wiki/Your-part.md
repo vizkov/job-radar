@@ -94,6 +94,7 @@ never clicks the final Submit. It won't touch LinkedIn, Indeed or Glassdoor at a
 | Claude has filled an application form | Check each page; **you** click Submit |
 | A LinkedIn/Indeed/Glassdoor job needs scoring | Paste the job description (Claude never opens those sites) |
 | Claude proposes a settings change, new job boards or a fix | Say yes or no. Nothing changes without your yes |
+| Claude asks who you know at a company you'd apply to | Tell it (family, friends, connections, recruiters); it drafts the messages, **you** send them, then tell it what happened |
 | You get a new job, certification or achievement | Tell Claude; it adds it to your CV lines so future applications can use it |
 
 ## Pausing, stopping, taking access back

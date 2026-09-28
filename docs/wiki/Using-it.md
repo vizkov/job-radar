@@ -27,6 +27,7 @@ Not sure what's possible? Ask **"what can this do?"** or type `/manual`.
 
 | You say | Claude does |
 |---|---|
+| "Who do I know at Amazon?" / "I asked Priya" / "Priya referred me" | Before you apply, Claude looks for a referral in your order: family and friends, then your network, then recruiters and hiring managers. It asks who you know there, drafts each message from your own CV lines for you to send, and tracks every ask on the card's **Referral** column. If nobody answers within 4 days (you can change that), it suggests one follow-up or applying directly |
 | "Tailor my CV for the MDSec role" | Builds a CV and cover letter from **your own** CV lines, picked and reordered for that job; a checker makes sure nothing was invented. You get a plain Word CV that applicant tracking systems read reliably, a Markdown copy (for a styled version), a cover letter, and a list of what changed |
 | "Help me apply to the Fortinet role" | Opens the application form in your Chrome and fills it in from your CV and profile, page by page. You approve every page's answers, and **you** press Submit. Questions about visas, salary or diversity are always asked, never guessed |
 | "I have an interview with Starling" | Likely questions, answers drawn from your STAR stories, gaps to prepare for |
@@ -81,6 +82,8 @@ plan's 2,000 minutes a month for private repos.
 | Tailored applications | `profile/applications/<date>-<company>-<role>/` |
 | Every role ever found | `data/matches.csv` |
 | Fit scores | `data/scores.jsonl` |
+| People you know at companies (names, how to reach them) | `profile/network.csv` |
+| Referral asks and answers | `data/referrals.jsonl` |
 | Job descriptions Claude fetched (not saved to GitHub) | `work/jd/<Role ID>/` |
 
 All of it stays in your **private** repo, which only you (and anyone you invite) can see.

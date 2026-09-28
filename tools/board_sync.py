@@ -52,6 +52,7 @@ FIELDS = {  # name -> single-select options, None for a number field, or DATE
     "Recommendation": ["Apply", "Maybe", "Skip"],
     "Sponsor": ["Yes", "Unknown", "No"],
     "Posted": DATE,  # when the employer posted it (else when the radar first saw it): sort for freshness
+    "Referral": ["Finding contact", "Asked", "Referred", "No route", "Not needed"],  # tools/referrals.py
 }
 FINAL_STAGES = {"Offer", "Rejected", "Skipped"}
 LABEL_COLORS = {"role": "0E8A16", "tier-1": "B60205", "tier-2": "FBCA04", "sponsor-yes": "0E8A16",
@@ -387,13 +388,13 @@ def refresh_bodies(gh: Gh) -> str:
 # board grouping, so those are reported as one-time clicks (`sort`, `group`).
 VIEWS = [
     {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "",
-     "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted"],
+     "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
      "sort": [("Fit", "DESC")], "group": []},
     {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "tier:T1 stage:New,Shortlisted -label:possibly-closed -recommendation:Skip posted:>=@today-14d",
-     "fields": ["Title", "Stage", "Fit", "Recommendation", "Sponsor", "Posted"],
+     "fields": ["Title", "Stage", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
      "sort": [("Posted", "DESC")], "group": []},
     {"name": "Pipeline", "layout": "BOARD_LAYOUT", "filter": "",
-     "fields": ["Title", "Tier", "Fit", "Recommendation", "Sponsor", "Posted"],
+     "fields": ["Title", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
      "sort": [], "group": ["Stage"]},
 ]
 API_KEYS = ("layout", "filter", "fields")   # what apply_views can set
@@ -425,6 +426,12 @@ def _click_steps(spec: dict, have: dict) -> list[str]:
     return steps
 
 
+def _same(key: str, have, want) -> bool:
+    """Columns compare as a set: GitHub keeps existing columns in place and appends new ones, whatever
+    order the API is given, so order differences are cosmetic and not drift."""
+    return set(have or []) == set(want) if key == "fields" else have == want
+
+
 def design_diff(gh: Gh) -> list[str]:
     """How your board's views differ from VIEWS ([] = in sync). Extra views of your own are fine."""
     board = load_board()
@@ -437,7 +444,7 @@ def design_diff(gh: Gh) -> list[str]:
         if v is None:
             diffs.append(f"view '{spec['name']}' is missing")
             continue
-        changed = [k for k in API_KEYS if v[k] != spec[k]] + [k for k in CLICK_KEYS if spec[k] and v[k] != spec[k]]
+        changed = [k for k in API_KEYS if not _same(k, v[k], spec[k])] +                   [k for k in CLICK_KEYS if spec[k] and v[k] != spec[k]]
         if changed:
             diffs.append(f"view '{spec['name']}' differs ({', '.join(changed)})")
     return diffs
@@ -462,7 +469,7 @@ def apply_views(gh: Gh) -> str:
             v = {"id": out["data"]["createProjectV2View"]["projectV2View"]["id"], "filter": "", "fields": [],
                  "layout": spec["layout"]}
             changed.append(f"created '{spec['name']}'")
-        if any(v.get(k) != spec[k] for k in API_KEYS):
+        if any(not _same(k, v.get(k), spec[k]) for k in API_KEYS):
             gh("api", "graphql", "-f", "query=mutation{updateProjectV2View(input:{viewId:"
                f"{json.dumps(v['id'])},layout:{spec['layout']},filter:{json.dumps(spec['filter'])},{cfg}}})"
                "{projectV2View{id}}}")

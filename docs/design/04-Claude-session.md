@@ -27,6 +27,7 @@ The skills, and the tools each one runs:
 | `consultant-brief` | "what's new?" | reads the session brief, `board_sync.py fill` if needed |
 | `score-roles` | "which of these fit me?" | `jd_prep.py`, then Claude writes `score.json`, then `jd_check.py score --board` |
 | `tailor-application` | "tailor my CV for X" | Claude writes `tailored.json`, `jd_check.py tailor`, `render_resume.py` |
+| `referrals` | "who do I know at …", a role recommended apply, an unanswered ask in the brief | `tools/referrals.py contacts/ask/result/route/pending`; drafts in `profile/applications/<folder>/outreach.md` |
 | `apply-assist` | "help me apply to X" | Claude in Chrome; a Sonnet subagent types approved values; the user submits |
 | `track` | "I applied to X" | `board_sync.py set <ref> Stage=Applied` |
 | `tune-radar` | "stop showing X", "add company Y" | edits `profile/`, `radar.py --dry-run`, `build_candidates.py`, `verify_boards.py` |

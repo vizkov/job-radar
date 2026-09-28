@@ -17,6 +17,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "what's new?", "how's my search going?", "anything good this week?" | `consultant-brief` |
 | "which of these fit me?", "score the new roles", "is this one worth it?" | `score-roles` |
 | "tailor my CV for …", "prep my application for …", "write a cover letter for …" | `tailor-application` |
+| a role is shortlisted or "apply", "who do I know at …", "X referred me", brief lists an unanswered ask | `referrals` (asked before applying; the user sends every message) |
 | "fill in the application for …", "help me apply to …" | `apply-assist` (Chrome; the user approves every page and submits) |
 | "I applied to …", "got an interview with …", "rejected by …", "not interested in …" | `track` |
 | "stop showing …", "add company …", "also look in Germany", "too much noise", "pause/resume the radar" | `tune-radar` |

@@ -66,3 +66,10 @@ def test_apply_creates_missing_view_and_lists_clicks_for_sort_and_group():
     assert "Sort by -> Fit (descending)" in out and "Column by -> Stage" in out
     filters = [c[3] for c in gh.calls if c[:2] == ("api", "graphql") and "updateProjectV2View" in c[3]]
     assert any("posted:>=@today-14d" in f for f in filters)
+
+
+def test_column_order_is_not_drift():
+    board(bs.BOARD_FILE)
+    spec = bs.VIEWS[0]
+    gh = ViewsGh([node(v) for v in bs.VIEWS[1:]] + [node(spec, fields=list(reversed(spec["fields"])))])
+    assert bs.design_diff(gh) == []

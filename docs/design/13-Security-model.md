@@ -27,6 +27,13 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
 | Actions logs show job titles or target companies | Workflows run with `--quiet`: counts only | `radar.py`, `verify_boards.py` |
 | The "Radar status" issue, visible to anyone with repo access, lists roles | It contains counts and source health only, no titles | `radar.py: render_status()` |
 
+### 1b. Other people's details
+
+| Risk | Defence | Where |
+|---|---|---|
+| Names and contact routes of the user's friends and colleagues get published | Kept only in `profile/network.csv` and `data/referrals.jsonl`, both private (never on the publish allowlist) | `tools/public_template.py` |
+| Claude contacts them | Claude only drafts; the user sends every message. No lookups on LinkedIn/Indeed/Glassdoor | `referrals` skill, `CLAUDE.md` rules 3–4 |
+
 ### 2. The mailbox password leaks
 
 | How it could happen | Defence | Where |

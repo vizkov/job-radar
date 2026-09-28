@@ -104,6 +104,7 @@ doesn't match `PRIVATE`.
 | `sponsor_overrides.csv` | Pinned sponsor-register matches | Claude | `sponsors.py` |
 | `career/master_resume.md`, `stories.md`, `cover_blocks.md` | The user's CV lines, STAR stories and cover paragraphs, each with an ID | Claude (converted from the user's CV, confirmed by them) | `career.py` → `jd_check.py`, `render_resume.py`, skills |
 | `applications/<folder>/` | Per-application `tailored.json`, `validated.sha256`, `resume.docx/.md`, `cover_letter.md`, `submitted.md` | Claude, `jd_check.py`, `render_resume.py` | the user, `apply-assist` |
+| `network.csv` | People the user knows, per company: `name,relation,company,role,how_to_reach,notes,added` (relation: friend_family, connection, recruiter, hiring_manager) | Claude (`referrals` skill), from what the user says | `tools/referrals.py` |
 | `board.json` | The Project's owner, number, node ID, URL, field IDs and option IDs | `board_sync.py setup-project` | `board_sync.py`, `session_brief.py` |
 
 ### Pipeline memory (`state/`, committed by the scheduled run)
@@ -124,6 +125,7 @@ doesn't match `PRIVATE`.
 | `data/matches.csv` | One row per new role ever found: ref, date, company, title, location, countries, url, source, posted, on_list, tier, score, score_reasons, uk/nl sponsor, also_on, ats, ats_slug, external_id | `radar.py: append_matches()` | `jd_prep.py`, `session_brief.py`, `board_sync.py` (Posted fallback), Claude |
 | `data/scores.jsonl` | One JSON line per scored role: fit_score, recommendation, blockers, missing requirements, summary, injection flag | `jd_check.py score` | `session_brief.py`, `jd_prep.py` (skip scored), `cv-review` |
 | `data/pipeline_log.jsonl` | Every stage change: `{ref, field, value, by: claude|board, at, from?, note?}` | `board_sync.py set`, `session_brief.py` | `session_brief.py` (follow-ups) |
+| `data/referrals.jsonl` | Every referral ask and answer: `{ref, person, relation?, channel?, status: asked|referred|declined|no_reply|finding|none|not_needed, note, at}` | `tools/referrals.py` | `tools/referrals.py`, `session_brief.py` (reminders) |
 | `data/usage_log.jsonl` | Per scoring batch: roles, JD characters, the user's `/usage` before and after (to put a real cost figure in the guide) | Claude (`score-roles`, first 3 batches) | Claude |
 | `data/pipeline_snapshot.json` | `{ref: stage}` at the last session start, to detect cards the user dragged | `session_brief.py` | `session_brief.py` |
 | `data/registers/uk_sponsors.csv`, `nl_sponsors.csv`, `meta.json` | UK and NL sponsor registers | `refresh_registers.py` (weekly workflow) | `sponsors.py` |

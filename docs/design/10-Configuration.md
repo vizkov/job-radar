@@ -130,6 +130,14 @@ Every source takes `enabled` and `timeout_seconds` (a cap on the whole source). 
 The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 `tools/board_sync.py` ([Board internals](11-Board-internals.md)).
 
+## Referrals (`config.json` → `referrals`)
+
+| Key | Default | Meaning |
+|---|---|---|
+| `wait_days` | 4 | Days an ask may go unanswered before the session brief suggests one follow-up or applying directly |
+
+Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
+
 ## Other `config.json` keys
 
 | Key | Meaning |

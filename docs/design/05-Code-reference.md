@@ -399,6 +399,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 |---|---|
 | `FOLLOW_UP_DAYS`, `REVIEW_EVERY_DAYS`, `GRACE` | 14, 7, 1 hour. |
 | `DOCS_REVIEW_AFTER_FILES`, `CODE_PATHS`, `LAST_DOCS_REVIEW`, `docs_review_note(now, runner)` | Suggest `docs-review` once 10 distinct files changed under `CODE_PATHS` (`radar.py`, `verify_boards.py`, `jobradar/`, `tools/`, `.claude/skills/`, `.github/workflows/`; docs and settings don't count) since `work/.last_docs_review`, per `git log --since` (the stamp is UTC and passed with `+00:00`). On a fresh copy the first call only writes the stamp. Called from `main()`. |
+| `referral_notes(now)` | Asks unanswered after `referrals.wait_days`, as health notes (at most 5). |
 | `stale_days(root)` | `board.stale_days` from the config, for the brief's "looks closed" line. |
 | `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
 | `_CONTROL`, `_REF` | Characters stripped by `safe()`; the ref marker in issue bodies. |
@@ -514,6 +515,22 @@ CLI: `export <dir>`, `check`, `drift` (print unpublished public files), `publish
 first line (via `ast`, without importing), `wrap()`, `paint(color)` (ANSI colours only on a
 real terminal and without `NO_COLOR`), `main()`. Generated from the code, so it can't go
 out of date.
+
+### `tools/referrals.py`: referral routes and asks (standard library only)
+
+| Name | Is |
+|---|---|
+| `NETWORK`, `LOG` | `profile/network.csv`, `data/referrals.jsonl` |
+| `RELATIONS` | The user's ask order: friend_family, connection, recruiter, hiring_manager |
+| `RESULTS`, `ROUTES` | Answer → board value (only *referred* sets one); route status → board value |
+| `wait_days()` | `config.json` → `referrals.wait_days` (default 4) |
+| `contacts(company)` | People at a company, loosely matched (whole-word prefix either way), in ask order |
+| `records()`, `_append()` | Read / append the log |
+| `pending(days, now)` | Latest record per (role, person) still *asked* after `days` |
+| `_board(ref, value, note)` | Set the card's Referral field (via `board_sync.set_role_fields`) and comment the note; without a value, comment only |
+| `ask`, `result`, `route`, `main` | The CLI: log each step, update the card |
+
+**Watch out**: a second ask after someone already referred leaves the field at *Referred* (the ask is still logged and commented).
 
 ### `tools/check_doc_links.py`: doc link checker (standard library only)
 

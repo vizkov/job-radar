@@ -15,6 +15,7 @@ New cards arrive three times a day. (How they get there, for the curious:
 | Fit | 0-100 | Claude, after scoring |
 | Recommendation | Apply, Maybe, Skip | Claude, after scoring |
 | Sponsor | Yes, Unknown, No | Claude (UK/NL register match; a name match, not a promise) |
+| Referral | Finding contact, Asked, Referred, No route, Not needed | Claude, as you tell it about referral asks (each step is also a comment on the card) |
 | Posted | date | When the employer posted it; if the source doesn't say, the day job-radar first found it. Sort by it to apply early |
 
 Cards that arrived since your last Claude session may have empty fields: GitHub doesn't

@@ -40,7 +40,8 @@ The views are defined in `VIEWS` in `tools/board_sync.py`: name, layout, filter,
 columns, sort and board grouping. `board_sync.py views` creates or updates the board to
 match (GraphQL `createProjectV2View` / `updateProjectV2View`), so every copy gets the same
 board. The API sets name, layout, filter and columns, but **not sort or grouping**: for those
-it prints the exact menu clicks for the user, once per view.
+it prints the exact menu clicks for the user, once per view. Columns are compared as a set: GitHub appends a new
+column at the end whatever order the API is given, so order isn't treated as drift.
 
 The session brief runs `design-diff`. If the user changed a view on purpose, Claude updates
 `VIEWS` (the commit publishes it to the template, so new copies get it); if not, it offers

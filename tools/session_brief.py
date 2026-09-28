@@ -237,6 +237,18 @@ def docs_review_note(now: datetime, runner=run) -> str | None:
     return None
 
 
+def referral_notes(now: datetime) -> list[str]:
+    """Referral asks with no answer after referrals.wait_days: suggest one follow-up or applying directly."""
+    try:
+        sys.path.insert(0, str(ROOT / "tools"))
+        import referrals  # stdlib-only
+        rows = referrals.pending(referrals.wait_days(), now.replace(tzinfo=timezone.utc))
+    except Exception:
+        return []
+    return [f"referral ask unanswered: {safe(r['person'], 30)} for role {r['ref']} ({r['days']} days); offer a "
+            "follow-up message once, or suggest applying directly (referrals skill)" for r in rows[:5]]
+
+
 GRACE = timedelta(hours=1)  # GitHub often starts scheduled runs late
 
 
@@ -395,6 +407,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
     checks = health_checks(root, now, rows, scores, last_run, alert_row, run_note)
     if docs_note:
         checks.append(docs_note)
+    checks += referral_notes(now)
     if design_note:
         checks.append(design_note)
     if unpublished:

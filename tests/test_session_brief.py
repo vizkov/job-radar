@@ -148,3 +148,20 @@ def test_docs_review_git_since_is_utc():
     seen = []
     sb.docs_review_note(now, runner=lambda c, t: (seen.append(c), (True, ""))[1])
     assert seen[0][2].endswith("+00:00")
+
+
+def test_cards_closed_on_the_board_are_synced(monkeypatch):
+    from datetime import datetime
+    import board_sync as bs
+    edits, logged = [], []
+    monkeypatch.setattr(bs, "load_board", lambda: {"id": "P", "fields": {}})
+    monkeypatch.setattr(bs, "_edit", lambda gh, board, item, name, value: edits.append((item, name, value)))
+    monkeypatch.setattr(bs, "log_stage", lambda ref, f, v, by, note="": logged.append((ref, v, by, note)))
+    body = "x <!-- job-radar:ref={} -->"
+    items = [{"id": "I1", "status": "Done", "stage": "New", "content": {"body": body.format("a" * 16)}},
+             {"id": "I2", "status": "Done", "stage": "Applied", "content": {"body": body.format("b" * 16)}},
+             {"id": "I3", "status": "Done", "stage": "Rejected", "content": {"body": body.format("c" * 16)}},
+             {"id": "I4", "status": "Todo", "stage": "New", "content": {"body": body.format("d" * 16)}}]
+    skipped, ask = sb.closed_cards(items, datetime(2026, 9, 28), gh=object())
+    assert skipped == ["a" * 16] and ask == ["b" * 16]
+    assert edits == [("I1", "Stage", "Skipped")] and logged == [("a" * 16, "Skipped", "board", "closed on the board")]

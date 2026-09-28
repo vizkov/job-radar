@@ -415,6 +415,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `pull()` | `git pull --ff-only`. |
 | `read_matches`, `read_scores`, `status_info` | Read `matches.csv`, `scores.jsonl`, `status.md` (last run, problems, alert row). |
 | `board_items()` | Role cards via `gh project item-list`. |
+| `closed_cards(items, now, gh)` | Sync cards closed on the board: Stage → Skipped when not yet acted on; list in-progress ones for Claude to ask about. |
 | `track_stage_changes(items, now)` | Log drags since the last snapshot; save a new snapshot. |
 | `stale_applications(items, now)` | Applied cards with no movement for 14+ days. |
 | `start_fill(now)` | Start `board_sync.py fill` detached, at most once per 10 minutes. |

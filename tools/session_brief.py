@@ -151,6 +151,34 @@ def track_stage_changes(items: list[dict], now: datetime) -> list[dict]:
     return changes
 
 
+def closed_cards(items: list[dict], now: datetime, gh=None) -> tuple[list[str], list[str]]:
+    """Cards the user closed on the board (GitHub's Status = Done) whose Stage isn't final.
+    Not yet acted on (New / Shortlisted / blank) -> set Stage to Skipped, logged as the user's
+    decision. Applied / Interview -> left alone and listed, so Claude asks what happened.
+    Returns (refs skipped, refs to ask about)."""
+    skipped, ask = [], []
+    todo = [i for i in items if i.get("status") == "Done"
+            and i.get("stage") not in ("Offer", "Rejected", "Skipped")]
+    if not todo:
+        return skipped, ask
+    sys.path.insert(0, str(ROOT / "tools"))
+    import board_sync  # stdlib-only
+    gh = gh or board_sync.Gh()
+    board = board_sync.load_board()
+    for i in todo:
+        hit = _REF.search((i.get("content") or {}).get("body") or "")
+        if not hit:
+            continue
+        if i.get("stage") in (None, "", "New", "Shortlisted"):
+            board_sync._edit(gh, board, i["id"], "Stage", "Skipped")
+            board_sync.log_stage(hit.group(1), "Stage", "Skipped", "board", note="closed on the board")
+            i["stage"] = "Skipped"
+            skipped.append(hit.group(1))
+        else:
+            ask.append(hit.group(1))
+    return skipped, ask
+
+
 def stale_applications(items: list[dict], now: datetime) -> list[tuple[str, int]]:
     """(ref, days) for cards in Applied with no logged movement for FOLLOW_UP_DAYS."""
     last_change: dict[str, datetime] = {}
@@ -365,7 +393,8 @@ def _age(posted: str, today: date) -> str:
 def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, items: list[dict] | None,
           board_note: str | None, fill_note: str | None, changes: list[dict], follow_ups: list[tuple[str, int]],
           run_note: str | None, updates: list[str] = (), unpublished: list[str] = (),
-          design_note: str | None = None, docs_note: str | None = None) -> str:
+          design_note: str | None = None, docs_note: str | None = None,
+          closed_now: tuple[list[str], list[str]] = ((), ())) -> str:
     rows = read_matches(root)
     scores = read_scores(root)
     by_ref = {r.get("ref"): r for r in rows}
@@ -415,6 +444,14 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         r = by_ref.get(c["ref"], {})
         lines.append(f"- You moved {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)} "
                      f"from {c['from']} to {c['value']} (logged)")
+    for ref in closed_now[0]:
+        r = by_ref.get(ref, {})
+        lines.append(f"- You closed {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)} on the board: "
+                     "Stage set to Skipped (logged)")
+    for ref in closed_now[1]:
+        r = by_ref.get(ref, {})
+        lines.append(f"- You closed {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)} while it was in "
+                     "progress: ask whether it was a rejection, an offer or a withdrawal, then `track` it")
     for ref, days in follow_ups:
         r = by_ref.get(ref, {})
         lines.append(f"- Follow-up due: {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)}, "
@@ -453,7 +490,13 @@ def main() -> int:
         note = pull(run)
         items, board_note = board_items(ROOT, run)
         changes, follow_ups, fill_note = [], [], None
+        closed_skipped, closed_ask = [], []
         if items is not None:
+            try:
+                closed_skipped, closed_ask = closed_cards(items, now)
+            except Exception as e:  # a board hiccup must not stop the brief
+                closed_ask = []
+                note = (note + "; " if note else "") + f"couldn't sync closed cards ({type(e).__name__})"
             changes = track_stage_changes(items, now)
             follow_ups = stale_applications(items, now)
             if any(not i.get("stage") for i in items):
@@ -461,7 +504,7 @@ def main() -> int:
         updates, unpublished = template_status(since, run)
         print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, last_run_health(run),
                     updates, unpublished, board_design_note() if items is not None else None,
-                    docs_review_note(now, run)))
+                    docs_review_note(now, run), (closed_skipped, closed_ask)))
         WORK.mkdir(exist_ok=True)
         LAST.write_text(now.isoformat())
     except Exception as e:  # never break a session

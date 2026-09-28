@@ -34,6 +34,12 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
 creates the Project and fields, links the repo, then builds the views. The Auto-add
 workflow is a manual step (see [Your part](../wiki/Your-part.md)).
 
+## Stage vs GitHub's Status
+
+Projects has a built-in **Status** field (Todo / In Progress / Done) that its "Item closed" workflow
+sets to Done. job-radar tracks **Stage** instead. The session brief reconciles the two
+(`closed_cards()`), and the *Act now* view filters `is:open`, so a card the user closes leaves it.
+
 ## What's on a card
 
 The issue body (`board.py: payload()`): company and location, the posting link, sponsor match,

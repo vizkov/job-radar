@@ -57,7 +57,10 @@ errors become one-line notes, and it always exits 0.
 3. **`board_items()`**: `gh project item-list` with the user's login; keeps cards labelled
    `role`. Each item arrives with its labels, its field values (`stage`, `tier`, `posted`…)
    and its issue body.
-4. **`track_stage_changes()`**: compares each card's Stage with
+4. **`closed_cards()`**: cards the user closed on the board (GitHub's built-in Status = Done) whose
+   Stage isn't final: New/Shortlisted/blank become Skipped (logged `by: "board"`); Applied/Interview
+   are listed so Claude asks what happened.
+4b. **`track_stage_changes()`**: compares each card's Stage with
    `data/pipeline_snapshot.json` from last time. Differences are cards the user dragged;
    they're appended to `data/pipeline_log.jsonl` with `by: "board"`. Then it saves the new
    snapshot.

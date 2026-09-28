@@ -24,7 +24,11 @@ open a session (it takes a minute or two, in the background). Until then, "Act n
 other views that filter on those columns won't show those cards yet; the "All Roles" view
 does. Nothing is lost in the meantime.
 
-Moving a role to Offer, Rejected or Skipped closes its issue.
+Moving a role to Offer, Rejected or Skipped closes its issue. It works the other way too: if you
+**close a card** (or mark it Done) that you hadn't acted on, Claude sets its Stage to Skipped at your
+next session. If it was Applied or at Interview, Claude asks what happened instead of guessing.
+GitHub also shows its own **Status** column (Todo / In Progress / Done); job-radar doesn't use it,
+so Stage is the one to watch.
 
 ## Each card
 

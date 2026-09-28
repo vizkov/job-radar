@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import html
 import json
 import sys
 from datetime import date, timedelta
@@ -85,6 +86,14 @@ def via_scraper(row: dict) -> str | None:
     return _as_text(desc) if desc else None
 
 
+def greenhouse_detail_url(row: dict) -> str | None:
+    """Greenhouse's public per-job API, for roles the radar found on a Greenhouse board."""
+    ext = row.get("external_id") or ""
+    if row.get("ats") != "greenhouse" or not row.get("ats_slug") or not ext.startswith("greenhouse:"):
+        return None
+    return f"https://boards-api.greenhouse.io/v1/boards/{row['ats_slug']}/jobs/{ext.split(':', 1)[1]}"
+
+
 def public_url(url: str) -> str:
     """Rewrite known login-walled links to the public job page."""
     if m := re.match(r"https?://account\.amazon\.jobs/jobs/(\d+)", url):
@@ -132,6 +141,17 @@ class Fetcher:
                 return f"ok: {row['ats']} scraper", text
         except Exception:  # scraper quirks: fall back to the page
             pass
+        if (api := greenhouse_detail_url(row)):
+            # The Greenhouse scraper only has descriptions from its board listing, so ask the public job API;
+            # companies' own career pages often wrap Greenhouse and rate-limit or render with JavaScript.
+            try:
+                r = self.c.get(api, headers={"Accept": "application/json"})
+                r.raise_for_status()
+                text = _as_text(html.unescape(r.json().get("content") or ""))
+                if len(text) >= 200:
+                    return "ok: greenhouse api", text
+            except (httpx.HTTPError, ValueError):
+                pass
         if not self._allowed(url):
             return "unavailable: disallowed by robots.txt; paste the JD into jd.txt", ""
         try:

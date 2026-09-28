@@ -116,6 +116,7 @@ def test_scraper_failure_falls_back_to_page(work, monkeypatch):
     def boom(r):
         raise RuntimeError("scraper changed")
     monkeypatch.setattr(jd_prep, "via_scraper", boom)
+    respx.get("https://boards-api.greenhouse.io/v1/boards/acme/jobs/1").mock(return_value=httpx.Response(404))
     respx.get("https://job-boards.greenhouse.io/robots.txt").mock(return_value=httpx.Response(404))
     respx.get("https://job-boards.greenhouse.io/acme/jobs/1").mock(return_value=httpx.Response(200, text=GH_PAGE))
     r = row("8" * 16, "https://job-boards.greenhouse.io/acme/jobs/1") | {"ats": "greenhouse", "ats_slug": "acme",
@@ -126,3 +127,16 @@ def test_scraper_failure_falls_back_to_page(work, monkeypatch):
 def test_amazon_links_are_rewritten_to_the_public_page():
     assert jd_prep.public_url("https://account.amazon.jobs/jobs/10528460/apply") == \
         "https://www.amazon.jobs/en/jobs/10528460"
+
+
+@respx.mock
+def test_greenhouse_role_uses_job_api_when_company_page_fails(work, monkeypatch):
+    monkeypatch.setattr(jd_prep, "via_scraper", lambda r: None)  # the scraper has no per-job description
+    api = respx.get("https://boards-api.greenhouse.io/v1/boards/acme/jobs/42").mock(return_value=httpx.Response(
+        200, json={"content": "&lt;p&gt;Product security: threat modelling and code review.&lt;/p&gt;" * 5}))
+    page = respx.get(url__regex=r"https://acme\.example/.*").mock(return_value=httpx.Response(429))
+    r = row("7" * 16, "https://acme.example/jobs/42?gh_jid=42") | {"ats": "greenhouse", "ats_slug": "acme",
+                                                                   "external_id": "greenhouse:42"}
+    folder, status = jd_prep.prepare(r, fetcher())
+    assert status == "ok: greenhouse api" and api.called and not page.called
+    assert "<p>" not in (folder / "jd.txt").read_text(encoding="utf-8")

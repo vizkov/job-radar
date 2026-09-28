@@ -128,10 +128,13 @@ matches.csv ─▶ jd_prep.py ─▶ work/jd/<ref>/{jd.txt, meta.json, packet.md
 2. refuse if the URL is LinkedIn, Indeed or Glassdoor (`NEVER_FETCH`): "paste it";
 3. the ATS scraper's own `get_description()` (`via_scraper()`), using the `ats`,
    `ats_slug` and `external_id` columns `radar.py` saved;
-4. robots.txt check;
-5. Workday's detail API;
-6. the page's schema.org `JobPosting` JSON-LD;
-7. the page's main text (if under 300 characters it's probably a JavaScript shell:
+4. for Greenhouse roles, Greenhouse's public per-job API (`greenhouse_detail_url()`): the scraper
+   has no per-job description, and companies' own pages that wrap Greenhouse often rate-limit or
+   need JavaScript;
+5. robots.txt check;
+6. Workday's detail API;
+7. the page's schema.org `JobPosting` JSON-LD;
+8. the page's main text (if under 300 characters it's probably a JavaScript shell:
    "paste it").
 
 It writes `jd.txt` (max 20,000 characters), `meta.json` (role facts) and `packet.md`,

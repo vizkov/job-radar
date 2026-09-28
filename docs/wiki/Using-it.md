@@ -35,7 +35,7 @@ Not sure what's possible? Ask **"what can this do?"** or type `/manual`.
 
 | You say | Claude does |
 |---|---|
-| "I applied to Starling" / "Got an interview with Fortinet" / "Rejected by X" / "Not interested in Y" | Moves the card (final stages also close it). Dragging the card yourself works too: Claude notices at the next session |
+| "I applied to Starling" / "Got an interview with Fortinet" / "Rejected by X" / "Not interested in Y" | Moves the card (final stages also close it) and, if you say why, saves your reason as a comment on the card. Dragging the card yourself works too: Claude notices at the next session. Tell Claude your feedback rather than writing comments on the card yourself: nothing reads those |
 
 ### Improving the search and your CV
 

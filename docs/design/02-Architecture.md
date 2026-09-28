@@ -123,7 +123,7 @@ doesn't match `PRIVATE`.
 |---|---|---|---|
 | `data/matches.csv` | One row per new role ever found: ref, date, company, title, location, countries, url, source, posted, on_list, tier, score, score_reasons, uk/nl sponsor, also_on, ats, ats_slug, external_id | `radar.py: append_matches()` | `jd_prep.py`, `session_brief.py`, `board_sync.py` (Posted fallback), Claude |
 | `data/scores.jsonl` | One JSON line per scored role: fit_score, recommendation, blockers, missing requirements, summary, injection flag | `jd_check.py score` | `session_brief.py`, `jd_prep.py` (skip scored), `cv-review` |
-| `data/pipeline_log.jsonl` | Every stage change: `{ref, field, value, by: claude|board, at, from?}` | `board_sync.py set`, `session_brief.py` | `session_brief.py` (follow-ups) |
+| `data/pipeline_log.jsonl` | Every stage change: `{ref, field, value, by: claude|board, at, from?, note?}` | `board_sync.py set`, `session_brief.py` | `session_brief.py` (follow-ups) |
 | `data/usage_log.jsonl` | Per scoring batch: roles, JD characters, the user's `/usage` before and after (to put a real cost figure in the guide) | Claude (`score-roles`, first 3 batches) | Claude |
 | `data/pipeline_snapshot.json` | `{ref: stage}` at the last session start, to detect cards the user dragged | `session_brief.py` | `session_brief.py` |
 | `data/registers/uk_sponsors.csv`, `nl_sponsors.csv`, `meta.json` | UK and NL sponsor registers | `refresh_registers.py` (weekly workflow) | `sponsors.py` |

@@ -148,3 +148,14 @@ def test_fill_dates_every_undated_role_card(board_file):
     assert bs.fill_new(gh).endswith("dated 1")
     dates = [c for c in gh.calls if c[:2] == ("project", "item-edit") and "--date" in c]
     assert len(dates) == 1 and dates[0][-1] == "2026-09-21"
+
+
+def test_note_is_logged_and_commented_on_the_issue(board_file):
+    gh, _ = setup(board_file)
+    gh.items = [item()]
+    msg = bs.set_role_fields(gh, REF, {"Stage": "Skipped"}, note="No live way to apply.")
+    comments = [c for c in gh.calls if c[:2] == ("issue", "comment")]
+    assert len(comments) == 1 and comments[0][2] == "https://github.com/me/r/issues/7"
+    assert ("issue", "close", "https://github.com/me/r/issues/7") in gh.calls and "(closed)" in msg
+    logged = [json.loads(l) for l in bs.PIPELINE_LOG.read_text(encoding="utf-8").splitlines()]
+    assert logged[-1]["note"] == "No live way to apply." and logged[-1]["value"] == "Skipped"

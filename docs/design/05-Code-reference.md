@@ -366,7 +366,7 @@ Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
 | `setup_project(gh, repo)` | Create or adopt the "Job search" Project, create missing fields, link the repo, save IDs. |
 | `_items`, `find_item(gh, board, ref)` | All cards; the card whose body has this ref's marker. |
 | `_edit(gh, board, item, field, value)` | Set one field (single-select by option ID, date, or number). |
-| `set_role_fields(gh, ref, values, close)` | Set fields on a role's card, log stage changes, close on final stages. |
+| `set_role_fields(gh, ref, values, close, note)` | Set fields on a role's card, log stage changes (with the note), comment the note on the issue, close on final stages. |
 | `VIEWS`, `API_KEYS`, `CLICK_KEYS` | The board's views as data; what the API can set; what needs a click. |
 | `DESIGN_QUERY`, `views(gh, owner, number)` | GraphQL for the board's views, returned in `VIEWS` shape plus IDs. |
 | `_click_steps(spec, have)` | Menu instructions for sort/grouping differences. |
@@ -384,6 +384,7 @@ retry. It refuses a repo whose owner isn't the Project's owner. It does **not** 
 itself: the `setup-project` command runs `setup_project()` then `apply_views()`.
 
 **CLI flags**: `--repo OWNER/REPO` (setup-project), `--close` (set: also close the issue),
+`--note "…"` (set: the reason, stored in `pipeline_log.jsonl` as `note` and posted as an issue comment),
 `--dry-run` (print the `gh` commands; nothing changes and no stage changes are logged),
 `--max N` (roles: issues per run). `sync_roles()` takes the queue oldest first.
 

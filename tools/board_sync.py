@@ -8,7 +8,7 @@
 Local only (your `gh` login needs the project scope: gh auth refresh -s project):
     python tools/board_sync.py setup-project --repo OWNER/REPO   # create the Project + fields, link the repo
     python tools/board_sync.py fill                              # set Stage/Tier/Sponsor on new cards from labels
-    python tools/board_sync.py set <ref> Stage=Applied [Fit=72 …] [--close]
+    python tools/board_sync.py set <ref> Stage=Applied [Fit=72 …] [--close] [--note "why"]
     python tools/board_sync.py views                             # create/update the board's views (VIEWS)
     python tools/board_sync.py design-diff                       # how the board's views differ from VIEWS
 
@@ -156,12 +156,15 @@ def sync_stale(gh: Gh) -> str:
     return f"possibly-closed: +{added} / -{removed} (now {len(flagged)})"
 
 
-def log_stage(ref: str, field: str, value: str, by: str) -> None:
+def log_stage(ref: str, field: str, value: str, by: str, note: str = "") -> None:
     from datetime import datetime, timezone
     PIPELINE_LOG.parent.mkdir(parents=True, exist_ok=True)
+    rec = {"ref": ref, "field": field, "value": value, "by": by,
+           "at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
+    if note:
+        rec["note"] = note
     with open(PIPELINE_LOG, "a", encoding="utf-8") as fh:
-        fh.write(json.dumps({"ref": ref, "field": field, "value": value, "by": by,
-                             "at": datetime.now(timezone.utc).isoformat(timespec="seconds")}) + "\n")
+        fh.write(json.dumps(rec, ensure_ascii=False) + "\n")
 
 
 def sync_status(gh: Gh) -> str:
@@ -272,7 +275,9 @@ def _edit(gh: Gh, board: dict, item_id: str, name: str, value) -> None:
     gh(*args)
 
 
-def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False) -> str:
+def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: str = "") -> str:
+    """Set fields on a role's card. `note` (the user's reason, e.g. why they skipped it) is logged
+    with the stage change and posted as a comment on the issue, so the card shows it later."""
     board = load_board()
     if board is None:
         return "board not set up yet (python tools/board_sync.py setup-project --repo OWNER/REPO)"
@@ -282,11 +287,16 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False) -> str:
     for name, value in values.items():
         _edit(gh, board, item["id"], name, value)
         if not gh.dry_run and name in ("Stage", "Recommendation"):
-            log_stage(ref, name, str(value), "claude")
-    if close or values.get("Stage") in FINAL_STAGES:
-        url = (item.get("content") or {}).get("url")
-        if url:
-            gh("issue", "close", url)
+            log_stage(ref, name, str(value), "claude", note)
+    url = (item.get("content") or {}).get("url")
+    if note and url:
+        path = _body_file(f"**{', '.join(f'{k}: {v}' for k, v in values.items())}**. {note}")
+        try:
+            gh("issue", "comment", url, "--body-file", path)
+        finally:
+            Path(path).unlink(missing_ok=True)
+    if (close or values.get("Stage") in FINAL_STAGES) and url:
+        gh("issue", "close", url)
     closed = close or values.get("Stage") in FINAL_STAGES
     return f"{ref}: " + ", ".join(f"{k}={v}" for k, v in values.items()) + (" (closed)" if closed else "")
 
@@ -438,6 +448,7 @@ def main(argv=None) -> int:
     ap.add_argument("args", nargs="*", help="set: <ref> Field=Value …")
     ap.add_argument("--repo", help="setup-project: OWNER/REPO of your private copy")
     ap.add_argument("--close", action="store_true", help="set: also close the role's issue")
+    ap.add_argument("--note", default="", help="set: the reason, logged and posted as a comment on the issue")
     ap.add_argument("--dry-run", action="store_true", help="print the gh commands instead of running them")
     ap.add_argument("--max", type=int, help="max issues to create (default: board.max_per_run in config.json)")
     args = ap.parse_args(argv)
@@ -469,7 +480,7 @@ def main(argv=None) -> int:
         if len(args.args) < 2 or not all("=" in a for a in args.args[1:]):
             ap.error("usage: set <ref> Field=Value [Field=Value …]")
         values = dict(a.split("=", 1) for a in args.args[1:])
-        print(set_role_fields(gh, args.args[0], values, close=args.close))
+        print(set_role_fields(gh, args.args[0], values, close=args.close, note=args.note))
     return 0
 
 

@@ -11,7 +11,11 @@ description: Update an application's stage on the GitHub Projects board (shortli
 2. Map what they said to a Stage: Shortlisted, Applied, Interview, Offer, Rejected, Skipped.
 3. `python tools/board_sync.py set <ref> Stage=<Stage>` (logs the change with a date in
    `data/pipeline_log.jsonl`, which drives follow-up reminders in the session brief). Offer, Rejected and Skipped also close the
-   issue (the Project moves it to Done). Add `--close` only if the user wants a different stage closed.
+   issue. Add `--close` only if the user wants a different stage closed.
+   **Always pass the user's reason** when they gave one (why they skipped it, who rejected them and
+   how, what the recruiter said): `--note "<one or two plain sentences>"`. It's logged with the stage
+   change and posted as a comment on the issue, so the card shows why. Feedback reaches the system
+   through the conversation: nothing reads issue comments the user writes themselves.
 4. If the board isn't set up or the card doesn't exist yet, say so and offer `setup` / wait for the
    next daily run.
 5. Moving to **Interview** → offer `interview-prep`. Cards labelled `possibly-closed` that the user

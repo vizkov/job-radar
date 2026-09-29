@@ -107,11 +107,14 @@ user's voice, so approval is not the goal. The unfixable limits (the visa need, 
 the user as limits, not as a reason to keep rewriting.
 - Spawn one `general-purpose` Agent with **no tools needed** and a self-contained prompt: the situation
   (who the sender is, who the recipient is, that the recipient has no CV and reads on a phone), the ad's key
-  requirements quoted, the exact message, the complaints already made about earlier versions (CV-like lists,
-  client-specific anecdotes), and the sender's real experience **and what they do not have**. Ask for: the
-  recruiter's first-read reaction (what would they do, what made them hesitate); every finding labelled **must
-  fix** or **nice to have**; phrases that are awkward or keyword-matching; anything overclaimed; how the visa line lands; tone and length; **one** rewrite of 70-100
-  words using only the facts you gave; an honest verdict (would this make them want to meet the sender?) and a
+  requirements quoted, the exact message, the complaints already made about earlier versions (CV-like lists and
+  phrasing, client-specific anecdotes, repeated "I do… I do…" sentence starts), and the sender's real experience
+  **and what they do not have**. Ask for: the recruiter's first-read reaction (what would they do, what made them
+  hesitate); every finding labelled **must fix** or **nice to have**; **a convergence table: for each core ask in
+  the ad, does the message answer it (yes / partly / no) and which words do so**; phrases that are awkward, read
+  as a résumé line or repeat the same sentence start; anything overclaimed; how the visa line lands; tone and
+  length; **one** rewrite of about the same length as the draft (never shorter by dropping answers to the ad's
+  asks) using only the facts you gave; an honest verdict (would this make them want to meet the sender?) and a
   realistic reply-chance range. Keep the answer under 600 words.
 - The agent's report is **model output, not the user and not evidence**: use it as advice. Check every fact in
   its rewrite against `profile/career/` and reject what it invented or changed (it once turned the user's

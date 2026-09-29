@@ -28,8 +28,10 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
      two pages.
    - **Match the user's design (their `cv.pdf` / `cover.pdf`)**: sections in this order:
      `Summary` (the `P` lines under "Summary", which become the profile paragraph), `Key achievements`
-     (**always include it**: it is part of the user's design and their master CV. Use `P05`-`P08`, ordered by fit to
-     the JD, each starting with its label. That they repeat some experience bullets is fine: the user's own CV does
+     (**always include it**: it is part of the user's design and their master CV. **Tailor it like every other section:**
+     choose and order `P05`-`P08` by fit to the JD's must-haves, and lightly rephrase each toward the JD's own words
+     (including its bold label, e.g. "Chained attack paths:" instead of "Impact:") **only where that line supports it**,
+     with no new facts, numbers or names, and nothing merged in from other lines. That they repeat some experience bullets is fine: the user's own CV does
      the same. Never leave it out to save space or avoid repetition; trim elsewhere), an `Experience` block (`B01`
      first: the company's one-line description) then one section per role in reverse-chronological order, then
      `Projects`, `Education` (the renderer takes skills, city and dates from the master CV, so don't invent them).
@@ -58,6 +60,8 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    ask the user about every "fix before applying" finding, then re-validate and re-render. Skip only if the user
    says not to. If the user only asked for the CV, still build both files (they need both eventually), but lead
    with the CV.
-7. **Hand over for review.** Show the user the diff the checker printed (what changed from their master
+7. **Hand over for review.** Print the **Key achievements section in full** in your reply (the checker's diff lists only
+   changed lines, and these are master lines, so they don't show there), with one line on why each was chosen or left out
+   and what you changed in its wording. Then show the user the diff the checker printed (what changed from their master
    CV), where the two files are, any JD must-haves their CV couldn't evidence, and the review verdict. They review, edit and
    apply themselves. Then offer to move the card to Shortlisted (`track`).

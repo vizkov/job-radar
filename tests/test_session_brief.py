@@ -177,3 +177,17 @@ def test_auto_score_picks_freshest_unscored_tier1_not_skipped():
     pick = sb.auto_score_pick(rows, {"e" * 16: {}}, items, 8)
     assert [r["ref"] for r in pick] == ["b" * 16, "a" * 16]
     assert sb.auto_score_pick(rows, {}, items, 1)[0]["ref"] in ("e" * 16, "b" * 16)
+
+
+def test_read_stamp_accepts_aware_and_naive_times(tmp_path):
+    """work/.last_review is written by Claude with +00:00; the brief compares it with a naive `now`."""
+    import session_brief as sb
+    from datetime import datetime, timedelta
+    aware, naive = tmp_path / "a", tmp_path / "n"
+    aware.write_text("2026-09-29T06:58:46+00:00")
+    naive.write_text("2026-09-29T06:58:46")
+    assert sb._read_stamp(aware) == sb._read_stamp(naive) == datetime(2026, 9, 29, 6, 58, 46)
+    assert datetime(2026, 10, 1) - sb._read_stamp(aware) >= timedelta(days=1)   # would raise TypeError before
+    aware.write_text("2026-09-29T08:58:46+02:00")                                # other offsets convert to UTC
+    assert sb._read_stamp(aware) == datetime(2026, 9, 29, 6, 58, 46)
+    assert sb._read_stamp(tmp_path / "missing") is None

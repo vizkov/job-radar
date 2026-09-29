@@ -68,10 +68,13 @@ def _read_json(path: Path, default):
 
 
 def _read_stamp(path: Path) -> datetime | None:
+    """A stamp file's time as naive UTC (the brief's `now` is naive UTC). Claude writes some stamps with
+    "+00:00", and comparing an aware time with a naive one raises TypeError, which used to blank the brief."""
     try:
-        return datetime.fromisoformat(path.read_text().strip())
+        at = datetime.fromisoformat(path.read_text().strip())
     except (OSError, ValueError):
         return None
+    return at.astimezone(timezone.utc).replace(tzinfo=None) if at.tzinfo else at
 
 
 # ---------------------------------------------------------------- data

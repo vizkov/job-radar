@@ -427,7 +427,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | Other thresholds (in code) | Top 6 new Tier 1 roles listed; "unscored" = Tier 1 from the last 14 days; "fresh" = posted in the last 3 days; "no run completed for 2+ days" warning; a CV gap needs 3+ scored roles missing it. Follow-ups only apply to cards with a logged stage change. |
 | `safe(text, limit)` | Sanitise third-party text for the brief. |
 | `run(cmd, timeout)` | Run a command; `(ok, output)`; never raises. |
-| `_read_json`, `_read_stamp` | Tolerant file readers. |
+| `_read_json`, `_read_stamp` | Tolerant file readers. `_read_stamp` returns naive UTC even when the file holds a `+00:00` time (Claude writes `.last_review` that way); an aware stamp used to crash the brief with `TypeError`. |
 | `pull()` | `git pull --ff-only`. |
 | `read_matches`, `read_scores`, `status_info` | Read `matches.csv`, `scores.jsonl`, `status.md` (last run, problems, alert row). |
 | `board_items()` | Role cards via `gh project item-list`. |

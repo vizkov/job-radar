@@ -17,7 +17,9 @@ description: Update an application's stage on the GitHub Projects board (shortli
    change and posted as a comment on the issue, so the card shows why. Feedback reaches the system
    through the conversation: nothing reads issue comments the user writes themselves.
 4. If the board isn't set up or the card doesn't exist yet, say so and offer `setup` / wait for the
-   next daily run.
+   next daily run. Skipped cards are **archived daily** (session start, `board_sync.py archive`), and an
+   archived card is invisible to `set`: to change one, tell the user to restore it from the Project's
+   Archived items first.
 5. Moving to **Interview** → offer `interview-prep`. Cards labelled `possibly-closed` that the user
    hasn't applied to → suggest Skipped.
 6. Confirm in one line. When relevant, suggest the next action (e.g. "want interview prep from your

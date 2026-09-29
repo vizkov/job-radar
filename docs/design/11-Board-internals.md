@@ -24,6 +24,10 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
    `jd_check.py score --board` when a role is scored.
 5. `board_sync.py stale` labels roles no source has listed for `stale_days` as
    `possibly-closed` (and removes the label if they come back).
+6. **Archiving Skipped cards** (`board_sync.py archive`) is not in the Action: the Action's token has no
+   access to the user's Project, so the session-start hook (`session_brief.start_archive`) runs it in the
+   background at most once a day, capped at 40 cards a run. Archived cards leave `item-list`, so
+   `find_item` (and `set`) can't see them until they're restored from the Project's Archived items.
 
 **First run:** the baseline records every open role but only puts `baseline_tiers`
 (Tier 1) on the board.

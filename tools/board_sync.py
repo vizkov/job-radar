@@ -12,6 +12,8 @@ Local only (your `gh` login needs the project scope: gh auth refresh -s project)
     python tools/board_sync.py views                             # create/update the board's views (VIEWS)
     python tools/board_sync.py design-diff                       # how the board's views differ from VIEWS
     python tools/board_sync.py refresh-bodies                    # tidy role cards; add fit breakdowns from scores
+    python tools/board_sync.py archive                           # archive cards in Stage=Skipped (max 40 a run; the
+                                                                 #   session-start hook runs it once a day)
 
 In GitHub Actions `gh` uses GITHUB_TOKEN (issues: write). Issues labelled `role`
 are pulled onto the Project board by its built-in "Auto-add to project" workflow.
@@ -332,6 +334,24 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: s
     return f"{ref}: " + ", ".join(f"{k}={v}" for k, v in values.items()) + (" (closed)" if closed else "")
 
 
+ARCHIVE_MAX = 40  # per run: each archive is a GraphQL call, and a big first backlog can trip GitHub's rate limit
+
+
+def archive_skipped(gh: Gh, max_n: int = ARCHIVE_MAX, sleep=time.sleep) -> str:
+    """Archive cards whose Stage is Skipped: they leave the board's views but aren't deleted (the Project's
+    Archive keeps them, and they can be restored there). `item-list` never returns archived items, so
+    running this daily is idempotent; what's over the cap waits for the next run."""
+    board = load_board()
+    if board is None:
+        return "board not set up yet (python tools/board_sync.py setup-project --repo OWNER/REPO)"
+    todo = [i for i in _items(gh, board) if i.get("stage") == "Skipped"]
+    for i in todo[:max_n]:
+        gh("project", "item-archive", board["number"], "--owner", board["owner"], "--id", i["id"])
+        sleep(0.5)
+    n = min(len(todo), max_n)
+    return f"archived {n} Skipped card(s)" + (f", {len(todo) - n} left for the next run" if len(todo) > n else "")
+
+
 FIT_START, FIT_END = "<!-- job-radar:fit -->", "<!-- /job-radar:fit -->"
 TIER_LINE = re.compile(r"^- \*\*Tier \d\*\* \(score [^\n]*\)\n?", re.M)  # older cards carried the tier arithmetic
 BLOCKER_NAMES = {"clearance": "Security clearance", "right_to_work": "Right to work", "language": "Language",
@@ -558,7 +578,7 @@ def fill_new(gh: Gh) -> str:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("what", choices=["roles", "status", "setup-project", "fill", "set", "stale", "backfill-map",
-                                     "design-diff", "views", "refresh-bodies", "promote"])
+                                     "design-diff", "views", "refresh-bodies", "promote", "archive"])
     ap.add_argument("args", nargs="*", help="set: <ref> Field=Value …; promote: <ref> … (then run roles)")
     ap.add_argument("--repo", help="setup-project: OWNER/REPO of your private copy")
     ap.add_argument("--close", action="store_true", help="set: also close the role's issue")
@@ -594,6 +614,8 @@ def main(argv=None) -> int:
         print(promote(args.args, dry_run=args.dry_run))
     elif args.what == "refresh-bodies":
         print(refresh_bodies(gh))
+    elif args.what == "archive":
+        print(archive_skipped(gh, sleep=(lambda s: None) if args.dry_run else time.sleep))
     else:
         if len(args.args) < 2 or not all("=" in a for a in args.args[1:]):
             ap.error("usage: set <ref> Field=Value [Field=Value …]")

@@ -47,6 +47,14 @@ Dutch and Swedish equivalents. "Smart contract" is exempt. Sources without an em
 (public APIs, careers pages, alert emails) are filtered by title only; `score-roles` treats a
 contract stated only in the job description as a blocker.
 
+## Old roles (`max_age_days`)
+
+A role is dropped when its posted date is more than `max_age_days` days ago (drop reason "posted too
+long ago" in the digest). `0` means no limit. A role with no posted date is always kept: some
+sources (alert emails, careers pages, a few ATSs) don't report one. The check runs in `radar.select`
+before roles are deduplicated or marked seen, so it only affects roles found from now on; roles
+already on the board are moved to Skipped separately (ask Claude).
+
 ## Countries
 
 `priority_countries` are always searched; `extra_countries` only when

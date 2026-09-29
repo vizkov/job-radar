@@ -109,6 +109,29 @@ def test_fill_sets_new_cards_only(board_file):
     assert opts == ["O_Stage_New", "O_Tier_T1", "O_Sponsor_Licensed"]  # register match = Licensed, not "Yes"
 
 
+def test_archive_archives_only_skipped_and_respects_cap(board_file):
+    gh, _ = setup(board_file)
+    def skipped(n):
+        i = item(stage="Skipped")
+        i["id"] = f"PVTI_{n}"
+        return i
+    gh.items = [item(), item(stage="Applied"), skipped(1), skipped(2), skipped(3)]
+    msg = bs.archive_skipped(gh, max_n=2, sleep=lambda s: None)
+    archived = [c for c in gh.calls if c[:2] == ("project", "item-archive")]
+    assert [c[-1] for c in archived] == ["PVTI_1", "PVTI_2"]          # not New/Applied cards, capped at 2
+    assert archived[0][:5] == ("project", "item-archive", "3", "--owner", "me")
+    assert msg == "archived 2 Skipped card(s), 1 left for the next run"
+
+
+def test_archive_with_nothing_skipped_or_no_board(board_file):
+    gh, _ = setup(board_file)
+    gh.items = [item(), item(stage="Interview")]
+    assert bs.archive_skipped(gh, sleep=lambda s: None) == "archived 0 Skipped card(s)"
+    assert not any(c[:2] == ("project", "item-archive") for c in gh.calls)
+    board_file.unlink()
+    assert "not set up" in bs.archive_skipped(FakeProjectGh())
+
+
 def test_existing_project_is_adopted_not_duplicated(board_file):
     gh = FakeProjectGh(projects=[{"number": 2, "id": "PVT_2", "title": "Job search", "closed": False,
                                   "url": "https://github.com/users/me/projects/2"}])

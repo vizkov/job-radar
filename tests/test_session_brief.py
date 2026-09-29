@@ -114,6 +114,16 @@ def test_system_updates_and_unpublished_code(tmp_path):
     assert "1 code file(s) changed here but not in the public template (tools/radar.py)" in text
 
 
+def test_archive_started_once_a_day(monkeypatch):
+    started = []
+    monkeypatch.setattr(sb.subprocess, "Popen", lambda cmd, **kw: started.append(cmd))
+    morning = datetime(2026, 9, 29, 8, 0)
+    assert "started in the background" in sb.start_archive(morning)
+    assert sb.start_archive(morning + timedelta(hours=6)) is None              # same day: not again
+    assert "started in the background" in sb.start_archive(morning + timedelta(days=1))
+    assert len(started) == 2 and started[0][-1] == "archive"
+
+
 def test_missed_scheduled_run_is_restarted():
     from datetime import datetime, timezone
     calls = []

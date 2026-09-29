@@ -51,5 +51,5 @@ def _isolate_tool_state(tmp_path, monkeypatch):
     monkeypatch.setattr(referrals, "NETWORK", tmp_path / "_iso_network.csv")
     monkeypatch.setattr(referrals, "LOG", tmp_path / "_iso_referrals.jsonl")
     import session_brief
-    for attr in ("WORK", "LAST", "LAST_REVIEW", "LAST_DOCS_REVIEW", "LAST_CALIBRATION", "FILL_LOCK", "SNAPSHOT", "PIPELINE_LOG"):
+    for attr in ("WORK", "LAST", "LAST_REVIEW", "LAST_DOCS_REVIEW", "LAST_CALIBRATION", "FILL_LOCK", "LAST_ARCHIVE", "SNAPSHOT", "PIPELINE_LOG"):
         monkeypatch.setattr(session_brief, attr, tmp_path / f"_iso_sb_{attr.lower()}")

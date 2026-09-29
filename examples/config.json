@@ -5,6 +5,9 @@
   "extra_countries": ["FR", "ES", "IT", "DK", "FI", "NO", "AT", "BE", "LU", "PT", "EE", "LT", "PL"],
   "include_extra_countries": false,
 
+  "max_age_days": 0,
+  "_max_age_comment": "Drop roles posted more than this many days ago (0 = no limit). Roles with no posted date are kept.",
+
   "title_include": [
     "application security", "appsec", "app sec", "product security", "software security",
     "penetration test*", "pentest*", "pen test*", "security consultant", "security engineer",

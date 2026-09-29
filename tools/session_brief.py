@@ -9,7 +9,8 @@ What it does, in order:
   2. reads data/matches.csv, data/scores.jsonl, digests/status.md, state/*
   3. reads the Projects board via `gh`; logs stage changes you made by dragging cards
      (data/pipeline_log.jsonl) and flags applications with no movement for 14+ days
-  4. starts `board_sync.py fill` in the background if new cards lack fields
+  4. starts `board_sync.py fill` in the background if new cards lack fields, and (once a day)
+     `board_sync.py archive` if any card is in Stage=Skipped
   5. runs health checks: career docs, alert emails, scheduled runs, weekly review due,
      docs review due (after enough code changes)
   6. prints a short brief; Claude Code adds stdout to the session context
@@ -36,6 +37,7 @@ LAST_REVIEW = WORK / ".last_review"
 LAST_DOCS_REVIEW = WORK / ".last_docs_review"
 LAST_CALIBRATION = WORK / ".last_calibration"
 FILL_LOCK = WORK / ".fill_started"
+LAST_ARCHIVE = WORK / ".last_archive"
 SNAPSHOT = ROOT / "data" / "pipeline_snapshot.json"
 PIPELINE_LOG = ROOT / "data" / "pipeline_log.jsonl"
 FOLLOW_UP_DAYS = 14
@@ -202,6 +204,24 @@ def stale_applications(items: list[dict], now: datetime) -> list[tuple[str, int]
             if days >= FOLLOW_UP_DAYS:
                 out.append((hit.group(1), days))
     return out
+
+
+def start_archive(now: datetime) -> str | None:
+    """Archive Skipped cards: run board_sync.py archive detached, at most once a day (the daily
+    GitHub Action can't do it: its token has no access to the user's Project). None = already done today."""
+    stamp = _read_stamp(LAST_ARCHIVE)
+    if stamp and stamp.date() == now.date():
+        return None
+    WORK.mkdir(exist_ok=True)
+    LAST_ARCHIVE.write_text(now.isoformat())
+    log = open(WORK / "board_archive.log", "a", encoding="utf-8")
+    kwargs = {"cwd": ROOT, "stdout": log, "stderr": log, "stdin": subprocess.DEVNULL}
+    if os.name == "nt":
+        kwargs["creationflags"] = 0x00000008 | 0x00000200  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+    else:
+        kwargs["start_new_session"] = True
+    subprocess.Popen([sys.executable, str(ROOT / "tools" / "board_sync.py"), "archive"], **kwargs)
+    return "started in the background (log: work/board_archive.log)"
 
 
 def start_fill(now: datetime) -> str:
@@ -556,6 +576,8 @@ def main() -> int:
             follow_ups = stale_applications(items, now)
             if any(not i.get("stage") for i in items):
                 fill_note = start_fill(now)
+            if any(i.get("stage") == "Skipped" for i in items):
+                start_archive(now)
         updates, unpublished = template_status(since, run)
         print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, last_run_health(run),
                     updates, unpublished, board_design_note() if items is not None else None,

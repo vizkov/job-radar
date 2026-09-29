@@ -48,7 +48,8 @@ def load(p: Path, default):
 UNRECOGNISED: defaultdict = defaultdict(list)  # source -> sample locations (title matched, no country found)
 UNRECOGNISED_N: Counter = Counter()  # source -> how many title-matching listings that cost
 DROP_REASONS = {"country": "outside your countries", "title": "titles not matching",
-                "employment": "not permanent", "company": "employers not on your list"}
+                "employment": "not permanent", "old": "posted too long ago",
+                "company": "employers not on your list"}
 
 
 def select(results: list[SourceResult], include_outside, matcher=None,
@@ -81,6 +82,10 @@ def select(results: list[SourceResult], include_outside, matcher=None,
             if not_permanent(p.title) or not_permanent(p.raw.get("employment", "")):
                 dropped[(res.source, "employment")] += 1
                 continue  # permanent roles only (config.json: employment_exclude)
+            max_age = int(CONFIG.get("max_age_days") or 0)  # 0 = no limit; roles with no posted date always pass
+            if max_age and p.posted_at and (date.today() - p.posted_at.date()).days > max_age:
+                dropped[(res.source, "old")] += 1
+                continue  # posted more than max_age_days ago (config.json: max_age_days)
             p.countries = frozenset(countries)
             p.company_canonical = matcher.resolve(p.company, p.company_hint)
             if p.company_canonical is None and not outside_ok:

@@ -360,7 +360,9 @@ share one link. So if an employer edits a job's title, it's reported as a new ro
 ### `tools/board_sync.py`: GitHub issues and the Project (standard library only)
 
 Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
-`setup-project`, `fill`, `set`, `views`, `design-diff`, `refresh-bodies` (local, need the `project` scope);
+`setup-project`, `fill`, `set`, `views`, `design-diff`, `refresh-bodies`, `archive` (local, need the `project` scope;
+`archive_skipped(gh, max_n=ARCHIVE_MAX)` archives up to 40 cards with Stage = Skipped per run via `gh project
+item-archive`, idempotent because `item-list` omits archived items; `session_brief.start_archive` runs it once a day);
 `promote <ref> …` (local, queues cards for recorded roles; then `roles`).
 
 | Name | Is |
@@ -422,6 +424,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `auto_score_count(root)`, `auto_score_pick(rows, scored, items, n)`, `start_prep(refs)` | How many roles to score automatically; which (freshest unscored Tier 1, not closed/skipped); fetch their JDs in the background. |
 | `referral_notes(now)` | Asks unanswered after `referrals.wait_days`, as health notes (at most 5). |
 | `stale_days(root)` | `board.stale_days` from the config, for the brief's "looks closed" line. |
+| `start_archive(now)`, `LAST_ARCHIVE` | Once a day (stamp `work/.last_archive`), start `board_sync.py archive` detached (log `work/board_archive.log`) when any card is in Stage = Skipped. |
 | `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
 | `_CONTROL`, `_REF` | Characters stripped by `safe()`; the ref marker in issue bodies. |
 | Other thresholds (in code) | Top 6 new Tier 1 roles listed; "unscored" = Tier 1 from the last 14 days; "fresh" = posted in the last 3 days; "no run completed for 2+ days" warning; a CV gap needs 3+ scored roles missing it. Follow-ups only apply to cards with a logged stage change. |

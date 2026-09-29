@@ -51,6 +51,25 @@ def test_select_filters_and_matches():
     assert {p.url for p in kept} == {"1", "4"}
 
 
+def test_select_drops_roles_older_than_max_age(monkeypatch):
+    from collections import Counter
+    from datetime import datetime, timedelta
+    m = CompanyMatcher(["Secura"], [])
+    def posted(url, days):
+        p = P("s", "Secura", "Penetration Tester", {"NL"}, url)
+        p.posted_at = None if days is None else datetime.now() - timedelta(days=days)
+        return p
+    res = SourceResult("s", postings=[posted("new", 5), posted("edge", 30), posted("old", 45), posted("undated", None)])
+    monkeypatch.setitem(radar.CONFIG, "max_age_days", 30)
+    dropped = Counter()
+    kept, _ = radar.select([res], include_outside=False, matcher=m, dropped=dropped)
+    assert {p.url for p in kept} == {"new", "edge", "undated"}      # undated roles are kept
+    assert dropped[("s", "old")] == 1
+    monkeypatch.setitem(radar.CONFIG, "max_age_days", 0)            # 0 = no limit
+    kept, _ = radar.select([res], include_outside=False, matcher=m)
+    assert len(kept) == 4
+
+
 def test_diff_seen_uses_id_and_content_key():
     today = "2026-09-27"
     a = P("ats", "X", "Pentester", {"GB"}, "https://x/1"); a.company_canonical = "X"

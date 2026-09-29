@@ -10,6 +10,7 @@ All settings live in `profile/` (copy a file from `examples/` first if it isn't 
 | Request | File |
 |---|---|
 | titles to include/exclude, countries, tier weights | `profile/config.json` (`title_include`, `title_exclude`, `priority_countries`, `tiering`) |
+| ignore old roles ("skip anything posted over a month ago") | `profile/config.json` `max_age_days` (0 = no limit; undated roles are kept). It only stops new finds: move existing old cards to Skipped with `track` |
 | add/remove a target company | `profile/targets.tsv` (+ board discovery, below) |
 | a company appears under another name | `profile/aliases.csv` |
 | a company has a careers page without an ATS | `profile/careers_pages.yaml` (see its header; check the page source for a hidden ATS first and prefer `profile/overrides.csv`) |

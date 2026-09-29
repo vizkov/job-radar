@@ -184,6 +184,10 @@ async def fetch_board(ats: str, slug: str, url: str, sem: asyncio.Semaphore) -> 
             kwargs = {"include_descriptions": False, "timeout": 30.0}
             if ats == "workday":
                 kwargs["max_fetch_seconds"] = float(timeout - 10)
+                # Big tenants (Nvidia, Palo Alto) get throttled deep into pagination and the library gives up
+                # after 3 tries; it has no option for this, only a module constant.
+                import ats_scrapers.scrapers.workday as _wd
+                _wd.MAX_RETRIES = max(_wd.MAX_RETRIES, int(CONFIG.get("workday_max_retries", 6)))
             scraper = get_scraper(ats, slug, **kwargs)
             res.jobs = await asyncio.wait_for(scraper.afetch(), timeout=timeout)
             res.ok = True

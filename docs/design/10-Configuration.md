@@ -156,6 +156,7 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | `tiering` | Score weights and `tier1_min_score`; see [Tiers and sponsorship](09-Tiers-and-sponsorship.md) |
 | `sponsorship.fuzzy_yes` / `fuzzy_unknown` | Fuzzy name-match thresholds (0–100) for the sponsor registers |
 | `board_timeout_seconds` | Time cap per ATS board fetch (180) |
+| `workday_max_retries` | Retries per Workday page before a board fails (6; the library's own default is 3). Big tenants such as Nvidia and Palo Alto get throttled deep into pagination |
 | `concurrency` | ATS boards fetched at once (6) |
 | `_comment` keys | Ignored by the code; notes for humans |
 

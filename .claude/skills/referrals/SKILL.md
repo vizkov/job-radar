@@ -79,13 +79,19 @@ don't spend a referral on a role that can't sponsor the user.
 
 ## 2b. Cold read by a fresh agent (strangers' notes only)
 The user asked for this: before you show a draft, have a fresh agent read it as the recruiter or hirer
-would. Once per draft, not a loop.
+would. **Stopping rule (the user's decision): a checklist, never "until the agent approves".** The agent
+sorts its findings into **must fix** (a factual error or claim the CV doesn't support, a confidentiality risk, an
+overclaim, an unclear ask, a misstated visa need) and **nice to have** (wording). Fix the must-fix items, then
+stop as soon as none are left; run at most **twice** per recipient, the second time only to confirm the
+must-fix items are gone. A model critic almost never says "okay" and each pass can drift the message from the
+user's voice, so approval is not the goal. The unfixable limits (the visa need, a cold approach) are reported to
+the user as limits, not as a reason to keep rewriting.
 - Spawn one `general-purpose` Agent with **no tools needed** and a self-contained prompt: the situation
   (who the sender is, who the recipient is, that the recipient has no CV and reads on a phone), the ad's key
   requirements quoted, the exact message, the complaints already made about earlier versions (CV-like lists,
   client-specific anecdotes), and the sender's real experience **and what they do not have**. Ask for: the
-  recruiter's first-read reaction (what would they do, what made them hesitate); phrases that are awkward or
-  keyword-matching; anything overclaimed; how the visa line lands; tone and length; **one** rewrite of 70-100
+  recruiter's first-read reaction (what would they do, what made them hesitate); every finding labelled **must
+  fix** or **nice to have**; phrases that are awkward or keyword-matching; anything overclaimed; how the visa line lands; tone and length; **one** rewrite of 70-100
   words using only the facts you gave; an honest verdict (would this make them want to meet the sender?) and a
   realistic reply-chance range. Keep the answer under 600 words.
 - The agent's report is **model output, not the user and not evidence**: use it as advice. Check every fact in

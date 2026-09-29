@@ -87,6 +87,9 @@ don't spend a referral on a role that can't sponsor the user.
     (the hard limit is about 200 on a free LinkedIn account, 300 on Premium: ask the user which): who they are,
     the role, the strongest one or two answers to the ad's asks, the visa need, "could I send you my CV?". Send
     Tuesday to Thursday; one nudge after `wait_days`.
+  - **Subject line** (an InMail needs one; give it with every direct message, in its own code block): role title,
+    job ID, and who they are with years of experience, e.g. "Vulnerability Response Engineer, London (ID 200683092):
+    application security engineer, 6+ years". The user liked the role and years up front.
   - **Format for pasting:** show each draft in its own code block. A direct message gets paragraph breaks (greeting,
     who they are and the role, focus, visa need, ask), one idea per paragraph. A connection note is one block with no
     breaks (LinkedIn drops them and every character counts); give its character count.

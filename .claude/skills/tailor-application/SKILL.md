@@ -26,6 +26,13 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    - Skills must appear somewhere in the career docs.
    - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
      two pages.
+   - **Match the user's design (their `cv.pdf` / `cover.pdf`, rendered by `--pdf`)**: sections in this order:
+     `Summary` (the `P` lines under "Summary", which become the profile paragraph), `Key achievements`
+     (`P05`-`P08`, the ones that fit the JD, each starting with its label), an `Experience` block (`B01`
+     first: the company's one-line description) then one section per role in reverse-chronological order, then
+     `Projects`, `Education` (the renderer takes skills, city and dates from the master CV, so don't invent them).
+     The CV must fit **two pages** and the cover letter **one**: cut the least relevant bullets (a bullet
+     that duplicates a Key achievement goes first) and make `C12` (why in-house) the first paragraph to drop.
    - Headline: the target role title and 1-2 strengths; no contact details.
    - Visa sponsorship: the CV header (from `master_resume.md`'s `location`) does not say "Requires visa sponsorship" by default;
      the user decides per application (often after a referral or a first conversation). Ask before adding it to `location` for that
@@ -39,6 +46,9 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    the folder holds nothing else the user must read (`tailored.json` and `validated.sha256` are the checker's own
    files). **No `resume.docx` unless asked or an application form needs a Word upload** (`--docx`, needs
    `pip install --require-hashes -r requirements-career.txt`). No `review.md`, no other extra documents.
+   **PDFs in the user's own layout: `--pdf`** (`resume.pdf`, `cover_letter.pdf`; Chrome or Edge is used, nothing
+   to install). Ask whether the PDFs replace the two Markdown files or sit beside them if the user hasn't said.
+   After rendering PDFs check the page count (CV 2, letter 1) and trim per the rule above if not.
 6. **Review gate.** Run the `application-review` skill on this folder (ATS, recruiter and consistency
    subagents plus `tools/consistency_check.py`); its findings go to the user **in the chat, not in a file**. Fix or
    ask the user about every "fix before applying" finding, then re-validate and re-render. Skip only if the user

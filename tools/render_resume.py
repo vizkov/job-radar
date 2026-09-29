@@ -1,11 +1,13 @@
 """Render a validated tailored résumé + cover letter. No LLM here.
 
-    python tools/render_resume.py <folder> [--docx]    # profile/applications/<folder>/
+    python tools/render_resume.py <folder> [--pdf] [--docx]    # profile/applications/<folder>/
 
 Refuses to run unless tools/jd_check.py tailor has validated exactly this
 tailored.json (it checks the saved SHA-256). Writes, by default, the two files the user wants per application:
   resume.md          the tailored CV as plain Markdown (paste into Claude Design for a styled version)
   cover_letter.md    greeting + the chosen paragraphs + sign-off
+Only with --pdf: resume.pdf and cover_letter.pdf in the user's Claude Design layout (tools/render_pdf.py; needs
+Chrome or Edge, which is already installed; nothing to pip install).
 Only with --docx (when an application form needs a Word upload):
   resume.docx        single column, standard headings, no tables/images/text boxes:
                      the layout applicant tracking systems parse reliably
@@ -69,8 +71,8 @@ def to_docx(data: dict, contact: dict, path: Path) -> None:
 
 def main(argv=None) -> int:
     args = list(argv if argv is not None else sys.argv[1:])
-    want_docx = "--docx" in args
-    args = [a for a in args if a != "--docx"]
+    want_docx, want_pdf = "--docx" in args, "--pdf" in args
+    args = [a for a in args if a not in ("--docx", "--pdf")]
     if len(args) != 1:
         print(__doc__)
         return 2
@@ -91,6 +93,9 @@ def main(argv=None) -> int:
     if want_docx:
         to_docx(data, contact, app / "resume.docx")
         wrote.append("resume.docx")
+    if want_pdf:
+        from render_pdf import render_pdfs  # tools/ is on sys.path when run as a script
+        wrote += render_pdfs(app, data, load_career(), str(data["key"]))
     print(f"wrote {app.name}/" + ", ".join(wrote))
     return 0
 

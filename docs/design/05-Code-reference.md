@@ -476,7 +476,27 @@ capitalised anyway, so "Led the review" doesn't flag "Led" as a new name.
 
 `contact_line()`, `to_markdown()`, `cover_letter()`, `to_docx()` (python-docx: title,
 contact line, headline, one heading per section, bullet list, skills), `main()` (refuses
-unless `validated.sha256` matches the current `tailored.json`).
+unless `validated.sha256` matches the current `tailored.json`). By default it writes only `resume.md` and
+`cover_letter.md`; `--docx` adds the Word file and `--pdf` adds the two PDFs below.
+
+### `tools/render_pdf.py`: the CV and cover letter as PDFs in the user's Claude Design layout
+
+Called by `render_resume.py --pdf`. No LLM, nothing to pip install: HTML is printed to PDF with headless Chrome or
+Edge (`find_browser()`, `print_pdf()` with a throwaway user-data dir so an open browser doesn't interfere). The
+look (Arial, A4 CV with 43 pt side margins, US Letter cover letter with 54 pt margins, teal `#005477` headings,
+10 pt body at a 1.43 line height, a rule under the header, right-aligned city and dates, a two-column skills grid)
+was measured from the user's `Downloads/cv.pdf` and `cover.pdf`; change `CSS` and the `@page` rules to change it.
+`resume_html(data, career, contact)` takes the **tailored text** and the **structure from the master CV**:
+`experience_structure()` groups every `B` line by its master heading (company block with city and dates, roles
+under it, a four-part heading `Title — Company — City — Dates` is its own company), so the PDF cannot show a
+date or employer the master doesn't have; `P` lines under "Summary" become the profile paragraph, "Key
+achievements" lines get their bold label, `K` lines become the skills grid, `E` lines get right-aligned years.
+`cover_html()` merges `C01`+`C02` into the opening, lists the middle blocks as bullets titled from their master
+heading (an "(optional)" block becomes a sub-point of the block before it), and puts `C12`-`C14` after them;
+the role title and company come from `data/matches.csv` by the key. `pretty_headline()` turns the tailored headline
+into the design's middot line. All text is HTML-escaped. `render_pdfs()` writes `resume.pdf` and `cover_letter.pdf`.
+**Watch out:** the design is two pages for the CV and one for the letter; the tailoring skill trims low-value
+lines to fit, and the renderer never shrinks the type.
 
 ### `tools/consistency_check.py`: cross-check CV, cover letter and STAR stories
 

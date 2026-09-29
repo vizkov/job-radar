@@ -33,16 +33,26 @@ _COUNTRY_NAMES = {
 _CITY_NAMES = {
     "GB": ["london", "manchester", "edinburgh", "glasgow", "cambridge", "bristol", "reading", "leeds",
            "birmingham", "belfast", "guildford", "cheltenham", "southampton", "norwich", "newbury",
-           "swindon", "abingdon", "durham", "ipswich"],
+           "swindon", "abingdon", "durham", "ipswich",
+           # seen dropped as "location not recognised" (2026-09); not "york" (it would match New York)
+           "harrow", "frimley", "milton keynes", "basingstoke", "gloucester", "farnborough", "slough", "woking",
+           "bracknell", "maidenhead", "winchester", "portsmouth", "bournemouth", "poole", "brighton", "crawley",
+           "watford", "luton", "stevenage", "hatfield", "hemel hempstead", "uxbridge", "wembley", "croydon",
+           "osterley", "chelmsford", "colchester", "oxford", "coventry", "warwick", "leicester", "nottingham",
+           "derby", "sheffield", "liverpool", "newcastle", "sunderland", "knutsford", "exeter", "plymouth",
+           "cardiff", "newport", "swansea", "neath", "aberdeen", "dundee", "stirling", "livingston"],
     "NL": ["amsterdam", "the hague", "den haag", "rotterdam", "utrecht", "eindhoven", "delft", "amstelveen",
            "amersfoort", "leusden", "veldhoven", "zoetermeer", "maastricht", "haarlem", "leiden", "groningen",
-           "arnhem", "nijmegen", "breda", "tilburg", "hilversum", "hoofddorp", "schiphol", "almere", "enschede"],
+           "arnhem", "nijmegen", "breda", "tilburg", "hilversum", "hoofddorp", "schiphol", "almere", "enschede",
+           "hertogenbosch", "den bosch", "zwolle", "apeldoorn", "deventer", "dordrecht", "gouda", "alkmaar"],
     "IE": ["dublin", "cork", "galway", "limerick", "waterford", "dundalk"],
     "CH": ["zurich", "zürich", "geneva", "genève", "geneve", "bern", "lausanne", "basel", "baar", "aarau",
            "rapperswil"],
     "DE": ["berlin", "munich", "münchen", "muenchen", "frankfurt", "hamburg", "stuttgart", "cologne", "köln",
            "koeln", "heidelberg", "düsseldorf", "dusseldorf", "bonn", "walldorf", "ulm", "bochum", "freiburg",
-           "tübingen", "tuebingen"],
+           "tübingen", "tuebingen", "lüneburg", "hannover", "hanover", "nuremberg", "nürnberg", "leipzig",
+           "dresden", "karlsruhe", "mannheim", "darmstadt", "wiesbaden", "mainz", "essen", "dortmund", "bremen",
+           "potsdam", "augsburg", "münster", "aachen", "erlangen", "ingolstadt"],
     "SE": ["stockholm", "gothenburg", "göteborg", "malmö", "malmo", "linköping", "karlskrona", "kista"],
     "FR": ["paris", "lyon", "montpellier", "roubaix"], "ES": ["madrid", "barcelona", "bilbao"],
     "IT": ["milan", "milano", "rome"], "DK": ["copenhagen", "aarhus"], "FI": ["helsinki", "espoo"],
@@ -60,6 +70,9 @@ def _words_re(words):
 
 _COUNTRY_RE = {c: _words_re(w) for c, w in _COUNTRY_NAMES.items()}
 _CITY_RE = {c: _words_re(w) for c, w in _CITY_NAMES.items()}
+# A bare country code closing the location, any case ("…, NDS, de"). Target countries only: other
+# two-letter tails are too often US/Canadian state codes.
+_TRAILING_ISO = re.compile(r",\s*(de|nl|gb|uk|ie|ch|se)\s*$", re.I)
 _REMOTE_EUROPE = re.compile(r"remote.*(europe|emea|\beu\b)|(europe|emea|\beu\b).*remote", re.I)
 # Upper-case state/province codes after a comma. DE and IN are left out on purpose:
 # "Berlin, DE" is common and must not be read as Delaware.
@@ -103,6 +116,8 @@ def countries_for(country_iso: str | None, location: str | None) -> set[str]:
             for c, rx in _CITY_RE.items():
                 if rx.search(loc):
                     found.add(c)
+        if not found and (tail := _TRAILING_ISO.search(loc)):  # "Lüneburg, NDS, de"
+            found.add(ISO_ALIASES.get(tail.group(1).upper(), tail.group(1).upper()))
         if non_europe and not found:
             found.add("OUTSIDE-EUROPE")  # e.g. "Sunnyvale, CA": clearly not Europe, country not named
     if _REMOTE_EUROPE.search(loc):

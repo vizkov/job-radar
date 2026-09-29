@@ -48,6 +48,10 @@ _NOISE = re.compile(r"^(easy apply|apply with .*|actively recruiting|promoted|be
                     r"top applicant|in your network|school alumni|<[^>]+>.*)$", re.I)
 
 
+_ACCOUNT_MAIL = re.compile(r"\b(is now active|confirm|verify|welcome|has been (created|updated|deleted)|"
+                           r"unsubscribed|password)\b", re.I)
+
+
 def _part(msg: Message, ctype: str) -> str:
     for part in msg.walk():
         if part.get_content_type() == ctype and not part.is_attachment():
@@ -208,7 +212,8 @@ class AlertEmailSource:
                 continue
             ps = to_postings(msg, p)
             stats["jobs"] += len(ps)
-            stats["empty"] += not ps
+            # account mail ("your job alert is now active", welcome, verify) may list no jobs: not a layout change
+            stats["empty"] += not ps and not _ACCOUNT_MAIL.search(msg.get("Subject") or "")
             out.postings += ps
         for name, s in per.items():
             # a quiet week with no alerts is normal (track_empty=False)

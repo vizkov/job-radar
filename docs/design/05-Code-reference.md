@@ -22,7 +22,7 @@ only), `--include-outside` (keep employers not on the list).
 |---|---|
 | `STATE`, `DIGESTS`, `DATA` | The `state/`, `digests/` and `data/` folders. |
 | `load(path, default)` | Reads a JSON file, or returns `default` if it doesn't exist. |
-| `UNRECOGNISED` | Per source, up to 5 sample location texts in which no country was found; listed in the digest so missing places can be added. |
+| `UNRECOGNISED`, `UNRECOGNISED_N` | Per source, up to 30 distinct sample locations of listings whose **title matched** but where no country was found, and how many such listings there were: possible real losses, listed in the digest so missing places can be added to `_CITY_NAMES`. |
 | `DROP_REASONS`, `drop_lines(results, matched, dropped)` | Why a listing was dropped (country, title, employment, company), and one status line per source: found → dropped by reason → kept. |
 | `select(results, include_outside, matcher, dropped)` | Country filter, title filter, company matching; returns kept postings and per-source match counts. `include_outside` is a bool or a per-source dict. |
 | `diff_seen(groups, seen, today)` | Returns groups none of whose keys are in `seen`; stamps all their keys with today. |
@@ -92,6 +92,7 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 |---|---|
 | `CONFIG` | `config.json`, loaded once at import. |
 | `_COUNTRY_NAMES`, `_CITY_NAMES` | Words that identify a country in location text (country names and known cities). Also a few non-European countries (India, US, Canada, Australia, Singapore, UAE, Israel): never targets, but named so the status card can say where dropped listings were. |
+| `_TRAILING_ISO` | A bare target-country code ending the location, any case ("Lüneburg, NDS, de"); used only when no name matched. |
 | `_REMOTE_EUROPE` | "remote … Europe/EMEA/EU" → `REMOTE-EU`. |
 | `_NON_EUROPE` | US/Canada/Australia markers, including `, CA`-style state codes. |
 | `target_countries()` | Priority countries, plus extra countries if enabled. |
@@ -347,7 +348,7 @@ share one link. So if an employer edits a job's title, it's reported as a new ro
 | `parse_html(p, body)` | HTML cards: from each job link, climb to the largest element containing only that job. |
 | `to_postings(msg, p)` | Text first, HTML as fallback; URL **rebuilt from the job ID**. |
 | `_mailbox_units()` | Turns the fetcher's per-provider counts into health units: nothing from any provider at all, or provider mail only from unknown sender addresses. |
-| `AlertEmailSource` | `_messages()` reads `.alert_mail/*.eml` and fails if `_status.json` says the fetch failed; `fetch()` drops unknown senders and DKIM failures, and reports per provider: jobs, rejected, and emails that yielded no jobs (layout change). |
+| `AlertEmailSource` | `_messages()` reads `.alert_mail/*.eml` and fails if `_status.json` says the fetch failed; `fetch()` drops unknown senders and DKIM failures, and reports per provider: jobs, rejected, and emails that yielded no jobs (layout change), not counting account mail such as "your job alert is now active" (`_ACCOUNT_MAIL`). |
 
 ---
 

@@ -39,3 +39,13 @@ def test_countries(iso, loc, expected):
 ])
 def test_live_regressions(loc, expected):
     assert countries_for(None, loc) == expected
+
+
+@pytest.mark.parametrize("loc,want", [
+    ("Harrow", {"GB"}), ("Frimley", {"GB"}), ("Milton Keynes", {"GB"}), ("Neath", {"GB"}),
+    ("'s-Hertogenbosch", {"NL"}), ("Lüneburg, NDS, de", {"DE"}), ("Zug, ch", {"CH"}),
+    # same-name places abroad stay abroad
+    ("Portsmouth, NH", {"OUTSIDE-EUROPE"}), ("Newcastle, NSW", {"OUTSIDE-EUROPE"}), ("New York, NY", {"OUTSIDE-EUROPE"}),
+])
+def test_towns_and_trailing_country_codes(loc, want):
+    assert countries_for(None, loc) == want

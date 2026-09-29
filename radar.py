@@ -45,7 +45,8 @@ def load(p: Path, default):
     return json.loads(p.read_text()) if p.exists() else default
 
 
-UNRECOGNISED: defaultdict = defaultdict(list)  # source -> sample location texts no country was found in
+UNRECOGNISED: defaultdict = defaultdict(list)  # source -> sample locations (title matched, no country found)
+UNRECOGNISED_N: Counter = Counter()  # source -> how many title-matching listings that cost
 DROP_REASONS = {"country": "outside your countries", "title": "titles not matching",
                 "employment": "not permanent", "company": "employers not on your list"}
 
@@ -66,8 +67,12 @@ def select(results: list[SourceResult], include_outside, matcher=None,
             if not countries:
                 dropped[(res.source, "country")] += 1
                 dropped[(res.source, "where:" + (",".join(sorted(p.countries)) or "location not recognised"))] += 1
-                if not p.countries and len(UNRECOGNISED[res.source]) < 5:
-                    UNRECOGNISED[res.source].append(p.location or "(empty)")  # samples for the digest
+                # only roles you'd want can be real losses: count and sample those, for the digest
+                if not p.countries and title_matches(p.title):
+                    UNRECOGNISED_N[res.source] += 1
+                    sample = p.location or "(empty)"
+                    if len(UNRECOGNISED[res.source]) < 30 and sample not in UNRECOGNISED[res.source]:
+                        UNRECOGNISED[res.source].append(sample)
                 continue
             # a hash-watched careers page has no job titles to filter; its change notice always passes
             if not (p.raw.get("page_changed") or title_matches(p.title)):
@@ -180,9 +185,11 @@ def render_digest(today, baseline, new: list[Group], broken, results: list[Sourc
         lines.append("")
 
     if UNRECOGNISED:
-        lines += ["## Locations not recognised (samples)", "Listings dropped because no country was found in the "
-                  "location. Add missing places to `jobradar/common.py`.", ""]
-        lines += [f"- **{src}**: " + "; ".join(md(x) for x in samples) for src, samples in UNRECOGNISED.items()]
+        lines += ["## Locations not recognised (title matches)", "Listings with a matching title dropped because no "
+                  "country was found in the location: possible real losses. Add missing places to "
+                  "`jobradar/common.py`.", ""]
+        lines += [f"- **{src}** ({UNRECOGNISED_N[src]} listings): " + "; ".join(md(x) for x in samples)
+                  for src, samples in UNRECOGNISED.items()]
         lines.append("")
     lines += ["## Sources", "", "| Source | Status | Units erroring | Raw results | Matches | Time |",
               "|---|---|---|---|---|---|"]

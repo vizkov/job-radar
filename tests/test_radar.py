@@ -133,3 +133,16 @@ def test_drop_reasons_are_counted_per_source():
                                                   ("alert_email", "where:US"): 1})
     line = radar.drop_lines([res], matched, dropped)[0]
     assert line.startswith("- **alert_email**: 5 found →") and "1 outside your countries (US 1)" in line and "**1 kept**" in line
+
+
+def test_unrecognised_places_are_sampled_only_for_matching_titles(monkeypatch):
+    from collections import Counter, defaultdict
+    from jobradar.matching import CompanyMatcher
+    from jobradar.model import Posting, SourceResult
+    monkeypatch.setattr(radar, "UNRECOGNISED", defaultdict(list))
+    monkeypatch.setattr(radar, "UNRECOGNISED_N", Counter())
+    ps = [Posting("ats", "Acme", "Application Security Engineer", "Smalltown", frozenset(), "u1"),
+          Posting("ats", "Acme", "Application Security Engineer", "Smalltown", frozenset(), "u2"),
+          Posting("ats", "Acme", "Sales Manager", "2 Locations", frozenset(), "u3")]
+    radar.select([SourceResult("ats", postings=ps)], include_outside=False, matcher=CompanyMatcher(["Acme"], []))
+    assert radar.UNRECOGNISED["ats"] == ["Smalltown"] and radar.UNRECOGNISED_N["ats"] == 2

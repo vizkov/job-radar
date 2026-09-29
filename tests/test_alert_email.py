@@ -166,3 +166,17 @@ def test_real_indeed_layout_without_job_ids():
     again = to_postings(load("real/indeed_real_2026_09.eml"), PROVIDERS["indeed"])
     assert [j.external_id for j in again] == [j.external_id for j in jobs]  # stable across emails
     assert len({j.external_id for j in jobs}) == 3
+
+
+def test_account_mail_with_no_jobs_is_not_a_layout_change(tmp_path):
+    (tmp_path / "_status.json").write_text(json.dumps({"ok": True, "fetched": 2, "mailbox": "INBOX", "providers": {}}))
+    head = ("From: Indeed <donotreply@jobalert.indeed.com>\nTo: alerts@example.com\nSubject: {s}\n"
+            "Authentication-Results: mx.google.com; dkim=pass header.i=@jobalert.indeed.com\n"
+            "Content-Type: text/plain; charset=utf-8\n\n{b}\n")
+    (tmp_path / "a.eml").write_text(head.format(s="Your job alert for pen tester jobs in United Kingdom is now active",
+                                                b="Your job alert is active"), encoding="utf-8")
+    (tmp_path / "b.eml").write_text(head.format(s="5 new pen tester jobs in United Kingdom",
+                                                b="A layout the parser doesn't know"), encoding="utf-8")
+    res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["indeed"]}).fetch())
+    unit = next(u for u in res.units if u.key == "indeed:parse")
+    assert unit.error.startswith("1 indeed emails yielded no jobs")  # only the real alert counts

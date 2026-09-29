@@ -492,7 +492,7 @@ was measured from the user's `Downloads/cv.pdf` and `cover.pdf`; change `CSS` an
 `experience_structure()` groups every `B` line by its master heading (company block with city and dates, roles
 under it, a four-part heading `Title — Company — City — Dates` is its own company), so the PDF cannot show a
 date or employer the master doesn't have; `P` lines under "Summary" become the profile paragraph, "Key
-achievements" lines get their bold label, `K` lines become the skills grid, `E` lines get right-aligned years.
+achievements" lines get their bold label, the tailored `K` lines (a `Skills` section in `tailored.json`; every master `K` line if none were chosen) become the skills grid, `E` lines get right-aligned years.
 `cover_html()` merges `C01`+`C02` into the opening, lists the middle blocks as bullets titled from their master
 heading (an "(optional)" block becomes a sub-point of the block before it), and puts `C12`-`C14` after them;
 the role title and company come from `data/matches.csv` by the key. `pretty_headline()` turns the tailored headline

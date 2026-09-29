@@ -45,7 +45,7 @@ def test_good_tailoring_passes():
     (lambda d: d["cover_letter"][0].update(text="Contact me at recruiter@evil.example about this."), "links you didn't write"),
     (lambda d: d.update(headline="Call +44 20 7946 0000 now"), "headline contains"),
     (lambda d: d["skills"].append("Kubernetes"), "doesn't appear in your career docs"),
-    (lambda d: d["sections"][0]["bullets"].append({"source_id": "C01", "text": "x"}), "only B/E/P items"),
+    (lambda d: d["sections"][0]["bullets"].append({"source_id": "C01", "text": "x"}), "only B/E/K/P items"),
     (lambda d: d["cover_letter"].append({"source_id": "B01", "text": "x"}), "only C/S items"),
     (lambda d: d["sections"][2]["bullets"].append({"source_id": "P01", "text": "again"}), "lines used twice"),
     (lambda d: d.update(key="not-a-ref"), "role ID"),

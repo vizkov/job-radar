@@ -82,6 +82,20 @@ def test_cover_letter_layout_follows_the_design():
     assert h.index("Explaining risk") < h.index("I would need visa sponsorship.") < h.index("Kind regards,")
 
 
+def test_skills_grid_uses_the_tailored_skill_lines_else_all_master_lines():
+    c = career()
+    assert "<b>Languages</b><span>Python, Java</span>" in rp.resume_html(DATA, c, CONTACT)        # none chosen: every master line
+    tailored = {**DATA, "sections": DATA["sections"] + [{"heading": "Skills", "bullets": [
+        {"source_id": "K02", "text": "Languages: Java, Python"}]}]}
+    h = rp.resume_html(tailored, c, CONTACT)
+    assert "<b>Languages</b><span>Java, Python</span>" in h and "Application security</b>" not in h   # chosen lines only, as worded
+
+
+def test_markdown_links_in_a_bullet_become_teal_links():
+    h = rp.rich("[Thick Client Security Assessment](https://medium.com/@a), a blog series & more")
+    assert h == '<a href="https://medium.com/@a">Thick Client Security Assessment</a>, a blog series &amp; more'
+
+
 def test_text_is_escaped():
     d = {**DATA, "sections": [{"heading": "x", "bullets": [{"source_id": "P01", "text": "a <script>x</script> & b"}]}]}
     h = rp.resume_html(d, career(), CONTACT)

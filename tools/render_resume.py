@@ -41,7 +41,7 @@ def to_markdown(data: dict, contact: dict) -> str:
         lines.append(f"## {sec['heading']}")
         lines += [f"- {b['text']}" for b in sec["bullets"]]
         lines.append("")
-    if data["skills"]:
+    if data["skills"] and not any(s["heading"] == "Skills" for s in data["sections"]):
         lines += ["## Skills", ", ".join(data["skills"]), ""]
     return "\n".join(lines)
 

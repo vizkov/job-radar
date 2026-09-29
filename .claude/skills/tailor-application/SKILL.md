@@ -34,7 +34,10 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
      with no new facts, numbers or names, and nothing merged in from other lines. That they repeat some experience bullets is fine: the user's own CV does
      the same. Never leave it out to save space or avoid repetition; trim elsewhere), an `Experience` block (`B01`
      first: the company's one-line description) then one section per role in reverse-chronological order, then
-     `Projects`, `Education` (the renderer takes skills, city and dates from the master CV, so don't invent them).
+     `Projects`, `Volunteering` (if it fits), `Education`. **Skills are tailored too**: a `Skills` section of `K` lines,
+     the rows most relevant to the JD first, the least relevant rows dropped, and the items inside a row reordered
+     JD-first (drop or reorder only; never add a skill). The renderer draws it as the skills grid, so a `Skills`
+     section replaces the master's full seven rows. City and dates come from the master CV, so don't invent them.
      The CV must fit **two pages** and the cover letter **one**: cut the least relevant bullets (a bullet
      that duplicates a Key achievement goes first) and make `C12` (why in-house) the first paragraph to drop.
    - Headline: the target role title and 1-2 strengths; no contact details.
@@ -62,6 +65,6 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    with the CV.
 7. **Hand over for review.** Print the **Key achievements section in full** in your reply (the checker's diff lists only
    changed lines, and these are master lines, so they don't show there), with one line on why each was chosen or left out
-   and what you changed in its wording. Then show the user the diff the checker printed (what changed from their master
+   and what you changed in its wording, and the **Skills rows chosen and dropped** the same way. Then show the user the diff the checker printed (what changed from their master
    CV), where the two files are, any JD must-haves their CV couldn't evidence, and the review verdict. They review, edit and
    apply themselves. Then offer to move the card to Shortlisted (`track`).

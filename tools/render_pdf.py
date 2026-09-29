@@ -38,6 +38,14 @@ def esc(s: str) -> str:
     return html.escape(s or "", quote=False)
 
 
+_MDLINK = re.compile(r"\[([^\]]+)\]\((https?://[^)\s]+)\)")
+
+
+def rich(s: str) -> str:
+    """Escaped text in which [phrase](https://url) becomes a link (the design's teal links)."""
+    return _MDLINK.sub(lambda m: f'<a href="{m.group(2)}">{m.group(1)}</a>', esc(s))
+
+
 def find_browser() -> str | None:
     for name in ("chrome", "google-chrome", "chromium", "msedge"):
         if p := shutil.which(name):
@@ -182,7 +190,7 @@ def resume_html(data: dict, career, contact: dict) -> str:
         lis = []
         for _, t in ach:
             label, rest = split_label(t)
-            lis.append(f"<li><b>{esc(label)}:</b> {esc(rest)}</li>" if label else f"<li>{esc(t)}</li>")
+            lis.append(f"<li><b>{esc(label)}:</b> {rich(rest)}</li>" if label else f"<li>{rich(t)}</li>")
         out.append("<h2>Key achievements</h2><ul>" + "".join(lis) + "</ul>")
 
     exp = []
@@ -195,7 +203,7 @@ def resume_html(data: dict, career, contact: dict) -> str:
             title = "<span><b>" + esc(r["title"]) + "</b>" + (f'<span class="sub"> · {esc(r["company"])}</span>' if r["company"] else "") + "</span>"
             meta = f'<span class="meta">{esc(dash(r["dates"]))}</span>' if r["dates"] else ""
             head = f'<div class="row role">{title}{meta}</div>'
-            roles.append(head + "<ul>" + "".join(f"<li>{esc(by_id[i])}</li>" for i in ids) + "</ul>")
+            roles.append(head + "<ul>" + "".join(f"<li>{rich(by_id[i])}</li>" for i in ids) + "</ul>")
         desc = [by_id[i] for i, _ in chosen if blk["desc_ctx"] and i.startswith("B") and career.items[i].context == blk["desc_ctx"]]
         if not roles and not desc:
             continue
@@ -208,11 +216,12 @@ def resume_html(data: dict, career, contact: dict) -> str:
     if exp:
         out.append("<h2>Experience</h2>" + "".join(exp))
 
-    ks = [it for it in career.items.values() if it.id.startswith("K")]
+    picked = [i for i, _ in chosen if i.startswith("K")]
+    ks = [(i, by_id[i]) for i in picked] or [(it.id, it.text) for it in career.items.values() if it.id.startswith("K")]
     if ks:
         rows = []
-        for it in ks:
-            label, rest = split_label(it.text)
+        for _, text in ks:
+            label, rest = split_label(text)
             rows.append(f"<b>{esc(label)}</b><span>{esc(rest)}</span>")
         out.append('<h2>Skills</h2><div class="skills">' + "".join(rows) + "</div>")
 
@@ -222,7 +231,7 @@ def resume_html(data: dict, career, contact: dict) -> str:
         for _, t in proj:
             m = re.match(r"(https?://\S+?):\s+(.*)", t)
             lis.append(f'<li><a href="{esc(m.group(1))}">{esc(short_link(m.group(1)))}</a>: {esc(m.group(2))}</li>'
-                       if m else f"<li>{esc(t)}</li>")
+                       if m else f"<li>{rich(t)}</li>")
         out.append("<h2>Projects &amp; writing</h2><ul>" + "".join(lis) + "</ul>")
 
     vol = [(i, t) for i, t in chosen if i.startswith("B") and career.items[i].context.startswith("Volunteering")]

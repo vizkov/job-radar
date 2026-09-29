@@ -152,7 +152,7 @@ def _in_text(term: str, text_norm: str) -> bool:
 def new_names(text: str, career_text: str) -> list[str]:
     known = _norm(career_text)
     return sorted({n for n in _NAME.findall(text.strip()) if not _in_text(n, known)})
-SECTION_KINDS = {"P", "B", "E"}   # summary, experience, education lines may appear in résumé sections
+SECTION_KINDS = {"P", "B", "E", "K"}   # summary, experience, education and skill lines may appear in résumé sections
 COVER_KINDS = {"C", "S"}          # cover-letter paragraphs come from cover blocks or STAR stories
 
 

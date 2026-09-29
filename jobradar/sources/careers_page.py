@@ -68,6 +68,13 @@ def parse_selector(html: str, page: dict) -> list[Posting]:
     return out
 
 
+def _pick(item, path: str):
+    """A field from a JSON job, by dotted path ("data.title")."""
+    for key in path.split("."):
+        item = item.get(key) if isinstance(item, dict) else None
+    return item
+
+
 def parse_feed(body: str, page: dict) -> list[Posting]:
     fields = page.get("fields") or {}
     out = []
@@ -77,11 +84,15 @@ def parse_feed(body: str, page: dict) -> list[Posting]:
             if key:
                 data = data[key]
         for it in data:
-            title = clean(str(it.get(fields.get("title", "title"), "")))
-            url = urljoin(page["url"], str(it.get(fields.get("url", "url"), "")))
-            loc = clean(str(it.get(fields.get("location", "location"), "") or page.get("default_location", "")))
+            title = clean(str(_pick(it, fields.get("title", "title")) or ""))
+            jid = str(_pick(it, fields.get("id", "id")) or "")
+            # url_template: for feeds whose items carry no public link, only an ID
+            link = page["url_template"].format(id=jid) if page.get("url_template") and jid else \
+                str(_pick(it, fields.get("url", "url")) or "")
+            url = urljoin(page["url"], link)
+            loc = clean(str(_pick(it, fields.get("location", "location")) or page.get("default_location", "")))
             if title:
-                out.append(_posting(page, title, loc, url, external_id=str(it.get(fields.get("id", "id")) or url)))
+                out.append(_posting(page, title, loc, url, external_id=jid or url))
         return out
     from defusedxml import ElementTree  # untrusted XML: block entity-expansion attacks
     root = ElementTree.fromstring(body.encode())

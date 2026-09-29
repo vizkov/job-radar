@@ -128,3 +128,16 @@ def test_robots_rules_follow_rfc_9309():
     assert robots_rules(503, "") is False         # server error: assume disallowed
     rp = robots_rules(200, "User-agent: *\nDisallow: /jobs")
     assert not rp.can_fetch("x", "https://a.example/jobs/1") and rp.can_fetch("x", "https://a.example/")
+
+
+def test_json_feed_with_nested_fields_and_url_template():
+    import json
+    from jobradar.sources.careers_page import parse_feed
+    body = json.dumps({"jobs": [{"data": {"title": "Product Security Engineer", "full_location": "United Kingdom",
+                                          "req_id": "5773"}}]})
+    page = {"company": "GitHub (Microsoft)", "url": "https://careers.example/jobs", "items_path": "jobs",
+            "fields": {"title": "data.title", "location": "data.full_location", "id": "data.req_id"},
+            "url_template": "https://careers.example/jobs/{id}"}
+    [p] = parse_feed(body, page)
+    assert (p.title, p.location, p.url, p.external_id) == (
+        "Product Security Engineer", "United Kingdom", "https://careers.example/jobs/5773", "5773")

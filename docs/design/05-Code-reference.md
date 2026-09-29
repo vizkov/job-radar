@@ -322,7 +322,8 @@ default queries and paging. Specifics:
 |---|---|
 | `clean(text)` | Collapse whitespace, drop soft hyphens. |
 | `parse_selector(html, page)` | CSS selectors → postings. A missing `anchor` raises "page layout changed". |
-| `parse_feed(body, page)` | JSON (with `items_path`/`fields`) or RSS/Atom via `defusedxml`. |
+| `_pick(item, path)` | A JSON job field by dotted path (`data.title`). |
+| `parse_feed(body, page)` | JSON (with `items_path`/`fields`, where fields may be dotted paths, and an optional `url_template` that builds the job link from its id when items carry no public URL) or RSS/Atom via `defusedxml`. |
 | `parse_hash(html, page)` | Hash the listing section's text; the hash is the posting ID, so any change surfaces once as "Careers page changed". |
 | `_posting(...)` | Build a `Posting` with the page's company as hint. |
 | `render_js(url)` | Playwright, only if installed (local only). |

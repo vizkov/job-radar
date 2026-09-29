@@ -13,13 +13,16 @@ this process imports.
 Trust: email is spoofable. A message is only used when its sender belongs to a
 known provider and (by default) it carries a passing DKIM signature for that
 provider's domain. Job URLs are rebuilt from the job ID, so a spoofed or
-tampered email can't smuggle a phishing link into the digest. Titles/companies
+tampered email can't smuggle a phishing link into the digest. Where a provider's
+alerts carry no ID (Indeed: opaque tracking redirects), only links on its own
+https redirect host are accepted. Titles/companies
 are still untrusted text (see untrusted.py).
 """
 from __future__ import annotations
 
 import asyncio
 import email
+import hashlib
 import json
 import re
 from email.message import Message
@@ -61,6 +64,24 @@ def _find_id(p: Provider, s: str) -> str | None:
     return m.group(1) if m else None
 
 
+def _find_link(p: Provider, s: str) -> tuple[str | None, str | None]:
+    """(job ID, None) when the link carries one; else (None, redirect URL) for ID-less providers."""
+    if (jid := _find_id(p, s)):
+        return jid, None
+    m = p.redirect.search(s) if p.redirect else None
+    return None, (m.group(0) if m else None)
+
+
+def _has_company_line(line: str) -> bool:
+    return any(sep in line for sep in (" · ", " - ", " – "))
+
+
+def _content_id(title: str, company: str, location: str) -> str:
+    """Stable ID for a job the email only links to through a one-off tracking redirect."""
+    key = "|".join(" ".join(x.lower().split()) for x in (title, company, location))
+    return "h" + hashlib.sha1(key.encode()).hexdigest()[:15]
+
+
 def _split_company_location(lines: list[str]) -> tuple[str, str]:
     lines = [l for l in lines if l and not _NOISE.match(l)]
     if not lines:
@@ -77,14 +98,17 @@ def parse_text(p: Provider, body: str) -> list[dict]:
     jobs, para, prev = [], [], []
     for raw in body.splitlines():
         line = " ".join(raw.split())
-        jid = _find_id(p, line) if "http" in line else None
-        if jid:
+        jid, link = _find_link(p, line) if "http" in line else (None, None)
+        if jid or link:
             # An insight line ("This company is actively hiring") can sit after a blank line, alone in
             # its paragraph: then the card is the paragraph before it.
             card = [l for l in para if not _NOISE.match(l)] or [l for l in prev if not _NOISE.match(l)]
-            if card and len(card) <= 6:  # longer = prose, not a job card
+            # longer = prose, not a job card; an ID-less link needs a real "Company - Location" line,
+            # else it's the email's own browse/unsubscribe/footer link
+            if card and len(card) <= 6 and (jid or (len(card) > 1 and _has_company_line(card[1]))):
                 company, location = _split_company_location(card[1:])
-                jobs.append({"id": jid, "title": card[0], "company": company, "location": location})
+                jobs.append({"id": jid or _content_id(card[0], company, location), "link": link,
+                             "title": card[0], "company": company, "location": location})
             para, prev = [], []
         elif not line or set(line) <= set("-=_"):
             if para:
@@ -121,16 +145,27 @@ def parse_html(p: Provider, body: str) -> list[dict]:
     return jobs
 
 
+_SUBJECT_PLACE = re.compile(r"\bjobs? in (.+?)(?: is now active)?$", re.I)
+
+
 def to_postings(msg: Message, p: Provider) -> list[Posting]:
     jobs = parse_text(p, _part(msg, "text/plain")) or parse_html(p, _part(msg, "text/html"))
+    # Alerts are per search, e.g. "5 new … jobs in United Kingdom": the searched place backs up card
+    # locations the country lookup doesn't know (small towns).
+    hit = _SUBJECT_PLACE.search(" ".join((msg.get("Subject") or "").split()))
+    place = hit.group(1) if hit else ""
+    out = []
     try:
         when = parsedate_to_datetime(msg.get("Date")) if msg.get("Date") else None
     except (TypeError, ValueError):
         when = None
-    return [Posting(source=f"{p.name}_email", company=j["company"], title=j["title"], location=j["location"],
-                    countries=frozenset(countries_for(None, j["location"])), url=p.url.format(id=j["id"]),
-                    external_id=j["id"], posted_at=when, raw={"message_id": msg.get("Message-ID", "")})
-            for j in jobs]
+    for j in jobs:
+        countries = countries_for(None, j["location"]) or (countries_for(None, place) if place else set())
+        out.append(Posting(source=f"{p.name}_email", company=j["company"], title=j["title"],
+                           location=j["location"], countries=frozenset(countries),
+                           url=j.get("link") or p.url.format(id=j["id"]), external_id=j["id"], posted_at=when,
+                           raw={"message_id": msg.get("Message-ID", "")}))
+    return out
 
 
 class AlertEmailSource:

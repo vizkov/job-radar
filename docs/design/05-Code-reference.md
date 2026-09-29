@@ -342,7 +342,8 @@ share one link. So if an employer edits a job's title, it's reported as a new ro
 | `_part(msg, type)` | The text/plain or text/html body. |
 | `_find_id(provider, s)` | The job ID in a link, also after URL-decoding (tracking redirects encode it). |
 | `_split_company_location(lines)` | "Acme · London" or two lines → (company, location). |
-| `parse_text(p, body)` | Plain-text cards: a short paragraph followed by the job URL. |
+| `_find_link(p, s)`, `_content_id(...)`, `_has_company_line(line)` | A job ID from a link, or (for ID-less providers like Indeed) the provider's pinned redirect URL; a stable hash ID from title/company/location; whether a card line is "Company - Location". |
+| `parse_text(p, body)` | Plain-text cards: a short paragraph followed by the job URL. ID-less cards also need a company line; the alert's subject supplies the country for unknown towns (`to_postings`). |
 | `parse_html(p, body)` | HTML cards: from each job link, climb to the largest element containing only that job. |
 | `to_postings(msg, p)` | Text first, HTML as fallback; URL **rebuilt from the job ID**. |
 | `_mailbox_units()` | Turns the fetcher's per-provider counts into health units: nothing from any provider at all, or provider mail only from unknown sender addresses. |

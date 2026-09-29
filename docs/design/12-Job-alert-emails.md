@@ -133,6 +133,15 @@ Anyone can send email to the user's dedicated address pretending to be LinkedIn.
   | Indeed | `jk=<16 hex>` | `https://www.indeed.com/viewjob?jk=<id>` |
   | Glassdoor | `jobListingId=` or `jl=<digits>` | `https://www.glassdoor.com/partner/jobListing.htm?jobListingId=<id>` |
 
+  Indeed's alerts (seen 2026-09) no longer carry `jk=` at all: every link is an opaque
+  `https://engage.indeed.com/f/a/…` tracking redirect, and resolving it would mean fetching Indeed.
+  For providers with a `redirect` pattern (`jobradar/alert_providers.py`), a card whose link has no ID
+  is keyed by a hash of title, company and location (`_content_id()`, stable across emails), and its
+  link is the redirect itself, accepted only when it matches that https host exactly. A card needs a
+  "Company - Location" line, so the email's own browse, unsubscribe and footer links aren't jobs.
+  When a card's town isn't recognised, the country comes from the alert's subject ("… jobs in United
+  Kingdom"). The JD fetcher still refuses these links (`NEVER_FETCH`): paste Indeed job descriptions.
+
 - Titles and company names are escaped before they go into the GitHub issue.
 
 Rejected and unknown-sender emails are counted in the Radar status card's Sources table.

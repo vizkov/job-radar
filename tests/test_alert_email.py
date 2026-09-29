@@ -149,3 +149,20 @@ def test_real_linkedin_layout_insight_lines_are_not_titles():
     assert by_title[("Cloud Security Specialist", "Alliander")].countries == frozenset({"NL"})
     assert by_title[("Infrastructure Security Engineer", "ElevenLabs")].location == "London"
     assert all(j.url.startswith("https://www.linkedin.com/jobs/view/") for j in jobs)
+
+
+def test_real_indeed_layout_without_job_ids():
+    """Sanitised from a real Indeed alert (2026-09): no job IDs, only engage.indeed.com tracking redirects.
+    Jobs are keyed by title/company/location; boilerplate links and off-host links are not jobs."""
+    msg = load("real/indeed_real_2026_09.eml")
+    assert dkim_ok(msg, PROVIDERS["indeed"].dkim_domain)
+    jobs = to_postings(msg, PROVIDERS["indeed"])
+    assert [(j.title, j.company, j.location) for j in jobs] == [
+        ("Junior Application Software Engineer", "One Big Circle", "Bristol"),
+        ("Cyber Security Engineer", "Tai Tarian", "Neath"),
+        ("Senior IT Security Analyst", "Synthomer (UK) Limited", "London")]
+    assert all(j.url.startswith("https://engage.indeed.com/f/a/") for j in jobs)  # the spoofed host is dropped
+    assert jobs[1].countries == frozenset({"GB"})  # unknown town: country from the alert's subject
+    again = to_postings(load("real/indeed_real_2026_09.eml"), PROVIDERS["indeed"])
+    assert [j.external_id for j in again] == [j.external_id for j in jobs]  # stable across emails
+    assert len({j.external_id for j in jobs}) == 3

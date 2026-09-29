@@ -18,6 +18,10 @@ class Provider:
     dkim_domain: str
     job_id: re.Pattern      # group(1) = job ID, searched in (URL-decoded) hrefs and text
     url: str                # canonical job URL template with {id}
+    # Some alerts carry no job ID, only opaque tracking redirects (Indeed since 2026). Then the job is
+    # keyed by title/company/location and this pattern, pinned to the provider's own https redirect host,
+    # is the only link accepted, so a spoofed email still can't smuggle in a link elsewhere.
+    redirect: re.Pattern | None = None
 
 
 PROVIDERS = {
@@ -30,7 +34,8 @@ PROVIDERS = {
         "indeed", ("alert@indeed.com", "donotreply@jobalert.indeed.com", "noreply@indeed.com", "@indeed.com"),
         "indeed.com",
         re.compile(r"indeed\.[a-z.]+/[^\s\"']*?[?&](?:amp;)?jk=([0-9a-f]{16})", re.I),
-        "https://www.indeed.com/viewjob?jk={id}"),
+        "https://www.indeed.com/viewjob?jk={id}",
+        re.compile(r"https://engage\.indeed\.com/f/a/[\w~-]+/[\w~-]+/[\w~-]+")),
     "glassdoor": Provider(
         "glassdoor", ("noreply@glassdoor.com", "@glassdoor.com"),
         "glassdoor.com",

@@ -16,6 +16,7 @@ files to change from `examples/` into `profile/`.
 | `targets.tsv` | The user's target companies |
 | `aliases.csv` | Employer spellings that normalization can't fold into a target |
 | `overrides.csv` | Extra ATS careers URLs for `verify_boards.py` |
+| `board_blocklist.csv` | Boards `verify_boards.py` must never poll (`ats,slug,board_url,reason`; match on ats+slug or on the URL). For placeholder boards that list fake jobs |
 | `careers_pages.yaml` | Careers pages without an ATS |
 | `sponsor_overrides.csv` | Pinned sponsor-register matches |
 

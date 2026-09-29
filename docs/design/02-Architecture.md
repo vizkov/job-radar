@@ -100,6 +100,7 @@ doesn't match `PRIVATE`.
 | `targets.tsv` | Target companies (`Company<TAB>Offices`) | Claude (`setup`, `tune-radar`) | `matching.py`, `build_candidates.py` |
 | `aliases.csv` | `alias,canonical` spellings | Claude | `matching.py` |
 | `overrides.csv` | Extra ATS boards: `company,careers_url,ats,slug` | Claude, `discover_boards.py --apply` | `verify_boards.py` |
+| `board_blocklist.csv` | Boards never to poll: `ats,slug,board_url,reason` | Claude | `verify_boards.py` (`load_blocklist`) |
 | `careers_pages.yaml` | Careers pages without an ATS, with CSS selectors | Claude | `sources/careers_page.py` |
 | `sponsor_overrides.csv` | Pinned sponsor-register matches | Claude | `sponsors.py` |
 | `career/master_resume.md`, `stories.md`, `cover_blocks.md` | The user's CV lines, STAR stories and cover paragraphs, each with an ID | Claude (converted from the user's CV, confirmed by them) | `career.py` → `jd_check.py`, `render_resume.py`, skills |

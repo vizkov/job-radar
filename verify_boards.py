@@ -9,6 +9,9 @@ Also reads overrides.csv (profile/) (company,careers_url) so you can add boards 
 companies the mapping missed — paste their careers page URL and the ATS is
 detected automatically (Greenhouse, Lever, Ashby, Workday, SmartRecruiters…).
 
+profile/board_blocklist.csv (ats,slug,board_url,reason) lists boards to never poll, such as a placeholder
+board that shows fake jobs in your countries and so passes the check above.
+
 Outputs:
   data/verified_boards.csv   one row per board: jobs total / in target countries
   data/coverage_report.csv   one row per company: final status + kept boards
@@ -28,6 +31,22 @@ from jobradar.common import ROOT, all_europe, fetch_many, job_countries, target_
 from jobradar.paths import profile_path
 
 DATA = ROOT / "data"
+
+
+def load_blocklist() -> tuple[set, set]:
+    """profile/board_blocklist.csv (ats,slug,reason  and/or  board_url,reason): boards to never poll, e.g. a
+    placeholder board that lists fake jobs. Returns ({(ats, slug)}, {board_url}), lower-cased."""
+    path = profile_path("board_blocklist.csv")
+    pairs, urls = set(), set()
+    if path.exists():
+        for r in csv.DictReader(open(path, encoding="utf-8")):
+            ats, slug = (r.get("ats") or "").strip().lower(), (r.get("slug") or "").strip().lower()
+            url = (r.get("board_url") or "").strip().lower().rstrip("/")
+            if ats and slug:
+                pairs.add((ats, slug))
+            if url:
+                urls.add(url)
+    return pairs, urls
 
 
 def load_candidates():
@@ -54,7 +73,9 @@ def load_candidates():
             rows = [x for x in rows if not (x["company"] == company and not x["board_url"])]
             rows.append({"company": company, "offices": "", "status": "override", "source": "override",
                          "ats": ats, "scraper_slug": slug, "board_url": url, "board_name": company})
-    return rows
+    pairs, urls = load_blocklist()
+    return [r for r in rows if (r["ats"].lower(), r["scraper_slug"].lower()) not in pairs
+            and (r["board_url"] or "").lower().rstrip("/") not in urls]
 
 
 def careers_page_companies() -> set[str]:

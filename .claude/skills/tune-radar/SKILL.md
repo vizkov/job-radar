@@ -16,6 +16,7 @@ All settings live in `profile/` (copy a file from `examples/` first if it isn't 
 | a company has a careers page without an ATS | `profile/careers_pages.yaml` (see its header; check the page source for a hidden ATS first and prefer `profile/overrides.csv`) |
 | turn a source on/off, search terms | `profile/sources.yaml` |
 | wrong sponsor match | `profile/sponsor_overrides.csv` |
+| a board lists fake or wrong jobs (placeholder or same-name company) | `profile/board_blocklist.csv` (`ats,slug,board_url,reason`), and remove its entry from `boards.json` now: the blocklist stops `verify_boards.py` re-adding it on its monthly run |
 
 Steps:
 1. Make the smallest change that does what they asked. Title keywords are whole-word; `*` matches

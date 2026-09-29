@@ -104,7 +104,7 @@ doesn't match `PRIVATE`.
 | `careers_pages.yaml` | Careers pages without an ATS, with CSS selectors | Claude | `sources/careers_page.py` |
 | `sponsor_overrides.csv` | Pinned sponsor-register matches | Claude | `sponsors.py` |
 | `career/master_resume.md`, `stories.md`, `cover_blocks.md` | The user's CV lines, STAR stories and cover paragraphs, each with an ID | Claude (converted from the user's CV, confirmed by them) | `career.py` → `jd_check.py`, `render_resume.py`, skills |
-| `applications/<folder>/` | Per-application `tailored.json`, `validated.sha256`, `resume.md`, `cover_letter.md` (plus `resume.docx` only when asked), `submitted.md` | Claude, `jd_check.py`, `render_resume.py` | the user, `apply-assist` |
+| `applications/<folder>/` | Per-application `tailored.json`, `validated.sha256`, `resume.pdf`, `cover_letter.pdf` (Markdown copies for the reviewers in `work/apps/<folder>/`; `resume.docx` only when asked), `submitted.md` | Claude, `jd_check.py`, `render_resume.py` | the user, `apply-assist` |
 | `network.csv` | Who can help where: `name,company,added`, one row per person per company. Nothing about how people are related or what they do (the user's choice) | Claude (`referrals` skill), from what the user says | `tools/referrals.py` |
 | `board.json` | The Project's owner, number, node ID, URL, field IDs and option IDs | `board_sync.py setup-project` | `board_sync.py`, `session_brief.py` |
 

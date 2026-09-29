@@ -11,8 +11,8 @@ The reviewers' output is judgement, not fact: verify every finding before you re
 
 ## 0. Pick the target
 
-- **After `tailor-application`:** the folder `profile/applications/<folder>/` (`resume.md`,
-  `cover_letter.md`) plus `profile/career/stories.md`, and the role's JD `work/jd/<ref>/jd.txt`
+- **After `tailor-application`:** the review text `work/apps/<folder>/` (`resume.md`,
+  `cover_letter.md`, written by `render_resume.py`; the application folder itself holds the PDFs) plus `profile/career/stories.md`, and the role's JD `work/jd/<ref>/jd.txt`
   (run the `score-roles` steps for the JD first if it is missing).
 - **The user gave or updated documents** (PDFs in Downloads, edits to `profile/career/`): review the
   three as a set. PDFs are read with `pdftotext`; no JD means skip the ATS keyword check and the fit
@@ -81,7 +81,7 @@ The JD for a role is `work/jd/<ref>/jd.txt`; `packet.md` there wraps it as untru
   says buried) instead of hiding them.
 - Fit: if the role is scored, use its `scores.jsonl` entry; do not invent a second score. If it
   is not, offer `score-roles`.
-- **Report in the chat; do not write a `review.md`** (the user wants only `resume.md` and `cover_letter.md` in an
+- **Report in the chat; do not write a `review.md`** (the user wants only the two PDFs in an
   application folder; write a review file only if they ask for one, and then only in `profile/career/`). Give:
   verdict (ready / fix first / do not send), then findings ranked **fix before applying**, **should fix**,
   **nice to have**, each with file, quote, why, fix. Include the ATS keyword picture and the recruiter's shortlist

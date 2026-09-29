@@ -208,8 +208,9 @@ Each `source_id` at most once, within the sections and within the cover letter. 
 items are exempt, since condensing a story is expected.
 
 **`render_resume.py`** refuses to run unless that hash matches the current file, so
-nothing edited after validation can be rendered. By default it writes only `resume.md` and
-`cover_letter.md` (the user's rule: two files per application); `--docx` also writes
+nothing edited after validation can be rendered. By default it writes only `resume.pdf` and
+`cover_letter.pdf` (the user's rule: two files per application; the Markdown text goes to
+`work/apps/<folder>/` for the reviewers, `--md` also puts it in the folder); `--docx` also writes
 `resume.docx` (one column, standard headings, no tables or images, which applicant tracking
 systems parse reliably) when a form needs a Word upload. Name and contact details come only from
 `master_resume.md`'s front matter.

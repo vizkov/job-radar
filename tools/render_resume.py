@@ -1,23 +1,24 @@
 """Render a validated tailored résumé + cover letter. No LLM here.
 
-    python tools/render_resume.py <folder> [--pdf] [--docx]    # profile/applications/<folder>/
+    python tools/render_resume.py <folder> [--md] [--docx]    # profile/applications/<folder>/
 
 Refuses to run unless tools/jd_check.py tailor has validated exactly this
-tailored.json (it checks the saved SHA-256). Writes, by default, the two files the user wants per application:
-  resume.md          the tailored CV as plain Markdown (paste into Claude Design for a styled version)
-  cover_letter.md    greeting + the chosen paragraphs + sign-off
-Only with --pdf: resume.pdf and cover_letter.pdf in the user's Claude Design layout (tools/render_pdf.py; needs
-Chrome or Edge, which is already installed; nothing to pip install).
-Only with --docx (when an application form needs a Word upload):
-  resume.docx        single column, standard headings, no tables/images/text boxes:
-                     the layout applicant tracking systems parse reliably
+tailored.json (it checks the saved SHA-256). By default it writes the two files the user wants per application,
+as PDFs in their own Claude Design layout (tools/render_pdf.py; headless Chrome or Edge, nothing to pip install):
+  resume.pdf         the tailored CV, two pages
+  cover_letter.pdf   the cover letter, one page
+The same text as Markdown goes to work/apps/<folder>/ (resume.md, cover_letter.md): scratch text for the review
+skills and consistency_check.py, not a deliverable. Extras, only when asked:
+  --md     also put resume.md and cover_letter.md in the application folder
+  --docx   resume.docx (single column, ATS-safe) for a form that needs a Word upload; needs requirements-career.txt
+If no Chrome or Edge is found the Markdown files go into the folder instead, and it says so.
 Name and contact details come only from profile/career/master_resume.md.
---docx needs requirements-career.txt (python-docx); local use only.
 """
 from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -26,6 +27,7 @@ sys.path.insert(0, str(ROOT))
 from jobradar.career import load_career  # noqa: E402
 
 APPS = ROOT / "profile" / "applications"
+SCRATCH = ROOT / "work" / "apps"   # review text (Markdown) for each application
 CONTACT_FIELDS = ("email", "phone", "location", "links")
 
 
@@ -71,8 +73,8 @@ def to_docx(data: dict, contact: dict, path: Path) -> None:
 
 def main(argv=None) -> int:
     args = list(argv if argv is not None else sys.argv[1:])
-    want_docx, want_pdf = "--docx" in args, "--pdf" in args
-    args = [a for a in args if a not in ("--docx", "--pdf")]
+    want_docx, want_md = "--docx" in args, "--md" in args
+    args = [a for a in args if a not in ("--docx", "--md", "--pdf")]
     if len(args) != 1:
         print(__doc__)
         return 2
@@ -87,16 +89,26 @@ def main(argv=None) -> int:
         return 1
     data = json.loads(src.read_text(encoding="utf-8"))
     contact = load_career().contact
-    (app / "resume.md").write_text(to_markdown(data, contact), encoding="utf-8")
-    (app / "cover_letter.md").write_text(cover_letter(data, contact), encoding="utf-8")
-    wrote = ["resume.md", "cover_letter.md"]
+    scratch = SCRATCH / app.name
+    scratch.mkdir(parents=True, exist_ok=True)
+    md, cover = to_markdown(data, contact), cover_letter(data, contact)
+    (scratch / "resume.md").write_text(md, encoding="utf-8")
+    (scratch / "cover_letter.md").write_text(cover, encoding="utf-8")
+    wrote = []
+    try:
+        from render_pdf import render_pdfs  # tools/ is on sys.path when run as a script
+        wrote += render_pdfs(app, data, load_career(), str(data["key"]))
+    except (RuntimeError, subprocess.SubprocessError) as e:
+        print(f"note: no PDF ({e}); writing Markdown into the folder instead")
+        want_md = True
+    if want_md:
+        (app / "resume.md").write_text(md, encoding="utf-8")
+        (app / "cover_letter.md").write_text(cover, encoding="utf-8")
+        wrote += ["resume.md", "cover_letter.md"]
     if want_docx:
         to_docx(data, contact, app / "resume.docx")
         wrote.append("resume.docx")
-    if want_pdf:
-        from render_pdf import render_pdfs  # tools/ is on sys.path when run as a script
-        wrote += render_pdfs(app, data, load_career(), str(data["key"]))
-    print(f"wrote {app.name}/" + ", ".join(wrote))
+    print(f"wrote {app.name}/" + ", ".join(wrote) + f"  (review text: work/apps/{app.name}/)")
     return 0
 
 

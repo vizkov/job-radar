@@ -1,6 +1,6 @@
 ---
 name: tailor-application
-description: Build a tailored, ATS-safe CV and cover letter for one role from the user's own career docs, validate it, and render two Markdown files (resume.md and cover_letter.md) for review. Use when the user asks to tailor their CV, prep an application, or write a cover letter for a specific role.
+description: Build a tailored, ATS-safe CV and cover letter for one role from the user's own career docs, validate it, and render the CV and cover letter as two PDFs in the user's own layout (resume.pdf, cover_letter.pdf). Use when the user asks to tailor their CV, prep an application, or write a cover letter for a specific role.
 ---
 
 # Tailor an application
@@ -26,9 +26,9 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    - Skills must appear somewhere in the career docs.
    - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
      two pages.
-   - **Match the user's design (their `cv.pdf` / `cover.pdf`, rendered by `--pdf`)**: sections in this order:
-     `Summary` (the `P` lines under "Summary", which become the profile paragraph), `Key achievements`
-     (`P05`-`P08`, the ones that fit the JD, each starting with its label), an `Experience` block (`B01`
+   - **Match the user's design (their `cv.pdf` / `cover.pdf`)**: sections in this order:
+     `Summary` (the `P` lines under "Summary", which become the profile paragraph), optionally `Key achievements`
+     (`P05`-`P08`, the ones that fit the JD, each starting with its label; skip it if the CV would pass two pages), an `Experience` block (`B01`
      first: the company's one-line description) then one section per role in reverse-chronological order, then
      `Projects`, `Education` (the renderer takes skills, city and dates from the master CV, so don't invent them).
      The CV must fit **two pages** and the cover letter **one**: cut the least relevant bullets (a bullet
@@ -41,14 +41,16 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
      honestly if the role is abroad (block `C03`-style text if they have one).
 4. **Validate:** `python tools/jd_check.py tailor <folder>`. Fix every error; never work around one.
    Warnings about heavy rewording mean you drifted from what the user actually did — tighten it.
-5. **Render:** `python tools/render_resume.py <folder>` → **two files only, the user's rule**: `resume.md` and
-   `cover_letter.md`. Master documents (career docs, stories) already exist and don't change per application;
-   the folder holds nothing else the user must read (`tailored.json` and `validated.sha256` are the checker's own
-   files). **No `resume.docx` unless asked or an application form needs a Word upload** (`--docx`, needs
-   `pip install --require-hashes -r requirements-career.txt`). No `review.md`, no other extra documents.
-   **PDFs in the user's own layout: `--pdf`** (`resume.pdf`, `cover_letter.pdf`; Chrome or Edge is used, nothing
-   to install). Ask whether the PDFs replace the two Markdown files or sit beside them if the user hasn't said.
-   After rendering PDFs check the page count (CV 2, letter 1) and trim per the rule above if not.
+5. **Render:** `python tools/render_resume.py <folder>` → **two files only, the user's rule**: `resume.pdf` (two pages)
+   and `cover_letter.pdf` (one page), in the layout of the user's own `cv.pdf` / `cover.pdf`. It uses Chrome or
+   Edge, which are already installed; nothing to pip install. The same text as Markdown is written to
+   `work/apps/<folder>/` as scratch for the review skills (not a deliverable). Master documents (career docs,
+   stories) already exist and don't change per application. The folder holds nothing else the user must read
+   (`tailored.json` and `validated.sha256` are the checker's own files). **No `--md` (Markdown in the folder),
+   no `--docx`, unless asked or an application form needs a Word upload.** No `review.md`, no other extra documents.
+   After rendering, check the page count (CV 2, letter 1).
+   **Once the user has approved the content, never change it to fit the page**: adjust spacing in
+   `tools/render_pdf.py` or ask; changing approved text needs their yes.
 6. **Review gate.** Run the `application-review` skill on this folder (ATS, recruiter and consistency
    subagents plus `tools/consistency_check.py`); its findings go to the user **in the chat, not in a file**. Fix or
    ask the user about every "fix before applying" finding, then re-validate and re-render. Skip only if the user

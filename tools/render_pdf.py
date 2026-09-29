@@ -1,6 +1,6 @@
 """Render a validated tailored CV and cover letter as PDFs in the user's Claude Design layout. No LLM here.
 
-Called by  python tools/render_resume.py <folder> --pdf  (which first checks the SHA-256 that
+Called by  python tools/render_resume.py <folder>  (the default output; it first checks the SHA-256 that
 tools/jd_check.py tailor saved, so only validated text is rendered). Writes resume.pdf and cover_letter.pdf.
 
 The layout (Arial, A4 CV / US Letter cover letter, teal #005477 headings, a rule under the header, right-aligned
@@ -48,7 +48,7 @@ def find_browser() -> str | None:
 def print_pdf(html_text: str, pdf_path: Path) -> None:
     browser = find_browser()
     if not browser:
-        raise RuntimeError("no Chrome or Edge found: install one, or use resume.md")
+        raise RuntimeError("no Chrome or Edge found")
     with tempfile.TemporaryDirectory() as tmp:
         src = Path(tmp) / "page.html"
         src.write_text(html_text, encoding="utf-8")
@@ -289,10 +289,10 @@ def cover_html(data: dict, career, contact: dict, role_title: str = "", company:
         if i in CLOSING:
             body.append(f"<p>{esc(t)}</p>")
     body.append(f'<p>Kind regards,</p><p><b>{esc(contact.get("name", ""))}</b></p>')
-    css = ("@page { size: Letter; margin: 54pt; } body { font-size: 10.5pt; line-height: 1.5; } "
-           "p { margin: 0 0 10.5pt; } .addr { margin: 0 0 1.5pt; } hr.rule + .addr { margin-top: 13.5pt; } "
-           ".salute { margin-top: 10.5pt; } .lead { margin-bottom: 4.5pt; } "
-           "ul.blocks { padding-left: 14pt; margin: 0 0 10.5pt; } ul.blocks > li { margin-top: 5pt; } "
+    css = ("@page { size: Letter; margin: 40pt 54pt 34pt 54pt; } body { font-size: 10.5pt; line-height: 1.5; } "
+           "p { margin: 0 0 8.5pt; } .addr { margin: 0 0 1.5pt; } hr.rule + .addr { margin-top: 13.5pt; } "
+           ".salute { margin-top: 9.5pt; } .lead { margin-bottom: 4.5pt; } "
+           "ul.blocks { padding-left: 14pt; margin: 0 0 8.5pt; } ul.blocks > li { margin-top: 5pt; } "
            "ul.blocks ul { list-style: circle; padding-left: 16pt; margin-top: 4pt; } ul ul:empty { display: none; }")
     return page(css, "".join(body))
 

@@ -1,7 +1,7 @@
 """Cross-check the CV, cover letter and STAR stories against each other. No LLM here.
 
     python tools/consistency_check.py                          # the career docs in profile/career/
-    python tools/consistency_check.py --folder <application>   # that folder's resume.md + cover_letter.md
+    python tools/consistency_check.py --folder <application>   # that folder's resume.md + cover_letter.md (or work/apps/<folder>/)
                                                                #   + profile/career/stories.md
     python tools/consistency_check.py --cv a.pdf --cover b.pdf --stories c.md   # explicit files
     add --final to treat leftover placeholders as errors, --json for the fact sheet
@@ -127,7 +127,9 @@ def locate(args) -> dict[str, Path]:
     if args.folder:
         folder = Path(args.folder)
         folder = folder if folder.is_absolute() or folder.exists() else ROOT / "profile" / "applications" / folder
-        paths = {"cv": folder / "resume.md", "cover": folder / "cover_letter.md",
+        scratch = ROOT / "work" / "apps" / folder.name     # render_resume.py writes the review text here
+        pick = lambda n: folder / n if (folder / n).exists() else scratch / n  # noqa: E731
+        paths = {"cv": pick("resume.md"), "cover": pick("cover_letter.md"),
                  "stories": career_dir() / "stories.md"}
     else:
         paths = {"cv": career_dir() / "master_resume.md", "cover": career_dir() / "cover_blocks.md",

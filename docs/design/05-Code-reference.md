@@ -476,12 +476,14 @@ capitalised anyway, so "Led the review" doesn't flag "Led" as a new name.
 
 `contact_line()`, `to_markdown()`, `cover_letter()`, `to_docx()` (python-docx: title,
 contact line, headline, one heading per section, bullet list, skills), `main()` (refuses
-unless `validated.sha256` matches the current `tailored.json`). By default it writes only `resume.md` and
-`cover_letter.md`; `--docx` adds the Word file and `--pdf` adds the two PDFs below.
+unless `validated.sha256` matches the current `tailored.json`). By default it writes only `resume.pdf` and
+`cover_letter.pdf` (via `tools/render_pdf.py`, below) and puts the Markdown in `work/apps/<folder>/` (`SCRATCH`) for the
+reviewers; `--md` also writes it into the application folder, `--docx` adds the Word file. With no Chrome or Edge it
+falls back to Markdown in the folder.
 
 ### `tools/render_pdf.py`: the CV and cover letter as PDFs in the user's Claude Design layout
 
-Called by `render_resume.py --pdf`. No LLM, nothing to pip install: HTML is printed to PDF with headless Chrome or
+Called by `render_resume.py` (the default). No LLM, nothing to pip install: HTML is printed to PDF with headless Chrome or
 Edge (`find_browser()`, `print_pdf()` with a throwaway user-data dir so an open browser doesn't interfere). The
 look (Arial, A4 CV with 43 pt side margins, US Letter cover letter with 54 pt margins, teal `#005477` headings,
 10 pt body at a 1.43 line height, a rule under the header, right-aligned city and dates, a two-column skills grid)

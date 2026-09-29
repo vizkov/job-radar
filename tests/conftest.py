@@ -40,6 +40,7 @@ def _isolate_tool_state(tmp_path, monkeypatch):
     monkeypatch.setattr(board_sync, "WORK_JD", tmp_path / "_iso_jd")
     import render_resume
     monkeypatch.setattr(render_resume, "APPS", tmp_path / "_iso_apps")
+    monkeypatch.setattr(render_resume, "SCRATCH", tmp_path / "_iso_scratch")
     import calibrate, referrals, sponsorship
     for attr in ("SCORES", "MATCHES", "LOG"):
         monkeypatch.setattr(calibrate, attr, tmp_path / f"_iso_cal_{attr.lower()}")

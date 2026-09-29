@@ -17,6 +17,11 @@ level evidence (a careers FAQ, a relocation programme) can be reused; re-check a
 ~3 months and anything role-specific.
 
 ## 2. Read the ad (`work/jd/<ref>/jd.txt`; run jd_prep first if missing)
+**Read the whole ad, top to bottom. Never decide from a keyword search alone**: the statement that matters
+(relocation, right to work, "based in X") is often a single line near the end, and a search misses word
+forms (a search for "relocation" misses "willing to relocate"; this happened on Sonar, whose ad said it would
+relocate the right candidate). If you do search first, use stems (`relocat`, `sponsor`, `visa`, `permit`,
+`right to work`, `eligib`, `national`, `citizen`, `clearance`) and then still read the ad.
 Look for explicit statements, and quote them verbatim:
 - For: "visa sponsorship available", "we sponsor", "relocation support/package", "global mobility",
   "open to candidates requiring sponsorship".

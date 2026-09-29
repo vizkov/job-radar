@@ -105,24 +105,24 @@ h1 {{ font-size: 23pt; line-height: 1.15; margin: 0; font-weight: bold; }}
 .contact span {{ margin-right: 9pt; white-space: nowrap; }}
 .headline + .contact {{ margin-top: 5pt; }}
 .rule {{ border: 0; border-top: .75pt solid {INK}; margin: 7pt 0 0; }}
-h2 {{ color: {TEAL}; font-size: 9.5pt; letter-spacing: .09em; text-transform: uppercase; margin: 11.6pt 0 4.5pt;
+h2 {{ color: {TEAL}; font-size: 9.5pt; letter-spacing: .09em; text-transform: uppercase; margin: 10.4pt 0 4pt;
      font-weight: bold; break-after: avoid; }}
 p {{ margin: 0; }}
 ul {{ margin: 0; padding-left: 12pt; }}
-li {{ margin-top: 3pt; orphans: 2; widows: 2; }}
+li {{ margin-top: 2.6pt; orphans: 2; widows: 2; }}
 ul ul {{ list-style: circle; margin-top: 3pt; }}
 .row {{ display: flex; justify-content: space-between; align-items: baseline; gap: 12pt; }}
 .row .meta {{ color: {GREY}; white-space: nowrap; }}
 .co {{ font-size: 10.5pt; font-weight: bold; }}
 .co small {{ font-size: 10pt; font-weight: normal; color: {GREY}; }}
 .desc {{ color: {GREY}; font-style: italic; }}
-.role {{ margin-top: 9pt; break-inside: avoid; break-after: avoid; }}
+.role {{ margin-top: 7pt; break-inside: avoid; break-after: avoid; }}
 .sub {{ color: {GREY}; }}
-.block {{ margin-top: 9pt; }}
-.block + .block {{ margin-top: 12pt; }}
-.skills {{ display: grid; grid-template-columns: 110pt 1fr; column-gap: 8pt; row-gap: 5pt; }}
+.block {{ margin-top: 8pt; }}
+.block + .block {{ margin-top: 10pt; }}
+.skills {{ display: grid; grid-template-columns: 110pt 1fr; column-gap: 8pt; row-gap: 4pt; }}
 .skills b {{ font-weight: bold; }}
-.edu p {{ margin-top: 3pt; }}
+.edu p {{ margin-top: 2pt; }}
 """
 
 

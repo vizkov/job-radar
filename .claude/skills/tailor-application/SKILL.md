@@ -27,8 +27,10 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
      two pages.
    - **Match the user's design (their `cv.pdf` / `cover.pdf`)**: sections in this order:
-     `Summary` (the `P` lines under "Summary", which become the profile paragraph), optionally `Key achievements`
-     (`P05`-`P08`, the ones that fit the JD, each starting with its label; skip it if the CV would pass two pages), an `Experience` block (`B01`
+     `Summary` (the `P` lines under "Summary", which become the profile paragraph), `Key achievements`
+     (**always include it**: it is part of the user's design and their master CV. Use `P05`-`P08`, ordered by fit to
+     the JD, each starting with its label. That they repeat some experience bullets is fine: the user's own CV does
+     the same. Never leave it out to save space or avoid repetition; trim elsewhere), an `Experience` block (`B01`
      first: the company's one-line description) then one section per role in reverse-chronological order, then
      `Projects`, `Education` (the renderer takes skills, city and dates from the master CV, so don't invent them).
      The CV must fit **two pages** and the cover letter **one**: cut the least relevant bullets (a bullet

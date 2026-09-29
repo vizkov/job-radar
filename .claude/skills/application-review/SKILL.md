@@ -29,7 +29,9 @@ It lists figures, years and names that one document has and the others never men
 story backs up, and leftover placeholders (`[Optional`, `[Date]`, `{company}`, "Fill in before
 using"). These are **candidates**: some are fine (a cover-letter figure the CV also carries in other
 words). Hand the output to reviewer 3 as its checklist. Placeholders in a folder about to be sent
-are always a fix-first item.
+are always a fix-first item. In the master documents (`cover_blocks.md`, a cover-letter PDF template) they
+are expected: `tailor-application` fills them per application, so don't run `--final` there and don't report
+them. A blank inside a story (say `[Optional: one line on ...]` in a STAR) is different: it is a missing fact.
 
 ## 2. Launch three reviewers in parallel (read-only)
 

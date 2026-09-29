@@ -123,29 +123,40 @@ def parse_text(p: Provider, body: str) -> list[dict]:
 
 
 def parse_html(p: Provider, body: str) -> list[dict]:
-    """HTML part: find job links, take the largest enclosing element that holds only that one job."""
+    """HTML part: find job links, take the largest enclosing element that holds only that one job.
+    A job is keyed by its ID, or for ID-less providers (Indeed) by its pinned redirect link."""
+    def key(href: str) -> str | None:
+        jid, link = _find_link(p, href or "")
+        return jid or link
+
     tree = HTMLParser(body)
     jobs, done = [], set()
     for a in tree.css("a[href]"):
-        jid = _find_id(p, a.attributes.get("href") or "")
-        if not jid or jid in done:
+        k = key(a.attributes.get("href"))
+        if not k or k in done:
             continue
         node = a
         while node.parent is not None:
-            parent_ids = {_find_id(p, x.attributes.get("href") or "") for x in node.parent.css("a[href]")} - {None}
-            if len(parent_ids) > 1:
+            if len({key(x.attributes.get("href")) for x in node.parent.css("a[href]")} - {None}) > 1:
                 break
             node = node.parent
         lines = [" ".join(t.split()) for t in node.text(separator="\n").splitlines()]
         lines = [l for l in lines if l and not _NOISE.match(l)]
-        title = next((" ".join(x.text().split()) for x in node.css("a[href]")
-                      if _find_id(p, x.attributes.get("href") or "") == jid and x.text().strip()), "")
+        # the shortest same-job link text is the title (Indeed also wraps the whole card in that link)
+        title = min((" ".join(x.text().split()) for x in node.css("a[href]")
+                     if key(x.attributes.get("href")) == k and x.text().strip()), key=len, default="")
         if not title:
             continue
         rest = lines[lines.index(title) + 1:] if title in lines else lines
+        if len(rest) > 1 and rest[1][:2] in ("- ", "– "):  # Indeed HTML: "Tai Tarian" / "3.7" / "- Neath"
+            rest = [f"{rest[0]} - {rest[1][2:].strip()}"] + rest[2:]
+        jid, link = _find_link(p, a.attributes.get("href") or "")
+        if not jid and not (rest and _has_company_line(rest[0])):
+            continue  # an ID-less link without a "Company - Location" line is the email's own link
         company, location = _split_company_location(rest)
-        done.add(jid)
-        jobs.append({"id": jid, "title": title, "company": company, "location": location})
+        done.add(k)
+        jobs.append({"id": jid or _content_id(title, company, location), "link": link,
+                     "title": title, "company": company, "location": location})
     return jobs
 
 

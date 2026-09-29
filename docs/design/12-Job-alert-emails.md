@@ -31,7 +31,7 @@ marked read or deleted.
 
 The fetch step always runs. If the source is enabled before the secrets exist, the Radar
 status card's Sources table shows
-`FAILED: RuntimeError: JOBALERT_IMAP_USER / JOBALERT_IMAP_PASSWORD not set`. The other
+`FAILED: mail fetch failed: RuntimeError: JOBALERT_IMAP_USER / JOBALERT_IMAP_PASSWORD not set`. The other
 sources are unaffected.
 
 ## Where it looks, and what it reports
@@ -137,7 +137,7 @@ Anyone can send email to the user's dedicated address pretending to be LinkedIn.
   `https://engage.indeed.com/f/a/…` tracking redirect, and resolving it would mean fetching Indeed.
   For providers with a `redirect` pattern (`jobradar/alert_providers.py`), a card whose link has no ID
   is keyed by a hash of title, company and location (`_content_id()`, stable across emails), and its
-  link is the redirect itself, accepted only when it matches that https host exactly. A card needs a
+  link is the redirect itself, accepted only when it matches that https host exactly. This works in both the plain-text and the HTML part. A card needs a
   "Company - Location" line, so the email's own browse, unsubscribe and footer links aren't jobs.
   When a card's town isn't recognised, the country comes from the alert's subject ("… jobs in United
   Kingdom"). The JD fetcher still refuses these links (`NEVER_FETCH`): paste Indeed job descriptions.

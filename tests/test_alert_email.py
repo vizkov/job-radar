@@ -180,3 +180,17 @@ def test_account_mail_with_no_jobs_is_not_a_layout_change(tmp_path):
     res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["indeed"]}).fetch())
     unit = next(u for u in res.units if u.key == "indeed:parse")
     assert unit.error.startswith("1 indeed emails yielded no jobs")  # only the real alert counts
+
+
+def test_indeed_html_only_card_uses_redirect_and_shortest_title():
+    """Real Indeed HTML (2026-09): the whole card sits inside the job link, then a title link with the same
+    URL; company, rating and "- Location" are separate elements. Other links are the email's own."""
+    job = "https://engage.indeed.com/f/a/AAAAjob1~~/AAR9hBA~/job1Token"
+    html = (f'<a href="https://engage.indeed.com/f/a/AAAAbrowse~~/AAR9hBA~/browseTok">Browse jobs</a>'
+            f'<table><tr><td><a href="{job}"><table><tr><td><a href="{job}">Cyber Security Engineer</a></td></tr>'
+            '<tr><td>Tai Tarian</td><td>3.7</td><td>- Neath</td></tr><tr><td>£53,966 a year</td></tr>'
+            '<tr><td>Just posted</td></tr></table></a></td></tr></table>'
+            '<a href="https://evil.example/f/a/x~~/y~/z">Phishing Role</a>')
+    jobs = parse_html(PROVIDERS["indeed"], html)
+    assert [(j["title"], j["company"], j["location"], j["link"]) for j in jobs] == [
+        ("Cyber Security Engineer", "Tai Tarian", "Neath", job)]

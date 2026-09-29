@@ -151,7 +151,6 @@ starts them from scratch (so both review timers reset).
 | `work/.last_calibration` | When calibration last ran | `session_brief.py` |
 | `work/discovered_boards.csv` | Proposed boards for uncovered targets | `discover_boards.py` |
 | `work/.last_session`, `.fill_started`, `board_fill.log` | Timestamps and logs for the session brief | `session_brief.py` |
-| `docs/reviews.md` (committed, private) | One paragraph per weekly system review: findings and what was applied | Claude (`system-review` skill) |
 | `.claude/settings.local.json` | Personal Claude Code settings; never copied to the template (`NEVER_COPY`) | the user / Claude Code |
 | `work/.last_docs_review` | When the last docs review happened | `session_brief.py` (first start), Claude (`docs-review` skill) |
 | `work/.last_review` | When the last weekly review happened | Claude, at the end of the `system-review` skill (no tool writes it) |

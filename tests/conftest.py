@@ -32,6 +32,14 @@ def _isolate_tool_state(tmp_path, monkeypatch):
     import jd_check, jd_prep
     monkeypatch.setattr(jd_check, "SCORES", tmp_path / "_iso_scores.jsonl")
     monkeypatch.setattr(jd_prep, "SCORES", tmp_path / "_iso_scores.jsonl")
+    # the JD packets, applications and matches too: a test that forgets its own fixture still can't touch them
+    monkeypatch.setattr(jd_prep, "WORK", tmp_path / "_iso_jd")
+    monkeypatch.setattr(jd_prep, "MATCHES", tmp_path / "_iso_matches.csv")
+    monkeypatch.setattr(jd_check, "WORK", tmp_path / "_iso_jd")
+    monkeypatch.setattr(jd_check, "APPS", tmp_path / "_iso_apps")
+    monkeypatch.setattr(board_sync, "WORK_JD", tmp_path / "_iso_jd")
+    import render_resume
+    monkeypatch.setattr(render_resume, "APPS", tmp_path / "_iso_apps")
     import calibrate, referrals, sponsorship
     for attr in ("SCORES", "MATCHES", "LOG"):
         monkeypatch.setattr(calibrate, attr, tmp_path / f"_iso_cal_{attr.lower()}")
@@ -39,6 +47,7 @@ def _isolate_tool_state(tmp_path, monkeypatch):
     _cfg.write_text((Path(__file__).resolve().parent.parent / "examples" / "config.json").read_text(encoding="utf-8"), encoding="utf-8")
     monkeypatch.setattr(calibrate, "config_path", lambda: _cfg)
     monkeypatch.setattr(sponsorship, "LOG", tmp_path / "_iso_sponsorship.jsonl")
+    monkeypatch.setattr(sponsorship, "WORK", tmp_path / "_iso_jd")
     monkeypatch.setattr(referrals, "NETWORK", tmp_path / "_iso_network.csv")
     monkeypatch.setattr(referrals, "LOG", tmp_path / "_iso_referrals.jsonl")
     import session_brief

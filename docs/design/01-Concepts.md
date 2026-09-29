@@ -77,7 +77,7 @@ Skim it now; come back when a word is unclear.
 | **Sponsorship verdict** | Claude's checked answer to "will this employer sponsor this role for this user?": confirmed, likely, licensed, unclear, unlikely, no, with evidence (ad quotes, register, company pages). Replaces the register-only value on the Sponsor field. | `tools/sponsorship.py`, `sponsorship-check` skill |
 | **Calibration** | Weekly automatic adjustment of tier title-keyword weights from Fit scores: one step, bounded, logged, reversible. | `tools/calibrate.py` |
 | **Sponsor tag** | `yes` / `unknown` / `no`, plus the register entry it matched. | `sponsors.py: SponsorTag` |
-| **Board queue** | Roles chosen for the board, waiting to become issues (at most 40 per run). | `state/board_queue.json` |
+| **Board queue** | Roles chosen for the board, waiting to become issues (drained at most `max_per_run`, 40, per run; the queue itself has no cap). | `state/board_queue.json` |
 | **Payload** | One queued role: `{ref, title, body, labels}`, ready to become an issue. | `board.py: payload()` |
 | **Stale** / **possibly-closed** | A board role no source has listed for more than `stale_days` (5) days. Its issue gets the `possibly-closed` label. | `board.py: stale_refs()` |
 | **Profile** / **examples** | `profile/` holds the user's real settings (private). `examples/` holds generic samples (public). Every settings file is read from `profile/` if present, else `examples/`. | `paths.py: profile_path()` |

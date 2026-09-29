@@ -6,6 +6,10 @@ Your GitHub Project is the dashboard: one card per role, plus a "Radar status" c
 New cards arrive three times a day. (How they get there, for the curious:
 [Board internals](../design/11-Board-internals.md).)
 
+**If a view looks empty:** cards that arrived since your last Claude session may have blank Stage, Tier or
+Posted fields until Claude next opens (it fills them at the start of every session), and views filter on those.
+The **All Roles** view shows every card regardless.
+
 ## Fields
 
 | Field | Values | Set by |

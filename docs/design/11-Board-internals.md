@@ -53,7 +53,7 @@ Claude adds to it later:
   cards carried).
 - **Promoting a recorded role** (`board_sync.py promote <ref> …`, then `roles`): roles that are in
   `matches.csv` but never got a card (the first run cards only `baseline_tiers`) are queued from their
-  CSV row by `board.row_payload()`, the same title, body, marker and labels a radar run would give them.
+  CSV row by `board.row_payload()`, an equivalent title, body, marker and labels to what a radar run gives them ("Also on" is plain text there, not links).
   Claude does this for Tier 2 roles that score apply or maybe.
 - **Visa sponsorship block** (`tools/sponsorship.py record --board`): verdict, summary and up to 4
   evidence lines with links, between `<!-- job-radar:visa -->` markers.

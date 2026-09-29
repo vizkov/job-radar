@@ -118,8 +118,9 @@ def sync_roles(gh: Gh, max_per_run: int, sleep=time.sleep) -> tuple[int, int]:
     return created, len(queue) - created
 
 
-def promote(refs: list[str]) -> str:
-    """Queue cards for roles that are in matches.csv but not on the board; `roles` then opens them."""
+def promote(refs: list[str], dry_run: bool = False) -> str:
+    """Queue cards for roles that are in matches.csv but not on the board; `roles` then opens them.
+    dry_run: report what would be queued, write nothing."""
     import csv
     from jobradar.board import row_payload
     on_board = set(_load(ISSUE_MAP, {}))
@@ -134,8 +135,9 @@ def promote(refs: list[str]) -> str:
         queue.append(row_payload(rows[ref]))
         queued.add(ref)
         added.append(ref)
-    QUEUE.write_text(json.dumps(queue, indent=1, ensure_ascii=False), encoding="utf-8")
-    return f"queued {len(added)} card(s)" + (f"; skipped (on the board, queued or unknown): {', '.join(skipped)}"
+    if not dry_run:
+        QUEUE.write_text(json.dumps(queue, indent=1, ensure_ascii=False), encoding="utf-8")
+    return f"{'would queue' if dry_run else 'queued'} {len(added)} card(s)" + (f"; skipped (on the board, queued or unknown): {', '.join(skipped)}"
                                             if skipped else "")
 
 
@@ -589,7 +591,7 @@ def main(argv=None) -> int:
     elif args.what == "views":
         print(apply_views(gh))
     elif args.what == "promote":
-        print(promote(args.args))
+        print(promote(args.args, dry_run=args.dry_run))
     elif args.what == "refresh-bodies":
         print(refresh_bodies(gh))
     else:

@@ -97,9 +97,21 @@ def _apple_text(data: dict) -> str:
     return _as_text("\n\n".join(p for p in parts if p))
 
 
+def _eures_text(data: dict) -> str:
+    """EURES vacancy JSON: one profile per language; the ad's own language comes first."""
+    profiles = data.get("jvProfiles") or {}
+    profile = next(iter(profiles.values()), {}) if isinstance(profiles, dict) else {}
+    return _as_text(profile.get("description") or "")
+
+
+_EURES_PAGE = re.compile(r"https://europa\.eu/eures/portal/jv-se/jv-details/([\w=-]+)")
+
+
 def job_api(row: dict) -> tuple[str, str, callable] | None:
     """A public per-job API for ATSs whose scraper has no per-job description: (name, url, to_text).
     Companies' own pages for these are often JavaScript-only or rate-limited."""
+    if m := _EURES_PAGE.match(row.get("url") or ""):  # the portal page is JavaScript-only
+        return "eures", f"https://europa.eu/eures/api/jv-searchengine/public/jv/id/{m.group(1)}?lang=en", _eures_text
     ats, slug, ext = row.get("ats"), row.get("ats_slug"), row.get("external_id") or ""
     job_id = ext.split(":", 1)[1] if ext.startswith(f"{ats}:") else ""
     if not job_id:

@@ -22,7 +22,7 @@ only), `--include-outside` (keep employers not on the list).
 |---|---|
 | `STATE`, `DIGESTS`, `DATA` | The `state/`, `digests/` and `data/` folders. |
 | `load(path, default)` | Reads a JSON file, or returns `default` if it doesn't exist. |
-| `UNRECOGNISED`, `UNRECOGNISED_N` | Per source, up to 30 distinct sample locations of listings whose **title matched** but where no country was found, and how many such listings there were: possible real losses, listed in the digest so missing places can be added to `_CITY_NAMES`. |
+| `UNRECOGNISED`, `UNRECOGNISED_N` | Per source, up to 30 distinct sample locations of listings whose **title matched** but where no country was found, and how many such listings there were: possible real losses, listed in the digest so missing places can be added to `_CITY_NAMES`. Module-level and never reset: they add up across `select()` calls in one process (one per run in practice; tests reset them). |
 | `DROP_REASONS`, `drop_lines(results, matched, dropped)` | Why a listing was dropped (country, title, employment, company), and one status line per source: found → dropped by reason → kept. |
 | `select(results, include_outside, matcher, dropped)` | Country filter, title filter, company matching; returns kept postings and per-source match counts. `include_outside` is a bool or a per-source dict. |
 | `diff_seen(groups, seen, today)` | Returns groups none of whose keys are in `seen`; stamps all their keys with today. |
@@ -93,7 +93,8 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 |---|---|
 | `CONFIG` | `config.json`, loaded once at import. |
 | `_COUNTRY_NAMES`, `_CITY_NAMES` | Words that identify a country in location text (country names and known cities). Also a few non-European countries (India, US, Canada, Australia, Singapore, UAE, Israel): never targets, but named so the status card can say where dropped listings were. |
-| `_TRAILING_ISO` | A bare target-country code ending the location, any case ("Lüneburg, NDS, de"); used only when no name matched. |
+| `_TRAILING_ISO` | A bare country code ending the location, any case ("Lüneburg, NDS, de"); used only when no name matched. A **fixed** list (de, nl, gb, uk, ie, ch, se), not read from config: a new target country needs adding here. |
+| `_words_re()`, `_COUNTRY_RE`, `_CITY_RE` | Build and hold the whole-word regexes for `_COUNTRY_NAMES` and `_CITY_NAMES`. |
 | `_REMOTE_EUROPE` | "remote … Europe/EMEA/EU" → `REMOTE-EU`. |
 | `_NON_EUROPE` | US/Canada/Australia markers, including `, CA`-style state codes. |
 | `target_countries()` | Priority countries, plus extra countries if enabled. |
@@ -346,7 +347,7 @@ share one link. So if an employer edits a job's title, it's reported as a new ro
 | `_split_company_location(lines)` | "Acme · London" or two lines → (company, location). |
 | `_find_link(p, s)`, `_content_id(...)`, `_has_company_line(line)` | A job ID from a link, or (for ID-less providers like Indeed) the provider's pinned redirect URL; a stable hash ID from title/company/location; whether a card line is "Company - Location". |
 | `parse_text(p, body)` | Plain-text cards: a short paragraph followed by the job URL. ID-less cards also need a company line; the alert's subject supplies the country for unknown towns (`to_postings`). |
-| `parse_html(p, body)` | HTML cards: from each job link, climb to the largest element containing only that job. |
+| `parse_html(p, body)` | HTML cards: from each job link (keyed by ID, or by the pinned redirect for ID-less providers), climb to the largest element containing only that job. The title is the shortest link text for that job (Indeed wraps the whole card in the same link); a "Company" line followed by "- Location" is joined, and ID-less cards need that company line. |
 | `to_postings(msg, p)` | Text first, HTML as fallback; URL **rebuilt from the job ID**. |
 | `_mailbox_units()` | Turns the fetcher's per-provider counts into health units: nothing from any provider at all, or provider mail only from unknown sender addresses. |
 | `AlertEmailSource` | `_messages()` reads `.alert_mail/*.eml` and fails if `_status.json` says the fetch failed; `fetch()` drops unknown senders and DKIM failures, and reports per provider: jobs, rejected, and emails that yielded no jobs (layout change), not counting account mail such as "your job alert is now active" (`_ACCOUNT_MAIL`). |
@@ -358,7 +359,8 @@ share one link. So if an employer edits a job's title, it's reported as a new ro
 ### `tools/board_sync.py`: GitHub issues and the Project (standard library only)
 
 Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
-`setup-project`, `fill`, `set`, `views`, `design-diff` (local, need the `project` scope).
+`setup-project`, `fill`, `set`, `views`, `design-diff`, `refresh-bodies` (local, need the `project` scope);
+`promote <ref> …` (local, queues cards for recorded roles; then `roles`).
 
 | Name | Is |
 |---|---|
@@ -403,7 +405,8 @@ itself: the `setup-project` command runs `setup_project()` then `apply_views()`.
 
 **CLI flags**: `--repo OWNER/REPO` (setup-project), `--close` (set: also close the issue),
 `--note "…"` (set: the reason, stored in `pipeline_log.jsonl` as `note` and posted as an issue comment),
-`--dry-run` (print the `gh` commands; nothing changes and no stage changes are logged),
+`--dry-run` (print the `gh` commands; nothing changes and no stage changes are logged; `promote` reports
+what it would queue),
 `--max N` (roles: issues per run). `sync_roles()` takes the queue oldest first.
 
 ### `tools/session_brief.py`: the SessionStart hook (standard library only)
@@ -442,7 +445,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 ### `tools/jd_prep.py`: fetch job descriptions
 
 Walkthrough: [4.3](04-Claude-session.md). Functions: `html_to_text()` (main text, no
-nav/scripts), `_as_text()`, `via_scraper()` (ATS scraper's description), `job_api()` (public per-job APIs for Greenhouse and Apple), `public_url()`
+nav/scripts), `_as_text()`, `via_scraper()` (ATS scraper's description), `job_api()` (public per-job APIs for Greenhouse, Apple and EURES; `_greenhouse_text()`, `_apple_text()`, `_eures_text()` turn each JSON reply into text; `_EURES_PAGE` matches EURES portal links), `public_url()`
 (Amazon's login-walled links → public page), `jsonld_description()`, `Fetcher` (`_allowed`
 robots cache, `fetch` the ordered fallbacks), `load_rows()`, `scored_refs()`, `select()`
 (which roles), `render_packet()`, `prepare()` (write `jd.txt`, `meta.json`, `packet.md`),

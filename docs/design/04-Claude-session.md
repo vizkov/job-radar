@@ -60,7 +60,7 @@ errors become one-line notes, and it always exits 0.
 4. **`closed_cards()`**: cards the user closed on the board (GitHub's built-in Status = Done) whose
    Stage isn't final: New/Shortlisted/blank become Skipped (logged `by: "board"`); Applied/Interview
    are listed so Claude asks what happened.
-4b. **`track_stage_changes()`**: compares each card's Stage with
+5. **`track_stage_changes()`**: compares each card's Stage with
    `data/pipeline_snapshot.json` from last time. Differences are cards the user dragged;
    they're appended to `data/pipeline_log.jsonl` with `by: "board"`. Then it saves the new
    snapshot.
@@ -77,7 +77,10 @@ errors become one-line notes, and it always exits 0.
    run, GitHub skipped it: start one with `gh workflow run job-radar`.
 9. **`board_design_note()`**: `board_sync.design_diff()`: do the board's views still
    match `VIEWS` in code?
-10. **`brief()`** prints the result: new roles since last session (the top Tier 1 ones,
+10. **`brief()`** prints the result, and has two side effects: it starts the background JD fetch for the
+    auto-score roles (`start_prep()`), and `calibration_notes()` may run `calibrate.py apply`, which
+    **rewrites the tier weights in `profile/config.json`** (reported in the brief with an undo line).
+    It reports: new roles since last session (the top Tier 1 ones,
     freshest first), unscored Tier 1 roles, score counts, board stage counts, cards that
     look closed, cards the user moved, follow-ups due, system updates, and health notes
     from `health_checks()`: missing career docs, alert emails failing or silent, runs not
@@ -128,8 +131,9 @@ matches.csv ─▶ jd_prep.py ─▶ work/jd/<ref>/{jd.txt, meta.json, packet.md
 2. refuse if the URL is LinkedIn, Indeed or Glassdoor (`NEVER_FETCH`): "paste it";
 3. the ATS scraper's own `get_description()` (`via_scraper()`), using the `ats`,
    `ats_slug` and `external_id` columns `radar.py` saved;
-4. for Greenhouse and Apple roles, the ATS's public per-job API (`job_api()`): their scrapers have
-   no per-job description, and the job pages often rate-limit or need JavaScript;
+4. for Greenhouse, Apple and EURES roles, a public per-job API (`job_api()`): the Greenhouse and Apple
+   scrapers have no per-job description, and those pages (and the EURES portal) often rate-limit or need
+   JavaScript;
 5. robots.txt check;
 6. Workday's detail API;
 7. the page's schema.org `JobPosting` JSON-LD;

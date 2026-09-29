@@ -154,3 +154,14 @@ def test_apple_role_uses_job_api(work, monkeypatch):
     folder, status = jd_prep.prepare(r, fetcher())
     assert status == "ok: apple api" and not page.called
     assert "5 years of security research" in (folder / "jd.txt").read_text(encoding="utf-8")
+
+
+@respx.mock
+def test_eures_role_uses_vacancy_api(work):
+    jv = "MzQ0YTVlOGMtZTAyYS00NTljLWEzOWMtNDc2NTRhMTZmYmU4IDYx"
+    api = respx.get(f"https://europa.eu/eures/api/jv-searchengine/public/jv/id/{jv}?lang=en").mock(
+        return_value=httpx.Response(200, json={"jvProfiles": {"de": {"description": "<p>Penetration Tester: " + "Web, Cloud. " * 30 + "</p>"}}}))
+    page = respx.get(url__regex=r".*/portal/.*").mock(return_value=httpx.Response(200, text=""))
+    folder, status = jd_prep.prepare(row("5" * 16, f"https://europa.eu/eures/portal/jv-se/jv-details/{jv}?lang=en"), fetcher())
+    assert status == "ok: eures api" and api.called and not page.called
+    assert "Penetration Tester" in (folder / "jd.txt").read_text(encoding="utf-8")

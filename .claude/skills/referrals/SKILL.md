@@ -29,6 +29,9 @@ don't spend a referral on a role that can't sponsor the user.
 - Nobody the user knows: look in the JD packet (`work/jd/<ref>/jd.txt`) for a named recruiter or
   hiring manager, or ask the user whether they've found one; that's a stranger route (step 2).
   Public sources off LinkedIn often name the security lead too (engineering blog, conference talks).
+- **Switching it:** "switch on/off the LinkedIn lookup" sets `referrals.linkedin_lookup` in
+  `profile/config.json`. Before switching it on, say the risk once, plainly: LinkedIn's terms ban any
+  automated use, so the account could be restricted. Commit the change.
 - **LinkedIn lookup (opt-in, one role at a time).** Only if `referrals.linkedin_lookup` is true in
   `profile/config.json` and the user is applying to *this* role and asks. Otherwise give them 2-3
   LinkedIn people-search links to open themselves and ask them to paste what they see.

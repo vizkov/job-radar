@@ -75,7 +75,9 @@ Three times a day (02:47, 08:47 and 14:47 UTC; ask Claude for your local times) 
 checks for new roles and adds them
 to your board as **New** cards: Tier 1 and 2, at companies on your list. When you next
 open Claude Code, a briefing is ready: new roles, cards you moved, follow-ups due,
-anything broken. Scoring and tailoring happen when you ask. Say "what's new?" when you
+anything broken. When you send your first message, Claude first scores up to 8 of the freshest new Tier 1
+roles (on by default; say "don't auto-score" to turn it off). Anything else, including tailoring, happens
+when you ask. Say "what's new?" when you
 sit down, or just look at the board.
 
 ## Costs

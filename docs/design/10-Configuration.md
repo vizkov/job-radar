@@ -96,7 +96,7 @@ Every source takes `enabled` and `timeout_seconds` (a cap on the whole source). 
 | `bundesagentur`, `jobtech`, `eures` | `queries`, `health_query` (the canary), `days` (look-back), `max_pages`; `eures` also `countries` |
 | `reed` | `queries`, `health_query`, `max_pages`, `location` (default "United Kingdom"); key from the `REED_API_KEY` environment variable |
 | `careers_page` | `pages_file` (default `careers_pages.yaml` via the profile), `respect_robots` (default true) |
-| `alert_email` | `providers`, `eml_dir` (default `.alert_mail`), `require_dkim` (default true) |
+| `alert_email` | `providers` (default **linkedin only** when unset, while the mail fetcher defaults to all three: list every provider you set alerts up for), `eml_dir` (default `.alert_mail`), `require_dkim` (default true) |
 
 ## `careers_pages.yaml` keys (one entry per page)
 
@@ -156,7 +156,7 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | `tiering` | Score weights and `tier1_min_score`; see [Tiers and sponsorship](09-Tiers-and-sponsorship.md) |
 | `sponsorship.fuzzy_yes` / `fuzzy_unknown` | Fuzzy name-match thresholds (0–100) for the sponsor registers |
 | `board_timeout_seconds` | Time cap per ATS board fetch (180) |
-| `workday_max_retries` | Retries per Workday page before a board fails (6; the library's own default is 3). Big tenants such as Nvidia and Palo Alto get throttled deep into pagination |
+| `workday_max_retries` | Retries per Workday page before a board fails (6). It can only raise the library's own value (3), never lower it, and it sets a module global inside ats-scrapers for the rest of the process. Big tenants such as Nvidia and Palo Alto get throttled deep into pagination |
 | `concurrency` | ATS boards fetched at once (6) |
 | `_comment` keys | Ignored by the code; notes for humans |
 

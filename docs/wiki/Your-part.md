@@ -13,6 +13,10 @@ Claude's; a few are yours), and how to pause, stop or take access back.
 | *Optional:* **Chrome** with the **Claude in Chrome** extension | Only if you want Claude to pre-fill application forms | free |
 | *Optional:* a **Gmail** account for job-alert emails | Only if you want LinkedIn/Indeed/Glassdoor jobs included | free |
 
+Installing them: Claude Code from Anthropic's Claude Code docs; git from **git-scm.com**; Python from
+**python.org**; `gh` from **cli.github.com**, then log it in once with `gh auth login`. Once Claude Code runs,
+you can also ask Claude to check the others are installed and walk you through anything missing.
+
 GitHub's free plan includes 2,000 minutes a month of automated runs for private
 projects; job-radar uses roughly 450–750.
 
@@ -47,10 +51,14 @@ projects; job-radar uses roughly 450–750.
       Sort by → Posted, descending → Save view").
    5. **Stop the email flood.** On your repository page: **Watch → Participating and
       @mentions**. Otherwise GitHub emails you about every new job.
-3. **Optional: job-alert emails.** See below.
-4. **Optional: form filling.** Install the Claude in Chrome extension. Like any extension
-   that can operate web pages, it asks Chrome for broad permissions when you install it;
-   read them there. How Claude limits what it does with them is below.
+Steps 3 to 6 are optional; do any of them after setup finishes, in any order.
+
+3. **Job-alert emails** (LinkedIn, Indeed, Glassdoor jobs). See below.
+4. **Reed** (more UK jobs). See below.
+5. **Form filling.** Install the Claude in Chrome extension. It works in your **real Chrome**, where
+   you're already logged in to sites, and asks Chrome for broad permissions when you install it.
+   How Claude limits what it does with it is below.
+6. **LinkedIn contact lookup** (for referrals). Off unless you switch it on. See below.
 
 The first run records everything currently open and puts only the strongest matches
 (Tier 1) on your board, so you don't start with hundreds of cards. After that, only new
@@ -85,10 +93,20 @@ ignored. **Never paste the password into Claude or a file.**
    the same way as the mail secrets. Never paste it into Claude.
 3. Tell Claude it's added; it switches the Reed source on. The key only allows searching jobs.
 
+## Optional: LinkedIn contact lookup
+
+When you're about to apply to a role and know nobody there, Claude can find the likely hiring manager and a
+recruiter. By default it gives you LinkedIn search links to open yourself. If you'd rather it looked for you,
+say **"switch on the LinkedIn lookup"**: it then reads LinkedIn's search results in your logged-in Chrome,
+for one role at a time and only when you ask, and never connects, messages or follows anyone.
+**The risk:** LinkedIn's terms ban any automated use of the site, so this could get your LinkedIn account
+restricted, even at this low volume. Say "switch off the LinkedIn lookup" to stop it.
+
 ## What Claude can do in your browser
 
-Only when you ask it to help with an application. Claude works in tabs it opens itself
-for the task, on the employer's own application site. You approve the answers for every
+Only when you ask it to help with an application, or for the LinkedIn lookup if you've switched it on. Claude
+works in tabs it opens itself for the task, on the employer's own application site. The extension could see
+your other logged-in tabs; Claude doesn't use them. You approve the answers for every
 page before they're typed. It never answers questions about visas, salary, diversity or
 consent for you, never logs in or creates accounts for you (you do that in the tab), and
 never clicks the final Submit. It won't touch LinkedIn, Indeed or Glassdoor applications at all (the

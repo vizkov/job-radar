@@ -21,8 +21,10 @@ publish`): a failing test blocks the publish.
    `JOBRADAR_PROFILE=examples` *before* any `jobradar` import, because `common.py` reads
    `config.json` at import time. So results don't depend on whatever is in `profile/`.
 3. **Never write real files.** The autouse fixture `_isolate_tool_state` points every
-   file path constant in `board_sync.py`, `jd_check.py`, `jd_prep.py` and
-   `session_brief.py` at a temporary folder. (It exists because earlier tests once wrote
+   file path constant in `board_sync.py`, `jd_check.py`, `jd_prep.py`, `render_resume.py`,
+   `session_brief.py`, `calibrate.py`, `referrals.py` and `sponsorship.py` at a temporary folder
+   (JD packets, applications, scores, matches, logs, state), and gives `calibrate.py` a copy of
+   the sample config. (It exists because earlier tests once wrote
    into the real `scores.jsonl` and `issue_map.json`.) When a tool gains a new file path,
    it must be a module constant and must be added here. `_no_politeness_delays` sets the
    HTTP pause and backoff to 0.
@@ -54,10 +56,11 @@ exposed insight lines being read as job titles. Indeed and Glassdoor still have 
 | `test_board.py` | `board` | Payload title/labels/marker, hostile text neutralised, title cap, same ref across sources, baseline vs daily selection, queue dedupe, status has no titles, stale refs |
 | `test_radar.py` | `radar` | One broken source doesn't stop others, filtering, seen by ID and content key, digest sections, per-source outside flag, Markdown injection, CSV header migration |
 | `test_ats_adapter.py` | `sources/ats` | Greenhouse conversion, Workday detail URL and roll-up resolution |
-| `test_eu_sources.py` | `bundesagentur`, `jobtech`, `eures` | Parsing, JobTech phrase quoting, EURES title search, one failing query keeps the rest |
+| `test_eu_sources.py` | `bundesagentur`, `jobtech`, `eures`, `reed` | Parsing, JobTech phrase quoting, EURES title search, one failing query keeps the rest |
 | `test_careers_page.py` | `sources/careers_page` | Each real page, hash stability, missing anchor is an error, JSON/RSS feeds, XML entity-expansion rejected, robots.txt |
 | `test_alert_email.py` | `sources/alert_email` | Text and HTML cards, URLs rebuilt from IDs, tracking redirects, DKIM per provider, spoofed/foreign mail rejected, fetch failure surfaced, adapter never touches IMAP |
 | `test_fetch_alert_emails.py` | `tools/fetch_alert_emails` | Read-only + PEEK, missing credentials reported not raised, **password never written or printed**, old mail cleared, runs with standard library only (a real `python -I -S` subprocess) |
+| `test_verify_boards.py` | `verify_boards` | Companies with a careers page count as covered |
 | `test_board_sync.py` | `board_sync` (issues) | Argument lists and caps, labels created once, crash midway keeps the rest queued, status create/pin/edit, issue map, stale labels, stage logging |
 | `test_board_project.py` | `board_sync` (Project) | Setup creates fields and saves IDs, idempotent, adopts an existing Project, saved even if linking fails, set/close, fill, Posted date |
 | `test_board_design.py` | `board_sync` (views) | No diff when matching, extra views allowed, changed columns reported, missing views created with clicks listed |

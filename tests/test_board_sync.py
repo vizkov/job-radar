@@ -155,3 +155,11 @@ def test_promote_queues_recorded_roles_not_on_the_board():
     assert p["labels"] == ["role", "tier-2", "country-GB", "sponsor-yes"]
     assert "<!-- job-radar:ref=aaaaaaaaaaaaaaaa -->" in p["body"] and "- Posted: 2026-09-14" in p["body"]
     assert bs.promote(["aaaaaaaaaaaaaaaa"]).startswith("queued 0")  # already queued: no duplicate card
+
+
+def test_promote_dry_run_writes_nothing():
+    head = "ref,date,company,title,location,countries,url,source,posted,on_list,tier,score,score_reasons,uk_sponsor,nl_sponsor,also_on\n"
+    bs.MATCHES.write_text(head + "aaaaaaaaaaaaaaaa,2026-09-28,Acme,AppSec,London,GB,https://a.example/1,ats,,yes,2,4,r,no,no,\n",
+                          encoding="utf-8")
+    assert bs.promote(["aaaaaaaaaaaaaaaa"], dry_run=True).startswith("would queue 1")
+    assert not bs.QUEUE.exists()

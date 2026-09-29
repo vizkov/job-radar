@@ -1,6 +1,6 @@
 # 8. Sources
 
-**What this is:** Where roles come from: the six adapters, what each costs to run, what breaks, and how to add a company or a careers page.  
+**What this is:** Where roles come from: the seven adapters (ats, careers_page, alert_email, bundesagentur, jobtech, eures, reed), what each costs to run, what breaks, and how to add a company or a careers page.  
 **Read first:** [3. A scheduled run](03-Scheduled-run.md)  
 **Code:** `jobradar/sources/`, `verify_boards.py`, `boards.json`, `profile/sources.yaml`, `profile/careers_pages.yaml`, `profile/overrides.csv`
 

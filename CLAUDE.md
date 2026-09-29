@@ -17,6 +17,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "what's new?", "how's my search going?", "anything good this week?" | `consultant-brief` |
 | "which of these fit me?", "score the new roles", "is this one worth it?" | `score-roles` |
 | "tailor my CV for …", "prep my application for …", "write a cover letter for …" | `tailor-application` |
+| "review my application", "are these consistent?", "would a recruiter shortlist this?", the user provides or updates their CV / cover letter / STAR drafts, or `tailor-application` finishes | `application-review` (three read-only subagents: ATS, recruiter, consistency audit; runs automatically after tailoring) |
 | "will they sponsor?", a role recommended apply/maybe before referrals | `sponsorship-check` (ad + country rules + register + web research; verdict with evidence on the card) |
 | a role is shortlisted or "apply", "who do I know at …", "X referred me", brief lists an unanswered ask | `referrals` (asked before applying; the user sends every message) |
 | "fill in the application for …", "help me apply to …" | `apply-assist` (Chrome; the user approves every page and submits) |
@@ -50,7 +51,7 @@ chose this; `scoring.auto_per_session` in config.json sets how many, 0 turns it 
   (`profile/applications/<folder>/`).
 - Tools you run (all have `--help`): `radar.py`, `verify_boards.py`,
   `tools/board_sync.py`, `tools/jd_prep.py`, `tools/jd_check.py`, `tools/render_resume.py`,
-  `tools/refresh_registers.py`, `tools/build_candidates.py`, `tools/public_template.py`,
+  `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/build_candidates.py`, `tools/public_template.py`,
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
 - Board views are code (`VIEWS` in `tools/board_sync.py`): `board_sync.py views` builds/restores
   them, `design-diff` shows drift (the session brief checks it). Sort and board grouping can't be set

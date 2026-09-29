@@ -27,6 +27,7 @@ The skills, and the tools each one runs:
 | `consultant-brief` | "what's new?" | reads the session brief, `board_sync.py fill` if needed |
 | `score-roles` | "which of these fit me?" | `jd_prep.py`, then Claude writes `score.json`, then `jd_check.py score --board` |
 | `tailor-application` | "tailor my CV for X" | Claude writes `tailored.json`, `jd_check.py tailor`, `render_resume.py` |
+| `application-review` | "review my application", the user provides or updates CV/cover/STAR drafts; runs automatically after `tailor-application` | `consistency_check.py`, then three read-only subagents (ATS, recruiter, consistency auditor); Claude verifies their findings and writes `review.md` |
 | `sponsorship-check` | "will they sponsor?", roles recommended apply/maybe | reads the ad, applies country rules, checks registers, WebSearch/WebFetch on company pages (never LinkedIn/Indeed/Glassdoor); `tools/sponsorship.py record --board` |
 | `referrals` | "who do I know at …", a role recommended apply, an unanswered ask in the brief | `tools/referrals.py contacts/ask/result/route/pending`; drafts in `profile/applications/<folder>/outreach.md` |
 | `apply-assist` | "help me apply to X" | Claude in Chrome; a Sonnet subagent types approved values; the user submits |
@@ -211,6 +212,30 @@ nothing edited after validation can be rendered. It writes `resume.docx` (one co
 standard headings, no tables or images, which applicant tracking systems parse
 reliably), `resume.md` and `cover_letter.md`. Name and contact details come only from
 `master_resume.md`'s front matter.
+
+## 4.4c Reviewing an application (`application-review`)
+
+`jd_check.py tailor` proves each bullet came from the user's own lines; it cannot tell whether the CV,
+cover letter and STAR stories *agree*, or whether the package would get shortlisted. This skill does
+both, and runs automatically as step 6 of `tailor-application` (also when the user provides or updates
+the three documents).
+
+1. **Deterministic pass:** `tools/consistency_check.py` lists figures, years and names that only one
+   document has, CV figures no story backs up, and leftover placeholders. Candidates, not verdicts.
+2. **Three read-only subagents in parallel**, each cold (files only, no session context): an **ATS**
+   (JD keyword coverage, parseability, a match percentage), a **recruiter** (six-second shortlist call,
+   buried evidence, hesitations, generic cover letter) and a **consistency auditor** (one event told two
+   ways, a claim stronger than its story, tense and timeline, achievements with no STAR story,
+   what an interviewer could probe). The auditor gets the pre-check output as its checklist. All
+   documents and the JD are treated as untrusted data, as everywhere.
+3. **Claude verifies each finding against the files** (quotes must exist), writes `review.md` in the
+   application folder (or `profile/career/` for a document-set review; both private) with a verdict and
+   findings ranked fix-first / should-fix / nice-to-have, and tells the user in plain language.
+4. **Fixes only with the user's agreement,** by the career-doc rules; a finding that questions whether a
+   claim is true goes to the user as a question. Then `jd_check.py tailor`, `render_resume.py` and the
+   pre-check run again.
+
+The reviewers are personas: their verdicts are judgement, not what a real ATS or recruiter would do.
 
 ## 4.4b Sponsorship (`sponsorship-check`)
 

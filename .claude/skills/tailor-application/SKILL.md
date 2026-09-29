@@ -34,6 +34,9 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
 5. **Render:** `python tools/render_resume.py <folder>` → `resume.docx` (plain single-column, ATS-safe),
    `resume.md` (for a styled version in Claude Design), `cover_letter.md`.
    Needs `pip install --require-hashes -r requirements-career.txt` once.
-6. **Hand over for review.** Show the user the diff the checker printed (what changed from their master
-   CV), where the files are, and any JD must-haves their CV couldn't evidence. They review, edit and
+6. **Review gate.** Run the `application-review` skill on this folder (ATS, recruiter and consistency
+   subagents plus `tools/consistency_check.py`). Fix or ask the user about every "fix before applying"
+   finding, then re-validate and re-render. Skip only if the user says not to.
+7. **Hand over for review.** Show the user the diff the checker printed (what changed from their master
+   CV), where the files are, any JD must-haves their CV couldn't evidence, and the review verdict. They review, edit and
    apply themselves. Then offer to move the card to Shortlisted (`track`).

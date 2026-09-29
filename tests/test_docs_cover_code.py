@@ -44,7 +44,7 @@ def test_every_config_section_is_documented():
 # How each skill shows up in the user guide's "Things you can say" (docs/wiki/Using-it.md).
 # A new skill must get a row there and an entry here, or this test fails.
 USER_PHRASES = {
-    "apply-assist": "Help me apply", "consultant-brief": "What's new?", "cv-review": "How do I strengthen my CV?",
+    "apply-assist": "Help me apply", "application-review": "Review my application", "consultant-brief": "What's new?", "cv-review": "How do I strengthen my CV?",
     "docs-review": "Are the docs still right?", "health": "Is anything broken?", "interview-prep": "I have an interview",
     "manual": "/manual", "referrals": "Who do I know at", "score-roles": "Which of these fit me?",
     "setup": "Set this up for me", "sponsorship-check": "sponsor my visa", "system-review": "What could be better?",

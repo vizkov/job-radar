@@ -66,6 +66,7 @@ exposed insight lines being read as job titles. Indeed and Glassdoor still have 
 | `test_board_design.py` | `board_sync` (views) | No diff when matching, extra views allowed, changed columns reported, missing views created with clicks listed |
 | `test_jd_prep.py` | `tools/jd_prep` | JSON-LD preferred, page text cleanup, Workday API, **LinkedIn never fetched**, pasted JD used, robots/JS shell, selection, scraper first with fallback, Amazon link rewrite |
 | `test_jd_check_score.py` | `tools/jd_check score` | Valid passes; each invalid case rejected; quotes compared ignoring case/whitespace; no JD refuses; upsert |
+| `test_consistency_check.py` | `tools/consistency_check` | Spelled-out and digit numbers match; a figure, year or name in only one document is flagged; CV-only figures; placeholders; the STAR picker table is ignored; exit codes |
 | `test_tailor.py` | `jd_check tailor`, `render_resume` | Valid passes; invented IDs/numbers/names/links rejected; rewording warns; render requires validation of the exact file; outputs |
 | `test_career.py` | `career`, `manual` | Parsing, contact tokens, comments ignored, duplicate IDs, missing CV message; manual lists everything; colour only when asked |
 | `test_session_brief.py` | `tools/session_brief` | Counts and freshness, health checks, quiet alert emails, drag logging and follow-ups, hostile titles neutralised, gh/git via fakes, system updates, missed-run restart |

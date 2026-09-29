@@ -474,6 +474,21 @@ capitalised anyway, so "Led the review" doesn't flag "Led" as a new name.
 contact line, headline, one heading per section, bullet list, skills), `main()` (refuses
 unless `validated.sha256` matches the current `tailored.json`).
 
+### `tools/consistency_check.py`: cross-check CV, cover letter and STAR stories
+
+Used by the `application-review` skill ([4.4c](04-Claude-session.md)). No LLM. `read_doc()` (`.md`/`.txt`,
+or `.pdf` through `pdftotext`), `clean()` (drops front matter, comments, `[Bxx]` IDs, heading marks,
+all-caps headings and the STAR story-picker table), `figures()` (numbers and percentages with the noun after
+them; spelled-out numbers become digits; keyed by the number alone so "eight assessors" matches "8 assessors"),
+`names()` (acronyms, CamelCase and mid-sentence capitalised words), `facts()`, `compare()` (`unsupported`:
+in the cover letter or stories but in neither other document; `cv-only`: a CV figure nothing backs up;
+`placeholders`), `locate()` (`--folder` or the career docs, `--cv/--cover/--stories` override), `report()`,
+`main()` (exit 1 on unsupported items, or placeholders with `--final`).
+
+**Watch out**: it finds *candidates*. Two sentences that contradict each other in words (a rating "confirmed"
+in one document and "compromised" in another) share no figure or name, so only the reviewer subagent reading
+the pages catches them.
+
 ### `tools/fetch_alert_emails.py`: IMAP (standard library only)
 
 `all_mail_name(m)`: Gmail's All Mail folder from `LIST` flags. `fetch(host, user, password, mailbox,

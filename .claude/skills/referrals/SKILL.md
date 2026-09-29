@@ -64,6 +64,9 @@ don't spend a referral on a role that can't sponsor the user.
     AI and cloud (AWS) systems, which is close to what your ad describes"). Check each phrase against the
     JD's asks (its first asks come first) and against `profile/career/`; cite the CV IDs to the user in your
     reply, not in the message.
+  - **No proof points, numbers or examples** (e.g. "cut triage time by half"): that's what the CV is for. The note
+    is who they are, the role, one plain line on their focus in the ad's terms, the visa need, one ask. Never lift CV
+    wording into a note ("from report to verified fix", "source-code-level remediation guidance"): write it as speech.
   - **Never a specific client finding** (e.g. a flaw in an airline's platform): it can identify the client and
     reads as a confidentiality flag. Describe the kind of work instead; findings belong in the CV and the call.
   - **Never claim what the CV lacks**, and don't hint at the ad's gaps. Keep "our team's work" as the CV states
@@ -73,8 +76,12 @@ don't spend a referral on a role that can't sponsor the user.
   - **Visa need in one calm line**, in the middle, not last, quoting the ad if it offers relocation.
   - **One small ask**: "Should I send you my CV, or apply through the site?" beats "a call?". If she says
     apply, that overrides the referral-before-apply rule only if the user agrees.
-  - **Short**: about 90 words for a direct message; a connection request is 120-180 characters (300 is the hard
-    limit) and plain: who they are, the role, the visa need, "could I send you my CV?".
+  - **Name the role by title and the company's job ID** in the first line, so a recruiter can route it.
+  - **Recipient may not own the role** (a recruiter, not the hiring team): add a fallback, "if you're not the right
+    person, could you point me to them?" (a suggestion from web advice, not a tested rule).
+  - **Short**: about 90 words for a direct message; a connection request is 120-180 characters (the hard limit is
+    about 200 on a free LinkedIn account, 300 on Premium: ask the user which) and plain: who they are, the role, the
+    visa need, "could I send you my CV?". Send Tuesday to Thursday; one nudge after `wait_days`.
   - Only facts from `profile/career/` and the score. The user edits and sends it.
 - **Before showing a stranger-note, run the cold read (step 2b).**
 

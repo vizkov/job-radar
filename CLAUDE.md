@@ -43,7 +43,9 @@ Likewise, **standing rule (the user's):** every role that gets a card on the boa
 `sponsorship-check` verdict. Run it right after you score a role `apply`/`maybe`, after you `promote`
 roles to the board, and for any **SPONSOR-CHECK** line in the brief (live apply/maybe cards with no verdict).
 The ad's own statement wins: a "does not offer sponsorship" ad is verdict `no`, and the role becomes Skip.
-Batch the board writes (each `--board` call reads the whole board): GitHub's rate limit is real.
+GitHub's rate limit is real: every board read is costly and a burst trips a throttle. Pass **several refs in one
+call** (`jd_check.py score r1 r2 … --board`, `sponsorship.py record r1 r2 … --board`): they share one board read.
+Never loop over refs with one call each.
 
 ## How the machinery fits together
 

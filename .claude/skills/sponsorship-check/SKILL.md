@@ -62,7 +62,8 @@ reputable news or government sources. Note the URL and today's date for each.
 | `no` | The ad, or the company's own published policy, says it won't sponsor or requires existing work rights |
 
 Write `work/jd/<ref>/sponsorship.json` (schema in `tools/sponsorship.py`) with 1–4 evidence items,
-then `python tools/sponsorship.py record <ref> --board`. It sets the Sponsor column and adds a short
+then `python tools/sponsorship.py record <ref> [<ref> …] --board` (all refs in one call: they share one board
+read). It sets the Sponsor column and adds a short
 "Visa sponsorship" block to the card. If it prints INVALID, fix the record; never weaken the evidence.
 
 ## 6. Tell the user

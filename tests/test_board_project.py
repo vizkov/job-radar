@@ -92,15 +92,34 @@ def test_set_fields_and_close_on_final_stage(board_file):
 def test_skip_recommendation_moves_untouched_cards_to_skipped_but_not_users_cards(board_file):
     gh, _ = setup(board_file)
     for stage, moved in ((None, True), ("New", True), ("Shortlisted", False), ("Applied", False)):
-        gh.items, gh.calls = [item(stage=stage)], []
+        gh.items, gh.calls, gh._items_cache = [item(stage=stage)], [], None   # a fresh process: nothing cached
         msg = bs.set_role_fields(gh, REF, {"Fit": "20", "Recommendation": "Skip"})
         opts = [c[-1] for c in gh.calls if c[:2] == ("project", "item-edit") and c[-2] == "--single-select-option-id"]
         assert ("O_Stage_Skipped" in opts) is moved, stage
         assert (("issue", "close", "https://github.com/me/r/issues/7") in gh.calls) is moved
         assert ("(closed)" in msg) is moved
-    gh.items, gh.calls = [item(stage="New")], []
+    gh.items, gh.calls, gh._items_cache = [item(stage="New")], [], None
     bs.set_role_fields(gh, REF, {"Recommendation": "Apply"})                      # only Skip moves a card
     assert not any(c[:3] == ("issue", "close", "https://github.com/me/r/issues/7") for c in gh.calls)
+
+
+def test_board_is_read_once_per_session_and_cache_stays_in_step(board_file):
+    gh, _ = setup(board_file)
+    REF2 = "b" * 16
+    second = item()
+    second["id"], second["content"] = "PVTI_2", {"type": "Issue", "url": "https://github.com/me/r/issues/8",
+                                                   "body": f"... <!-- job-radar:ref={REF2} -->"}
+    gh.items, gh.calls = [item(), second], []
+    for ref in (REF, REF2, REF):                      # three updates, two cards
+        bs.set_role_fields(gh, ref, {"Sponsor": "Likely"})
+    assert sum(1 for c in gh.calls if c[:2] == ("project", "item-list")) == 1
+    # a Skip recommendation moves card 1 to Skipped; the cache knows, so archive (same session) sees it, no re-read
+    bs.set_role_fields(gh, REF, {"Recommendation": "Skip"})
+    assert bs.archive_skipped(gh, sleep=lambda s: None) == "archived 1 Skipped card(s)"
+    assert [c[-1] for c in gh.calls if c[:2] == ("project", "item-archive")] == ["PVTI_9"]
+    assert sum(1 for c in gh.calls if c[:2] == ("project", "item-list")) == 1
+    bs._items(gh, bs.load_board(), refresh=True)      # an explicit refresh does re-read
+    assert sum(1 for c in gh.calls if c[:2] == ("project", "item-list")) == 2
 
 
 def test_bad_option_and_missing_card(board_file):

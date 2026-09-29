@@ -384,7 +384,7 @@ item-archive`, idempotent because `item-list` omits archived items; `session_bri
 | `sync_status(gh)` | Update or create-and-pin the "Radar status" issue. |
 | `gh_json`, `load_board`, `_read_fields`, `_save_board` | JSON output of gh; read `profile/board.json`; field and option IDs; save board.json. |
 | `setup_project(gh, repo)` | Create or adopt the "Job search" Project, create missing fields, link the repo, save IDs. |
-| `_items`, `find_item(gh, board, ref)` | All cards; the card whose body has this ref's marker. |
+| `_items(gh, board, refresh=False)`, `find_item(gh, board, ref)` | All cards, read **once per `gh` object** (cached as `gh._items_cache`; `_edit` updates the cached cards after each write; `refresh=True` re-reads; dry runs never cache); the card whose body has this ref's marker. `jd_check.py score` and `sponsorship.py record` take several refs and share one `Gh`, so a batch costs one board read. |
 | `_edit(gh, board, item, field, value)` | Set one field (single-select by option ID, date, or number). |
 | `FIT_START`, `FIT_END`, `fit_section(score, scored_on)`, `with_fit(body, section)`, `set_fit_section(gh, ref, score, scored_on)` | The card's fit breakdown from a validated `score.json` (third-party-derived text escaped with `md()`), inserted before the Role ID line or replacing the previous block between the markers. |
 | `promote(refs)` | CLI `promote`: queue cards for recorded roles not on the board (skips ones already carded or queued); `roles` opens them. |
@@ -583,7 +583,7 @@ out of date.
 | `check(data, ref, jd_text)` | Validate a record: fields, verdict, country code, summary length, 1–6 evidence items, verbatim ad quotes, http(s) non-banned URLs, `confirmed` and `no` each backed by the ad or the company's own page |
 | `visa_section(data)`, `with_visa(body, section)`, `VISA_START`, `VISA_END` | The card's escaped sponsorship block, inserted or replaced in place |
 | `upsert`, `company_records(company)` | Log one verdict per role; earlier verdicts for the same employer (loose name match) |
-| `record(ref, board)`, `main` | CLI `record <ref> [--board]` and `company "<name>"` |
+| `record(ref, board, gh=None)`, `main` | CLI `record <ref> [<ref> …] [--board]` (refs share one `Gh`, so one board read) and `company "<name>"` |
 
 ### `tools/calibrate.py`: automatic tier tuning (standard library only)
 

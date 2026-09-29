@@ -170,11 +170,18 @@ def record(ref: str, board: bool, gh=None) -> int:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    r = sub.add_parser("record"); r.add_argument("ref"); r.add_argument("--board", action="store_true")
+    r = sub.add_parser("record")
+    r.add_argument("refs", nargs="+", metavar="ref",
+                   help="one or more roles; with --board they share ONE read of the board (GitHub throttles bursts)")
+    r.add_argument("--board", action="store_true")
     c = sub.add_parser("company"); c.add_argument("company")
     args = ap.parse_args(argv)
     if args.cmd == "record":
-        return record(args.ref, args.board)
+        gh = None
+        if args.board:
+            import board_sync
+            gh = board_sync.Gh()
+        return max(record(ref, args.board, gh) for ref in args.refs)
     rows = company_records(args.company)
     for r in rows:
         print(f"{r['checked_at'][:10]}  {r['verdict']:9} {r.get('country', '')}  {r.get('title', '')[:50]}  {r['summary'][:90]}")

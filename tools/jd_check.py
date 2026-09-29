@@ -101,7 +101,7 @@ def upsert_score(record: dict, path: Path | None = None) -> None:
     path.write_text("\n".join(kept + [json.dumps(record, ensure_ascii=False)]) + "\n", encoding="utf-8")
 
 
-def cmd_score(ref: str, board: bool) -> int:
+def cmd_score(ref: str, board: bool, gh=None) -> int:
     folder = WORK / ref
     score_file, jd_file, meta_file = folder / "score.json", folder / "jd.txt", folder / "meta.json"
     if not score_file.exists():
@@ -130,7 +130,7 @@ def cmd_score(ref: str, board: bool) -> int:
           + (" [injection suspected]" if data["injection_suspected"] else ""))
     if board:
         from board_sync import Gh, set_fit_section, set_role_fields  # tools/ is on sys.path as a script
-        gh = Gh()
+        gh = gh or Gh()
         print(set_role_fields(gh, ref, {"Fit": str(data["fit_score"]),
                                         "Recommendation": data["recommendation"].capitalize()}))
         print(set_fit_section(gh, ref, data, record["scored_at"][:10]))
@@ -276,13 +276,18 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("score")
-    s.add_argument("ref")
+    s.add_argument("refs", nargs="+", metavar="ref",
+                   help="one or more roles; with --board they share ONE read of the board (GitHub throttles bursts)")
     s.add_argument("--board", action="store_true", help="also set Fit/Recommendation on the board card")
     t = sub.add_parser("tailor")
     t.add_argument("folder")
     args = ap.parse_args(argv)
     if args.cmd == "score":
-        return cmd_score(args.ref, args.board)
+        gh = None
+        if args.board:
+            from board_sync import Gh
+            gh = Gh()
+        return max(cmd_score(ref, args.board, gh) for ref in args.refs)
     return cmd_tailor(args.folder)
 
 

@@ -281,9 +281,19 @@ def setup_project(gh: Gh, repo: str, title: str = "Job search", owner: str = "@m
             "open the project -> ... -> Workflows -> 'Auto-add to project' -> filter  is:issue label:role  -> On.")
 
 
-def _items(gh: Gh, board: dict) -> list[dict]:
-    return gh_json(gh, "project", "item-list", board["number"], "--owner", board["owner"],
-                   "--format", "json", "--limit", "2000").get("items", [])
+def _items(gh: Gh, board: dict, refresh: bool = False) -> list[dict]:
+    """The board's cards. Read once per `gh` object and reused (every read is a costly GraphQL query, and GitHub
+    throttles bursts): `_edit` keeps the cached cards in step, so callers doing several updates in one process
+    (jd_check.py / sponsorship.py with many refs) share one read. `refresh=True` forces a re-read."""
+    cache = None if (refresh or getattr(gh, "dry_run", False)) else getattr(gh, "_items_cache", None)
+    if cache is None:
+        cache = gh_json(gh, "project", "item-list", board["number"], "--owner", board["owner"],
+                        "--format", "json", "--limit", "2000").get("items", [])
+        try:
+            gh._items_cache = cache
+        except AttributeError:   # a gh stand-in without attributes: just don't cache
+            pass
+    return cache
 
 
 def find_item(gh: Gh, board: dict, ref: str) -> dict | None:
@@ -306,6 +316,11 @@ def _edit(gh: Gh, board: dict, item_id: str, name: str, value) -> None:
     else:
         args += ["--number", str(float(value))]
     gh(*args)
+    for card in getattr(gh, "_items_cache", None) or []:   # keep the shared read in step with what we just wrote
+        if card.get("id") == item_id:
+            opts = FIELDS.get(name)
+            canon = next((o for o in opts if o.lower() == str(value).lower()), value) if isinstance(opts, list) else value
+            card[name.lower()] = float(value) if opts is None else canon
 
 
 def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: str = "") -> str:

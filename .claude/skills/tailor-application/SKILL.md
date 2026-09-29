@@ -27,6 +27,9 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
      two pages.
    - Headline: the target role title and 1-2 strengths; no contact details.
+   - Visa sponsorship: the CV header (from `master_resume.md`'s `location`) does not say "Requires visa sponsorship" by default;
+     the user decides per application (often after a referral or a first conversation). Ask before adding it to `location` for that
+     copy; the cover letter block `C13` states it either way. An ATS screening filter may reject on the phrase; a recruiter may want it.
    - Cover letter: 3-4 paragraphs from cover blocks and condensed STAR stories; mention sponsorship needs
      honestly if the role is abroad (block `C03`-style text if they have one).
 4. **Validate:** `python tools/jd_check.py tailor <folder>`. Fix every error; never work around one.

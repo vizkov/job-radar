@@ -77,8 +77,9 @@ don't spend a referral on a role that can't sponsor the user.
   - **Write "India", not a city** (recruiters abroad may not know it). Say the user would live in the ad's
     location if the ad requires it ("relocation to Geneva"); confirm with the user that they are willing.
   - **Visa need in one calm line**, in the middle, not last, quoting the ad if it offers relocation. Phrase it "I'd need UK visa sponsorship, and I'm willing to relocate to <city>" (the user's wording; softer than "would move").
-  - **One small ask**: "Should I send you my CV, or apply through the site?" beats "a call?". If she says
-    apply, that overrides the referral-before-apply rule only if the user agrees.
+  - **One small ask**: "Could I send you my CV?" beats "a call?" (the user's approved ask). Never offer "or apply
+    through the site" as a choice: if she says apply, that overrides the referral-before-apply rule only if the
+    user agrees.
   - **Name the role by title and the company's job ID** in the first line, so a recruiter can route it.
   - **Recipient may not own the role** (a recruiter, not the hiring team): add a fallback, "if you're not the right
     person, could you point me to them?" (a suggestion from web advice, not a tested rule).

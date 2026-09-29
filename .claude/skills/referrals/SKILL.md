@@ -54,12 +54,16 @@ don't spend a referral on a role that can't sponsor the user.
 - **People they know: no draft.** The user writes to family, friends and their network in their own
   words. Give them only what the person needs to act on it: each role's title, link and the company's
   job ID (for internal referral tools), best role first, and offer the tailored CV to attach.
-- **Strangers (recruiters, HR, hiring managers, team managers): draft it.** Save in
-  `profile/applications/<folder>/outreach.md` (folder named as in tailor-application): a short cold
-  note with the role and link, 2–3 of the user's strongest matching lines (from the score's "Matches",
-  lightly rephrased; cite IDs in an HTML comment for your own checking), the visa sponsorship need
-  stated plainly (the user is in India), and a request for a short call or for the CV to be considered.
-  Only facts from `profile/career/` and the score. The user edits and sends it.
+- **Strangers (recruiters, HR, hiring managers, team managers): draft it, in the chat only.** The user does
+  not want message drafts saved to files: show the note in your reply, never write it to `outreach.md`
+  (which keeps only the contacts: name, headline, profile URL). Make it impactful, since the aim is that
+  the recruiter wants to meet the user: first check each line against the JD's own requirements (the JD's
+  first asks come first; don't lead with what merely sounds strong), lead with the match to the role, give
+  outcomes not vulnerability jargon (a recruiter can't judge the jargon), keep it short, state the visa need in
+  one calm line (quote the ad if it offers relocation), and make one low-friction ask (a 15-minute call, CV
+  first if preferred). A LinkedIn connection request is at most 300 characters: give a version that fits.
+  Only facts from `profile/career/` and the score; keep "our team's work" as the CV states it. The user edits
+  and sends it.
 
 ## 3. Track it
 - When the user says they asked someone: `python tools/referrals.py ask <ref> --person "<name>"`

@@ -31,6 +31,10 @@ does. Nothing is lost in the meantime.
 Moving a role to Offer, Rejected or Skipped closes its issue. It works the other way too: if you
 **close a card** (or mark it Done) that you hadn't acted on, Claude sets its Stage to Skipped at your
 next session. If it was Applied or at Interview, Claude asks what happened instead of guessing.
+**A role scored Skip goes straight to Skipped.** When Claude rates a role Skip and you haven't acted
+on its card, the card moves to Skipped (its issue closes with a note). Cards you've shortlisted or
+applied to are never moved: those are your decisions.
+
 **Skipped cards are archived once a day.** The first time you open a session each day, cards in the
 Skipped stage are archived (up to 40 a day; a bigger backlog clears over the next days). Archiving
 hides a card from every view without deleting it: open the Project's menu, choose **Archived items**,

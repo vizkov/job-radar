@@ -61,7 +61,8 @@ Batch the board writes (each `--board` call reads the whole board): GitHub's rat
 - Board views are code (`VIEWS` in `tools/board_sync.py`): `board_sync.py views` builds/restores
   them, `design-diff` shows drift (the session brief checks it). Sort and board grouping can't be set
   by API: relay the clicks it prints. To change a view for good, edit `VIEWS` and commit.
-- Skipped cards are archived once a day by the SessionStart hook (`board_sync.py archive`; the Action's
+- Scoring a role `skip` moves its card to Stage=Skipped (only if the user hasn't acted on it: Shortlisted/
+  Applied stay). Then it's archived, once a day, by the SessionStart hook (`board_sync.py archive`; the Action's
   token can't reach the user's Project). An archived card is invisible to `set`: restore it first.
   `max_age_days` in `profile/config.json` drops roles posted longer ago than that (0 = no limit).
 - User guide: `docs/wiki/`. Design reference (yours): `docs/design/`, starting at its README:

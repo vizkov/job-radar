@@ -317,6 +317,12 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: s
     item = find_item(gh, board, ref)
     if item is None:
         return f"no board card for {ref} yet (it's created by the daily run; see state/board_queue.json)"
+    if (str(values.get("Recommendation", "")).lower() == "skip" and "Stage" not in values
+            and item.get("stage") in (None, "", "New")):
+        # a Skip recommendation takes a card nobody has acted on off the board (Skipped is archived daily);
+        # Shortlisted/Applied/... cards are the user's decision and are never moved
+        values = {**values, "Stage": "Skipped"}
+        note = note or "recommendation was Skip"
     for name, value in values.items():
         _edit(gh, board, item["id"], name, value)
         if not gh.dry_run and name in ("Stage", "Recommendation"):

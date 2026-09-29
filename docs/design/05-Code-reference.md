@@ -389,7 +389,7 @@ item-archive`, idempotent because `item-list` omits archived items; `session_bri
 | `FIT_START`, `FIT_END`, `fit_section(score, scored_on)`, `with_fit(body, section)`, `set_fit_section(gh, ref, score, scored_on)` | The card's fit breakdown from a validated `score.json` (third-party-derived text escaped with `md()`), inserted before the Role ID line or replacing the previous block between the markers. |
 | `promote(refs)` | CLI `promote`: queue cards for recorded roles not on the board (skips ones already carded or queued); `roles` opens them. |
 | `TIER_LINE`, `refresh_bodies(gh)` | CLI `refresh-bodies`: remove the tier-arithmetic line older cards carried, and add or refresh fit breakdowns for every scored role from `work/jd/<ref>/score.json`. |
-| `set_role_fields(gh, ref, values, close, note)` | Set fields on a role's card, log stage changes (with the note), comment the note on the issue, close on final stages. |
+| `set_role_fields(gh, ref, values, close, note)` | Set fields on a role's card, log stage changes (with the note), comment the note on the issue, close on final stages. Setting `Recommendation=Skip` on a card whose Stage is New or blank also sets `Stage=Skipped` (note "recommendation was Skip"), which closes the issue and gets the card archived by the daily run; Shortlisted/Applied/other stages are the user's and are never moved. |
 | `VIEWS`, `API_KEYS`, `CLICK_KEYS` | The board's views as data; what the API can set; what needs a click. |
 | `DESIGN_QUERY`, `views(gh, owner, number)` | GraphQL for the board's views, returned in `VIEWS` shape plus IDs. |
 | `_click_steps(spec, have)` | Menu instructions for sort/grouping differences. |

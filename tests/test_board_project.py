@@ -89,6 +89,20 @@ def test_set_fields_and_close_on_final_stage(board_file):
     assert ("issue", "close", "https://github.com/me/r/issues/7") in gh.calls and "Stage=Rejected" in msg
 
 
+def test_skip_recommendation_moves_untouched_cards_to_skipped_but_not_users_cards(board_file):
+    gh, _ = setup(board_file)
+    for stage, moved in ((None, True), ("New", True), ("Shortlisted", False), ("Applied", False)):
+        gh.items, gh.calls = [item(stage=stage)], []
+        msg = bs.set_role_fields(gh, REF, {"Fit": "20", "Recommendation": "Skip"})
+        opts = [c[-1] for c in gh.calls if c[:2] == ("project", "item-edit") and c[-2] == "--single-select-option-id"]
+        assert ("O_Stage_Skipped" in opts) is moved, stage
+        assert (("issue", "close", "https://github.com/me/r/issues/7") in gh.calls) is moved
+        assert ("(closed)" in msg) is moved
+    gh.items, gh.calls = [item(stage="New")], []
+    bs.set_role_fields(gh, REF, {"Recommendation": "Apply"})                      # only Skip moves a card
+    assert not any(c[:3] == ("issue", "close", "https://github.com/me/r/issues/7") for c in gh.calls)
+
+
 def test_bad_option_and_missing_card(board_file):
     gh, _ = setup(board_file)
     gh.items = [item()]

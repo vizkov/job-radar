@@ -82,6 +82,9 @@ don't spend a referral on a role that can't sponsor the user.
   - **Short**: about 90 words for a direct message; a connection request is 120-180 characters (the hard limit is
     about 200 on a free LinkedIn account, 300 on Premium: ask the user which) and plain: who they are, the role, the
     visa need, "could I send you my CV?". Send Tuesday to Thursday; one nudge after `wait_days`.
+  - **Format for pasting:** show each draft in its own code block. A direct message gets paragraph breaks (greeting,
+    who they are and the role, focus, visa need, ask), one idea per paragraph. A connection note is one block with no
+    breaks (LinkedIn drops them and every character counts); give its character count.
   - Only facts from `profile/career/` and the score. The user edits and sends it.
 - **Before showing a stranger-note, run the cold read (step 2b).**
 

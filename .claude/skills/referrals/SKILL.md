@@ -59,14 +59,17 @@ don't spend a referral on a role that can't sponsor the user.
   not want message drafts or contact notes saved to files: show the note in your reply, never write it to
   a file (no `outreach.md`). Make it impactful, since the aim is that
   the recruiter wants to meet the user. Rules, all learned from the user's edits:
-  - **Plain sentences, no bullet lists.** A list reads like a CV to someone who hasn't seen it. Say what the
-    user does day to day in the ad's own terms, in one or two sentences ("My current work is threat modelling
-    AI and cloud (AWS) systems, which is close to what your ad describes"). Check each phrase against the
-    JD's asks (its first asks come first) and against `profile/career/`; cite the CV IDs to the user in your
-    reply, not in the message.
-  - **No proof points, numbers or examples** (e.g. "cut triage time by half"): that's what the CV is for. The note
-    is who they are, the role, one plain line on their focus in the ad's terms, the visa need, one ask. Never lift CV
-    wording into a note ("from report to verified fix", "source-code-level remediation guidance"): write it as speech.
+  - **The note answers the recruiter's question, "is this person qualified?"** (the user's principle, and the
+    approved final form for Apple #75). List the JD's core asks, first asks first, and for each one say what the
+    user does that answers it, in plain words taken from `profile/career/`. Then the note converges on the ad
+    without claiming a match. Pick the CV items that fit *this* role (for a vulnerability-response role, exploit
+    re-testing automation beats a threat-modelling tool). Leave out asks the CV doesn't cover (say nothing about
+    them) and never say "production" or "at scale" when the CV shows internal tooling. Cite the CV IDs to the user
+    in your reply, not in the message.
+  - **Plain sentences, no bullet lists, and vary the sentence starts** ("I do… I do… I do…" reads as a template):
+    open sentences with "My background is", "The X side is familiar ground", "I also build". Use the CV's facts,
+    not its phrasing ("from report to verified fix" reads as a résumé line): write it as speech. Numbers and a
+    client's details stay in the CV; tools, methods and duties are fine in the note.
   - **Never a specific client finding** (e.g. a flaw in an airline's platform): it can identify the client and
     reads as a confidentiality flag. Describe the kind of work instead; findings belong in the CV and the call.
   - **Never claim what the CV lacks**, and don't hint at the ad's gaps. Keep "our team's work" as the CV states
@@ -79,9 +82,11 @@ don't spend a referral on a role that can't sponsor the user.
   - **Name the role by title and the company's job ID** in the first line, so a recruiter can route it.
   - **Recipient may not own the role** (a recruiter, not the hiring team): add a fallback, "if you're not the right
     person, could you point me to them?" (a suggestion from web advice, not a tested rule).
-  - **Short**: about 90 words for a direct message; a connection request is 120-180 characters (the hard limit is
-    about 200 on a free LinkedIn account, 300 on Premium: ask the user which) and plain: who they are, the role, the
-    visa need, "could I send you my CV?". Send Tuesday to Thursday; one nudge after `wait_days`.
+  - **Length**: a direct message is as long as the asks need, usually 100-140 words, in short paragraphs; cut
+    the least role-relevant clause first if the user finds it long. A connection request is 120-300 characters
+    (the hard limit is about 200 on a free LinkedIn account, 300 on Premium: ask the user which): who they are,
+    the role, the strongest one or two answers to the ad's asks, the visa need, "could I send you my CV?". Send
+    Tuesday to Thursday; one nudge after `wait_days`.
   - **Format for pasting:** show each draft in its own code block. A direct message gets paragraph breaks (greeting,
     who they are and the role, focus, visa need, ask), one idea per paragraph. A connection note is one block with no
     breaks (LinkedIn drops them and every character counts); give its character count.

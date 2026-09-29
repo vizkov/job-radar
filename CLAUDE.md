@@ -39,6 +39,11 @@ from it; don't redo those steps. Mention health items briefly and offer the matc
 prioritise the freshest Tier 1 roles, since applying early matters to this user. If the brief has an
 **AUTO-SCORE** line, run `score-roles` on those refs before answering the user's first message (they
 chose this; `scoring.auto_per_session` in config.json sets how many, 0 turns it off), then answer.
+Likewise, **standing rule (the user's):** every role that gets a card on the board gets a
+`sponsorship-check` verdict. Run it right after you score a role `apply`/`maybe`, after you `promote`
+roles to the board, and for any **SPONSOR-CHECK** line in the brief (live apply/maybe cards with no verdict).
+The ad's own statement wins: a "does not offer sponsorship" ad is verdict `no`, and the role becomes Skip.
+Batch the board writes (each `--board` call reads the whole board): GitHub's rate limit is real.
 
 ## How the machinery fits together
 

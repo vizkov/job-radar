@@ -266,6 +266,30 @@ def auto_score_pick(rows: list[dict], scored: dict, items: list[dict] | None, n:
     return out[:n]
 
 
+def sponsor_check_pick(scores: dict, checked: set, items: list[dict] | None, n: int = 10) -> list[str]:
+    """Refs of live board cards scored apply/maybe that have no sponsorship verdict yet: the user wants the
+    sponsorship-check skill run whenever a role reaches the board (a role that won't sponsor isn't worth effort)."""
+    out = []
+    for i in items or []:
+        hit = _REF.search((i.get("content") or {}).get("body") or "")
+        ref = hit.group(1) if hit else None
+        if (ref and ref not in checked and i.get("stage") in (None, "", "New", "Shortlisted")
+                and i.get("status") != "Done" and (scores.get(ref) or {}).get("recommendation") in ("apply", "maybe")):
+            out.append(ref)
+    return out[:n]
+
+
+def read_sponsor_keys(root: Path) -> set:
+    path, keys = root / "data" / "sponsorship.jsonl", set()
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                keys.add(json.loads(line).get("key", ""))
+            except ValueError:
+                pass
+    return keys
+
+
 def start_prep(refs: list[str]) -> str:
     """Fetch the job descriptions in the background (no Claude usage), so scoring starts faster."""
     venv = ROOT / ".venv" / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
@@ -497,6 +521,11 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
                      "message, run score-roles on these refs, freshest first, then answer them; say so in one line, "
                      "and skip it only if they ask for something urgent: " + ", ".join(r["ref"] for r in pick)
                      + (f" ({prep})" if prep else ""))
+    unchecked = sponsor_check_pick(scores, read_sponsor_keys(root), items)
+    if unchecked:
+        lines.append("- SPONSOR-CHECK (the user's standing rule: every role on the board gets a sponsorship verdict): "
+                     "run the sponsorship-check skill on these apply/maybe cards, and tell them in one line what "
+                     "you found: " + ", ".join(unchecked))
     lines.append(f"- Unscored Tier 1 roles (last 14 days): {len(unscored_t1)}, of which {len(fresh_unscored)} "
                  "posted in the last 3 days (score and apply to these first)")
     if scores:

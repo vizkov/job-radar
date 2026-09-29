@@ -53,8 +53,9 @@ description: Score job descriptions against the user's CV (fit score, met/missin
    carded Tier 1): `python tools/board_sync.py promote <ref> …`, then `board_sync.py roles`, then re-run
    `jd_check.py score <ref> --board`. Skips aren't carded. If GitHub says "rate limit exceeded" with quota
    left, it's the secondary limit: score without `--board` and apply the board updates later in one pass.
-   For roles recommended `apply` or `maybe`, run `sponsorship-check` next (a role that won't sponsor isn't
-   worth a referral), then offer the `referrals` step before tailoring: the user asks for a referral
+   For roles recommended `apply` or `maybe`, run `sponsorship-check` next, **always** (the user's standing
+   rule: every role on the board gets a verdict; a role that won't sponsor isn't worth a referral; an ad
+   that says it won't sponsor makes the role a Skip), then offer the `referrals` step before tailoring: the user asks for a referral
    before applying.
 6. **Log usage (while measuring, see step 0).** Ask the user for `/usage` again, then append one line
    to `data/usage_log.jsonl`:

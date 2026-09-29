@@ -114,6 +114,22 @@ def test_system_updates_and_unpublished_code(tmp_path):
     assert "1 code file(s) changed here but not in the public template (tools/radar.py)" in text
 
 
+def test_sponsor_check_lists_live_apply_maybe_cards_without_a_verdict(tmp_path):
+    a, b, c, d, e = ("a" * 16, "b" * 16, "c" * 16, "d" * 16, "e" * 16)
+    scores = {a: {"recommendation": "apply"}, b: {"recommendation": "maybe"}, c: {"recommendation": "skip"},
+              d: {"recommendation": "apply"}, e: {"recommendation": "apply"}}
+    items = [item(a, "New"), item(b, "Shortlisted"), item(c, "New"),
+             item(d, "Skipped"),                     # already skipped: not worth a check
+             item(e, "New")]                         # already has a verdict
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "sponsorship.jsonl").write_text(json.dumps({"key": e, "verdict": "likely"}) + "\n")
+    checked = sb.read_sponsor_keys(tmp_path)
+    assert checked == {e}
+    assert sb.sponsor_check_pick(scores, checked, items) == [a, b]
+    assert sb.sponsor_check_pick(scores, checked, None) == []
+    assert sb.read_sponsor_keys(tmp_path / "nowhere") == set()
+
+
 def test_archive_started_once_a_day(monkeypatch):
     started = []
     monkeypatch.setattr(sb.subprocess, "Popen", lambda cmd, **kw: started.append(cmd))

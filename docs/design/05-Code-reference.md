@@ -55,7 +55,8 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 | Function | Does |
 |---|---|
 | `load_candidates()` | Candidate rows plus override rows. An override has a careers URL (the ATS is detected with `ats_scrapers.resolve_careers_url()`) or explicit `ats` + `slug` columns. An override replaces the "not covered" row for that company. |
-| `main(argv)` | Fetch all boards concurrently; compute jobs in target countries per board; mark each company VERIFIED / no jobs in target countries / boards empty / fetch error / not covered; write the three outputs. |
+| `careers_page_companies()` | Companies with an enabled `careers_pages.yaml` entry: covered by the careers_page source even without an ATS board. |
+| `main(argv)` | Fetch all boards concurrently; compute jobs in target countries per board; mark each company VERIFIED / no jobs in target countries / boards empty / fetch error / not covered, or "careers page" when not VERIFIED but in `careers_pages.yaml`; write the three outputs. |
 
 **Watch out**
 - For Workday, Phenom and Oracle the "slug" passed to the scraper is the full URL (those

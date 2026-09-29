@@ -57,6 +57,14 @@ def load_candidates():
     return rows
 
 
+def careers_page_companies() -> set[str]:
+    """Lower-cased companies with an enabled entry in careers_pages.yaml (covered without an ATS board)."""
+    import yaml
+    path = profile_path("careers_pages.yaml")
+    pages = yaml.safe_load(path.read_text(encoding="utf-8")) if path.exists() else None
+    return {p["company"].lower() for p in pages or [] if p.get("company") and p.get("enabled", True)}
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description="Live check of every candidate ATS board; writes boards.json.")
     ap.add_argument("--quiet", action="store_true", help="no per-board lines (they name your target companies)")
@@ -91,6 +99,7 @@ def main(argv=None):
         by_company[r["company"]].append(r)
 
     report, keep = [], defaultdict(set)
+    watched = careers_page_companies()
     for company, rs in by_company.items():
         stats = [board_stats[r["board_url"]] for r in rs if r["board_url"] in board_stats]
         kept = [s for s in stats if s["jobs_target_countries"] > 0]
@@ -104,6 +113,8 @@ def main(argv=None):
             status = "fetch error"
         else:
             status = "not covered - add careers URL to profile/overrides.csv"
+        if status != "VERIFIED" and company.lower() in watched:
+            status = "careers page (profile/careers_pages.yaml)"  # the careers_page source covers it
         for s in kept:
             keep[s["board_url"]].add(company)
         report.append({

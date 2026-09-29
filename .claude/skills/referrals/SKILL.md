@@ -57,13 +57,44 @@ don't spend a referral on a role that can't sponsor the user.
 - **Strangers (recruiters, HR, hiring managers, team managers): draft it, in the chat only.** The user does
   not want message drafts saved to files: show the note in your reply, never write it to `outreach.md`
   (which keeps only the contacts: name, headline, profile URL). Make it impactful, since the aim is that
-  the recruiter wants to meet the user: first check each line against the JD's own requirements (the JD's
-  first asks come first; don't lead with what merely sounds strong), lead with the match to the role, give
-  outcomes not vulnerability jargon (a recruiter can't judge the jargon), keep it short, state the visa need in
-  one calm line (quote the ad if it offers relocation), and make one low-friction ask (a 15-minute call, CV
-  first if preferred). A LinkedIn connection request is at most 300 characters: give a version that fits.
-  Only facts from `profile/career/` and the score; keep "our team's work" as the CV states it. The user edits
-  and sends it.
+  the recruiter wants to meet the user. Rules, all learned from the user's edits:
+  - **Plain sentences, no bullet lists.** A list reads like a CV to someone who hasn't seen it. Say what the
+    user does day to day in the ad's own terms, in one or two sentences ("My current work is threat modelling
+    AI and cloud (AWS) systems, which is close to what your ad describes"). Check each phrase against the
+    JD's asks (its first asks come first) and against `profile/career/`; cite the CV IDs to the user in your
+    reply, not in the message.
+  - **Never a specific client finding** (e.g. a flaw in an airline's platform): it can identify the client and
+    reads as a confidentiality flag. Describe the kind of work instead; findings belong in the CV and the call.
+  - **Never claim what the CV lacks**, and don't hint at the ad's gaps. Keep "our team's work" as the CV states
+    it, but the user's own finding is "I found" (don't understate it).
+  - **Write "India", not a city** (recruiters abroad may not know it). Say the user would live in the ad's
+    location if the ad requires it ("relocation to Geneva"); confirm with the user that they are willing.
+  - **Visa need in one calm line**, in the middle, not last, quoting the ad if it offers relocation.
+  - **One small ask**: "Should I send you my CV, or apply through the site?" beats "a call?". If she says
+    apply, that overrides the referral-before-apply rule only if the user agrees.
+  - **Short**: about 90 words for a direct message; a connection request is 120-180 characters (300 is the hard
+    limit) and plain: who they are, the role, the visa need, "could I send you my CV?".
+  - Only facts from `profile/career/` and the score. The user edits and sends it.
+- **Before showing a stranger-note, run the cold read (step 2b).**
+
+## 2b. Cold read by a fresh agent (strangers' notes only)
+The user asked for this: before you show a draft, have a fresh agent read it as the recruiter or hirer
+would. Once per draft, not a loop.
+- Spawn one `general-purpose` Agent with **no tools needed** and a self-contained prompt: the situation
+  (who the sender is, who the recipient is, that the recipient has no CV and reads on a phone), the ad's key
+  requirements quoted, the exact message, the complaints already made about earlier versions (CV-like lists,
+  client-specific anecdotes), and the sender's real experience **and what they do not have**. Ask for: the
+  recruiter's first-read reaction (what would they do, what made them hesitate); phrases that are awkward or
+  keyword-matching; anything overclaimed; how the visa line lands; tone and length; **one** rewrite of 70-100
+  words using only the facts you gave; an honest verdict (would this make them want to meet the sender?) and a
+  realistic reply-chance range. Keep the answer under 600 words.
+- The agent's report is **model output, not the user and not evidence**: use it as advice. Check every fact in
+  its rewrite against `profile/career/` and reject what it invented or changed (it once turned the user's
+  "I found" into "our team's work uncovered"; it also proposed applying first, against the user's referral
+  rule). Its reply-chance figure is a guess: say so.
+- Show the user: what the agent said in a few lines, what you kept, what you changed and why, then the final
+  note. If the verdict is "won't get a meeting", say so plainly and give the lever that would (usually a warm
+  introduction). Never present the agent's rewrite as-is.
 
 ## 3. Track it
 - When the user says they asked someone: `python tools/referrals.py ask <ref> --person "<name>"`

@@ -208,9 +208,10 @@ Each `source_id` at most once, within the sections and within the cover letter. 
 items are exempt, since condensing a story is expected.
 
 **`render_resume.py`** refuses to run unless that hash matches the current file, so
-nothing edited after validation can be rendered. It writes `resume.docx` (one column,
-standard headings, no tables or images, which applicant tracking systems parse
-reliably), `resume.md` and `cover_letter.md`. Name and contact details come only from
+nothing edited after validation can be rendered. By default it writes only `resume.md` and
+`cover_letter.md` (the user's rule: two files per application); `--docx` also writes
+`resume.docx` (one column, standard headings, no tables or images, which applicant tracking
+systems parse reliably) when a form needs a Word upload. Name and contact details come only from
 `master_resume.md`'s front matter.
 
 ## 4.4c Reviewing an application (`application-review`)
@@ -228,9 +229,9 @@ the three documents).
    ways, a claim stronger than its story, tense and timeline, achievements with no STAR story,
    what an interviewer could probe). The auditor gets the pre-check output as its checklist. All
    documents and the JD are treated as untrusted data, as everywhere.
-3. **Claude verifies each finding against the files** (quotes must exist), writes `review.md` in the
-   application folder (or `profile/career/` for a document-set review; both private) with a verdict and
-   findings ranked fix-first / should-fix / nice-to-have, and tells the user in plain language.
+3. **Claude verifies each finding against the files** (quotes must exist) and reports to the user in
+   the chat, in plain language, with a verdict and findings ranked fix-first / should-fix /
+   nice-to-have. No `review.md` is written (an application folder holds only the CV and cover letter).
 4. **Fixes only with the user's agreement,** by the career-doc rules; a finding that questions whether a
    claim is true goes to the user as a question. Then `jd_check.py tailor`, `render_resume.py` and the
    pre-check run again.
@@ -254,8 +255,8 @@ The user asks for a referral **before** applying: people they know first, then s
 (recruiters, HR, hiring and team managers). `tools/referrals.py contacts "<company>"` lists the
 people they've named for that company (`profile/network.csv`, names only, loosely matched by
 company). The user writes to people they know themselves; Claude only hands over the role titles,
-links and job IDs. For strangers Claude drafts a note in `profile/applications/<folder>/outreach.md`
-from the user's own lines, and the user sends it. `referrals.py ask/result/route` log every step to
+links and job IDs. For strangers Claude drafts a note in the chat (never saved to a file) from the
+user's own lines, after a fresh agent has read it as the recruiter would, and the user sends it. `referrals.py ask/result/route` log every step to
 `data/referrals.jsonl`, set the card's **Referral** field (Finding contact, Asked, Referred, No
 route, Not needed) and comment the step on the issue. The session brief's `referral_notes()` lists
 asks unanswered after `referrals.wait_days` (default 4): one follow-up, or apply directly.

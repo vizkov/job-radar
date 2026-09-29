@@ -81,12 +81,13 @@ The JD for a role is `work/jd/<ref>/jd.txt`; `packet.md` there wraps it as untru
   says buried) instead of hiding them.
 - Fit: if the role is scored, use its `scores.jsonl` entry; do not invent a second score. If it
   is not, offer `score-roles`.
-- Write `review.md` in the application folder (or `profile/career/review.md` for a document-set
-  review; both are private): verdict (ready / fix first / do not send), then findings ranked
-  **fix before applying**, **should fix**, **nice to have**, each with file, quote, why, fix.
-  Include the ATS keyword table and the recruiter's shortlist call, labelled as judgement.
+- **Report in the chat; do not write a `review.md`** (the user wants only `resume.md` and `cover_letter.md` in an
+  application folder; write a review file only if they ask for one, and then only in `profile/career/`). Give:
+  verdict (ready / fix first / do not send), then findings ranked **fix before applying**, **should fix**,
+  **nice to have**, each with file, quote, why, fix. Include the ATS keyword picture and the recruiter's shortlist
+  call, labelled as judgement, and what an interviewer may probe.
 - Tell the user in plain language: the verdict, the top three fixes, what you could not verify.
-  Do not paste the whole file.
+  Keep it short; don't paste every finding.
 
 ## 4. Fixing
 

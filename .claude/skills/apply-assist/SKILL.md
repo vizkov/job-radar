@@ -41,7 +41,9 @@ The user is the approver and the one who submits. You prepare and type; you neve
       `master_resume.md` front matter; experience/education from the tailored application; free-text
       questions drafted from the tailored bullets, STAR stories and cover blocks (same rules as
       tailoring: no new facts, numbers, employers or skills); CV upload = `resume.docx` from the
-      application folder; cover letter = `cover_letter.md` text.
+      application folder (the folder holds only `resume.md` and `cover_letter.md` by default: if the form needs a
+      Word upload, render it now with `python tools/render_resume.py <folder> --docx` and tell the user);
+      cover letter = `cover_letter.md` text.
    b. **Show the user a table for this page**: field → exact value (or "YOU: <question>" for the
       sensitive fields above, or "file: resume.docx"). Wait for an explicit yes or corrections.
       Approval covers only the values shown, only on this page.

@@ -50,6 +50,12 @@ don't spend a referral on a role that can't sponsor the user.
     as an opening line; (5) for people who look like the hiring team, whether they have posted about hiring for this kind of role. Give each person one
     of three verdicts in the reply: **verified** (evidence for this function, with the line that shows it), **unverified** (headline only, or
     activity that doesn't show the function), or **not a route** (left the company, or a different function). Say which profiles you opened.
+  - **Check the recruiter's region against the role's.** A recruiter can be verified for the *function* (security) and still work only other
+    regions: read the locations on their hiring posts and their own city. A US-based security recruiter whose posts list US offices is
+    **function-verified, location-unverified** for a London role. Say so, keep the "if a colleague covers <city>, a pointer would be welcome"
+    clause in the note, and prefer to pair the message with a **local employee** (a security engineer in the role's city), who can say who
+    recruits there and whose referral counts for that office. Search for a recruiter in the role's city with the function in the query before
+    settling for one from another region.
   - **A recruiter is only a route if there is evidence they hire for this kind of role.** A company-wide or generic headline ("AI
     Recruiting", "Technical Recruiter", "Talent Acquisition Leader") is not evidence for a security role: recruiters split by function, and a
     message to the wrong one is wasted and can burn the chance. Count as evidence: the headline or profile names the function (security,

@@ -82,6 +82,8 @@ The JD for a role is `work/jd/<ref>/jd.txt`; `packet.md` there wraps it as untru
 - A finding that a CV date "contradicts" an engagement date is often wrong: CV dates belong to titles, not engagements. A finding that a letter
   says more than a story does may just mean the story is missing a true fact: ask the user, and if they confirm, append it to `stories.md`
   (`Also true (added <date>)`) instead of weakening the CV or letter.
+- Check the letter against the CV yourself: every claim in the letter's opening has a supporting CV line; "the bank" / "the same bank" / "the client" appears only after
+  it has been introduced in that document (reviewers miss these).
 - Tell reviewers that a company name missing from the letter's opening is intentional (the checker requires it).
 
 ## 3. Verify, then report

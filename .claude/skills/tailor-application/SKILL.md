@@ -63,6 +63,14 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
      copy; the cover letter block `C13` states it either way. An ATS screening filter may reject on the phrase; a recruiter may want it.
    - Cover letter: 3-4 paragraphs from cover blocks and condensed STAR stories; mention sponsorship needs
      honestly if the role is abroad (block `C03`-style text if they have one).
+   **Self-contained lines and matching documents (read the finished CV and letter top to bottom before validating):**
+   - A line that says "the bank", "the same bank", "the client" or "the team" needs its referent introduced *earlier in that same document*. Tailoring
+     reorders and drops lines, so a reference that worked in the master can dangle. Fix by reordering (put the paragraph that names the bank first) or by
+     swapping the phrase for a generic noun ("a global financial institution"). Add no facts, and no numbers: the checker rejects a number the line
+     didn't have, so "Fortune 100" cannot be added to a line that lacks it.
+   - Everything the letter claims in its opening (C01) must be backed by a line in the CV. If the CV dropped the supporting line (e.g. technical oversight of a
+     team), drop the clause from the letter, or restore the line.
+   - The masters stay as the user's logs; fix these in the tailored file, not in `master_resume.md`.
 4. **Validate:** `python tools/jd_check.py tailor <folder>`. Fix every error; never work around one.
    Warnings about heavy rewording mean you drifted from what the user actually did — tighten it.
 5. **Render:** `python tools/render_resume.py <folder>` → **two files only, the user's rule**: `resume.pdf` (two pages)

@@ -33,7 +33,7 @@ Write every bullet you might ever want; tailoring picks the relevant ones.
 
 # Skills
 - [K01] Web & API pentesting: Burp Suite, OWASP ASVS, OAuth 2.0 / OIDC, GraphQL
-- [K02] Code review: Java, Kotlin, JavaScript/TypeScript, Python, Go (reading)
+- [K02] Code review: Java, Kotlin, JavaScript, TypeScript, Python, Go (reading)
 - [K03] Tooling: Semgrep, CodeQL, OWASP ZAP, Snyk, GitHub Actions
 - [K04] Threat modeling: STRIDE, attack trees, data-flow diagrams
 

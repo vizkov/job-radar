@@ -239,9 +239,9 @@ cover letter and STAR stories *agree*, or whether the package would get shortlis
 both, and runs automatically as step 6 of `tailor-application` (also when the user provides or updates
 the three documents).
 
-1. **Deterministic pass:** `tools/consistency_check.py` lists figures, years and names that only one
+1. **Deterministic pass:** `tools/cv_lint.py` (form and section rules) and `tools/consistency_check.py` list figures, years and names that only one
    document has, CV figures no story backs up, and leftover placeholders. Candidates, not verdicts.
-2. **Three read-only subagents in parallel**, each cold (files only, no session context): an **ATS**
+2. **Four read-only subagents in parallel** (the fourth, a **copy editor**, reads for grammar, tense, tone, register, repetition and whether each CV section does its job; rules in `tailor-application/writing-rules.md`), each cold (files only, no session context): an **ATS**
    (JD keyword coverage, parseability, a match percentage), a **recruiter** (six-second shortlist call,
    buried evidence, hesitations, generic cover letter) and a **consistency auditor** (one event told two
    ways, a claim stronger than its story, tense and timeline, achievements with no STAR story,

@@ -5,6 +5,8 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
 
 # Tailor an application
 
+**Read `writing-rules.md` (next to this file) first**: what the CV, cover letter and stories are each for, what each CV section is for and how it reads, which sections are static, the skills rules, and the register rules. `jd_check.py tailor` runs `tools/cv_lint.py`, which enforces the mechanical ones.
+
 0. **Masters first.** Run `python tools/master_drift.py status`. If it says the masters are not cleared, run the `master-update` check (deterministic pass plus two
    fresh reviewers), fix what it finds, `python tools/master_drift.py clear`, and only then build or refresh the draft: drafts come from clean masters, once (the
    user's rule, 2026-09-30). `jd_check.py tailor` refuses otherwise.
@@ -23,9 +25,7 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    **Role lines in the PDF come from the master's own `## Role — Company — dates` headings** (`render_pdf.py`), not from the `tailored.json`
    section headings; the master's Consultant heading names all three employers and the PDF prints it in full. To change what the PDF shows,
    edit the master heading (the `tailored.json` heading is only for the review text and the checker's 80-character limit).
-   **Header location:** when the master `location` doesn't cover the role's country (e.g. it says "UK / EU" and the role is in
-   Switzerland), set the optional `"location"` field (e.g. `"Bengaluru, India · Open to relocation to Geneva, Switzerland"`); this is part
-   of tailoring, no need to ask.
+   **Header location** is always `Bangalore, India · Open to relocation` (no destination; the user's rule, 2026-10-01). No per-copy `location` field. The header carries no blog links.
    **Facts the user tells you** (a fuller version of an event, how something came about) are appended to `stories.md` as an
    "Also true (added <date>)" line on that story, in their words, so the CV, letter and stories agree.
    Note: JSON schema for the file:
@@ -43,34 +43,29 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
      cover letter. Each ID at most once.
    - You may select, reorder and lightly rephrase — mirror the JD's vocabulary **only where the original
      line supports it**. No new numbers, employers, tools, links, emails or phone numbers.
-   - **Converge with the JD's vocabulary (the user's rule, 2026-09-30).** Where a JD term means the same as work in the user's
+   - **Converge with the JD's vocabulary (the user's rule, 2026-09-30; refined 2026-10-01: the Profile is the first home for convergence terms that don't fit a bullet or a skills row).** Where a JD term means the same as work in the user's
      lines (the user's examples: "security by design" for secure design review and threat modelling; "authentication and
      authorisation testing" for the auth findings; "microservice" testing for their payments work), use the JD's word: it lifts
-     the ATS match. A term that is new to the masters goes through the user once (they confirm it is what they did), then into
-     the masters (K or B line) so every application gets it. Only terms the stories back up: a guardrail *review* is not
+     the ATS match. **Converged terms live in this tailored draft only and are never added to the masters** (the user's rule, 2026-10-01: the masters are untailored, polished logs and cannot carry every term from every role). Use a term when the stories back it; list it in the hand-over. Only terms the stories back up: a guardrail *review* is not
      "responsible AI", and NIST CSF, COBIT, certifications or tools they haven't used stay missing. In the hand-over, list
      the terms you converged and the ones you left missing and why.
-   - **Page fit on a refresh.** If a rebuild pushes the CV past two pages, cut in this order: a bullet that duplicates a Key
-     achievement, the least relevant bullet, Volunteering; and tell the user exactly which lines you dropped.
+   - **Page fit.** Static sections (Projects and writing, Volunteering, Education) are never cut; each role keeps at least 3 bullets (all, if the master has fewer); all seven Skills rows stay. Fit two pages by shortening wording, then dropping a bullet that restates a Key achievement, then the least relevant bullet above the floor; tell the user exactly which lines you dropped.
    - **Bullet order inside a role follows the master** (the user's order, 2026-09-30: Consultant = oversight of the 8 assessors, coaching them, the four-flaws finding, the
      triage script; Staff Consultant = the appointment to lead, the airline threat models, oversight of the bank team); drop bullets, don't reshuffle them. The CV carries only job-title dates (the user's rule, 2026-09-30): no dates inside bullets. **Education years and volunteering years are exempt** (they are standard and stay); reviewers must not flag them, and neither may you.
    - Skills must appear somewhere in the career docs.
    - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
      two pages.
    - **Match the user's design (their `cv.pdf` / `cover.pdf`)**: sections in this order:
-     `Summary` (the `P` lines under "Summary", which become the profile paragraph), `Key achievements`
-     (**always include it**: it is part of the user's design and their master CV. **Tailor it like every other section:**
+     `Summary` (the `P` lines under "Summary", which become the profile paragraph; **rewrite them heavily for the role**, in the JD's vocabulary, from facts the master and stories back: the Profile is the section that converges most; `writing-rules.md` section 2), `Key achievements`
+     (**always include it**: it is part of the user's design and their master CV. **Tailor it like every other section (but it tells outcomes, not methods; `writing-rules.md` section 2):**
      choose and order `P05`-`P08` by fit to the JD's must-haves, and lightly rephrase each toward the JD's own words
      (including its bold label, e.g. "Chained attack paths:" instead of "Impact:") **only where that line supports it**,
-     with no new facts, numbers or names, and nothing merged in from other lines. That they repeat some experience bullets is fine: the user's own CV does
-     the same. Never leave it out to save space or avoid repetition; trim elsewhere), an `Experience` block (`B01`
+     with no new facts, numbers or names, and nothing merged in from other lines. An event is told once in full: the achievement gives the outcome, the experience bullet the method; don't pick both when they read alike (the lint warns). Never leave the section out to save space; trim elsewhere), an `Experience` block (`B01`
      first: the company's one-line description) then one section per role in reverse-chronological order, then
-     `Projects`, `Volunteering` (if it fits), `Education`. **Skills are tailored too**: a `Skills` section of `K` lines,
-     the rows most relevant to the JD first, the least relevant rows dropped, and the items inside a row reordered
-     JD-first (drop or reorder only; never add a skill). The renderer draws it as the skills grid, so a `Skills`
-     section replaces the master's full seven rows. City and dates come from the master CV, so don't invent them.
+     `Projects`, `Volunteering`, `Education` (these three are **static**: copied verbatim from the master, always present; only Profile, Key achievements, Experience and Skills are tailored). **Skills are tailored too**: a `Skills` section of all seven `K` lines (none dropped), rows ordered by JD relevance, the items inside a row reordered JD-first or trimmed (never add a skill). Items are skill nouns only; JD phrases that are approaches ("security by design") go in the Profile, not in Skills. City and dates come from the master CV, so don't invent them.
      The CV must fit **two pages** and the cover letter **one**: cut the least relevant bullets (a bullet
-     that duplicates a Key achievement goes first) and make `C12` (why in-house) the first paragraph to drop.
+     that duplicates a Key achievement goes first) and make `C12` (why in-house) the first paragraph to drop. The letter and the CV must not read alike (`writing-rules.md` section 1).
+   **Read the CV and letter as a copy editor before validating**: no meta-commentary, no chat-style clauses, no repeated phrases, one tense per bullet, bullets grouped by context.
    - Headline: the target role title and 1-2 strengths; no contact details.
    - Visa sponsorship: the CV header (from `master_resume.md`'s `location`) does not say "Requires visa sponsorship" by default;
      the user decides per application (often after a referral or a first conversation). Ask before adding it to `location` for that
@@ -99,7 +94,7 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    `tools/render_pdf.py` or ask; changing approved text needs their yes.
 6. **Review gate.** Run the `application-review` skill on this folder (ATS, recruiter and consistency
    subagents plus `tools/consistency_check.py`); its findings go to the user **in the chat, not in a file**. Fix or
-   ask the user about every "fix before applying" finding, then re-validate and re-render. **Never skip it** (the user's rule, 2026-09-30): not for a small change, not when you only patch or refresh an existing application after a master change, not because the checker passed. All three readers, on every application.
+   ask the user about every "fix before applying" finding, then re-validate and re-render. **Never skip it** (the user's rule, 2026-09-30): not for a small change, not when you only patch or refresh an existing application after a master change, not because the checker passed. All four readers (ATS, recruiter, consistency, copy editor), on every application.
    If the user only asked for the CV, still build both files (they need both eventually), but lead
    with the CV.
 7. **Hand over for review.** Print the **Key achievements section in full** in your reply (the checker's diff lists only

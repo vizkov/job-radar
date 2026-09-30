@@ -24,6 +24,9 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from jobradar.career import EMAIL_RE, PHONE_RE, URL_RE, Career, load_career, masters_cleared  # noqa: E402
 
+sys.path.insert(0, str(ROOT / "tools"))
+from cv_lint import tailored_issues  # noqa: E402
+
 WORK = ROOT / "work" / "jd"
 SCORES = ROOT / "data" / "scores.jsonl"
 MET = {"yes", "partial", "no"}
@@ -201,10 +204,10 @@ def check_tailor(data: dict, career: Career) -> tuple[list[str], list[str]]:
             return
         if sid[0] not in kinds:
             errs.append(f"{where} cites [{sid}]; only {'/'.join(sorted(kinds))} items belong here")
-        if not isinstance(text, str) or not 0 < len(text) <= 450:
-            errs.append(f"{where} text must be 1-450 characters")
-            return
         source = career.items[sid].text
+        if not isinstance(text, str) or not 0 < len(text) <= max(450, len(source)):   # never longer than its own master line
+            errs.append(f"{where} text must be 1-450 characters (or no longer than its master line)")
+            return
         if (bad := _planted(text, contact)):
             errs.append(f"{where} adds contact details/links you didn't write: {bad}")
         if (new_nums := sorted(set(_NUM.findall(text)) - set(_NUM.findall(source)))):
@@ -241,7 +244,8 @@ def check_tailor(data: dict, career: Career) -> tuple[list[str], list[str]]:
             cover_used.append(str(c.get("source_id")))
     if (dupes := sorted({u for u in cover_used if cover_used.count(u) > 1})):
         errs.append(f"cover-letter paragraphs used twice: {dupes}")
-    return errs, warns
+    lint_errs, lint_warns = tailored_issues(data, career)   # form and section rules: writing-rules.md
+    return errs + lint_errs, warns + lint_warns
 
 
 def _digest(path: Path) -> str:

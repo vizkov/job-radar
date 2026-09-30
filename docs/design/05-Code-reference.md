@@ -516,6 +516,17 @@ Used by the `master-update` skill ([4.4d](04-Claude-session.md)). Read-only, no 
 application's `tailored.json` with the master line (`STALE` if a master file is newer than `resume.pdf`; `MISSING` ids; lines under 90%
 similar, most of which are deliberate condensations), `main()` prints one block per application folder.
 
+### `tools/cv_lint.py`: form and section rules for CV and letter text
+
+Used by `jd_check.py tailor` (errors fail validation) and by `master-update` (`python tools/cv_lint.py master`). No LLM. `line_issues()` flags
+meta-commentary ("too new for measured results", "came afterwards", "my own team", "from other teams"), "from about X to about Y", "extended deadline",
+dangling hyphens, RAG outside Skills, stacked hedges, "Briefed" without impact and repeated phrases. `skill_issues()` checks skill-item
+capitalisation and language lists. `master_issues()` adds the header rules (no relocation destination, no Medium link). `tailored_issues()` adds
+the section rules: static lines (projects, volunteering, education) present and verbatim, every skills row present, each role at its depth floor
+(3 bullets, or all if the master has fewer), a Key achievement that restates an experience bullet (warning). Rules: `.claude/skills/tailor-application/writing-rules.md`.
+
+**Watch out**: it is pattern-matching. Tone, tense and whether a section does its job are the copy-editor reviewer's (`application-review`).
+
 ### `tools/consistency_check.py`: cross-check CV, cover letter and STAR stories
 
 Used by the `application-review` skill ([4.4c](04-Claude-session.md)). No LLM. `read_doc()` (`.md`/`.txt`,

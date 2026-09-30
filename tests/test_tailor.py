@@ -30,6 +30,13 @@ GOOD = {
 }
 
 
+# A valid tailoring also keeps every static line, every skills row and each role at its depth floor (tools/cv_lint.py):
+_have = {b["source_id"] for sec in GOOD["sections"] for b in sec["bullets"]}
+GOOD["sections"].append({"heading": "Rest", "bullets": [
+    {"source_id": i, "text": it.text} for i, it in CAREER.items.items()
+    if i[0] in "BEK" and i not in _have]})
+
+
 def check(d):
     return jd_check.check_tailor(d, CAREER)
 

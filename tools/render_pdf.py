@@ -84,8 +84,14 @@ def all_names(name: str) -> str:
     return " / ".join([m.group(1).strip(), *parts])
 
 
+SMALL_WORDS = {"and", "or", "of", "for", "the", "to", "in", "on", "a", "an", "with", "at", "by"}
+
+
 def smart_title(s: str) -> str:
-    return " ".join(w if any(c.isupper() for c in w[1:]) or "/" in w else w[:1].upper() + w[1:] for w in s.split())
+    """Title-case a headline phrase: keep acronyms/mixed case, keep small words lowercase ("AI and Agent Security")."""
+    words = s.split()
+    return " ".join(w if any(c.isupper() for c in w[1:]) or "/" in w or (i and w.lower() in SMALL_WORDS)
+                    else w[:1].upper() + w[1:] for i, w in enumerate(words))
 
 
 def pretty_headline(h: str) -> str:

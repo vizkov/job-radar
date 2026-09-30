@@ -556,6 +556,11 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         r = by_ref.get(ref, {})
         lines.append(f"- You closed {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)} while it was in "
                      "progress: ask whether it was a rejection, an offer or a withdrawal, then `track` it")
+    awaiting = [i for i in (items or []) if i.get("stage") in ("Applied", "Interview") and _REF.search((i.get("content") or {}).get("body") or "")]
+    if awaiting:
+        names = ", ".join(sorted({safe((by_ref.get(_REF.search(i["content"]["body"]).group(1)) or {}).get("company"), 24) for i in awaiting}))
+        lines.append(f"- INBOX-CHECK: {len(awaiting)} applications await an answer ({names}); once per session, run the "
+                     "`inbox-check` skill (Gmail connector, read-only; suggest only, the user confirms)")
     for ref, days in follow_ups:
         r = by_ref.get(ref, {})
         lines.append(f"- Follow-up due: {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)}, "

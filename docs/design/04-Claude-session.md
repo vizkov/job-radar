@@ -27,6 +27,7 @@ The skills, and the tools each one runs:
 | `consultant-brief` | "what's new?" | reads the session brief, `board_sync.py fill` if needed |
 | `score-roles` | "which of these fit me?" | `jd_prep.py`, then Claude writes `score.json`, then `jd_check.py score --board` |
 | `tailor-application` | "tailor my CV for X" | Claude writes `tailored.json`, `jd_check.py tailor`, `render_resume.py` |
+| `inbox-check` | brief has an `INBOX-CHECK` line, or the user asks whether anyone replied | `inbox_outcomes.py pending`, the Gmail connector (search and read only), `inbox_outcomes.py classify`; suggests, the user confirms, then `track` (see [4.6b](#46b-reading-replies-inbox-check)) |
 | `master-update` | a master document (`master_resume.md`, `cover_blocks.md`, `stories.md`) changed, by the user or by Claude | `consistency_check.py` on the masters and `master_drift.py`, then two read-only subagents (master consistency auditor, cold reader); stale applications are rebuilt from the current masters and re-reviewed (see [4.4d](#44d-when-the-master-documents-change-master-update)) |
 | `application-review` | "review my application", the user provides or updates CV/cover/STAR drafts; runs automatically after `tailor-application` | `consistency_check.py`, then three read-only subagents (ATS, recruiter, consistency auditor); Claude verifies their findings and writes `review.md` |
 | `sponsorship-check` | "will they sponsor?", roles recommended apply/maybe | reads the ad, applies country rules, checks registers, WebSearch/WebFetch on company pages (never LinkedIn/Indeed/Glassdoor); `tools/sponsorship.py record --board` |
@@ -287,6 +288,17 @@ each from the user's material, and **the user approves the table**. Sensitive qu
 answered by Claude. A **Sonnet subagent** types the approved values only; Claude then
 re-reads the page and checks every field itself. Claude moves between pages; the **final
 Submit is always the user's click**. LinkedIn, Indeed and Glassdoor are never automated.
+
+## 4.6b Reading replies (`inbox-check`)
+
+The board only knows what the user tells it, so replies would otherwise go unnoticed. The session brief adds an `INBOX-CHECK` line when cards
+are in Applied or Interview. The skill then runs `tools/inbox_outcomes.py pending` (cards in those stages, with the date they got there and a
+Gmail search per company; the stage log overrides the snapshot, which is only refreshed at session start), searches the mailbox through the
+Gmail connector (search and read only; the connector is tied to the user's Claude login, so this runs only in a session, unlike the daily
+IMAP alert fetch), and labels each candidate with `inbox_outcomes.py classify` (phrase rules; rejection is tested first because rejections often
+mention interviews and thanks). Email text is untrusted (rule 1). Claude checks the label and the sender, reports one line per role, and the
+user confirms before `track` moves the card. `inbox_outcomes.py seen` (`state/inbox_seen.json`, private) stops an email being suggested twice.
+Nothing is sent, labelled or deleted.
 
 ## 4.7 Tracking and the board (`track`, views)
 

@@ -217,3 +217,12 @@ def test_read_stamp_accepts_aware_and_naive_times(tmp_path):
     aware.write_text("2026-09-29T08:58:46+02:00")                                # other offsets convert to UTC
     assert sb._read_stamp(aware) == datetime(2026, 9, 29, 6, 58, 46)
     assert sb._read_stamp(tmp_path / "missing") is None
+
+
+def test_inbox_check_line_lists_applications_awaiting_an_answer(tmp_path):
+    root = make_root(tmp_path, [row("a" * 16, "2026-10-02", company="Apple"), row("b" * 16, "2026-10-02", company="Sonar"),
+                                row("c" * 16, "2026-10-02", company="Other")])
+    out = brief(root, items=[item("a" * 16, "Applied"), item("b" * 16, "Interview"), item("c" * 16, "Shortlisted")])
+    line = next(x for x in out.splitlines() if "INBOX-CHECK" in x)
+    assert "2 applications await an answer" in line and "Apple" in line and "Sonar" in line and "Other" not in line
+    assert "INBOX-CHECK" not in brief(root, items=[item("c" * 16, "Shortlisted")])

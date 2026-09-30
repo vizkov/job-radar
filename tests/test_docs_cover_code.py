@@ -45,7 +45,7 @@ def test_every_config_section_is_documented():
 # A new skill must get a row there and an entry here, or this test fails.
 USER_PHRASES = {
     "apply-assist": "Help me apply", "application-review": "Review my application", "consultant-brief": "What's new?", "cv-review": "How do I strengthen my CV?",
-    "docs-review": "Are the docs still right?", "health": "Is anything broken?", "interview-prep": "I have an interview",
+    "docs-review": "Are the docs still right?", "health": "Is anything broken?", "inbox-check": "Did anyone reply?", "interview-prep": "I have an interview",
     "manual": "/manual", "master-update": "I updated my CV / cover letter / stories", "referrals": "Who do I know at", "score-roles": "Which of these fit me?",
     "setup": "Set this up for me", "sponsorship-check": "sponsor my visa", "system-review": "What could be better?",
     "tailor-application": "Tailor my CV", "track": "I applied to", "tune-radar": "Stop showing",

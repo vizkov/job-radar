@@ -19,6 +19,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "tailor my CV for …", "prep my application for …", "write a cover letter for …" | `tailor-application` |
 | "review my application", "are these consistent?", "would a recruiter shortlist this?", the user provides or updates their CV / cover letter / STAR drafts, or `tailor-application` finishes | `application-review` (three read-only subagents: ATS, recruiter, consistency audit; runs automatically after tailoring) |
 | the user edits `profile/career/master_resume.md`, `cover_blocks.md` or `stories.md`, or you change one (a review fix, an "Also true" line) | `master-update` (consistency re-check of the masters with two subagents, then refresh every application built from the old versions; run it after **every** master change) |
+| brief has an **INBOX-CHECK** line, "did anyone reply?", "any rejections?" | `inbox-check` (Gmail connector, read-only; suggests Rejected/Interview/Offer, the user confirms, then `track`) |
 | "will they sponsor?", a role recommended apply/maybe before referrals | `sponsorship-check` (ad + country rules + register + web research; verdict with evidence on the card) |
 | a role is shortlisted or "apply", "who do I know at …", "X referred me", brief lists an unanswered ask | `referrals` (asked before applying; the user sends every message) |
 | "fill in the application for …", "help me apply to …" | `apply-assist` (Chrome; the user approves every page and submits) |
@@ -59,7 +60,7 @@ Never loop over refs with one call each.
   (`profile/applications/<folder>/`).
 - Tools you run (all have `--help`): `radar.py`, `verify_boards.py`,
   `tools/board_sync.py`, `tools/jd_prep.py`, `tools/jd_check.py`, `tools/render_resume.py`,
-  `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/master_drift.py` (which applications no longer match the master documents), `tools/build_candidates.py`, `tools/public_template.py`,
+  `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/master_drift.py` (which applications no longer match the master documents), `tools/inbox_outcomes.py` (applications awaiting an answer; phrase classifier for outcome emails), `tools/build_candidates.py`, `tools/public_template.py`,
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
 - Tailoring always starts from `profile/career/` (never from another application's `tailored.json`); `tailored.json` may carry an optional
   per-copy `location` for the CV header; facts the user adds go into `stories.md` as "Also true" lines.

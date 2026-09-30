@@ -500,6 +500,13 @@ into the design's middot line. All text is HTML-escaped. `render_pdfs()` writes 
 **Watch out:** the design is two pages for the CV and one for the letter; the tailoring skill trims low-value
 lines to fit, and the renderer never shrinks the type.
 
+### `tools/inbox_outcomes.py`: applications awaiting an answer, and an outcome-email classifier
+
+Used by the `inbox-check` skill ([4.6b](04-Claude-session.md)). No mailbox access and no LLM. `pending()` lists refs in Stage Applied or Interview
+(`latest_stages()` overlays the stage log on `data/pipeline_snapshot.json`; `applied_dates()` gives the date each moved there) with a Gmail
+search string; `classify()` matches phrase rules in the order rejection, offer, interview, acknowledgement (unknown otherwise); `seen_ids()` and
+`add_seen()` keep `state/inbox_seen.json`; `main()` is the CLI (`pending`, `classify`, `seen`).
+
 ### `tools/master_drift.py`: which applications no longer match the master documents
 
 Used by the `master-update` skill ([4.4d](04-Claude-session.md)). Read-only, no LLM. `check_app()` compares each cited line in an

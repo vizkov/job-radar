@@ -71,9 +71,10 @@ The user is the approver and the one who submits. You prepare and type; you neve
    d. Only then press "Next"/"Continue" to the following page yourself. Page transitions stay with you.
 4. **Final review page:** screenshot it, list anything the site pre-filled or changed, and tell the user:
    "Everything is filled; please review and click Submit yourself." Do not click it. Leave the tab open.
-5. **After the user says they submitted:** run `track` (Stage=Applied), and save a short record in the
-   application folder (`submitted.md`: date, URL, answers the user gave to sensitive questions only if
-   they want them kept, any follow-up the site mentioned). Commit to `origin`.
+5. **After the user says they submitted:** run `track` (Stage=Applied) with a short dated `--note` (any follow-up the site
+   mentioned goes there). Save no other file: the application folder holds only the two PDFs and the checker's files, and
+   everything else is already logged (board card, `data/referrals.jsonl`, `profile/application_answers.json`). New standing
+   answers the user gave go in `profile/application_answers.json`. Commit to `origin` only when the user agrees.
 
 If the form behaves oddly (fields not accepting input, unexpected redirects, CAPTCHA), stop after two
 attempts, describe what happened, and let the user take over in that tab.

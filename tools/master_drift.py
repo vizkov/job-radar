@@ -1,6 +1,8 @@
 """Which applications no longer match the master career documents?
 
     python tools/master_drift.py            # every application folder with a tailored.json
+    python tools/master_drift.py status     # are the masters cleared by the master-update check?
+    python tools/master_drift.py clear      # record the masters as cleared (only after the check found nothing left to fix)
 
 Tailored lines are copies of master lines (P/B/K/E in the CV, C/S in the letter). When the user
 changes the master CV, cover blocks or stories, an application built earlier may be stale. Per
@@ -23,7 +25,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from jobradar.career import career_dir, load_career  # noqa: E402
+from jobradar.career import career_dir, clear_masters, load_career, masters_cleared  # noqa: E402
 
 APPS = ROOT / "profile" / "applications"
 MASTER_FILES = ("master_resume.md", "cover_blocks.md", "stories.md")
@@ -47,7 +49,16 @@ def check_app(app: Path, career, master_mtime: float) -> dict:
 
 
 def main() -> int:
-    argparse.ArgumentParser(description=__doc__.split("\n")[0]).parse_args()
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("action", nargs="?", choices=["list", "status", "clear"], default="list")
+    args = ap.parse_args()
+    if args.action == "status":
+        ok, why = masters_cleared()
+        print("masters cleared: applications may be built or refreshed" if ok else f"masters NOT cleared: {why}")
+        return 0 if ok else 1
+    if args.action == "clear":
+        print(f"masters recorded as cleared ({clear_masters()[:12]}): run this only after the master-update check found nothing left to fix")
+        return 0
     career = load_career()
     master_mtime = max((career_dir() / f).stat().st_mtime for f in MASTER_FILES if (career_dir() / f).exists())
     apps = sorted(p for p in APPS.glob("*/") if (p / "tailored.json").exists()) if APPS.exists() else []

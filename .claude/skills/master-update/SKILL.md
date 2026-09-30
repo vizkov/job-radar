@@ -10,6 +10,14 @@ one can leave the masters contradicting each other, and leave earlier applicatio
 to `profile/career/master_resume.md`, `cover_blocks.md` or `stories.md`, including your own edits (e.g. appending an
 "Also true" line to a story) and the user's.
 
+**Mandatory, in this order (the user's rule, 2026-09-30): masters first, drafts second.** The masters are the source; a draft built from a
+master that is still changing gets rebuilt again and again for the smallest thing. So: (1) batch every master change you know of (the
+user's new facts, review findings, wording fixes); (2) run steps 1-4 below on the result, **every time, never skipped** (the deterministic
+pass and the two fresh subagents); (3) fix what they find and repeat until nothing is left to fix; (4) only then
+`python tools/master_drift.py clear`, which records the masters as clean; (5) rebuild each unsent application **once** (step 5). `tools/jd_check.py tailor`
+refuses to validate any application, and so `render_resume.py` refuses too, while `python tools/master_drift.py status` says the masters are not cleared.
+A finding from `application-review` that needs a master change goes back to step 1: change the master, check it, clear it, then rebuild; don't patch the draft first.
+
 **Order matters: steps 1-4 (re-check the masters with the subagents, fix what they find) come before step 5 (rebuilding applications).** Applying the
 user's new facts to the masters is itself a master change, so the subagent review runs again after you apply them; don't rebuild
 applications from masters that haven't been re-checked.

@@ -5,6 +5,9 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
 
 # Tailor an application
 
+0. **Masters first.** Run `python tools/master_drift.py status`. If it says the masters are not cleared, run the `master-update` check (deterministic pass plus two
+   fresh reviewers), fix what it finds, `python tools/master_drift.py clear`, and only then build or refresh the draft: drafts come from clean masters, once (the
+   user's rule, 2026-09-30). `jd_check.py tailor` refuses otherwise.
 1. **Identify the role.** Find its ref in `data/matches.csv` (match company/title) or on the board card.
    If it isn't scored yet, run the `score-roles` steps for it first — the must-haves drive the tailoring.
 2. **Make the folder** `profile/applications/<YYYY-MM-DD>-<company>-<role>/` (lowercase, hyphens).

@@ -22,7 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from jobradar.career import EMAIL_RE, PHONE_RE, URL_RE, Career, load_career  # noqa: E402
+from jobradar.career import EMAIL_RE, PHONE_RE, URL_RE, Career, load_career, masters_cleared  # noqa: E402
 
 WORK = ROOT / "work" / "jd"
 SCORES = ROOT / "data" / "scores.jsonl"
@@ -262,6 +262,12 @@ def cmd_tailor(folder: str) -> int:
     career = load_career()
     errs, warns = check_tailor(data, career) if isinstance(data, dict) else (["tailored.json must be an object"], [])
     (app / "validated.sha256").unlink(missing_ok=True)
+    ok, why = masters_cleared()
+    if not ok:
+        print(f"MASTERS NOT CLEARED: {why}.\nApplication drafts are only built or refreshed from clean masters. "
+              "Run the master-update check (deterministic pass plus two fresh reviewers), fix what they find, "
+              "then  python tools/master_drift.py clear")
+        return 1
     if errs:
         print("INVALID tailored.json:\n" + "\n".join(f"  - {e}" for e in errs))
         return 1

@@ -241,6 +241,7 @@ docstring holds the four rules for any AI step.
 | `Item` | One line: `id`, `text`, `section`, `context` (the role heading it sits under). |
 | `Career` | `contact` (front matter), `items` (ID → Item), `raw_text`; `has(id)`, `contact_tokens()` (every email/URL/phone the user wrote). |
 | `career_dir()` | `profile/career` (else `examples/career`). |
+| `MASTER_FILES`, `CLEARED_FILE`, `masters_digest()`, `masters_cleared()`, `clear_masters()` | The "masters are clean" stamp: the three masters' hash, recorded by `master_drift.py clear` after the `master-update` check and required by `jd_check.py tailor`. |
 | `_front_matter(text)` | Splits `---`-delimited `key: value` lines from the body. |
 | `_add(...)` | Adds an item; a duplicate ID is an error. |
 | `load_career(folder)` | Parses `master_resume.md` (required), `stories.md` and `cover_blocks.md` (optional). |
@@ -508,6 +509,8 @@ search string; `classify()` matches phrase rules in the order rejection, offer, 
 `add_seen()` keep `state/inbox_seen.json`; `main()` is the CLI (`pending`, `classify`, `seen`).
 
 ### `tools/master_drift.py`: which applications no longer match the master documents
+
+Two more actions: `status` says whether the masters are **cleared** (they passed the `master-update` check exactly as they are now) and `clear` records it. `jobradar/career.py` holds the stamp: `masters_digest()` (SHA-256 of the three masters, line endings ignored), `masters_cleared()`, `clear_masters()`; the stamp is `profile/career/.master_cleared`. `tools/jd_check.py tailor` calls `masters_cleared()` and refuses (removing the validation stamp, so `render_resume.py` refuses too) when the masters changed after the last clean check.
 
 Used by the `master-update` skill ([4.4d](04-Claude-session.md)). Read-only, no LLM. `check_app()` compares each cited line in an
 application's `tailored.json` with the master line (`STALE` if a master file is newer than `resume.pdf`; `MISSING` ids; lines under 90%

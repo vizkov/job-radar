@@ -103,6 +103,10 @@ The JD for a role is `work/jd/<ref>/jd.txt`; `packet.md` there wraps it as untru
 
 ## 4. Fixing
 
+If a finding needs a **master** change (a fact, a wording the stories must back, a master line), stop patching the draft: change the master, run the `master-update` check,
+`python tools/master_drift.py clear`, then rebuild the draft once (the user's rule, 2026-09-30: masters first, drafts second). Only fixes that are purely about this draft
+(a referent, a line order, a page fit) are made in `tailored.json`.
+
 Fix only with the user's agreement, and only by the career-doc rules: rephrase or drop; never
 invent experience or numbers. A finding that means "the claim is not true or not evidenced" goes to
 the user as a question ("was the rating kept or lowered?"), never a guess. After edits to

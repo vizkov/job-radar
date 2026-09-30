@@ -10,6 +10,7 @@ letter may draw from; tools/jd_check.py enforces that by ID.
 """
 from __future__ import annotations
 
+import hashlib
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -51,6 +52,43 @@ class Career:
 
 def career_dir() -> Path:
     return profile_path("career")
+
+
+# The masters are the source every application is built from. The master-update check (deterministic pass plus
+# two fresh reviewers) must come first, and only clean masters may be used for drafts, so a clean check is
+# recorded as a stamp (the SHA-256 of the three masters) that tools/jd_check.py tailor requires.
+MASTER_FILES = ("master_resume.md", "cover_blocks.md", "stories.md")
+CLEARED_FILE = ".master_cleared"
+
+
+def masters_digest(directory: Path | None = None) -> str:
+    d = directory or career_dir()
+    h = hashlib.sha256()
+    for name in MASTER_FILES:
+        h.update(name.encode() + b"\x00")
+        f = d / name
+        if f.exists():
+            h.update(f.read_bytes().replace(b"\r\n", b"\n"))
+    return h.hexdigest()
+
+
+def masters_cleared(directory: Path | None = None) -> tuple[bool, str]:
+    """(True, "") when the masters are exactly as they were at the last clean master-update check."""
+    d = directory or career_dir()
+    stamp = d / CLEARED_FILE
+    if not stamp.exists():
+        return False, "the master documents have not been cleared by the master-update check"
+    if stamp.read_text(encoding="utf-8").strip() != masters_digest(d):
+        return False, "the master documents changed after the last clean master-update check"
+    return True, ""
+
+
+def clear_masters(directory: Path | None = None) -> str:
+    """Record that the masters passed the master-update check as they are now; returns the digest."""
+    d = directory or career_dir()
+    digest = masters_digest(d)
+    (d / CLEARED_FILE).write_text(digest + "\n", encoding="utf-8")
+    return digest
 
 
 def _front_matter(text: str) -> tuple[dict[str, str], str]:

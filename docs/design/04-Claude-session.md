@@ -227,7 +227,7 @@ Tailored applications are copies of master lines. If a master line changes (or a
 to contradict each other, and every earlier application is potentially stale. After **every** master change the skill runs
 `consistency_check.py` on the three masters and `tools/master_drift.py` (per application: `STALE` if the master files are newer than
 `resume.pdf`, `MISSING` ids, lines that `DIFFER` from the master), launches two read-only subagents (a master consistency auditor
-and a cold reader of the changed lines), verifies their findings against the pages, and rebuilds every unsent stale application from the current masters
+and a cold reader of the changed lines), verifies their findings against the pages, and rebuilds every unsent stale application from the current masters (but only once the masters are cleared: `master_drift.py clear` after the check found nothing left to fix; `jd_check.py tailor` refuses until then, so drafts are built from clean masters once, not re-patched for every small master edit)
 (`tailor-application` step 3, then `application-review`). Submitted applications are not re-rendered; the user is told which used a
 line that later changed. Reviewer claims about dates are usually wrong (CV dates belong to titles), and a claim stronger than its story
 usually means a true fact is missing from the story, which the user confirms and Claude appends as an "Also true" line.

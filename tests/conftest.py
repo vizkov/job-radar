@@ -37,6 +37,7 @@ def _isolate_tool_state(tmp_path, monkeypatch):
     monkeypatch.setattr(jd_prep, "MATCHES", tmp_path / "_iso_matches.csv")
     monkeypatch.setattr(jd_check, "WORK", tmp_path / "_iso_jd")
     monkeypatch.setattr(jd_check, "APPS", tmp_path / "_iso_apps")
+    monkeypatch.setattr(jd_check, "masters_cleared", lambda *a, **k: (True, ""))  # tests that want the real guard override this
     monkeypatch.setattr(board_sync, "WORK_JD", tmp_path / "_iso_jd")
     import render_resume
     monkeypatch.setattr(render_resume, "APPS", tmp_path / "_iso_apps")

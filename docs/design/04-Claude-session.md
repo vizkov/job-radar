@@ -279,6 +279,9 @@ user's own lines, after a fresh agent has read it as the recruiter would, and th
 route, Not needed) and comment the step on the issue. The session brief's `referral_notes()` lists
 asks unanswered after `referrals.wait_days` (default 4): one follow-up, or apply directly.
 
+A recruiter is suggested as a route only with evidence that they hire for this function (the headline or activity names it, or the JD names them);
+a generic "AI recruiting" or "technical recruiter" headline is labelled unverified and the team-member route goes first.
+
 The opt-in LinkedIn lookup also covers **hiring posts**: on request for one role, at most two read-only content searches (newest first). Posts by
 people who work at the company are reported as warm routes; job-board reposts are reported as "live but not a contact"; the rest is ignored.
 

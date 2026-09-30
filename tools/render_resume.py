@@ -89,6 +89,8 @@ def main(argv=None) -> int:
         return 1
     data = json.loads(src.read_text(encoding="utf-8"))
     contact = load_career().contact
+    if data.get("location"):
+        contact = {**contact, "location": data["location"]}
     scratch = SCRATCH / app.name
     scratch.mkdir(parents=True, exist_ok=True)
     md, cover = to_markdown(data, contact), cover_letter(data, contact)

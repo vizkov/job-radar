@@ -30,6 +30,10 @@ The user is the approver and the one who submits. You prepare and type; you neve
 
 1. **Referral first.** If the card's Referral field is empty or *Finding contact*, or an ask is still within
    `referrals.wait_days`, say so and offer the `referrals` step before filling anything; the user decides.
+1. **Standing answers first.** Read `profile/application_answers.json` (private): sponsorship, notice period, in-office, relocation,
+   consent to be contacted, voluntary demographics. Use those values in the page table (the user still approves each page).
+   Ask only about what is `null` or missing, and **save every new answer to that file** so it is never asked again. Voluntary
+   demographic questions with a `null` value stay blank.
 1. **Pick the role and material.** Find the ref in `data/matches.csv`. There must be a validated tailored
    application (`profile/applications/<folder>/validated.sha256` matching `tailored.json`); if not, run
    `tailor-application` first. Use the role's URL from `matches.csv` (the company's own ATS link), never

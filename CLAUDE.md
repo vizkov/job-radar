@@ -18,6 +18,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "which of these fit me?", "score the new roles", "is this one worth it?" | `score-roles` |
 | "tailor my CV for …", "prep my application for …", "write a cover letter for …" | `tailor-application` |
 | "review my application", "are these consistent?", "would a recruiter shortlist this?", the user provides or updates their CV / cover letter / STAR drafts, or `tailor-application` finishes | `application-review` (three read-only subagents: ATS, recruiter, consistency audit; runs automatically after tailoring) |
+| the user edits `profile/career/master_resume.md`, `cover_blocks.md` or `stories.md`, or you change one (a review fix, an "Also true" line) | `master-update` (consistency re-check of the masters with two subagents, then refresh every application built from the old versions; run it after **every** master change) |
 | "will they sponsor?", a role recommended apply/maybe before referrals | `sponsorship-check` (ad + country rules + register + web research; verdict with evidence on the card) |
 | a role is shortlisted or "apply", "who do I know at …", "X referred me", brief lists an unanswered ask | `referrals` (asked before applying; the user sends every message) |
 | "fill in the application for …", "help me apply to …" | `apply-assist` (Chrome; the user approves every page and submits) |
@@ -58,8 +59,12 @@ Never loop over refs with one call each.
   (`profile/applications/<folder>/`).
 - Tools you run (all have `--help`): `radar.py`, `verify_boards.py`,
   `tools/board_sync.py`, `tools/jd_prep.py`, `tools/jd_check.py`, `tools/render_resume.py`,
-  `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/build_candidates.py`, `tools/public_template.py`,
+  `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/master_drift.py` (which applications no longer match the master documents), `tools/build_candidates.py`, `tools/public_template.py`,
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
+- Tailoring always starts from `profile/career/` (never from another application's `tailored.json`); `tailored.json` may carry an optional
+  per-copy `location` for the CV header; facts the user adds go into `stories.md` as "Also true" lines.
+- `profile/application_answers.json` (private) holds the user's standing answers to application-form questions (sponsorship, notice period,
+  in-office, consent, voluntary demographics). `apply-assist` reads it first and saves every new answer there, so the user is never asked twice.
 - Board views are code (`VIEWS` in `tools/board_sync.py`): `board_sync.py views` builds/restores
   them, `design-diff` shows drift (the session brief checks it). Sort and board grouping can't be set
   by API: relay the clicks it prints. To change a view for good, edit `VIEWS` and commit.

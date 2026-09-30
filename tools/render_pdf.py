@@ -74,6 +74,16 @@ def base(name: str) -> str:
     return re.sub(r"\s*\(.*?\)", "", name).strip()
 
 
+def all_names(name: str) -> str:
+    """"X (formerly part of A, then B)" -> "X / A / B": a role line names every employer the master names."""
+    m = re.match(r"(.+?)\s*\((.*?)\)\s*$", name)
+    if not m:
+        return name
+    inner = re.sub(r"^(?:formerly|now|ex-?)\s+(?:part of\s+)?", "", m.group(2).strip(), flags=re.I)
+    parts = [x.strip() for x in re.split(r",\s*(?:then\s+)?|\s+then\s+", inner) if x.strip()]
+    return " / ".join([m.group(1).strip(), *parts])
+
+
 def smart_title(s: str) -> str:
     return " ".join(w if any(c.isupper() for c in w[1:]) or "/" in w else w[:1].upper() + w[1:] for w in s.split())
 
@@ -158,10 +168,11 @@ def experience_structure(career) -> list[dict]:
                            "roles": [{"title": p[0], "company": "", "dates": "", "ctx": ctx}]})
         elif len(p) == 3:                      # title — company — dates
             cur = blocks[-1] if blocks else None
-            if cur is None or base(p[1]) not in cur["company"]:
+            names = [base(n) for n in p[1].split("/")]   # "A / B / C": the employer under several names
+            if cur is None or not any(n in cur["company"] for n in names):
                 cur = {"company": p[1], "city": "", "dates": "", "desc_ctx": None, "roles": []}
                 blocks.append(cur)
-            cur["roles"].append({"title": p[0], "company": base(p[1]), "dates": p[2], "ctx": ctx})
+            cur["roles"].append({"title": p[0], "company": all_names(p[1]), "dates": p[2], "ctx": ctx})   # keep "(formerly …)": the master names every employer
     return blocks
 
 
@@ -308,6 +319,8 @@ def cover_html(data: dict, career, contact: dict, role_title: str = "", company:
 
 def render_pdfs(app: Path, data: dict, career, ref: str) -> list[str]:
     contact = career.contact
+    if data.get("location"):
+        contact = {**contact, "location": data["location"]}
     role_title, company = role_and_company(ref)
     print_pdf(resume_html(data, career, contact), app / "resume.pdf")
     print_pdf(cover_html(data, career, contact, role_title, company), app / "cover_letter.pdf")

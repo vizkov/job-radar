@@ -167,13 +167,22 @@ def check_tailor(data: dict, career: Career) -> tuple[list[str], list[str]]:
     """Returns (errors, warnings)."""
     errs, warns = [], []
     allowed = {"key", "headline", "sections", "skills", "cover_letter"}
-    if extra := set(data) - allowed:
+    optional = {"location"}   # per-copy header location (e.g. names the role's city); the user's decision
+    if extra := set(data) - allowed - optional:
         errs.append(f"unexpected fields: {sorted(extra)}")
     if missing := allowed - set(data):
         return errs + [f"missing fields: {sorted(missing)}"], warns
     if not re.fullmatch(r"[0-9a-f]{16}", str(data["key"])):
         errs.append("key must be the role ID (16 hex characters)")
     contact = career.contact_tokens()
+    if "location" in data:
+        loc, master_loc = data["location"], career.contact.get("location", "")
+        if not isinstance(loc, str) or not 0 < len(loc) <= 120:
+            errs.append("location must be 1-120 characters")
+        elif not loc.startswith(master_loc.split("·")[0].strip()):
+            errs.append("location must start with the city and country in your master CV")
+        elif _planted(loc, contact):
+            errs.append("location contains contact details/links you didn't write")
     head = data["headline"]
     if not isinstance(head, str) or not 0 < len(head) <= 120:
         errs.append("headline must be 1-120 characters")

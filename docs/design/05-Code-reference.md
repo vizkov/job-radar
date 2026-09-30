@@ -500,6 +500,12 @@ into the design's middot line. All text is HTML-escaped. `render_pdfs()` writes 
 **Watch out:** the design is two pages for the CV and one for the letter; the tailoring skill trims low-value
 lines to fit, and the renderer never shrinks the type.
 
+### `tools/master_drift.py`: which applications no longer match the master documents
+
+Used by the `master-update` skill ([4.4d](04-Claude-session.md)). Read-only, no LLM. `check_app()` compares each cited line in an
+application's `tailored.json` with the master line (`STALE` if a master file is newer than `resume.pdf`; `MISSING` ids; lines under 90%
+similar, most of which are deliberate condensations), `main()` prints one block per application folder.
+
 ### `tools/consistency_check.py`: cross-check CV, cover letter and STAR stories
 
 Used by the `application-review` skill ([4.4c](04-Claude-session.md)). No LLM. `read_doc()` (`.md`/`.txt`,

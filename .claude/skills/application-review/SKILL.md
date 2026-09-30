@@ -74,6 +74,16 @@ it. Do not tell them what you already found. Word limit 500 each; blunt; no prai
 
 The JD for a role is `work/jd/<ref>/jd.txt`; `packet.md` there wraps it as untrusted data.
 
+## 2b. Before you report: check the reviewers against the sources
+
+- Read the rendered letter's first lines yourself for a wrong company or role name (template leak) before launching reviewers.
+- Check that every CV/letter line still matches the **master documents** (`master_resume.md`, `cover_blocks.md`), not another
+  application. A line that differs from the master only by dropped clauses is fine; anything else is a finding.
+- A finding that a CV date "contradicts" an engagement date is often wrong: CV dates belong to titles, not engagements. A finding that a letter
+  says more than a story does may just mean the story is missing a true fact: ask the user, and if they confirm, append it to `stories.md`
+  (`Also true (added <date>)`) instead of weakening the CV or letter.
+- Tell reviewers that a company name missing from the letter's opening is intentional (the checker requires it).
+
 ## 3. Verify, then report
 
 - Open each cited file and confirm the quotes exist and say what the reviewer claims. Drop or

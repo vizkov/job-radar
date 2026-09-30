@@ -27,6 +27,7 @@ The skills, and the tools each one runs:
 | `consultant-brief` | "what's new?" | reads the session brief, `board_sync.py fill` if needed |
 | `score-roles` | "which of these fit me?" | `jd_prep.py`, then Claude writes `score.json`, then `jd_check.py score --board` |
 | `tailor-application` | "tailor my CV for X" | Claude writes `tailored.json`, `jd_check.py tailor`, `render_resume.py` |
+| `master-update` | a master document (`master_resume.md`, `cover_blocks.md`, `stories.md`) changed, by the user or by Claude | `consistency_check.py` on the masters and `master_drift.py`, then two read-only subagents (master consistency auditor, cold reader); stale applications are rebuilt from the current masters and re-reviewed (see [4.4d](#44d-when-the-master-documents-change-master-update)) |
 | `application-review` | "review my application", the user provides or updates CV/cover/STAR drafts; runs automatically after `tailor-application` | `consistency_check.py`, then three read-only subagents (ATS, recruiter, consistency auditor); Claude verifies their findings and writes `review.md` |
 | `sponsorship-check` | "will they sponsor?", roles recommended apply/maybe | reads the ad, applies country rules, checks registers, WebSearch/WebFetch on company pages (never LinkedIn/Indeed/Glassdoor); `tools/sponsorship.py record --board` |
 | `referrals` | "who do I know at …", a role recommended apply, an unanswered ask in the brief | `tools/referrals.py contacts/ask/result/route/pending`; drafts in `profile/applications/<folder>/outreach.md` |
@@ -201,8 +202,12 @@ The `tailored.json` contract:
  "sections": [{"heading": "1-80 chars",
                "bullets": [{"source_id": "P/B/E id", "text": "1-450 chars"}]}],
  "skills": ["each must appear in the career docs"],
- "cover_letter": [{"source_id": "C/S id", "text": "1-450 chars"}]}
+ "cover_letter": [{"source_id": "C/S id", "text": "1-450 chars"}],
+ "location": "optional per-copy header location; must start with the master CV's city and country"}
 ```
+
+`location` is the user's per-application decision (e.g. name the role's city when the master says "UK / EU"). `render_resume.py` and
+`render_pdf.py` use it in place of the master `location`; the checker rejects contact details in it.
 
 Each `source_id` at most once, within the sections and within the cover letter. Heavy rewording (under 45% similar) only warns, and `S`
 items are exempt, since condensing a story is expected.
@@ -214,6 +219,17 @@ nothing edited after validation can be rendered. By default it writes only `resu
 `resume.docx` (one column, standard headings, no tables or images, which applicant tracking
 systems parse reliably) when a form needs a Word upload. Name and contact details come only from
 `master_resume.md`'s front matter.
+
+## 4.4d When the master documents change (`master-update`)
+
+Tailored applications are copies of master lines. If a master line changes (or a story gains a fact), the masters can start
+to contradict each other, and every earlier application is potentially stale. After **every** master change the skill runs
+`consistency_check.py` on the three masters and `tools/master_drift.py` (per application: `STALE` if the master files are newer than
+`resume.pdf`, `MISSING` ids, lines that `DIFFER` from the master), launches two read-only subagents (a master consistency auditor
+and a cold reader of the changed lines), verifies their findings against the pages, and rebuilds every unsent stale application from the current masters
+(`tailor-application` step 3, then `application-review`). Submitted applications are not re-rendered; the user is told which used a
+line that later changed. Reviewer claims about dates are usually wrong (CV dates belong to titles), and a claim stronger than its story
+usually means a true fact is missing from the story, which the user confirms and Claude appends as an "Also true" line.
 
 ## 4.4c Reviewing an application (`application-review`)
 

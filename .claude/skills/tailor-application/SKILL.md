@@ -8,7 +8,24 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
 1. **Identify the role.** Find its ref in `data/matches.csv` (match company/title) or on the board card.
    If it isn't scored yet, run the `score-roles` steps for it first — the must-haves drive the tailoring.
 2. **Make the folder** `profile/applications/<YYYY-MM-DD>-<company>-<role>/` (lowercase, hyphens).
-3. **Write `tailored.json`:**
+3. **Write `tailored.json`, always from the master documents** (the `master-update` skill re-runs this when they change).** Take every line from `profile/career/master_resume.md`
+   and `cover_blocks.md`. **Never copy or start from another application's `tailored.json`**: it carries that
+   role's wording, its company name and its decisions (this once put "Amazon Web Services" in an Apple and a Sonar
+   letter, and dropped lines the user had approved in the master). If the checker's 450-character limit forces a
+   shorter line, drop clauses from the master line; don't import another application's version. Build the file from a
+   small script that reads the master by ID, so every line starts as the user's own text.
+   The checker rejects capitalised names that are not in the career docs, so the letter's opening names the role in
+   lowercase (`I am applying for the application security engineer role.`) and the company appears only in the
+   "why this company" line at the start of a sentence. Read every rendered letter for a wrong company name.
+   **Role lines in the PDF come from the master's own `## Role — Company — dates` headings** (`render_pdf.py`), not from the `tailored.json`
+   section headings; the master's Consultant heading names all three employers and the PDF prints it in full. To change what the PDF shows,
+   edit the master heading (the `tailored.json` heading is only for the review text and the checker's 80-character limit).
+   **Header location:** when the master `location` doesn't cover the role's country (e.g. it says "UK / EU" and the role is in
+   Switzerland), set the optional `"location"` field (e.g. `"Bengaluru, India · Open to relocation to Geneva, Switzerland"`); this is part
+   of tailoring, no need to ask.
+   **Facts the user tells you** (a fuller version of an event, how something came about) are appended to `stories.md` as an
+   "Also true (added <date>)" line on that story, in their words, so the CV, letter and stories agree.
+   Note: JSON schema for the file:
    ```json
    {"key": "<ref>",
     "headline": "one line, e.g. Application Security Engineer — secure code review & threat modeling",

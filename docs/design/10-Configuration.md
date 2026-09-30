@@ -48,6 +48,18 @@ Dutch and Swedish equivalents. "Smart contract" is exempt. Sources without an em
 (public APIs, careers pages, alert emails) are filtered by title only; `score-roles` treats a
 contract stated only in the job description as a blocker.
 
+## Working languages (`languages`)
+
+The languages the user works in, by English name (default `["English"]`). It is read by `tools/jd_prep.py`,
+not by the daily run (which never sees an ad's text). For every job description it writes one
+"Language check" line into `packet.md`: which language the ad is written in (stop-word counts for
+English, German, French, Dutch, Spanish, Italian, Swedish, Portuguese), and any other language the ad
+asks for ("fluent German", "Dutch language skills"; a sentence naming a language needs a proficiency cue,
+so "our German bank clients" is ignored; "a plus" or "nice to have" next to it makes it optional). An ad
+written in, or requiring, a language not in this list is a `language` blocker and `score-roles`
+recommends skip. It is a hint: Claude still reads the text. Adding a language here (for example
+`["English", "German"]`) stops both the flag and the blocker for it.
+
 ## Old roles (`max_age_days`)
 
 A role is dropped when its posted date is more than `max_age_days` days ago (drop reason "posted too

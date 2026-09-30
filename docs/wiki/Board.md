@@ -72,7 +72,7 @@ can see it.
 
 | View | What it's for |
 |---|---|
-| **Act now** | Tier 1 roles posted in the last 14 days that you haven't acted on or ruled out, newest first. Start here: applying early matters |
+| **Act now** | Tier 1 roles posted 14 or more days ago that you haven't acted on or ruled out, best fit first: the ones about to expire. Fresh roles are in All Roles, sorted by fit then newest first |
 | **All Roles** | Everything, best fit first |
 | **Pipeline** | A board with one column per Stage; drag cards as things happen |
 

@@ -56,6 +56,7 @@ do?" or type `/manual` (it's generated from the system itself).
 | "Add a view with only Tier 2 roles" | Adds it to your board and keeps it in your copy's design, so it comes back if the board is rebuilt |
 | "Undo that tuning change" | Puts a title rating back to what it was before Claude's automatic weekly adjustment |
 | "Stop showing DevSecOps roles" / "Add Checkmarx" / "Also look in Germany" | Changes your settings, shows you before/after numbers, saves when you agree |
+| "Only roles in English" | Your working languages are `languages` in your config (English by default). Every job description gets a language check: an ad written in, or requiring, another language (German, Dutch, French…) is flagged and scored as a skip. Add a language there if you learn one |
 | "Skip anything posted over a month ago" | Sets the maximum age of a role (`max_age_days`, 30 by default when you ask for a month). Roles with no posted date are kept. Older roles already on your board can be moved to Skipped |
 | "How do I strengthen my CV?" / "Which certs matter?" | Looks across your scored roles for requirements you keep missing and suggests what to add or evidence better |
 | (automatic) | At the start of each session, when you send your first message, Claude first scores up to 8 of the freshest unscored Tier 1 roles (2–4% of a session), then answers you. Say "don't auto-score" or ask Claude to change the number |

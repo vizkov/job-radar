@@ -165,3 +165,36 @@ def test_eures_role_uses_vacancy_api(work):
     folder, status = jd_prep.prepare(row("5" * 16, f"https://europa.eu/eures/portal/jv-se/jv-details/{jv}?lang=en"), fetcher())
     assert status == "ok: eures api" and api.called and not page.called
     assert "Penetration Tester" in (folder / "jd.txt").read_text(encoding="utf-8")
+
+
+# --- language check -------------------------------------------------------------------------------------------------
+EN_AD = ("We are looking for a Senior Security Engineer to join our team. You will work with the engineering team and "
+         "be responsible for the security of our products and the people who use them every day. ") * 2
+
+
+def test_english_ad_asking_nothing_is_clean():
+    assert "no other language asked for" in jd_prep.language_line(EN_AD + "Our German bank clients trust us.")
+
+
+def test_required_language_is_a_blocker_hint_and_a_plus_is_not():
+    assert jd_prep.language_requirements(EN_AD + "Fluent German is required.") == {"German": "required"}
+    assert jd_prep.language_requirements(EN_AD + "French language skills are a plus.") == {"French": "optional"}
+
+
+def test_run_on_line_is_judged_by_the_words_around_the_language():
+    text = EN_AD + "Fluent Swedish is mandatory You speak and write fluent English and you know our tools well enough to work alone from day one, ideally with a security background"
+    assert jd_prep.language_requirements(text) == {"Swedish": "required"}
+
+
+def test_non_english_ad_is_flagged():
+    de = ("Wir suchen einen Senior Security Engineer für unser Team. Sie sind verantwortlich für die Sicherheit der "
+          "Anwendungen und arbeiten mit den Entwicklern zusammen. ") * 3
+    assert jd_prep.detect_language(de) == "de"
+    assert "written in German" in jd_prep.language_line(de)
+
+
+def test_allowed_languages_come_from_config(monkeypatch, tmp_path):
+    (tmp_path / "config.json").write_text('{"languages": ["English", "German"]}', encoding="utf-8")
+    monkeypatch.setattr("jobradar.paths.profile_path", lambda name: tmp_path / name)
+    assert jd_prep.allowed_languages() == {"en", "de"}
+    assert jd_prep.language_requirements(EN_AD + "Fluent German is required.") == {}

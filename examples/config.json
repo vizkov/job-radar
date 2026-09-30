@@ -5,6 +5,9 @@
   "extra_countries": ["FR", "ES", "IT", "DK", "FI", "NO", "AT", "BE", "LU", "PT", "EE", "LT", "PL"],
   "include_extra_countries": false,
 
+  "languages": ["English"],
+  "_languages_comment": "Working languages you have. An ad that requires any other language (German, French, Dutch, ...), or is written in one, is flagged in the JD packet and scored as a language blocker (skip).",
+
   "max_age_days": 0,
   "_max_age_comment": "Drop roles posted more than this many days ago (0 = no limit). Roles with no posted date are kept.",
 

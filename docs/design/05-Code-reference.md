@@ -453,7 +453,7 @@ Walkthrough: [4.3](04-Claude-session.md). Functions: `html_to_text()` (main text
 nav/scripts), `_as_text()`, `via_scraper()` (ATS scraper's description), `job_api()` (public per-job APIs for Greenhouse, Apple and EURES; `_greenhouse_text()`, `_apple_text()`, `_eures_text()` turn each JSON reply into text; `_EURES_PAGE` matches EURES portal links), `public_url()`
 (Amazon's login-walled links → public page), `jsonld_description()`, `Fetcher` (`_allowed`
 robots cache, `fetch` the ordered fallbacks), `load_rows()`, `scored_refs()`, `select()`
-(which roles), `render_packet()`, `prepare()` (write `jd.txt`, `meta.json`, `packet.md`),
+(which roles), `allowed_languages()` (config `languages`), `detect_language()` (stop-word counts), `language_requirements()` (languages an ad asks for: required or optional) and `language_line()` (the "Language check" line in every packet), `render_packet()`, `prepare()` (write `jd.txt`, `meta.json`, `packet.md`),
 `main()`. The ATS scraper's text is used only if it's at least 200 characters; otherwise
 it falls back to the page. `--refresh` re-fetches even when `jd.txt` exists.
 

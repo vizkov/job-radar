@@ -456,10 +456,11 @@ def refresh_bodies(gh: Gh) -> str:
 VIEWS = [
     {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "",
      "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
-     "sort": [("Fit", "DESC")], "group": []},
-    {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "is:open tier:T1 stage:New,Shortlisted -label:possibly-closed -recommendation:Skip posted:>=@today-14d",
+     "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},
+    # "Act now" = the roles about to expire: still open, posted 14+ days ago (the user's definition, 2026-09-30).
+    {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "is:open tier:T1 stage:New,Shortlisted -label:possibly-closed -recommendation:Skip posted:<=@today-14d",
      "fields": ["Title", "Stage", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
-     "sort": [("Posted", "DESC")], "group": []},
+     "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},
     {"name": "Pipeline", "layout": "BOARD_LAYOUT", "filter": "",
      "fields": ["Title", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
      "sort": [], "group": ["Stage"]},

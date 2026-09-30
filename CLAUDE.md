@@ -66,6 +66,9 @@ Never loop over refs with one call each.
   per-copy `location` for the CV header; facts the user adds go into `stories.md` as "Also true" lines.
 - `profile/application_answers.json` (private) holds the user's standing answers to application-form questions (sponsorship, notice period,
   in-office, consent, voluntary demographics). `apply-assist` reads it first and saves every new answer there, so the user is never asked twice.
+- `languages` in `profile/config.json` (English by default) is the user's working languages. `jd_prep.py` puts a "Language check"
+  line in every JD packet (the ad's language, any other language it asks for); an ad written in or requiring another language is a
+  `language` blocker, so `score-roles` recommends skip. It's a hint: read the text.
 - Board views are code (`VIEWS` in `tools/board_sync.py`): `board_sync.py views` builds/restores
   them, `design-diff` shows drift (the session brief checks it). Sort and board grouping can't be set
   by API: relay the clicks it prints. To change a view for good, edit `VIEWS` and commit.

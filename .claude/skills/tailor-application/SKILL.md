@@ -52,6 +52,8 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
      the terms you converged and the ones you left missing and why.
    - **Page fit on a refresh.** If a rebuild pushes the CV past two pages, cut in this order: a bullet that duplicates a Key
      achievement, the least relevant bullet, Volunteering; and tell the user exactly which lines you dropped.
+   - **Bullet order inside a role follows the master** (the user's order, 2026-09-30: Consultant = oversight of the 8 assessors, coaching them, the four-flaws finding, the
+     triage script; Staff Consultant = the appointment to lead, the airline threat models, oversight of the bank team); drop bullets, don't reshuffle them. The CV carries only job-title dates (the user's rule, 2026-09-30): no dates inside bullets. **Education years and volunteering years are exempt** (they are standard and stay); reviewers must not flag them, and neither may you.
    - Skills must appear somewhere in the career docs.
    - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
      two pages.

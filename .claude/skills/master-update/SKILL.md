@@ -23,6 +23,7 @@ user's new facts to the masters is itself a master change, so the subagent revie
 applications from masters that haven't been re-checked.
 
 ## What the master documents are (and are not)
+The CV carries only job-title dates (the user's rule, 2026-09-30): no dates inside bullets. **Education years and volunteering years are exempt** (they are standard and stay); reviewers must not flag them, and neither may you. Put dates of events in `stories.md` or the cover-letter blocks (letters may carry dates).
 The masters are **extensive, unpolished logs** of everything the user has done, in every variation: generic, not tailored, not ready to send, and
 deliberately not formatted. `tailor-application` picks the lines that fit a role's JD, shrinks them and changes keywords; what is dropped for
 one role may be right for another, so the masters are always the reference and tailored drafts never are. So the review checks **facts**, not polish:

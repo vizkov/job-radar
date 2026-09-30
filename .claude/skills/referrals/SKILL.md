@@ -116,6 +116,11 @@ don't spend a referral on a role that can't sponsor the user.
     it, but the user's own finding is "I found" (don't understate it).
   - **Write "India", not a city** (recruiters abroad may not know it). Say the user would live in the ad's
     location if the ad requires it ("relocation to Geneva"); confirm with the user that they are willing.
+  - **Visa line and connection notes (the user's edit, 2026-09-30):** a connection request that only asks for a **chat** may drop the visa line
+    to fit the 300 characters, but tell the user to raise sponsorship early in the conversation (a late reveal reads as a surprise). Any message that asks for a
+    **CV** or a **referral** keeps the visa line. Call the opening a **role** ("interested in applying for the Security Engineer, Applied AI role"), never
+    "the … ad". A connection note is **one block, no blank lines** (LinkedIn may drop them, and the count is exact: a draft at exactly 300 characters is one
+    stray character from failing), and always give the count.
   - **Visa need in one calm line**, in the middle, not last, quoting the ad if it offers relocation. Phrase it "I'd need UK visa sponsorship, and I'm willing to relocate to <city>" (the user's wording; softer than "would move").
   - **One small ask, matched to who is asked (the user's decision, 2026-09-30).** A **recruiter** gets "Could I send you my CV?" (they can act on
     a CV at once, and it beats "a call?"). An **engineer or hiring-team member** gets "Could we chat briefly about the team?": a small slice of

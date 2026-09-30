@@ -37,7 +37,8 @@ don't spend a referral on a role that can't sponsor the user.
   LinkedIn people-search links to open themselves and ask them to paste what they see.
   - Claude in Chrome, in a tab you open, in the user's own logged-in browser. Never type credentials;
     if LinkedIn asks to sign in or shows a CAPTCHA or security check, stop and hand it to the user.
-  - At most 3 people searches for this company (e.g. the likely hiring manager: "Head of Product
+  - At most **10 searches per role in total** (people searches and content searches together; the user raised the limit from 3, 2026-09-30),
+    first results page only, refined by function: e.g. the likely hiring manager: "Head of Product
     Security", "AppSec Manager"; the recruiter: "Technical Recruiter" or "Talent Acquisition" with
     "Security"/"Engineering"), first results page only. Read names and headlines from the results;
     open profiles to confirm the current employer and function: 5 by default, up to 8 when the user asks to dig deeper (see the checklist below).
@@ -64,7 +65,7 @@ don't spend a referral on a role that can't sponsor the user.
     profile URL. Don't write them to a file (an application folder holds only `resume.pdf` and
     `cover_letter.pdf`, the user's rule) and don't add strangers to `network.csv`.
   - **Hiring posts (same opt-in, same role, when the user asks "has anyone posted hiring?").** After the people searches, or when the user
-    asks for it alone, run at most **2 content searches** (`/search/results/content/?keywords=…&sortBy="date_posted"`, first page only), e.g.
+    asks for it alone, run content searches (they count toward the 10; `/search/results/content/?keywords=…&sortBy="date_posted"`, first page only), e.g.
     `<company> hiring <role words> <city>` and `"we're hiring" <company> <team or domain words> <city>`. Read-only, in the same tab, and never
     react, comment, follow or message. Sort what you see into: **(a)** a post by a person who works at the company (a recruiter, the team
     lead, an engineer) about this role or team: report author, headline, how old the post is, one short quoted line and the post's author
@@ -94,6 +95,11 @@ don't spend a referral on a role that can't sponsor the user.
     re-testing automation beats a threat-modelling tool). Leave out asks the CV doesn't cover (say nothing about
     them) and never say "production" or "at scale" when the CV shows internal tooling. Cite the CV IDs to the user
     in your reply, not in the message.
+  - **Convergence is a reading of the ad, then the user's ground, never a claim of fit.** Write: "Reading the ad, I took the core of the role to be
+    A, B and C. That is the ground I work on every day: <the domain or area, in plain words>." Do **not** write "two pieces of recent work fit the
+    ad" or list CV items as evidence (abrupt, reads like a résumé, and the user rejected it, 2026-09-30). Describe the *area and kind of work*
+    the user does, drawn from the CV, and keep the specific items, numbers and findings for the CV and the call. A and B and C are the ad's
+    core asks the CV covers; leave out the ones it doesn't.
   - **Plain sentences, no bullet lists, and vary the sentence starts** ("I do… I do… I do…" reads as a template):
     open sentences with "My background is", "The X side is familiar ground", "I also build". Use the CV's facts,
     not its phrasing ("from report to verified fix" reads as a résumé line): write it as speech. Numbers and a

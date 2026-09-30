@@ -40,7 +40,15 @@ don't spend a referral on a role that can't sponsor the user.
   - At most 3 people searches for this company (e.g. the likely hiring manager: "Head of Product
     Security", "AppSec Manager"; the recruiter: "Technical Recruiter" or "Talent Acquisition" with
     "Security"/"Engineering"), first results page only. Read names and headlines from the results;
-    open a profile only to confirm the current employer, 5 profiles at most.
+    open profiles to confirm the current employer and function: 5 by default, up to 8 when the user asks to dig deeper (see the checklist below).
+  - **Dig-deeper checklist (read each opened profile; read-only, stop at any LinkedIn challenge):** (1) the **current employer and role** in the
+    header (a hiring post or repost can be a year old and its author may have moved on: check where the poster works *now*; one hiring lead
+    seen in a repost had left the company); (2) the **function and team** (About, headline, recent posts, talks, conferences, open-source work), not just the
+    title; (3) **recent activity**: what they post or repost tells you what they hire for or work on, and a feed of only company brand reposts
+    (product launches, events) is *not* evidence of any function; (4) **shared ground** with the user (same school, mutual connections)
+    as an opening line; (5) for people who look like the hiring team, whether they have posted about hiring for this kind of role. Give each person one
+    of three verdicts in the reply: **verified** (evidence for this function, with the line that shows it), **unverified** (headline only, or
+    activity that doesn't show the function), or **not a route** (left the company, or a different function). Say which profiles you opened.
   - **A recruiter is only a route if there is evidence they hire for this kind of role.** A company-wide or generic headline ("AI
     Recruiting", "Technical Recruiter", "Talent Acquisition Leader") is not evidence for a security role: recruiters split by function, and a
     message to the wrong one is wasted and can burn the chance. Count as evidence: the headline or profile names the function (security,

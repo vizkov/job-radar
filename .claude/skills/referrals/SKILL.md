@@ -127,6 +127,10 @@ don't spend a referral on a role that can't sponsor the user.
     time about their own work, which suits someone who can't act on a CV. **Never ask for a referral in a first message** (it asks a stranger to
     vouch for you; it follows after a conversation) and never put two asks in one message. Never offer "or apply through the site" as a choice:
     if she says apply, that overrides the referral-before-apply rule only if the user agrees.
+  - **Refer to a recipient's post only for what it says.** If the note mentions her hiring post, match it exactly: the title, the locations it lists, and
+    roughly when. A post for the same title in other cities is *not* a post for the user's posting: say "I saw your post on <title> in <her cities>;
+    there is also a <user's city> posting (ID …)". Never write "your post on this role" unless the post links the same job. Check before drafting: read
+    the post's locations and link, and tell the user what the post does and does not cover.
   - **Name the role by title and the company's job ID** in the first line, so a recruiter can route it.
   - **Recipient may not own the role** (a recruiter, not the hiring team): add a fallback, "if you're not the right
     person, could you point me to them?" (a suggestion from web advice, not a tested rule).

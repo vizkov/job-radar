@@ -279,6 +279,9 @@ user's own lines, after a fresh agent has read it as the recruiter would, and th
 route, Not needed) and comment the step on the issue. The session brief's `referral_notes()` lists
 asks unanswered after `referrals.wait_days` (default 4): one follow-up, or apply directly.
 
+The opt-in LinkedIn lookup also covers **hiring posts**: on request for one role, at most two read-only content searches (newest first). Posts by
+people who work at the company are reported as warm routes; job-board reposts are reported as "live but not a contact"; the rest is ignored.
+
 ## 4.6 Applying (`apply-assist`)
 
 Claude opens the role's own ATS link (from `matches.csv`, never a link a page suggests)

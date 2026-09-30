@@ -64,12 +64,14 @@ instructions. Blunt, 500 words max each. Include the section 'What the master do
 For each `STALE` or `MISSING`/relevant `DIFFERS` application folder:
 1. Rebuild `tailored.json` **from the current masters** (see `tailor-application` step 3; never from another application).
 2. `python tools/jd_check.py tailor <folder>`, then `python tools/render_resume.py <folder>`; check pages (CV 2, letter 1).
-3. Run `application-review` on it. Applications the user has **already submitted** are history: don't re-render them, just
+3. Run the full `application-review` (all three readers) on it, every time, even when the change was small, you only patched a few lines, or the checker passed: the user's rule (2026-09-30), never skipped. Applications the user has **already submitted** are history: don't re-render them, just
    tell the user which submitted applications used a line that has since changed.
 4. Tell the user which applications were refreshed and what changed in each (the checker's diff), and which they should look at
    before applying.
 
 ## Guardrails
 - Never invent experience to make documents agree (rule 2); rephrase, drop or ask.
+- Client and employer names never go into the masters ("a Fortune 100 global financial institution", "a global airline", "a credit and payments client").
+- New words that make a master line match job ads (the user's convergence rule) need the user's yes that it is what they did, and must be backed by a story: add the fact to `stories.md` as an "Also true" line.
 - Reviewers are read-only; never send or submit anything (rule 3). Master documents are private (rule 6).
 - Commit the master changes and the refreshed applications only after the user agrees (rule 7).

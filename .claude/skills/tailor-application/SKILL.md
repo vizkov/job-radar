@@ -40,6 +40,15 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
      cover letter. Each ID at most once.
    - You may select, reorder and lightly rephrase — mirror the JD's vocabulary **only where the original
      line supports it**. No new numbers, employers, tools, links, emails or phone numbers.
+   - **Converge with the JD's vocabulary (the user's rule, 2026-09-30).** Where a JD term means the same as work in the user's
+     lines (the user's examples: "security by design" for secure design review and threat modelling; "authentication and
+     authorisation testing" for the auth findings; "microservice" testing for their payments work), use the JD's word: it lifts
+     the ATS match. A term that is new to the masters goes through the user once (they confirm it is what they did), then into
+     the masters (K or B line) so every application gets it. Only terms the stories back up: a guardrail *review* is not
+     "responsible AI", and NIST CSF, COBIT, certifications or tools they haven't used stay missing. In the hand-over, list
+     the terms you converged and the ones you left missing and why.
+   - **Page fit on a refresh.** If a rebuild pushes the CV past two pages, cut in this order: a bullet that duplicates a Key
+     achievement, the least relevant bullet, Volunteering; and tell the user exactly which lines you dropped.
    - Skills must appear somewhere in the career docs.
    - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
      two pages.
@@ -85,8 +94,8 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    `tools/render_pdf.py` or ask; changing approved text needs their yes.
 6. **Review gate.** Run the `application-review` skill on this folder (ATS, recruiter and consistency
    subagents plus `tools/consistency_check.py`); its findings go to the user **in the chat, not in a file**. Fix or
-   ask the user about every "fix before applying" finding, then re-validate and re-render. Skip only if the user
-   says not to. If the user only asked for the CV, still build both files (they need both eventually), but lead
+   ask the user about every "fix before applying" finding, then re-validate and re-render. **Never skip it** (the user's rule, 2026-09-30): not for a small change, not when you only patch or refresh an existing application after a master change, not because the checker passed. All three readers, on every application.
+   If the user only asked for the CV, still build both files (they need both eventually), but lead
    with the CV.
 7. **Hand over for review.** Print the **Key achievements section in full** in your reply (the checker's diff lists only
    changed lines, and these are master lines, so they don't show there), with one line on why each was chosen or left out

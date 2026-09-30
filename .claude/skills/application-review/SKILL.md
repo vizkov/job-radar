@@ -112,6 +112,7 @@ folders built from them. Then offer `track` (Shortlisted) or `apply-assist`.
 
 ## Guardrails
 
+- **Never skip the review** (the user's rule, 2026-09-30): not for a small change, not for a patch or refresh of an existing application after a master change, not because the checker passed. All three readers, on every application.
 - Reviewers are read-only and never see secrets; the review stays in private paths (`profile/`).
 - A reviewer's persona is not a real ATS or a real recruiter. Say the verdict is a judgement.
 - Never send, submit or message anyone (rule 3).

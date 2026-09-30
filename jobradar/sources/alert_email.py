@@ -49,7 +49,7 @@ _NOISE = re.compile(r"^(easy apply|apply with .*|actively recruiting|promoted|be
 
 
 _ACCOUNT_MAIL = re.compile(r"\b(is now active|confirm|verify|welcome|has been (created|updated|deleted)|"
-                           r"unsubscribed|password)\b", re.I)
+                           r"unsubscribed|password|sign in|code|security alert)\b", re.I)
 
 
 def _part(msg: Message, ctype: str) -> str:
@@ -160,11 +160,49 @@ def parse_html(p: Provider, body: str) -> list[dict]:
     return jobs
 
 
+# Indeed "job match" emails (donotreply@match.indeed.com): one recommended job, laid out as title / company / location /
+# "Job type: …", then "View job: <cts.indeed.com tracking link>". Only that link is accepted, so the "Edit profile",
+# "Manage email settings" and "Unsubscribe" links in the same email can never become a job.
+_MATCH_LINK = re.compile(r"https://cts\.indeed\.com/v3/[\w~.-]+(?:/[\w~.-]+)?")
+_MATCH_SKIP = re.compile(r"^(job type|work setting|shift and schedule|benefits|pay)\s*:", re.I)
+
+
+def is_match_mail(msg: Message) -> bool:
+    return "@match.indeed.com" in (msg.get("From") or "").lower()
+
+
+def parse_match(body: str) -> list[dict]:
+    paras, cur = [], []
+    for raw in body.splitlines():
+        line = " ".join(raw.split())
+        if line:
+            cur.append(line)
+        elif cur:
+            paras.append(cur)
+            cur = []
+    if cur:
+        paras.append(cur)
+    jobs = []
+    for i, para in enumerate(paras):
+        hit = _MATCH_LINK.search(para[0]) if para[0].lower().startswith("view job") else None
+        if not hit or i == 0:
+            continue
+        card = [l for l in paras[i - 1] if not _NOISE.match(l) and not _MATCH_SKIP.match(l)]
+        if len(card) >= 2:
+            title, company, location = card[0], card[1], (card[2] if len(card) > 2 else "")
+            jobs.append({"id": _content_id(title, company, location), "link": hit.group(0),
+                         "title": title, "company": company, "location": location})
+    return jobs
+
+
 _SUBJECT_PLACE = re.compile(r"\bjobs? in (.+?)(?: is now active)?$", re.I)
 
 
 def to_postings(msg: Message, p: Provider) -> list[Posting]:
-    jobs = parse_text(p, _part(msg, "text/plain")) or parse_html(p, _part(msg, "text/html"))
+    if is_match_mail(msg):
+        jobs = parse_match(_part(msg, "text/plain"))
+    else:
+        jobs = parse_text(p, _part(msg, "text/plain")) or parse_html(p, _part(msg, "text/html"))
     # Alerts are per search, e.g. "5 new … jobs in United Kingdom": the searched place backs up card
     # locations the country lookup doesn't know (small towns).
     hit = _SUBJECT_PLACE.search(" ".join((msg.get("Subject") or "").split()))

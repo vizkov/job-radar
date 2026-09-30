@@ -31,7 +31,8 @@ PROVIDERS = {
         re.compile(r"linkedin\.com/(?:comm/)?jobs/view/(?:[^/?\s\"']*?-)?(\d{6,})", re.I),
         "https://www.linkedin.com/jobs/view/{id}/"),
     "indeed": Provider(
-        "indeed", ("alert@indeed.com", "donotreply@jobalert.indeed.com", "noreply@indeed.com", "@indeed.com"),
+        "indeed", ("alert@indeed.com", "donotreply@jobalert.indeed.com", "noreply@indeed.com", "@indeed.com",
+                   "@match.indeed.com"),
         "indeed.com",
         re.compile(r"indeed\.[a-z.]+/[^\s\"']*?[?&](?:amp;)?jk=([0-9a-f]{16})", re.I),
         "https://www.indeed.com/viewjob?jk={id}",

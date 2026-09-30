@@ -194,3 +194,25 @@ def test_indeed_html_only_card_uses_redirect_and_shortest_title():
     jobs = parse_html(PROVIDERS["indeed"], html)
     assert [(j["title"], j["company"], j["location"], j["link"]) for j in jobs] == [
         ("Cyber Security Engineer", "Tai Tarian", "Neath", job)]
+
+
+def test_indeed_match_mail_is_one_job_and_other_links_are_not_jobs():
+    """Sanitised from a real Indeed job-match email (2026-09, donotreply@match.indeed.com): title / company / location, then
+    'View job:'. The sender used to be ignored as unknown; profile, settings and feedback links are never jobs."""
+    msg = load("real/indeed_match_2026_09.eml")
+    assert PROVIDERS["indeed"] is not None and dkim_ok(msg, PROVIDERS["indeed"].dkim_domain)
+    jobs = to_postings(msg, PROVIDERS["indeed"])
+    assert [(j.title, j.company, j.location) for j in jobs] == [("Security Engineer II (Offensive)", "Flywire", "Bengaluru, Karnataka")]
+    assert jobs[0].url == "https://cts.indeed.com/v3/FAKE_TOKEN_view-1/FAKE_SIG_a"
+    assert jobs[0].countries == frozenset({"IN"})
+    assert [j.external_id for j in to_postings(load("real/indeed_match_2026_09.eml"), INDEED)] == [jobs[0].external_id]
+
+
+def test_indeed_sign_in_code_mail_is_not_a_layout_change(tmp_path):
+    (tmp_path / "_status.json").write_text(json.dumps({"ok": True, "fetched": 1, "mailbox": "INBOX", "providers": {}}))
+    (tmp_path / "a.eml").write_text(
+        "From: Indeed <login@indeed.com>\nTo: alerts@example.com\nSubject: Sign in to Indeed with code: 000000\n"
+        "Authentication-Results: mx.google.com; dkim=pass header.i=@indeed.com\n"
+        "Content-Type: text/plain; charset=utf-8\n\nYour code.\n")
+    res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["indeed"]}).fetch())
+    assert not [u for u in res.units if u.key.endswith(":parse")]

@@ -13,7 +13,7 @@ The rules come from the failures in this user's Amazon, Allianz and Meta drafts,
 | Reader | ATS, then recruiter | Hiring manager | The user, before an interview (never sent) |
 | Voice | Telegraphic: verb-led fragments, no "I", no "we", no narrative | First person, connected prose, three or four paragraphs, one idea each | First person, full detail, honest about what was the team's and what was theirs |
 | Content | Claim + result + scale; nothing that needs the next sentence to make sense | One or two proof points told as a short story, tied to *this* role and company; adds what the CV cannot (motive, judgement, how) | Situation, task, action, result, lesson, plus "Also true" facts and private notes |
-| Never | Commentary on the work ("the X came afterwards"), hedges ("too new for measured results"), process asides, chatty clauses | A paragraph-by-paragraph replay of the CV; a claim the CV cannot back | Polish |
+| Never | Spoken phrasing and casual asides ("so I don't have a measured saving yet", "a lot", "much less", "really"): the user's rule, 2026-10-01, for every draft including application-form answers; state what was done in plain, specific prose, and a missing figure is simply left out; commentary on the work ("the X came afterwards"), hedges ("too new for measured results"), process asides, chatty clauses | A paragraph-by-paragraph replay of the CV; a claim the CV cannot back | Polish |
 
 How they relate: the CV *claims*, the letter *argues* (one or two of those claims, with the reasoning), the
 stories *prove* (every CV and letter claim traces to a story; the letter and CV never say more than the story

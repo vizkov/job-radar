@@ -26,6 +26,9 @@ BANNED = [
     (r"\((?:from|of|in|at) other [^)]*\)|,\s*from other \w+\b", "a parenthetical about where people came from: usually implied, cut it"),
     (r"\bfrom (?:about|around|roughly|approximately) .{3,40} to (?:about|around|roughly|approximately)\b", "informal \"from about X to about Y\": state the result once"),
     (r"\b\w+-\s+and\s+\w+-\w+", "dangling hyphen (\"passenger- and customer-data\"): drop the hyphens"),
+    # Casual talk (the user's rule, 2026-10-01): a draft is written prose, not speech.
+    (r"\b(I|we) (?:do not|don't|won't|will not|can't|cannot) (?:have|know|make|claim)\b", "spoken disclaimer (\"I don't have ...\"): state what was done; limits belong in the stories"),
+    (r"\byet\s*[.;,)]|\b(?:a lot|kind of|sort of|pretty (?:much|good)|really|basically)\b|\bmuch (?:less|more|faster|better)\b", "casual phrasing (\"yet\", \"a lot\", \"much less\", \"really\"): write it as plain, specific prose"),
 ]
 # Decided wording (\"expedited\", \"go-live fast approaching\" ...) is data, not code: writing-rules.md section 7, read by the reviewers.
 # Only in prose lines (P, B, C, S): the acronym belongs in Skills.

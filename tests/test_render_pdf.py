@@ -107,3 +107,12 @@ def test_prints_a_real_pdf(tmp_path):
     out = tmp_path / "resume.pdf"
     rp.print_pdf(rp.resume_html(DATA, career(), CONTACT), out)
     assert out.read_bytes()[:5] == b"%PDF-" and out.stat().st_size > 1000
+
+
+def test_posting_title_hyphen_is_tidied_and_volunteering_takes_its_label_from_the_heading():
+    h = rp.cover_html(DATA, career(), CONTACT, "Penetration Testing Engineer- VP", "ExampleCo", date(2026, 9, 30))
+    assert "<b>Re: Penetration Testing Engineer – VP</b>" in h
+    c = career()
+    c.items["B09"] = Item("B09", "Ran sessions for young people.", "Experience", "Volunteering — Helpers Abroad — 2023")
+    data = dict(DATA, sections=[{"heading": "x", "bullets": DATA["sections"][0]["bullets"] + [{"source_id": "B09", "text": "Ran sessions for young people."}]}])
+    assert "<b>Helpers Abroad</b>: Ran sessions for young people." in rp.resume_html(data, c, CONTACT)

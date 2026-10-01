@@ -257,6 +257,9 @@ def resume_html(data: dict, career, contact: dict) -> str:
         for i, t in vol:
             label, rest = split_label(t)
             year = career.items[i].context.split(" — ")[-1]
+            if not label:   # the entry name lives in the master heading, so the line itself need not repeat it
+                parts = career.items[i].context.split(" — ")
+                label = parts[1] if len(parts) > 1 else parts[0]
             rows.append(f'<div class="row"><p><b>{esc(label)}</b>: {esc(rest)}</p><span class="meta">{esc(year)}</span></div>')
         out.append('<h2>Volunteering</h2><div class="edu">' + "".join(rows) + "</div>")
 
@@ -296,7 +299,7 @@ def cover_html(data: dict, career, contact: dict, role_title: str = "", company:
     body.append(f'<p class="addr">{esc(when)}</p>' + (f'<p class="addr">{esc(company)}</p>' if company else ""))
     body.append('<p class="salute">Dear Hiring Manager,</p>')
     if role_title:
-        role_title = re.sub(r"(\w)- ", r" – ", role_title)   # posting titles often read "Engineer- VP"
+        role_title = re.sub(r"(\w)- ", r"\1 – ", role_title)   # posting titles often read "Engineer- VP"
         body.append(f'<p class="re"><b>Re: {esc(role_title)}</b></p>')
     body.append(f"<p>{esc(opening)}</p>")
     blocks = [(i, t) for i, t in paras if i not in OPENING + CLOSING]

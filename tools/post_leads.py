@@ -115,10 +115,13 @@ def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
     log = _load(QUERIES, {})
     stamp = now or _now()
     out = []
-    firms = sorted(fit_companies(), key=lambda c: (log.get(f"company|{c}") or {}).get("last", ""))
+    # keyed by the normalised name, so "Amazon" and "Amazon Web Services" are one employer however the best-scored role names it;
+    # the list itself is rebuilt from the scores each time, so new employers join (never run: first) and dropped ones leave
+    ckey = lambda c: f"company|{normalize(c)}"  # noqa: E731
+    firms = sorted(fit_companies(), key=lambda c: (log.get(ckey(c)) or {}).get("last", ""))
     for c in firms[:min(s["company_queries"], n)]:
         out.append(f'{c} "we\'re hiring" security')
-        log[f"company|{c}"] = {"last": stamp, "runs": (log.get(f"company|{c}") or {}).get("runs", 0) + 1}
+        log[ckey(c)] = {"last": stamp, "runs": (log.get(ckey(c)) or {}).get("runs", 0) + 1}
     titles, places, phrases = s["titles"], s["places"], s["phrases"]
     tail = f" NOT ({' OR '.join(s['not_words'])})" if s["not_words"] else ""
     pairs = list(itertools.product(range(len(titles)), range(len(places))))

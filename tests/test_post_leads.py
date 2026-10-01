@@ -93,3 +93,19 @@ def test_closest_title_wins_when_an_employer_has_several_similar_roles():
     write_matches(["a" * 16 + ",Solaris,Cyber Security Engineer - Vulnerability Management,Berlin,DE,u,ats,,1",
                    "b" * 16 + ",Solaris,Cyber Security Staff Engineer - Application Security,Berlin,DE,u,ats,,1"])
     assert pl.known_roles("Solaris", "Cyber Security Staff Engineer - Application Security")[0]["ref"] == "b" * 16
+
+
+def test_company_rotation_survives_a_name_change_and_picks_up_new_employers():
+    write_scores([{"company": "Amazon", "recommendation": "apply", "fit_score": 85},
+                  {"company": "Solaris", "recommendation": "maybe", "fit_score": 58}])
+    pl.next_queries(2, now="2026-10-01T00:00:00+00:00")   # both searched once
+    write_scores([{"company": "Amazon UK", "recommendation": "apply", "fit_score": 90},   # same employer, new display name
+                  {"company": "Solaris", "recommendation": "maybe", "fit_score": 58},
+                  {"company": "Monzo", "recommendation": "apply", "fit_score": 70}])               # new employer
+    out = pl.next_queries(3, now="2026-10-02T00:00:00+00:00")
+    assert out[0].startswith("Monzo ")                       # never searched: first
+    log = json.loads(pl.QUERIES.read_text(encoding="utf-8"))
+    assert sorted(k for k in log if k.startswith("company|")) == ["company|amazon", "company|monzo", "company|solaris"]   # one entry per employer
+    assert log["company|monzo"]["runs"] == 1 and log["company|amazon"]["runs"] in (1, 2)
+    out2 = pl.next_queries(3, now="2026-10-03T00:00:00+00:00")
+    assert sum(q.startswith("Amazon") for q in out + out2) == 2    # Amazon: once before the rename, once after, never twice in a row

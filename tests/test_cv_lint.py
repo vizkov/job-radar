@@ -31,6 +31,21 @@ def test_clean_line_passes():
     assert cv_lint.line_issues("B01", "Automated exploit revalidation in Python, cutting triage time by around 50%.") == ([], [])
 
 
+def test_vague_category_warns():
+    for bad in ("Familiar with endpoint tools.", "Scripting ability and networking skills.", "Holds security certifications."):
+        assert any("vague" in w for w in cv_lint.line_issues("B01", bad)[1]), bad
+    for good in ("Automated exploit revalidation in Python.", "Hold CompTIA Security+."):
+        assert not any("vague" in w for w in cv_lint.line_issues("B01", good)[1]), good
+    assert not any("vague" in w for w in cv_lint.line_issues("C03", "I have knowledge of this team.")[1])
+
+
+def test_soft_skill_filler_warns():
+    for bad in ("Team player with strong communication skills.", "Detail-oriented and self-motivated engineer."):
+        assert any("filler" in w for w in cv_lint.line_issues("P01", bad)[1]), bad
+    assert not any("filler" in w for w in cv_lint.line_issues("C03", "I am passionate about this team.")[1])
+    assert not any("filler" in w for w in cv_lint.line_issues("B01", "Walked the VPs through the chain with live exploit demonstrations.")[1])
+
+
 def test_briefed_without_impact_warns():
     assert cv_lint.line_issues("B06", "Briefed the Payments Senior VP and AppSec VPs.")[1]
 

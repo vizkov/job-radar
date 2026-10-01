@@ -34,6 +34,10 @@ STACKED_HEDGE = re.compile(r"\b(about|around|approximately|roughly)\b", re.I)
 LABEL_ONLY = re.compile(r"^\s*(?:\w+\s+){0,2}briefed\b", re.I)
 GENERIC = {"Web", "Network", "Mobile", "Cloud", "Microservice", "Thick-client"}
 MEDIUM = re.compile(r"medium\.com", re.I)
+# Soft-skill filler (the user's rule, 2026-10-01): every CV says it, a filter matches nothing on it, and only evidence counts.
+FILLER = re.compile(r"\b(team player|strong (?:communication|interpersonal)|excellent (?:communication|interpersonal)|hard-?working|detail-oriented|self-motivated|results-driven|go-getter|fast learner|passionate about)\b", re.I)
+# Category words instead of names (rule 14): an exact-phrase screen matches the tool, standard or language, not "scripting ability".
+VAGUE = re.compile(r"\b(familiar(?:ity)? with|knowledge of|exposure to|(?:scripting|networking|coding|programming) (?:skills|ability)|(?:security|industry) certifications?|(?:various|multiple|several) (?:tools|frameworks|platforms|languages)|experience (?:with|in) (?:various|multiple|several))\b", re.I)
 STOP = set("a an the of and or to in on for with by as at from that which this it its their our my into over across is are was were be been being have has had".split())
 
 
@@ -53,6 +57,10 @@ def line_issues(sid: str, text: str) -> tuple[list[str], list[str]]:
         warns.append(f"[{sid}] \"my own ...\": cut it if the ownership is implied; keep it only as a contrast")
     if sid[0] in "PB" and re.search(r"\b(I|me|my|we|our)\b", text):
         warns.append(f"[{sid}] first person in a CV line (I/me/my/we/our): the fact belongs in the letter or the stories")
+    if sid[0] in "PBK" and FILLER.search(text):
+        warns.append(f"[{sid}] soft-skill filler (team player, strong communication ...): say what the person did, or cut it")
+    if sid[0] in "PBK" and (m := VAGUE.search(text)):
+        warns.append(f"[{sid}] vague category (\"{m.group(0)}\"): name the tool, standard, language or certificate, if the stories back it")
     if len(STACKED_HEDGE.findall(text)) >= 2:
         warns.append(f"[{sid}] two hedges (about/around) in one line: state the figure once")
     if sid[0] in "PB" and LABEL_ONLY.match(re.sub(r"^\w+:\s*", "", text)):

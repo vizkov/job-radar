@@ -95,6 +95,15 @@ item, including the first in a row. Separators: commas; a language is listed on 
 11. **Dates** only on job titles (education and volunteering years are exempt and stay).
 12. **No first person in CV lines** (no I, me, my, we, our; the user's rule, 2026-10-01): the fact belongs in the letter or the stories. No exceptions (B16 was reworded 2026-10-01).
 13. **Links.** Every mentioned publication or repository has a clickable link in its entry.
+14. **Name the thing, not the category (the user's rule, 2026-10-01, from recruiter advice on ATS matching).** A keyword screen matches exact phrases from the
+    ad, so write the platform, tool, standard or language where the work happened ("automated exploit revalidation in Python", "Checkmarx", "OWASP Top 10"), not
+    "scripting ability", "scanning tools" or "familiar with frameworks". A bullet reads verb + named tool + object ("Automated exploit revalidation in Python"), and a
+    certificate is named in full. `cv_lint.py` warns on the vague phrases. **Only names the stories back:** advice written for other candidates (Splunk,
+    CrowdStrike, MITRE ATT&CK, Jira, Security+ ...) is a pattern, never a list to paste. If an ad names a tool, standard or certificate the masters don't mention,
+    do not add it: list it in the hand-over and ask the user whether they have really used or hold it; if yes it goes into `stories.md` as an "Also true" line first.
+    The converse: no soft-skill filler ("team player", "strong communication", "detail-oriented", "passionate about"): the claim filters nothing and proves nothing;
+    the evidence (a result with a number or an audience) does the job. `cv_lint.py` warns on the common phrases in Profile, bullets and Skills.
+    Keyword matching ranks and searches more than it auto-rejects: never bend a fact to chase a term.
 
 ## 4. Tailoring limits (so a good JD match does not gut the CV)
 

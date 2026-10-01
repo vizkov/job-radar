@@ -13,9 +13,17 @@ Claude's; a few are yours), and how to pause, stop or take access back.
 | *Optional:* **Chrome** with the **Claude in Chrome** extension | Only if you want Claude to pre-fill application forms | free |
 | *Optional:* a **Gmail** account for job-alert emails | Only if you want LinkedIn/Indeed/Glassdoor jobs included | free |
 
-Installing them: Claude Code from Anthropic's Claude Code docs; git from **git-scm.com**; Python from
-**python.org**; `gh` from **cli.github.com**, then log it in once with `gh auth login`. Once Claude Code runs,
-you can also ask Claude to check the others are installed and walk you through anything missing.
+**Installing them** (works on Windows, macOS and Linux; on Windows use PowerShell or Windows Terminal). After each
+install, open a **new** terminal window and run the check command; it should print a version number, not an error:
+
+| Tool | Get it from | Check it worked |
+|---|---|---|
+| Claude Code | Anthropic's Claude Code docs (search "Claude Code quickstart") | `claude --version` |
+| git | **git-scm.com** | `git --version` |
+| Python 3.13 (job-radar's code and the daily run use it) | **python.org** (on Windows tick "Add python.exe to PATH") | `python --version` |
+| GitHub's `gh` tool | **cli.github.com**, then log in once: `gh auth login` and follow the prompts | `gh auth status` |
+
+Stuck on any of these? Once Claude Code runs, say "check my setup" and Claude tells you what's missing and walks you through it.
 
 GitHub's free plan includes 2,000 minutes a month of automated runs for private
 projects; job-radar uses roughly 450–750.
@@ -34,8 +42,9 @@ projects; job-radar uses roughly 450–750.
       titles and companies you want. Claude converts your CV into its own format and
       shows you the result to confirm nothing changed.
    2. **Let Claude manage your board.** Claude asks you to type
-      `! gh auth refresh -s project` into Claude Code. The `!` runs it right there; it
-      opens your browser to approve. `gh` is GitHub's official command-line tool, already
+      `! gh auth refresh -s project` into Claude Code (the only command you type in the whole setup).
+      The `!` at the start tells Claude Code to run it as a command; it opens your browser to a
+      GitHub page asking you to approve the **project** permission, where you click **Authorize**. `gh` is GitHub's official command-line tool, already
       logged in as you (that's how Claude saves to your repository). This adds the
       **project** permission: reading and changing the GitHub Projects boards you have access
       to, including organisation boards you can edit. It gives no access to anything outside
@@ -131,6 +140,30 @@ only LinkedIn use is the opt-in contact lookup for referrals).
 | Claude proposes a settings change, new job boards or a fix | Say yes or no. Nothing changes without your yes |
 | Claude asks who can help at a company you'd apply to | Tell it the names. Message people you know yourself (Claude gives you the role links); for recruiters or hiring managers it drafts the note in the chat (never saved to a file) after a fresh reviewer has read it as the recruiter would. **You** send everything, then tell it what happened |
 | You get a new job, certification or achievement | Tell Claude; it adds it to your CV lines so future applications can use it |
+
+## Questions people ask
+
+- **My laptop is off. Does it still work?** The daily search runs on GitHub's servers three times a day whether or not
+  your computer is on, and new roles wait for you. What needs you: Claude scoring roles, filling in the board's
+  details and checking your inbox happen when you open a Claude Code session.
+- **Where is my board?** Ask Claude "give me the link to my board". It's on your GitHub account under Projects.
+- **Does an employer see that I looked at their job?** Not in any way tied to you. The search reads public job lists
+  and pages, so a company's website may log the page request like any other visitor, with no name attached. An
+  employer learns about you only from an application you submit yourself.
+- **What does the Claude in Chrome extension see?** It works in your real Chrome with your logins, so give it access only
+  to the sites you want (Chrome's extension settings let you limit it to specific sites), and keep banking and
+  email tabs out of the session. job-radar only asks it to open job pages and application forms.
+- **Does it change my settings without asking?** Almost never. The exception: about once a week it nudges the
+  scoring weight of a job-title keyword by one small step when your own scores justify it, and tells you with a
+  one-line undo. Everything else (what to search, which countries, your CV) changes only after you say yes.
+- **I'm not relocating / don't need a visa.** Tell Claude during setup: the sponsorship checks are written for someone relocating, so ask
+  Claude to turn them off or adapt them for you.
+- **Is my CV going to the public project?** No. Your CV and everything personal live only in your private copy.
+  Code improvements are published to the public project by a script that refuses to send private files.
+- **New computer or backup?** Your private repository on GitHub is the backup. On a new machine install the four tools,
+  run `gh auth login`, then tell Claude: "clone my-job-radar and get me going".
+- **Where do the costs come from?** The only money is your Claude plan. GitHub's free minutes cover the daily runs.
+  How much of a session scoring and tailoring use is in [Using it](Using-it.md) under Costs.
 
 ## Pausing, stopping, taking access back
 

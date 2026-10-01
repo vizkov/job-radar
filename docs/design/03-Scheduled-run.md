@@ -135,11 +135,13 @@ Only for **new** groups, so the expensive part stays small:
 ### Health: `update_health()`
 
 `health.py` keeps a streak counter per unit (`"ats|https://…"`, `"eures|canary"`). A
-unit is **bad** this run if it errored, or if it returned zero raw results when zero isn't
-normal (`track_empty`). After 2 bad runs in a row, a unit is reported if it reported an
-error, or (for zero results) if it has worked before. Such a unit is
-reported as "stopped returning results". A whole-source crash is tracked as unit `*` and
-reported even if the source never worked.
+unit has a **bad run** when it returns an error, or zero raw results where zero isn't
+normal (`track_empty`). Any good run resets the streak to 0. A unit is **reported** (as
+"stopped returning results", or with its error text) once it has had `BROKEN_AFTER_RUNS`
+(2) bad runs in a row **and** at least one of these holds: it has an error message (a DKIM
+failure, a layout change or a robots.txt block can be wrong from the first run), it worked
+before (`last_ok_count > 0`), or it is the whole-source unit `*`. A board that never had
+jobs is therefore not "broken". A whole-source crash is tracked as unit `*`.
 
 ### Reports and the board queue
 

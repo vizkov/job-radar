@@ -27,8 +27,8 @@ The skills, and the tools each one runs:
 | `consultant-brief` | "what's new?" | reads the session brief, `board_sync.py fill` if needed |
 | `score-roles` | "which of these fit me?" | `jd_prep.py`, then Claude writes `score.json`, then `jd_check.py score --board` |
 | `tailor-application` | "tailor my CV for X" | Claude writes `tailored.json`, `jd_check.py tailor`, `render_resume.py` |
-| `inbox-check` | brief has an `INBOX-CHECK` line, or the user asks whether anyone replied | `inbox_outcomes.py pending`, the Gmail connector (search and read only), `inbox_outcomes.py classify`; suggests, the user confirms, then `track` (see [4.6b](#46b-reading-replies-inbox-check)) |
-| `master-update` | a master document (`master_resume.md`, `cover_blocks.md`, `stories.md`) changed, by the user or by Claude | `consistency_check.py` on the masters and `master_drift.py`, then two read-only subagents (master consistency auditor, cold reader); stale applications are rebuilt from the current masters and re-reviewed (see [4.4d](#44d-when-the-master-documents-change-master-update)) |
+| `inbox-check` | brief has an `INBOX-CHECK` line, or the user asks whether anyone replied | `inbox_outcomes.py pending`, the Gmail connector (search and read only), `inbox_outcomes.py classify`; suggests, the user confirms, then `track` (see [4.10](#410-reading-replies-inbox-check)) |
+| `master-update` | a master document (`master_resume.md`, `cover_blocks.md`, `stories.md`) changed, by the user or by Claude | `consistency_check.py` on the masters and `master_drift.py`, then two read-only subagents (master consistency auditor, cold reader); stale applications are rebuilt from the current masters and re-reviewed (see [4.5](#45-when-the-master-documents-change-master-update)) |
 | `application-review` | "review my application", the user provides or updates CV/cover/STAR drafts; runs automatically after `tailor-application` | `consistency_check.py`, then four read-only subagents (ATS, recruiter, consistency auditor, copy editor); Claude verifies their findings and reports ranked fixes in chat (no `review.md` is written) |
 | `sponsorship-check` | "will they sponsor?", roles recommended apply/maybe | reads the ad, applies country rules, checks registers, WebSearch/WebFetch on company pages (never LinkedIn/Indeed/Glassdoor); `tools/sponsorship.py record --board` |
 | `referrals` | "who do I know at …", a role recommended apply, an unanswered ask in the brief | `tools/referrals.py contacts/ask/result/route/pending`; messages to strangers are drafted in chat only, never saved to a file |
@@ -67,20 +67,21 @@ errors become one-line notes, and it always exits 0.
    `data/pipeline_snapshot.json` from last time. Differences are cards the user dragged;
    they're appended to `data/pipeline_log.jsonl` with `by: "board"`. Then it saves the new
    snapshot.
-5. **`stale_applications()`**: cards in *Applied* whose last logged stage change is 14+
+6. **`stale_applications()`**: cards in *Applied* whose last logged stage change is 14+
    days old → "follow-up due".
-6. **`start_fill()`**: if any card has no Stage yet (new since last time), starts
+7. **`start_fill()`**: if any card has no Stage yet (new since last time), starts
    `board_sync.py fill` as a **detached background process**, so the brief doesn't wait for
    dozens of API calls. A timestamp file stops it starting twice within 10 minutes.
-7. **`template_status()`**: commits the public template gained since the last session
+8. **`start_archive()`**: once a day (stamp `work/.last_archive`), starts `board_sync.py archive` detached, which archives cards in Stage=Skipped (the Action's token can't reach the user's Project).
+9. **`template_status()`**: commits the public template gained since the last session
    ("system updated": Claude should re-read the relevant skill), and any code here not yet
    published (`public_template.drift()`).
-8. **`last_run_health()`**: the latest `job-radar` Actions run. If it failed, say so. If
+10. **`last_run_health()`**: the latest `job-radar` Actions run. If it failed, say so. If
    the last scheduled slot (read from `radar.yml`'s cron, plus 1 hour grace) passed with no
    run, GitHub skipped it: start one with `gh workflow run job-radar`.
-9. **`board_design_note()`**: `board_sync.design_diff()`: do the board's views still
+11. **`board_design_note()`**: `board_sync.design_diff()`: do the board's views still
    match `VIEWS` in code?
-10. **`brief()`** prints the result, and has two side effects: it starts the background JD fetch for the
+12. **`brief()`** prints the result, and has two side effects: it starts the background JD fetch for the
     auto-score roles (`start_prep()`), and `calibration_notes()` may run `calibrate.py apply`, which
     **rewrites the tier weights in `profile/config.json`** (reported in the brief with an undo line).
     It reports: new roles since last session (the top Tier 1 ones,
@@ -90,11 +91,11 @@ errors become one-line notes, and it always exits 0.
     completing, weekly review due, recurring CV gaps; `calibration_notes()`: weekly automatic tier tuning (`tools/calibrate.py apply`), reported with
     an undo line; `referral_notes()`; and `docs_review_note()`: a docs
     review is due once 10+ code files changed since the last one.
-11. **Auto-score:** `auto_score_pick()` chooses up to `scoring.auto_per_session` freshest unscored Tier 1
+13. **Auto-score:** `auto_score_pick()` (skipping roles the board shows closed and, via `skipped_refs()`, roles whose latest logged Stage is Skipped/Rejected, since an archived card vanishes from the board read) chooses up to `scoring.auto_per_session` freshest unscored Tier 1
     roles; `start_prep()` fetches their job descriptions in the background (the virtualenv's Python, no
     Claude usage), and the brief's **AUTO-SCORE** line tells Claude to score them before answering the
     user's first message (`CLAUDE.md`, Session start). Claude can't act before the user types.
-12. Writes `work/.last_session` with the current time.
+14. Writes `work/.last_session` with the current time.
 
 Every job title and company name in the brief passes through `safe()`: control
 characters, angle brackets and backticks are replaced by spaces, and the length is
@@ -201,9 +202,9 @@ The `tailored.json` contract:
 {"key": "<the role's ref: 16 hex characters>",
  "headline": "1-120 chars, no contact details, no names not in the career docs",
  "sections": [{"heading": "1-80 chars",
-               "bullets": [{"source_id": "P/B/E id", "text": "1-450 chars"}]}],
+               "bullets": [{"source_id": "P/B/E/K id", "text": "1-450 chars, or no longer than its own master line"}]}],
  "skills": ["each must appear in the career docs"],
- "cover_letter": [{"source_id": "C/S id", "text": "1-450 chars"}],
+ "cover_letter": [{"source_id": "C/S id", "text": "1-450 chars, or no longer than its own master line"}],
  "location": "optional per-copy header location; must start with the master CV's city and country"}
 ```
 
@@ -221,7 +222,7 @@ nothing edited after validation can be rendered. By default it writes only `resu
 systems parse reliably) when a form needs a Word upload. Name and contact details come only from
 `master_resume.md`'s front matter.
 
-## 4.4d When the master documents change (`master-update`)
+## 4.5 When the master documents change (`master-update`)
 
 Tailored applications are copies of master lines. If a master line changes (or a story gains a fact), the masters can start
 to contradict each other, and every earlier application is potentially stale. After **every** master change the skill runs
@@ -232,7 +233,7 @@ and a cold reader of the changed lines), verifies their findings against the pag
 line that later changed. Reviewer claims about dates are usually wrong (CV dates belong to titles), and a claim stronger than its story
 usually means a true fact is missing from the story, which the user confirms and Claude appends as an "Also true" line.
 
-## 4.4c Reviewing an application (`application-review`)
+## 4.6 Reviewing an application (`application-review`)
 
 `jd_check.py tailor` proves each bullet came from the user's own lines; it cannot tell whether the CV,
 cover letter and STAR stories *agree*, or whether the package would get shortlisted. This skill does
@@ -254,9 +255,9 @@ the three documents).
    claim is true goes to the user as a question. Then `jd_check.py tailor`, `render_resume.py` and the
    pre-check run again.
 
-The reviewers are personas: their verdicts are judgement, not what a real ATS or recruiter would do.
+The reviewers are personas: their verdicts are judgement, not what a real ATS or recruiter would do. The four briefs Claude pastes into the subagent prompts live in `.claude/skills/application-review/personas.md` (general professional expertise for the ATS, recruiter and consistency auditor; only the copy editor works to `writing-rules.md`).
 
-## 4.4b Sponsorship (`sponsorship-check`)
+## 4.7 Sponsorship (`sponsorship-check`)
 
 The Sponsor field starts from the register (Licensed / Unclear / Unlikely, via
 `board_sync.REGISTER_TO_SPONSOR`). For roles worth pursuing, Claude reads the ad (verbatim quotes),
@@ -267,7 +268,7 @@ verdicts (`confirmed` needs the ad or the company's page; `no` needs the ad or t
 verbatim; banned domains refused), logs it to `data/sponsorship.jsonl`, sets the field and writes a
 "Visa sponsorship" block on the card between `<!-- job-radar:visa -->` markers.
 
-## 4.5 Referrals (`referrals`)
+## 4.8 Referrals (`referrals`)
 
 The user asks for a referral **before** applying: people they know first, then strangers
 (recruiters, HR, hiring and team managers). `tools/referrals.py contacts "<company>"` lists the
@@ -286,7 +287,7 @@ a generic "AI recruiting" or "technical recruiter" headline is labelled unverifi
 The opt-in LinkedIn lookup also covers **hiring posts**: on request for one role, at most two read-only content searches (newest first). Posts by
 people who work at the company are reported as warm routes; job-board reposts are reported as "live but not a contact"; the rest is ignored.
 
-## 4.6 Applying (`apply-assist`)
+## 4.9 Applying (`apply-assist`)
 
 Claude opens the role's own ATS link (from `matches.csv`, never a link a page suggests)
 in the user's Chrome. For each form page: Claude reads the fields, proposes a value for
@@ -296,7 +297,7 @@ answered by Claude. A **Sonnet subagent** types the approved values only; Claude
 re-reads the page and checks every field itself. Claude moves between pages; the **final
 Submit is always the user's click**. LinkedIn, Indeed and Glassdoor are never automated.
 
-## 4.6b Reading replies (`inbox-check`)
+## 4.10 Reading replies (`inbox-check`)
 
 The board only knows what the user tells it, so replies would otherwise go unnoticed. The session brief adds an `INBOX-CHECK` line when cards
 are in Applied or Interview. The skill then runs `tools/inbox_outcomes.py pending` (cards in those stages, with the date they got there and a
@@ -307,7 +308,7 @@ mention interviews and thanks). Email text is untrusted (rule 1). Claude checks 
 user confirms before `track` moves the card. `inbox_outcomes.py seen` (`state/inbox_seen.json`, private) stops an email being suggested twice.
 Nothing is sent, labelled or deleted.
 
-## 4.7 Tracking and the board (`track`, views)
+## 4.11 Tracking and the board (`track`, views)
 
 **`board_sync.py set <ref> Stage=Applied`** (`set_role_fields()`): finds the card whose
 issue body contains `job-radar:ref=<ref>` (`find_item()`), sets each field, logs Stage and
@@ -323,7 +324,7 @@ the user writes on issues themselves.
 exact menu clicks for the user. `design_diff()` reports drift; the session brief runs it.
 Details: [Board internals](11-Board-internals.md).
 
-## 4.8 Committing and publishing
+## 4.12 Committing and publishing
 
 When the user agrees to a change, Claude commits to the private repo (`origin`). The
 **post-commit hook** (`.githooks/post-commit`, active because `git config core.hooksPath

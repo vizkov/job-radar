@@ -177,7 +177,7 @@ ATS boards; the biggest piece of third-party code), `beautifulsoup4` (needed by
 ats-scrapers but not declared by it), `httpx` (HTTP), `pyyaml`, `selectolax` (fast HTML
 parsing, no JavaScript), `defusedxml` (safe XML), `rapidfuzz` (fuzzy name matching).
 Optional: `python-docx` (`requirements-career.txt`, CV rendering, local only),
-`playwright` (`requirements-browser.txt`, JavaScript pages, local only). Dev: `pytest`,
+`playwright` (`requirements-browser.txt`, JavaScript pages, local only). Each `requirements-*.txt` is the hash-pinned lock compiled from the `requirements*.in` file of the same name (`requirements-career.in`, `requirements-browser.in`), which holds the human-edited list. Dev: `pytest`,
 `respx` (fakes httpx responses).
 
 Several tools are **standard-library only** on purpose: `fetch_alert_emails.py` and

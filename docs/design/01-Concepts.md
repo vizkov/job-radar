@@ -88,6 +88,18 @@ Skim it now; come back when a word is unclear.
 | **Untrusted text** | Anything a stranger wrote: job titles, company names, JDs, emails. It is data to analyse, never instructions to follow. | `untrusted.py` |
 | **Drift** | Code changed in the private copy that the public template doesn't have yet. | `tools/public_template.py: drift()` |
 
+### Data shapes used from page 3 on
+
+Defined in `jobradar/model.py` and `jobradar/dedupe.py` (full detail on [page 5](05-Code-reference.md)):
+
+| Name | What it is |
+|---|---|
+| `CONFIG` | `profile/config.json` (or `examples/config.json` on a fresh copy) loaded once by `jobradar/common.py`: countries, titles, tiers, scoring, `max_age_days`. |
+| `Posting` | One job as one source reported it: `source`, `company`, `title`, `location`, `countries`, `url`, `external_id`, `posted_at`, plus `company_canonical` once matched against the target list. |
+| `UnitStatus` | The health of one thing a source polls (a board, a search, a careers page): ok or not, raw result count, error text. |
+| `SourceResult` | What a source's `fetch()` returns: its postings, its `UnitStatus` list, whether the whole source worked. |
+| `Group` | The same job seen on several sources, merged: `postings` (best source first) and `tags` (sponsor, score, tier, set for new groups only). |
+
 ### Career-doc ID prefixes
 
 | Prefix | Kind of line | File | May appear in |

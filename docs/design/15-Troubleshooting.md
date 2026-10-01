@@ -64,6 +64,10 @@ exactly from the JD, an evidence ID that doesn't exist, a tailored line with a n
 name that isn't in the user's original. Fix the content; never loosen the checker. If the
 user's CV genuinely lacks something, tell them.
 
+## The board has more than 2,000 cards
+`board_items()` (the session brief) and the board tools read at most 2,000 cards and 2,000 issues (`--limit 2000`). Beyond that the oldest are silently missing from
+the brief and from `set`. Archive finished cards (`board_sync.py archive` runs daily for Stage=Skipped), or raise the limit in `tools/session_brief.py` and `tools/board_sync.py`.
+
 ## A JD can't be fetched
 
 `work/jd/<ref>/packet.md` says `unavailable: …`. Indeed and Glassdoor are never

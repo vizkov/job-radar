@@ -32,7 +32,7 @@ name the source reported):
 
 **The register is only the first step.** On the board it appears as *Licensed*, *Unclear* or
 *Unlikely*. The `sponsorship-check` skill turns that into a checked verdict for the specific role
-(Confirmed, Likely, Unlikely, No) from the ad's own words, the destination country's rules and the
+(Confirmed, Likely, Unlikely or No; the board's Sponsor field also holds the register-only *Licensed* and *Unclear*) from the ad's own words, the destination country's rules and the
 company's pages, with evidence and links on the card ([4](04-Claude-session.md)).
 
 **Always read the register name in brackets.** The signal is about legal
@@ -65,7 +65,7 @@ Score (rules in `config.json` → `tiering`):
 
 | Part | Default |
 |---|---|
-| Best title keyword | AppSec / product security / pentest / threat modeling = 4; secure code, offensive security, ethical hacker = 3; security consultant = 2; security engineer / architect / lead, DevSecOps = 1 |
+| Best title keyword | Defaults from `examples/config.json` (the user's `profile/config.json` may differ, and `calibrate.py` retunes it): AppSec / product security / pentest / threat modeling = 4; software security, secure code, offensive security, ethical hacker, VAPT = 3; security consultant, security tester = 2; security engineer / architect / lead, DevSecOps = 1; `vulnerabilit*` = 0 (the user's own file may raise or lower any of these) |
 | Seniority words (all that match) | senior, sr, lead +1; associate −1; junior −2; graduate, entry level −3 |
 | Best country | GB, NL, IE +2; CH, DE, SE, remote-Europe +1 |
 | Employer on your list | +1 |

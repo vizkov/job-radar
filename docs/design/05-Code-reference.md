@@ -453,19 +453,19 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 ### `tools/jd_prep.py`: fetch job descriptions
 
 Walkthrough: [4.3](04-Claude-session.md). Functions: `html_to_text()` (main text, no
-nav/scripts), `_as_text()`, `via_scraper()` (ATS scraper's description), `job_api()` (public per-job APIs for Greenhouse, Apple and EURES; `_greenhouse_text()`, `_apple_text()`, `_eures_text()` turn each JSON reply into text; `_EURES_PAGE` matches EURES portal links), `public_url()`
-(Amazon's login-walled links → public page), `jsonld_description()`, `Fetcher` (`_allowed`
-robots cache, `fetch` the ordered fallbacks), `load_rows()`, `scored_refs()`, `select()`
-(which roles), `allowed_languages()` (config `languages`), `detect_language()` (stop-word counts), `language_requirements()` (languages an ad asks for: required or optional) and `language_line()` (the "Language check" line in every packet), `render_packet()`, `prepare()` (write `jd.txt`, `meta.json`, `packet.md`),
+nav/scripts), `_as_text()` (HTML fragment to text, plain text passed through trimmed), `via_scraper()` (ATS scraper's description; `None` if the row has no ATS, slug or external id), `job_api()` (public per-job APIs for Greenhouse, Apple and EURES; `_greenhouse_text()`, `_apple_text()`, `_eures_text()` turn each JSON reply into text; `_EURES_PAGE` matches EURES portal links), `public_url()`
+(Amazon's login-walled links → public page), `jsonld_description()` (the description from a page's JSON-LD `script` tag), `Fetcher` (`_allowed`
+robots cache, `fetch` the ordered fallbacks), `load_rows()` (the rows of `data/matches.csv` that have a ref), `scored_refs()` (refs already in `data/scores.jsonl`), `select()`
+(the named refs, or else recent roles of the wanted tiers that are not yet scored, once each), `allowed_languages()` (config `languages`), `detect_language()` (stop-word counts), `language_requirements()` (languages an ad asks for: required or optional) and `language_line()` (the "Language check" line in every packet), `render_packet()` (the packet text: role facts, JD status, language line, then the JD wrapped as untrusted data and cut to `MAX_CHARS`), `prepare()` (write `jd.txt`, `meta.json`, `packet.md`),
 `main()`. The ATS scraper's text is used only if it's at least 200 characters; otherwise
 it falls back to the page. `--refresh` re-fetches even when `jd.txt` exists.
 
 ### `tools/jd_check.py`: validate Claude's output
 
 Walkthrough: [4.3 and 4.4](04-Claude-session.md). `check_score()`, `upsert_score()`,
-`cmd_score()`; `new_names()` (capitalised words and acronyms not in the career docs),
+`cmd_score()` (the `score` action: reads `work/jd/<ref>/score.json`, validates it with `check_score()`, upserts the record into `data/scores.jsonl`, and with `--board` sets Fit, Recommendation and the fit section on the card); `new_names()` (capitalised words and acronyms not in the career docs),
 `_planted()` (URLs/emails/phones the user didn't write), `check_tailor()` (with the inner
-`check_line()`), `_digest()`, `cmd_tailor()`, `main()`. Helpers: `_norm()` (lower-case,
+`check_line()`), `_digest()` (SHA-256 hex of a file's bytes, written as the `validated.sha256` stamp), `cmd_tailor()` (the `tailor` action: reads `tailored.json`, refuses if the masters are not cleared or the check finds errors, prints each bullet against its master line, and on success writes the stamp), `main()`. Helpers: `_norm()` (lower-case,
 collapse whitespace; all comparisons use it), `_NUM` (numbers), `APPS`
 (`profile/applications/`). `cmd_tailor()` deletes any old `validated.sha256` **before**
 checking, so a failed check never leaves a stale stamp.
@@ -477,7 +477,7 @@ capitalised anyway, so "Led the review" doesn't flag "Led" as a new name.
 
 ### `tools/render_resume.py`: CV and cover letter files
 
-`contact_line()`, `to_markdown()`, `cover_letter()`, `to_docx()` (python-docx: title,
+`contact_line()` (email, phone, location and links joined with " | "), `to_markdown()` (CV as Markdown: name, contact line, bold headline, one `##` section per heading with bullets, and a Skills section unless one is already there), `cover_letter()` (the letter text: "Dear Hiring Manager,", the `cover_letter` paragraphs, "Kind regards,", the name), `to_docx()` (python-docx: title,
 contact line, headline, one heading per section, bullet list, skills), `main()` (refuses
 unless `validated.sha256` matches the current `tailored.json`). By default it writes only `resume.pdf` and
 `cover_letter.pdf` (via `tools/render_pdf.py`, below) and puts the Markdown in `work/apps/<folder>/` (`SCRATCH`) for the
@@ -491,6 +491,7 @@ Edge (`find_browser()`, `print_pdf()` with a throwaway user-data dir so an open 
 look (Arial, A4 CV with 43 pt side margins, US Letter cover letter with 54 pt margins, teal `#005477` headings,
 10 pt body at a 1.43 line height, a rule under the header, right-aligned city and dates, a two-column skills grid)
 was measured from the user's `Downloads/cv.pdf` and `cover.pdf`; change `CSS` and the `@page` rules to change it.
+Small helpers: `all_names()` turns "X (formerly part of A, then B)" into "X / A / B"; `smart_title()` title-cases a phrase but keeps acronyms, mixed case and small words like "and"; `short_link()` strips `https://www.` and a trailing slash for display; `split_label()` splits "Label: text" into its two parts (empty label if no colon); `header_html()` builds the name, headline, contact lines and rule; `role_and_company()` looks up a ref's title and company in `data/matches.csv`.
 `resume_html(data, career, contact)` takes the **tailored text** and the **structure from the master CV**:
 `experience_structure()` groups every `B` line by its master heading (company block with city and dates, roles
 under it, a four-part heading `Title — Company — City — Dates` is its own company), so the PDF cannot show a
@@ -505,7 +506,7 @@ lines to fit, and the renderer never shrinks the type.
 
 ### `tools/inbox_outcomes.py`: applications awaiting an answer, and an outcome-email classifier
 
-Used by the `inbox-check` skill ([4.6b](04-Claude-session.md)). No mailbox access and no LLM. `pending()` lists refs in Stage Applied or Interview
+Used by the `inbox-check` skill ([4.10](04-Claude-session.md)). No mailbox access and no LLM. `pending()` lists refs in Stage Applied or Interview
 (`latest_stages()` overlays the stage log on `data/pipeline_snapshot.json`; `applied_dates()` gives the date each moved there) with a Gmail
 search string; `classify()` matches phrase rules in the order rejection, offer, interview, acknowledgement (unknown otherwise); `seen_ids()` and
 `add_seen()` keep `state/inbox_seen.json`; `main()` is the CLI (`pending`, `classify`, `seen`).
@@ -514,7 +515,7 @@ search string; `classify()` matches phrase rules in the order rejection, offer, 
 
 Two more actions: `status` says whether the masters are **cleared** (they passed the `master-update` check exactly as they are now) and `clear` records it. `jobradar/career.py` holds the stamp: `masters_digest()` (SHA-256 of the three masters, line endings ignored), `masters_cleared()`, `clear_masters()`; the stamp is `profile/career/.master_cleared`. `tools/jd_check.py tailor` calls `masters_cleared()` and refuses (removing the validation stamp, so `render_resume.py` refuses too) when the masters changed after the last clean check.
 
-Used by the `master-update` skill ([4.4d](04-Claude-session.md)). Read-only, no LLM. `check_app()` compares each cited line in an
+Used by the `master-update` skill ([4.5](04-Claude-session.md)). Read-only, no LLM. `check_app()` compares each cited line in an
 application's `tailored.json` with the master line (`STALE` if a master file is newer than `resume.pdf`; `MISSING` ids; lines under 90%
 similar, most of which are deliberate condensations), `main()` prints one block per application folder.
 
@@ -523,7 +524,7 @@ similar, most of which are deliberate condensations), `main()` prints one block 
 Used by `jd_check.py tailor` (errors fail validation) and by `master-update` (`python tools/cv_lint.py master`). No LLM. `line_issues()` flags
 meta-commentary ("too new for measured results", "came afterwards", "my own team", "from other teams"), "from about X to about Y", "extended deadline",
 dangling hyphens, RAG outside Skills, stacked hedges, "Briefed" without impact and repeated phrases. `skill_issues()` checks skill-item
-capitalisation and language lists. `master_issues()` adds the header rules (no relocation destination, no Medium link). `tailored_issues()` adds
+capitalisation and language lists (`skill_items()` splits a skills line into items on commas outside parentheses). `is_company_level()` says whether a master heading is a company-level one (another heading has three or more parts and names the same company), and `sid_is_role()` whether a line is a `B` bullet under a job (not Projects or Volunteering), for the depth-floor check. `master_issues()` adds the header rules (no relocation destination, no Medium link). `tailored_issues()` adds
 the section rules: static lines (projects, volunteering, education) present and verbatim, every skills row present, each role at its depth floor
 (3 bullets, or all if the master has fewer), a Key achievement that restates an experience bullet (warning). Rules: `.claude/skills/tailor-application/writing-rules.md`.
 
@@ -531,7 +532,7 @@ the section rules: static lines (projects, volunteering, education) present and 
 
 ### `tools/consistency_check.py`: cross-check CV, cover letter and STAR stories
 
-Used by the `application-review` skill ([4.4c](04-Claude-session.md)). No LLM. `read_doc()` (`.md`/`.txt`,
+Used by the `application-review` skill ([4.6](04-Claude-session.md)). No LLM. `read_doc()` (`.md`/`.txt`,
 or `.pdf` through `pdftotext`), `clean()` (drops front matter, comments, `[Bxx]` IDs, heading marks,
 all-caps headings and the STAR story-picker table), `figures()` (numbers and percentages with the noun after
 them; spelled-out numbers become digits; keyed by the number alone so "eight assessors" matches "8 assessors"),

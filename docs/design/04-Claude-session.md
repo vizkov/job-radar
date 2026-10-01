@@ -284,7 +284,8 @@ Each opened profile gets a verdict (verified, unverified or not a route) from a 
 ground); a hiring post's author is checked for where they work now. A recruiter is suggested as a route only with evidence that they hire for this function (the headline or activity names it, or the JD names them);
 a generic "AI recruiting" or "technical recruiter" headline is labelled unverified and the team-member route goes first.
 
-The opt-in LinkedIn lookup also covers **hiring posts**: on request for one role, at most two read-only content searches (newest first). Posts by
+The opt-in LinkedIn lookup always covers **posts**, in two places: each opened profile's recent-activity page (`/recent-activity/all/`, part of opening
+that profile) and **hiring posts** about the role, two read-only content searches (newest first) after the people searches. Posts by
 people who work at the company are reported as warm routes; job-board reposts are reported as "live but not a contact"; the rest is ignored.
 
 ## 4.9 Applying (`apply-assist`)

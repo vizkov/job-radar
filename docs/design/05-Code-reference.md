@@ -517,7 +517,9 @@ Two more actions: `status` says whether the masters are **cleared** (they passed
 
 Used by the `master-update` skill ([4.5](04-Claude-session.md)). Read-only, no LLM. `check_app()` compares each cited line in an
 application's `tailored.json` with the master line (`STALE` if a master file is newer than `resume.pdf`; `MISSING` ids; lines under 90%
-similar, most of which are deliberate condensations), `main()` prints one block per application folder.
+similar, most of which are deliberate condensations), `main()` prints one block per application folder. `stages()` reads the latest board stage
+per role from `data/pipeline_log.jsonl` (`LOG`); an application whose stage is in `SUBMITTED` (Applied, Interview, Offer, Rejected) is printed as
+`SUBMITTED` and not checked, because its PDFs are the record of what was sent (only a `MISSING` note is kept); `--all` checks those too.
 
 ### `tools/cv_lint.py`: form and section rules for CV and letter text
 

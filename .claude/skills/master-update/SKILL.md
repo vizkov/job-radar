@@ -37,7 +37,7 @@ the header comment in `master_resume.md` / `cover_blocks.md` with the date and w
 ## 2. Deterministic pass (you run it, no LLM)
 ```
 python tools/consistency_check.py --cv profile/career/master_resume.md --cover profile/career/cover_blocks.md --stories profile/career/stories.md
-python tools/master_drift.py
+python tools/master_drift.py          # applications already applied to show as SUBMITTED (a record of what was sent); --all checks them too
 python tools/cv_lint.py master        # register and form of the CV and cover-block lines; fix every ERROR
 ```
 The first lists figures, years and names one master has and the others don't (candidates; cover blocks and stories are

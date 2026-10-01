@@ -60,7 +60,7 @@ exposed insight lines being read as job titles. Indeed and Glassdoor still have 
 | `test_careers_page.py` | `sources/careers_page` | Each real page, hash stability, missing anchor is an error, JSON/RSS feeds, XML entity-expansion rejected, robots.txt |
 | `test_cv_lint.py` | `tools/cv_lint` | Form and section rules from `writing-rules.md` |
 | `test_inbox_outcomes.py` | `tools/inbox_outcomes` | Pending applications, phrase classifier, seen ids |
-| `test_master_clearance.py` | `tools/master_drift`, `jd_check tailor` | Applications refused until the masters are cleared |
+| `test_master_clearance.py` | `tools/master_drift`, `jd_check tailor` | Submitted applications listed as `SUBMITTED`, not STALE (`--all` checks them); applications refused until the masters are cleared |
 | `test_render_pdf.py` | `tools/render_pdf` | CV and cover-letter PDF layout |
 | `test_alert_email.py` | `sources/alert_email` | Text and HTML cards, URLs rebuilt from IDs, tracking redirects, DKIM per provider, spoofed/foreign mail rejected, fetch failure surfaced, adapter never touches IMAP |
 | `test_fetch_alert_emails.py` | `tools/fetch_alert_emails` | Read-only + PEEK, missing credentials reported not raised, **password never written or printed**, old mail cleared, runs with standard library only (a real `python -I -S` subprocess) |

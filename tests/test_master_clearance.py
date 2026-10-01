@@ -63,3 +63,37 @@ def test_master_drift_status_and_clear(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(sys, "argv", ["master_drift.py", "status"])
     assert master_drift.main() == 0
     assert "cleared" in capsys.readouterr().out
+
+
+def test_submitted_applications_are_listed_not_checked(tmp_path, monkeypatch, capsys):
+    """An application that was applied to is a record of what was sent: no STALE / DIFFERS unless --all."""
+    import os
+    cd = tmp_path / "career"
+    cd.mkdir()
+    masters(cd)
+    apps, log = tmp_path / "apps", tmp_path / "pipeline_log.jsonl"
+    for key, stage in (("a" * 16, "Applied"), ("b" * 16, "Shortlisted"), ("c" * 16, "Rejected")):
+        folder = apps / f"role-{stage.lower()}"
+        folder.mkdir(parents=True)
+        (folder / "tailored.json").write_text(json.dumps({"key": key, "headline": "h", "skills": [], "cover_letter": [],
+                                                           "sections": [{"bullets": [{"source_id": "P01", "text": "an old wording"}]}]}), encoding="utf-8")
+        (folder / "resume.pdf").write_bytes(b"%PDF")
+        os.utime(folder / "resume.pdf", (1, 1))                       # rendered long before the masters changed
+    log.write_text("\n".join(json.dumps(r) for r in [
+        {"ref": "a" * 16, "field": "Stage", "value": "Shortlisted"}, {"ref": "a" * 16, "field": "Stage", "value": "Applied"},
+        {"ref": "b" * 16, "field": "Stage", "value": "Shortlisted"}, {"ref": "c" * 16, "field": "Stage", "value": "Rejected"},
+        {"ref": "c" * 16, "field": "Notes", "value": "ignored: not a stage"}]) + "\n", encoding="utf-8")
+    assert master_drift.stages(log)["a" * 16] == "Applied"           # the last Stage entry wins
+    monkeypatch.setattr(master_drift, "APPS", apps)
+    monkeypatch.setattr(master_drift, "LOG", log)
+    monkeypatch.setattr(master_drift, "career_dir", lambda: cd)
+    monkeypatch.setattr(master_drift, "load_career", lambda: career.load_career(cd))
+    monkeypatch.setattr(sys, "argv", ["master_drift.py"])
+    master_drift.main()
+    out = capsys.readouterr().out
+    assert "role-applied: SUBMITTED (Applied)" in out and "role-rejected: SUBMITTED (Rejected)" in out
+    assert "role-shortlisted: STALE" in out                          # not sent: still flagged
+    assert "role-applied: STALE" not in out and "2 submitted application(s) listed" in out
+    monkeypatch.setattr(sys, "argv", ["master_drift.py", "--all"])
+    master_drift.main()
+    assert "role-applied: STALE" in capsys.readouterr().out          # --all restores the full check

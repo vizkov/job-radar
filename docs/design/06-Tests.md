@@ -74,7 +74,7 @@ exposed insight lines being read as job titles. Indeed and Glassdoor still have 
 | `test_tailor.py` | `jd_check tailor`, `render_resume` | Valid passes; invented IDs/numbers/names/links rejected; rewording warns; render requires validation of the exact file; outputs |
 | `test_career.py` | `career`, `manual` | Parsing, contact tokens, comments ignored, duplicate IDs, missing CV message; manual lists everything; colour only when asked |
 | `test_session_brief.py` | `tools/session_brief` | Counts and freshness, health checks, quiet alert emails, drag logging and follow-ups, hostile titles neutralised, gh/git via fakes, system updates, missed-run restart |
-| `test_public_template.py` | `tools/public_template` | Code is public; private or unknown paths never published; renames; wiki link rewriting |
+| `test_public_template.py` | `tools/public_template` | Code is public; private or unknown paths never published; renames; wiki link rewriting; only committed content is published (uncommitted edits are reported, not copied) |
 | `test_sponsorship.py` | `tools/sponsorship` | Valid verdict passes; non-verbatim quotes, banned sources, unbacked confirmed/no, bad verdicts rejected; card block escaped and replaced in place |
 | `test_calibrate.py` | `tools/calibrate` | No change below the evidence threshold; one bounded step down or up; layout kept; cooldown; revert |
 | `test_post_leads.py` | `tools/post_leads` | Query rotation spreads over titles and rotates the phrase; people read longest ago first; lead status known / stale / job-board / new; add-role writes the row with the poster, queues the card and cannot add twice |

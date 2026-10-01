@@ -595,9 +595,10 @@ user review them before `--apply`.
 | `PRIVATE`, `NEVER_COPY`, `PUBLIC` | What may never be published; what's never copied (venv, caches, clones); what may be published (allowlist). |
 | `is_private(rel)`, `is_public(rel)` | Path tests. Public = on `PUBLIC`, not on `PRIVATE`, not `NEVER_COPY`. |
 | `export(dest)` | Build a clean template tree in an empty folder. |
-| `drift(fetch)` | Public files changed here since the last template merge, plus uncommitted ones. |
+| `drift(fetch)` | Public files changed in **commits** here since the last template merge. Uncommitted edits are not included. |
+| `dirty_public()`, `committed_bytes(rel)` | Public files with uncommitted changes (reported, not published); a file as committed in `HEAD` (what `publish` copies, never the working-tree version) |
 | `status_paths(lines)` | Paths from `git status --porcelain`, both sides of a rename. |
-| `publish(template_dir, message)` | Copy/delete drifted files in the template clone, run tests, `check`, commit, push. |
+| `publish(template_dir, message)` | Copy (from `HEAD`)/delete drifted files in the template clone, run tests, `check`, commit, push. |
 | `autopublish()` | The post-commit hook's entry: publish, merge back, mirror the wiki; never raises. |
 | `wiki_text(text, blob_base)` | Rewrite links for the GitHub Wiki. |
 | `mirror_wiki(template_dir)` | Copy `docs/wiki/` into the template's wiki repo. |

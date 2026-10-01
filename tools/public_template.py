@@ -85,16 +85,28 @@ def export(dest: Path) -> None:
 
 
 def drift(fetch: bool = True) -> list[str]:
-    """Non-private files changed on this branch since it last merged the template."""
+    """Non-private files changed in COMMITS on this branch since it last merged the template. Uncommitted edits are not
+    included (see dirty_public): publishing copies committed content only, so unfinished work never reaches the public
+    template, and the pull that follows a publish cannot collide with edits still in the working tree."""
     if fetch:
         subprocess.run(["git", "fetch", "-q", "template"], cwd=ROOT, capture_output=True, timeout=60)
     # --no-renames: a moved file must show under its old path too, or publish never deletes it there
     r = subprocess.run(["git", "diff", "--name-only", "--no-renames", "template/main...HEAD"], cwd=ROOT,
                        capture_output=True, text=True)
+    return sorted(p for p in set(r.stdout.splitlines()) if p and is_public(p))
+
+
+def dirty_public() -> list[str]:
+    """Public files with uncommitted changes: not published until they are committed."""
     dirty = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"], cwd=ROOT,
                            capture_output=True, text=True).stdout.splitlines()
-    paths = set(r.stdout.splitlines()) | status_paths(dirty)
-    return sorted(p for p in paths if p and is_public(p))
+    return sorted(p for p in status_paths(dirty) if p and is_public(p))
+
+
+def committed_bytes(rel: str) -> bytes | None:
+    """The file as committed in HEAD, or None if HEAD does not have it."""
+    r = subprocess.run(["git", "show", f"HEAD:{rel}"], cwd=ROOT, capture_output=True)
+    return r.stdout if r.returncode == 0 else None
 
 
 def status_paths(lines: list[str]) -> set[str]:
@@ -112,10 +124,10 @@ def publish(template_dir: Path, message: str) -> None:
         print("nothing to publish: the template already has all code changes")
         return
     for rel in files:
-        src, dst = ROOT / rel, template_dir / rel
-        if src.exists():
+        dst, content = template_dir / rel, committed_bytes(rel)
+        if content is not None:
             dst.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(src, dst)
+            dst.write_bytes(content)  # the committed version, never the working-tree one
         elif dst.exists():
             dst.unlink()  # deleted here, delete there
     tests = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider"], cwd=template_dir,
@@ -143,6 +155,8 @@ def autopublish() -> None:
                                  text=True).stdout.strip()
         publish(template_dir, f"{subject}\n\n(auto-published from a private job-radar copy)")
         subprocess.run(["git", "pull", "-q", "--no-rebase", "--no-edit", "template", "main"], cwd=ROOT)
+        if (left := dirty_public()):
+            print(f"note: {len(left)} public file(s) have uncommitted changes and were NOT published: {', '.join(left)}")
         mirror_wiki(template_dir)
     except BaseException as e:  # includes SystemExit from failed tests
         print(f"job-radar autopublish skipped: {e}")

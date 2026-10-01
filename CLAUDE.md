@@ -24,6 +24,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | a role is shortlisted or "apply", "who do I know at …", "X referred me", brief lists an unanswered ask | `referrals` (people the user knows: asked before applying; recruiters and other strangers: after applying, with the tailored CV attached; the user sends every message) |
 | "fill in the application for …", "help me apply to …" | `apply-assist` (Chrome; the user approves every page and submits) |
 | "I applied to …", "got an interview with …", "rejected by …", "not interested in …" | `track` |
+| "check LinkedIn posts", "has anyone posted hiring?", the user pastes a hiring post, or a session starts with `discovery.linkedin_posts.enabled` | `post-discovery` (LinkedIn hiring posts and reposts by recruiters and hiring managers, read in Chrome; reposts traced to the original author; new roles become cards with the poster named; `tools/post_leads.py`) |
 | "stop showing …", "add company …", "also look in Germany", "too much noise", "pause/resume the radar" | `tune-radar` |
 | "is anything broken?", "why no new roles?", a source failing in the status issue | `health` |
 | brief says "weekly system review due", "what could be better?" | `system-review` |
@@ -41,6 +42,9 @@ from it; don't redo those steps. Mention health items briefly and offer the matc
 prioritise the freshest Tier 1 roles, since applying early matters to this user. If the brief has an
 **AUTO-SCORE** line, run `score-roles` on those refs before answering the user's first message (they
 chose this; `scoring.auto_per_session` in config.json sets how many, 0 turns it off), then answer.
+If `discovery.linkedin_posts.enabled` is true in `profile/config.json`, run `post-discovery` once per day (the sweep marks its queries
+run in `state/post_queries.json`) after answering the user's first message, unless they opened with a specific task: then offer it. It is
+how the user finds roles that recruiters and hiring managers announce in LinkedIn posts and reposts before, or instead of, a posting.
 Likewise, **standing rule (the user's):** every role that gets a card on the board gets a
 `sponsorship-check` verdict. Run it right after you score a role `apply`/`maybe`, after you `promote`
 roles to the board, and for any **SPONSOR-CHECK** line in the brief (live apply/maybe cards with no verdict).
@@ -61,6 +65,7 @@ Never loop over refs with one call each.
 - Tools you run (all have `--help`): `radar.py`, `verify_boards.py`,
   `tools/board_sync.py`, `tools/jd_prep.py`, `tools/jd_check.py`, `tools/render_resume.py`,
   `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/cv_lint.py` (form and section rules: `.claude/skills/tailor-application/writing-rules.md`), `tools/master_drift.py` (which applications no longer match the master documents), `tools/inbox_outcomes.py` (applications awaiting an answer; phrase classifier for outcome emails), `tools/build_candidates.py`, `tools/public_template.py`,
+  `tools/post_leads.py` (query rotation, recruiter list, lead log and add-role for LinkedIn hiring posts),
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
 - Tailoring always starts from `profile/career/` (never from another application's `tailored.json`); the CV header location is always
   "Open to relocation" (no destination); facts the user adds go into `stories.md` as "Also true" lines.
@@ -107,6 +112,13 @@ Never loop over refs with one call each.
    LinkedIn's terms ban automated access), the `referrals` skill may use Claude in Chrome, in the
    user's logged-in browser, to look up people at **one** company for **one** role the user is about
    to apply to, when they ask. Read-only: search results only, no connecting, messaging or following.
+   (c) **Hiring-post discovery (the user's instruction, 2026-10-01: the most likely routes to roles and recruiters are
+   hiring posts and reposts by recruiters and hiring managers; opt-in via `discovery.linkedin_posts.enabled`, knowing
+   LinkedIn's terms ban automated access):** the `post-discovery` skill may read LinkedIn **post-search results** and known
+   recruiters' own posts in the user's logged-in Chrome, at the start of a session or when asked. Capped by
+   `max_searches`, `max_scrolls` and `max_people_per_session`; scrolling is allowed up to that cap. Read-only: no reacting,
+   commenting, reposting, following, connecting or messaging; stop at any login wall, CAPTCHA or security prompt. Never from
+   the daily Action or in the background. Still no Indeed or Glassdoor, no LinkedIn job-search pages and no bulk job-page fetching.
 5. **Secrets never go in files, commits or chat.** The Gmail app password lives only in
    GitHub Actions secrets; walk the user through adding it in the GitHub UI.
 6. **Privacy:** `profile/`, `state/`, `digests/`, `data/matches.csv`, `data/scores.jsonl`

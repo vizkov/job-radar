@@ -626,6 +626,23 @@ out of date.
 
 **Watch out**: a second ask after someone already referred leaves the field at *Referred* (the ask is still logged and commented).
 
+### `tools/post_leads.py`: LinkedIn hiring-post discovery (standard library only)
+
+| Name | Is |
+|---|---|
+| `QUERIES`, `PEOPLE`, `LEADS`, `MATCHES` | `state/post_queries.json`, `data/post_people.jsonl`, `data/post_leads.jsonl`, `data/matches.csv` |
+| `KINDS`, `DEFAULTS`, `settings()` | Lead kinds (`person`, `job_board`); the defaults for `config.json` → `discovery.linkedin_posts`; the merged settings |
+| `next_queries(n, now)` | The next post searches, least recently run first, spread over a title x place diagonal; the phrase rotates when a pair comes round again; marks them run |
+| `people()`, `add_person`, `next_people`, `mark_read` | The recruiters and managers worth re-reading: latest record per profile URL, longest unread first |
+| `leads()`, `lead_id(url)`, `_clean_url` | Every lead by id (later records overwrite fields); id = hash of the post URL without tracking parameters |
+| `known_roles(company, title)` | Rows of `matches.csv` for the same employer (loose name match) with a similar title (60% of the shorter title's words shared) |
+| `log_lead(...)` | Log one post; status `known`, `job_board`, `stale` (older than `max_post_age_days` and not confirmed open) or `new`; one record per post |
+| `add_role(id, countries)` | A `new` lead becomes a `matches.csv` row (new columns `poster`, `poster_url`) and a queued card via `board_sync.promote`; the ref is the hash of the radar's own `c:company|title|country` key, so a later radar hit lands on the same card |
+| `stats(days)` | Counts of new, added, known, stale and job-board leads, and known people |
+| `main` | The CLI (`queries`, `person add/next/read`, `lead`, `add-role`, `stats`) |
+
+**Watch out**: this file never touches LinkedIn; Claude does the reading (CLAUDE.md rule 4c). `jobradar/board.py` `row_payload` adds a "Posted by" line when a row has a `poster`.
+
 ### `tools/sponsorship.py`: checked sponsorship verdicts (standard library only)
 
 | Name | Is |

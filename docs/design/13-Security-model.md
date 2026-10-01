@@ -10,7 +10,11 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
 
 - Log in to LinkedIn or any job portal with the user's credentials.
 - Scrape LinkedIn, Indeed or Glassdoor (their terms forbid it; their alert emails are
-  read instead). `jd_prep.py` refuses those domains in code (`NEVER_FETCH`). One opt-in
+  read instead). A third opt-in exception (`discovery.linkedin_posts.enabled`, the user's instruction of
+  2026-10-01): at the start of a session Claude in Chrome may read LinkedIn post-search results and known
+  recruiters' posts in the user's own logged-in browser, capped by `max_searches`, `max_scrolls` and
+  `max_people_per_session`, read-only, never from the daily Action. Same breach of LinkedIn's terms, same
+  user-accepted risk (CLAUDE.md rule 4c). `jd_prep.py` refuses those domains in code (`NEVER_FETCH`). One opt-in
   exception (`referrals.linkedin_lookup`, off by default): when the user is about to apply to one
   role and asks, Claude in Chrome may read LinkedIn people-search results in the user's own
   logged-in browser to find a recruiter or hiring manager. Read-only, a few searches, never

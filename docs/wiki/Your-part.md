@@ -128,7 +128,9 @@ your other logged-in tabs; Claude doesn't use them. You approve the answers for 
 page before they're typed. It never answers questions about visas, salary, diversity or
 consent for you, never logs in or creates accounts for you (you do that in the tab), and
 never clicks the final Submit. It won't touch LinkedIn, Indeed or Glassdoor applications at all (the
-only LinkedIn use is the opt-in contact lookup for referrals).
+only LinkedIn uses are the opt-in contact lookup for referrals and the opt-in hiring-post search). The
+hiring-post search (`discovery.linkedin_posts.enabled`) reads LinkedIn posts in your Chrome at the start of a
+session, read-only and capped. It breaches LinkedIn's terms like the contact lookup does, so it is off until you say yes.
 
 ## Every so often
 

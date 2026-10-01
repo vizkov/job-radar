@@ -88,6 +88,8 @@ def row_payload(row: dict) -> dict:
     if row.get("posted"):
         lines.append(f"- Posted: {row['posted'][:10]}")
     lines.append(f"- Found on: {row.get('source') or ''}")
+    if row.get("poster"):  # a role found through a LinkedIn hiring post: the poster is a warm route
+        lines.append(f"- Posted by: [{md(row['poster'])}]({md_url(row.get('poster_url') or '')})")
     if row.get("also_on"):
         lines.append(f"- Also on: {md(row['also_on'])}")
     lines += ["", f"Role ID: `{row['ref']}`", MARKER.format(ref=row["ref"])]

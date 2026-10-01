@@ -38,6 +38,8 @@ PRIVATE = [
     "data/pipeline_snapshot.json",
     "data/usage_log.jsonl",
     "data/referrals.jsonl",
+    "data/post_leads.jsonl",      # LinkedIn hiring posts you logged, with the posters' names
+    "data/post_people.jsonl",     # recruiters and managers whose posts are worth re-reading
     "data/sponsorship.jsonl",     # checked sponsorship verdicts for your roles
     "data/calibration_log.jsonl", # automatic tier-weight changes from your scores
     "docs/reviews.md",            # weekly system-review notes about your search

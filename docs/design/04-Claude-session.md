@@ -32,6 +32,7 @@ The skills, and the tools each one runs:
 | `application-review` | "review my application", the user provides or updates CV/cover/STAR drafts; runs automatically after `tailor-application` | `consistency_check.py`, then four read-only subagents (ATS, recruiter, consistency auditor, copy editor); Claude verifies their findings and reports ranked fixes in chat (no `review.md` is written) |
 | `sponsorship-check` | "will they sponsor?", roles recommended apply/maybe | reads the ad, applies country rules, checks registers, WebSearch/WebFetch on company pages (never LinkedIn/Indeed/Glassdoor); `tools/sponsorship.py record --board` |
 | `referrals` | "who do I know at …", a role recommended apply, an unanswered ask in the brief | `tools/referrals.py contacts/ask/result/route/pending`; messages to strangers are drafted in chat only, never saved to a file |
+| `post-discovery` | `discovery.linkedin_posts.enabled` at session start, "check LinkedIn posts", the user pastes a hiring post | `tools/post_leads.py queries/person/lead/add-role/stats`; Claude in Chrome reads post searches read-only; new roles become cards with the poster named |
 | `apply-assist` | "help me apply to X" | Claude in Chrome; a Sonnet subagent types approved values; the user submits |
 | `track` | "I applied to X" | `board_sync.py set <ref> Stage=Applied` |
 | `tune-radar` | "stop showing X", "add company Y" | edits `profile/`, `radar.py --dry-run`, `build_candidates.py`, `verify_boards.py` |
@@ -287,6 +288,19 @@ a generic "AI recruiting" or "technical recruiter" headline is labelled unverifi
 The opt-in LinkedIn lookup always covers **posts**, in two places: each opened profile's recent-activity page (`/recent-activity/all/`, part of opening
 that profile) and **hiring posts** about the role, two read-only content searches (newest first) after the people searches. Posts by
 people who work at the company are reported as warm routes; job-board reposts are reported as "live but not a contact"; the rest is ignored.
+
+### Post discovery (`post-discovery`)
+
+The job boards only show formal postings; recruiters and hiring managers often announce a role in a LinkedIn post (or repost a colleague's) first.
+With `discovery.linkedin_posts.enabled`, Claude runs a capped, read-only sweep in the user's own logged-in Chrome: `post_leads.py queries`
+prints the next post searches (rotated through titles x places so each session covers new ground), and `person next` lists recruiters and
+managers whose own posts are worth re-reading. Claude scrolls up to `max_scrolls` per search, sorts posts into a person hiring, a job-board
+repost, or noise, **follows a repost to the original post** (the original's date and author, not the reposter's), checks the author's
+current employer, and confirms the role on the company's own careers page. `post_leads.py lead` logs each post and says whether the
+radar already has the role (known), the post is too old (stale), it is a job-board repost, or the role is new; `add-role` turns a new
+one into a `matches.csv` row (`source = linkedin_post`, poster named) and a queued card, then `score-roles` and `sponsorship-check` run as
+for any role. `stats` shows how much the posts added over the other sources. Contacting the poster follows the `referrals` order (a
+stranger: after applying). Hard limits: CLAUDE.md rule 4c.
 
 ## 4.9 Applying (`apply-assist`)
 

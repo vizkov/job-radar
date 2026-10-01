@@ -73,6 +73,20 @@
     "auto_per_session": 8
   },
 
+  "discovery": {
+    "linkedin_posts": {
+      "_comment": "true: at the start of a session Claude in Chrome may read LinkedIn post-search results (hiring posts by recruiters and hiring managers, and the people who repost them) in your logged-in browser, to find roles the job boards miss. Read-only, never reacts, comments, connects or messages. LinkedIn's terms ban automated access; this is your risk to accept. false: nothing runs.",
+      "enabled": false,
+      "max_searches": 8,
+      "max_scrolls": 4,
+      "max_people_per_session": 8,
+      "max_post_age_days": 30,
+      "titles": ["application security", "product security", "security engineer", "penetration tester", "devsecops", "security architect"],
+      "places": ["United Kingdom", "London", "Netherlands", "Amsterdam", "Ireland", "Switzerland", "Germany", "Sweden"],
+      "phrases": ["we're hiring", "hiring", "join my team", "open role", "referral"]
+    }
+  },
+
   "referrals": {
     "_comment": "Days to wait for a reply to a referral ask before the session brief suggests a follow-up or applying directly.",
     "wait_days": 4,

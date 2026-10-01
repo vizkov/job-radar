@@ -170,6 +170,17 @@ The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 
 Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 
+## Hiring-post discovery (`config.json` → `discovery.linkedin_posts`)
+
+| Key | Default | Meaning |
+|---|---|---|
+| `enabled` | false | true lets the `post-discovery` skill use Claude in Chrome, in the user's logged-in browser, to read LinkedIn **post** searches and known recruiters' posts at the start of a session. Read-only; never reacts, comments, connects or messages. LinkedIn's terms ban automated access, so this is the user's risk to accept |
+| `max_searches` | 8 | Post searches per session |
+| `max_scrolls` | 4 | Scrolls per search, to read past the first screen |
+| `max_people_per_session` | 8 | Profiles opened (known people's posts, original authors) per session |
+| `max_post_age_days` | 30 | A post whose original is older than this is stale unless the role is confirmed open |
+| `titles`, `places`, `phrases` | security titles; countries and cities; "we're hiring", "hiring", "join my team", "open role", "referral" | The grid the search rotation walks (`tools/post_leads.py queries`) |
+
 ## Other `config.json` keys
 
 | Key | Meaning |

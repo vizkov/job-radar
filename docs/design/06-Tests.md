@@ -77,6 +77,7 @@ exposed insight lines being read as job titles. Indeed and Glassdoor still have 
 | `test_public_template.py` | `tools/public_template` | Code is public; private or unknown paths never published; renames; wiki link rewriting |
 | `test_sponsorship.py` | `tools/sponsorship` | Valid verdict passes; non-verbatim quotes, banned sources, unbacked confirmed/no, bad verdicts rejected; card block escaped and replaced in place |
 | `test_calibrate.py` | `tools/calibrate` | No change below the evidence threshold; one bounded step down or up; layout kept; cooldown; revert |
+| `test_post_leads.py` | `tools/post_leads` | Query rotation spreads over titles and rotates the phrase; people read longest ago first; lead status known / stale / job-board / new; add-role writes the row with the poster, queues the card and cannot add twice |
 | `test_referrals.py` | `tools/referrals` | Contacts found loosely and in the user's order; ask/result logged and put on the card; unanswered asks after the wait |
 | `test_docs_cover_code.py` | the overview docs | Every board field is in Concepts and the user guide's Board page; every skill in CLAUDE.md, page 4 and a "Things you can say" row (`USER_PHRASES`); every tool in the code reference; every config key in Configuration |
 | `test_check_doc_links.py` | `tools/check_doc_links` | The repo's docs have no broken links; a link with a space or a missing target is caught |

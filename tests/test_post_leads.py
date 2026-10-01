@@ -117,3 +117,14 @@ def test_company_extra_is_searched_first_and_each_employer_once(monkeypatch):
     monkeypatch.setattr(pl, "settings", lambda: {**real, "company_extra": ["Monzo", "Amazon UK"]})   # "Amazon UK" is the scored Amazon: not twice
     assert pl.search_companies() == ["Monzo", "Amazon UK"]
     assert pl.next_queries(2, now="2026-10-01T00:00:00+00:00")[0].startswith("Monzo ")
+
+
+def test_high_fit_targets_follow_extras_and_scored_employers(monkeypatch):
+    pl.TARGETS.write_text("Company\tEuropean City / Offices\tFit\nNCC Group\tManchester\tHigh\nSomeCo\tLondon\tMedium\n"
+                          "Amazon UK\tLondon\thigh\nWatchCo\tParis\tWatch\n", encoding="utf-8")
+    write_scores([{"company": "Amazon", "recommendation": "apply", "fit_score": 85}])
+    assert pl.fit_targets("High") == ["NCC Group", "Amazon UK"]                  # case-insensitive, file order
+    assert pl.search_companies() == ["Amazon", "NCC Group"]                      # scored first, High targets next, Amazon once
+    assert pl.fit_targets("") == []
+    pl.TARGETS.write_text("Company\tEuropean City / Offices\nNCC Group\tManchester\n", encoding="utf-8")   # an older file without Fit
+    assert pl.fit_targets("High") == []

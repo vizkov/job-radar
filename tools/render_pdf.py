@@ -296,6 +296,7 @@ def cover_html(data: dict, career, contact: dict, role_title: str = "", company:
     body.append(f'<p class="addr">{esc(when)}</p>' + (f'<p class="addr">{esc(company)}</p>' if company else ""))
     body.append('<p class="salute">Dear Hiring Manager,</p>')
     if role_title:
+        role_title = re.sub(r"(\w)- ", r" – ", role_title)   # posting titles often read "Engineer- VP"
         body.append(f'<p class="re"><b>Re: {esc(role_title)}</b></p>')
     body.append(f"<p>{esc(opening)}</p>")
     blocks = [(i, t) for i, t in paras if i not in OPENING + CLOSING]

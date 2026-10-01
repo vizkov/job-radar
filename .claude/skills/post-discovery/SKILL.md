@@ -26,6 +26,8 @@ it to true and commit. Never run it from the daily Action or in the background.
 
 ## The sweep
 
+0. **Which companies get searched:** the user's `company_extra`, then employers they scored apply/maybe, then `targets.tsv` companies with Fit =
+   `company_fit` (High), two per session, longest-unsearched first. With about 170 companies a full cycle is long: that is fine, keywords stay the priority.
 0. **Companies the user names.** "Also search <company>": add it to `discovery.linkedin_posts.company_extra` in `profile/config.json` (keep the list
    short; company searches are only `company_queries` of the session's searches, keyword searches stay the priority) and commit.
 1. **Queries.** `python tools/post_leads.py queries` prints the next searches, least recently run first and spread over titles

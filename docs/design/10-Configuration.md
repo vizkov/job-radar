@@ -180,6 +180,7 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | `max_people_per_session` | 8 | Profiles opened (known people's posts, original authors) per session |
 | `company_queries` | 2 | How many of the session's searches are `<company> "we're hiring" security`; the rest are keyword searches (the priority) |
 | `company_extra` | [] | Companies the user wants searched even before any of their roles is scored (named in chat; Claude edits the list). Searched in the same company slots, ahead of the scored apply/maybe employers; each employer once |
+| `company_fit` | High | Also search the `targets.tsv` companies whose Fit column has this value (after the user's `company_extra` and the scored apply/maybe employers). Blank: none. `targets.tsv` may have a `Fit` column (High / Medium / Watch); older files without it simply add nothing |
 | `not_words` | contract, contractor, freelance | Appended to keyword searches as `NOT (...)`; filters on post text only |
 | `max_post_age_days` | 30 | A post whose original is older than this is stale unless the role is confirmed open |
 | `titles`, `places`, `phrases` | security titles; countries and cities; "we're hiring", "hiring", "join my team", "open role", "referral" | The grid the search rotation walks (`tools/post_leads.py queries`) |

@@ -83,6 +83,7 @@
       "max_post_age_days": 30,
       "company_queries": 2,
       "company_extra": [],
+      "company_fit": "High",
       "not_words": ["contract", "contractor", "freelance"],
       "titles": ["(\"application security\" OR appsec)", "\"product security\"", "(\"penetration tester\" OR pentester OR \"pen tester\")", "(\"threat modelling\" OR \"threat modeling\")", "(\"AI security\" OR \"LLM security\")", "\"security consultant\"", "\"vulnerability management\"", "\"security architect\""],
       "places": ["United Kingdom", "London", "Netherlands", "Amsterdam", "Ireland", "Switzerland", "Germany", "Sweden"],

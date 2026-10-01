@@ -95,6 +95,10 @@ item, including the first in a row. Separators: commas; a language is listed on 
 11. **Dates** only on job titles (education and volunteering years are exempt and stay).
 12. **No first person in CV lines** (no I, me, my, we, our; the user's rule, 2026-10-01): the fact belongs in the letter or the stories. No exceptions (B16 was reworded 2026-10-01).
 13. **Links.** Every mentioned publication or repository has a clickable link in its entry.
+15. **One verb form in the Profile (the user, 2026-10-01).** The Profile sentences use one form throughout (here: third-person present, "Tests ..., provides ..., leads ..."); never "Hands-on in ..." next to "Provides ..." next to "Currently leads ...". The copy editor checks it.
+16. **No mechanism and no context clauses in a CV line (the user, 2026-10-01).** A CV line says what was done and what came of it. How a flaw works ("one token served the GPT layer, so a token meant only for ... also opened ...") belongs in the story or the letter, and so does background ("as the global practice moves there"). If dropping a clause leaves the claim and its impact intact, drop it.
+17. **Skills: genuine skill nouns only, related items grouped in parentheses (the user, 2026-10-01).** Testing areas that a parent term covers ("authentication and authorisation testing", "microservice testing") do not go in Skills; JD terms like these converge in the Profile. A sub-technology goes inside its parent's parentheses (RAG inside "LLM-assisted security workflows (LLMs, skills, MCP plugins, RAG)"), and a tool lives in Tools (AWS Threat Designer is a tool, not a threat-modelling technique).
+18. **A capability that Skills already names need not be repeated as an Experience bullet (the user, 2026-10-01).** B15 keeps only the workshop; "network penetration testing" is carried by K01. Recruiters then see one clear claim, not two.
 14. **Name the thing, not the category (the user's rule, 2026-10-01, from recruiter advice on ATS matching).** A keyword screen matches exact phrases from the
     ad, so write the platform, tool, standard or language where the work happened ("automated exploit revalidation in Python", "Checkmarx", "OWASP Top 10"), not
     "scripting ability", "scanning tools" or "familiar with frameworks". A bullet reads verb + named tool + object ("Automated exploit revalidation in Python"), and a
@@ -149,7 +153,7 @@ Give this section to the copy editor only; the cold readers (ATS, recruiter, aud
 - "around 50%" triage saving stated once; "onboarding its first set of assessors" (still in progress, present tense; "first set" is deliberate, no count).
 - Skills rows, labels and item wording (K01-K07) as set on 2026-10-01: all seven rows kept, `JavaScript, TypeScript (Node.js)`, no approach phrases, lowercase items. Do not rewrite the lists or drop rows.
 - E01 "graduate coursework, focused on adversarial AI/ML" (no degree is claimed; do not add one).
-- B17 opens with the repository URL; B06, B17, B18, B21 shapes and lengths (B06 and B21 stay single bullets); both B18 links point to the Medium profile (the user's choice).
+- B17 opens with the clickable name "OSS" (link text, not the raw URL; 2026-10-01); B06, B17, B18, B21 shapes and lengths (B06 and B21 stay single bullets); both B18 links point to the Medium profile (the user's choice).
 - Role headings name every employer (Consultant: Synopsys / Black Duck / UltraViolet Cyber): the user's choice, for ATS and recruiter lookups.
 - Role-heading dates only on titles; education and volunteering years stay.
 - "Fortune 100 global financial institution" is the defined term; "the bank" is used after it is introduced in the same document (tailoring fixes dangling referents, not the master).
@@ -162,6 +166,6 @@ Give this section to the copy editor only; the cold readers (ATS, recruiter, aud
 The user said (2026-10-01) that re-asking these wastes their time. Reviewers without context will keep raising them; verify against the stories, and answer from the record.
 
 - The timeline of technical oversight (8 assessors mid-2025 to mid-2026, bank team of 4 from August 2026), quality assurance and performance reviews for the bank team, the 100+ assessments and who highlighted what, the renewals and the account timeline: `stories.md` S01, S09 "Also true".
-- The "live exploit demonstrations where useful", the previous vendor's review, "6+ years": the user's approved wording; not open questions.
+- The live exploit demonstrations (the VPs saw them; "where useful" was dropped 2026-10-01), the previous vendor's review, "6+ years": the user's approved wording; not open questions.
 - "Interviewed 10+ candidates" was removed (no story; 2026-10-01). Do not re-add it.
 - Around 50% triage saving: accepted as written.

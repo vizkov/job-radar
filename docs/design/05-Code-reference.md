@@ -632,7 +632,7 @@ out of date.
 |---|---|
 | `QUERIES`, `PEOPLE`, `LEADS`, `MATCHES` | `state/post_queries.json`, `data/post_people.jsonl`, `data/post_leads.jsonl`, `data/matches.csv` |
 | `KINDS`, `DEFAULTS`, `settings()` | Lead kinds (`person`, `job_board`); the defaults for `config.json` → `discovery.linkedin_posts`; the merged settings |
-| `fit_companies()`, `search_companies()` | Employers scored apply/maybe, best first; the company-search list: `company_extra` first, then those, each employer once |
+| `fit_companies()`, `fit_targets(fit)`, `search_companies()` | Employers scored apply/maybe, best first; `targets.tsv` companies with a given Fit; the company-search list: `company_extra`, then the scored employers, then the High-fit targets, each employer once |
 | `next_queries(n, now)` | The next post searches, least recently run first, spread over a title x place diagonal; the phrase rotates when a pair comes round again; marks them run |
 | `people()`, `add_person`, `next_people`, `mark_read` | The recruiters and managers worth re-reading: latest record per profile URL, longest unread first |
 | `leads()`, `lead_id(url)`, `_clean_url` | Every lead by id (later records overwrite fields); id = hash of the post URL without tracking parameters |

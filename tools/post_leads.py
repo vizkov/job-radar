@@ -44,7 +44,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 4, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 2, "company_extra": [], "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 2, "company_extra": [], "company_fit": "High", "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
@@ -53,6 +53,7 @@ DEFAULTS = {
     "phrases": ['"we\'re hiring"', '"visa sponsorship"', '"relocation"', '"join my team"'],
 }
 SCORES = ROOT / "data" / "scores.jsonl"
+TARGETS = profile_path("targets.tsv")   # the user's target companies; an optional Fit column ranks them
 
 
 def settings() -> dict:
@@ -105,11 +106,21 @@ def fit_companies() -> list[str]:
     return [name for _, name in sorted(best.values(), key=lambda v: -v[0])]
 
 
+def fit_targets(fit: str) -> list[str]:
+    """Companies in targets.tsv whose Fit column equals `fit` (case-insensitive), in file order. No Fit column or no `fit`: none."""
+    if not fit or not TARGETS.exists():
+        return []
+    with TARGETS.open(encoding="utf-8", newline="") as fh:
+        return [r["Company"].strip() for r in csv.DictReader(fh, delimiter="\t")
+                if r.get("Company") and (r.get("Fit") or "").strip().lower() == fit.strip().lower()]
+
+
 def search_companies() -> list[str]:
-    """The employers the company searches walk: the user's `company_extra` list (named in chat, searched even before any role of
-    theirs is scored) followed by the scored apply/maybe employers, each employer once."""
+    """The employers the company searches walk, each once, in this order: the user's `company_extra` (named in chat), the scored
+    apply/maybe employers, then the targets.tsv companies whose Fit is `company_fit` (default High)."""
+    s = settings()
     seen, out = set(), []
-    for name in list(settings()["company_extra"]) + fit_companies():
+    for name in list(s["company_extra"]) + fit_companies() + fit_targets(s["company_fit"]):
         if normalize(name) not in seen:
             seen.add(normalize(name))
             out.append(name)

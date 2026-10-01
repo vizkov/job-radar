@@ -35,7 +35,7 @@ Write every bullet you might ever want; tailoring picks the relevant ones.
 - [K01] Web & API pentesting: Burp Suite, OWASP ASVS, OAuth 2.0 / OIDC, GraphQL
 - [K02] Code review: Java, Kotlin, JavaScript, TypeScript, Python, Go (reading)
 - [K03] Tooling: Semgrep, CodeQL, OWASP ZAP, Snyk, GitHub Actions
-- [K04] Threat modeling: STRIDE, attack trees, data-flow diagrams
+- [K04] Threat modeling: STRIDE, Attack trees, Data-flow diagrams
 
 # Education and certifications
 - [E01] OSCP (Offensive Security Certified Professional), 2020

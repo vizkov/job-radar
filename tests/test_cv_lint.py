@@ -52,7 +52,8 @@ def test_briefed_without_impact_warns():
 
 def test_skill_capitalisation_and_language_list():
     assert cv_lint.skill_issues("K01", "Application security: Web, API, bug bounty triage", "Application security")
-    assert cv_lint.skill_issues("K02", "Vulnerability management: Bug bounty triage, CVSS", "Vulnerability management")
+    assert not cv_lint.skill_issues("K02", "Vulnerability management: Bug bounty triage, CVSS", "Vulnerability management")
+    assert cv_lint.skill_issues("K02", "Vulnerability management: bug bounty triage, CVSS", "Vulnerability management")
     assert not cv_lint.skill_issues("K07", "Languages: Java, Python, JavaScript, TypeScript (Node.js)", "Languages")
     assert cv_lint.skill_issues("K07", "Languages: Java, JavaScript/TypeScript (Node.js)", "Languages")
 

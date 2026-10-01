@@ -35,7 +35,6 @@ BANNED = [
 RAG_PROSE = re.compile(r"\(RAG\)|\bRAG\b")
 STACKED_HEDGE = re.compile(r"\b(about|around|approximately|roughly)\b", re.I)
 LABEL_ONLY = re.compile(r"^\s*(?:\w+\s+){0,2}briefed\b", re.I)
-GENERIC = {"Web", "Network", "Mobile", "Cloud", "Microservice", "Thick-client"}
 MEDIUM = re.compile(r"medium\.com", re.I)
 # Soft-skill filler (the user's rule, 2026-10-01): every CV says it, a filter matches nothing on it, and only evidence counts.
 FILLER = re.compile(r"\b(team player|strong (?:communication|interpersonal)|excellent (?:communication|interpersonal)|hard-?working|detail-oriented|self-motivated|results-driven|go-getter|fast learner|passionate about)\b", re.I)
@@ -97,13 +96,9 @@ def skill_items(text: str) -> list[str]:
 def skill_issues(sid: str, text: str, label: str) -> list[str]:
     bad = []
     for item in skill_items(text):
-        core = re.sub(r"\(.*?\)", "", item).split()
-        letters = re.sub(r"[^A-Za-z]", "", " ".join(core[1:]))
-        # "Bug bounty triage", "Web": a common word capitalised; "Java", "Semgrep", "AWS Threat Designer" are proper nouns
-        phrase_case = bool(core) and core[0][:1].isupper() and core[0][1:].islower() and (
-            (len(core) > 1 and letters.islower()) or core[0] in GENERIC)
-        if phrase_case:
-            bad.append(f"[{sid}] skill \"{item}\" starts with a capital but is not a proper noun or acronym: lowercase it (every item, including the first)")
+        # every item starts with a capital letter (the user's rule, 2026-10-01, replacing the lowercase rule): "Secure code review", "AWS"
+        if item[:1].islower():
+            bad.append(f"[{sid}] skill \"{item}\" starts with a lowercase letter: capitalise it (every item, including the first)")
         if "/" in item and re.search(r"JavaScript/TypeScript", item):
             bad.append(f"[{sid}] list languages separately (\"JavaScript, TypeScript (Node.js)\"), not \"{item}\"")
     return bad

@@ -58,8 +58,7 @@ competence**: techniques, standards, tools, languages. Not approach phrases, sen
 "federated and shared-responsibility architectures", "agent and MCP tool permissions" are experience or profile language, not
 skills. Do not list a skill its parent already covers ("authentication and authorisation testing" sits under OWASP Top 10).
 Mirror the JD's exact words for genuine skill nouns and tools (ATS match on exact phrases, and a dedicated skills block carries weight). Put the core, most-asked items first (secure code review, secure design review, SAST/DAST, business-logic testing before
-the long tail). Capitalisation: lowercase, except proper nouns and acronyms (AWS, OWASP Top 10, Burp Suite, Java), every
-item, including the first in a row. Separators: commas; a language is listed on its own (`JavaScript, TypeScript (Node.js)`, not
+the long tail). Capitalisation: every item starts with a capital letter (Secure code review, Bug bounty triage, AWS, Burp Suite; the user, 2026-10-01, replacing the earlier lowercase rule), including the first in a row; items inside a parenthesis keep their own case. Separators: commas; a language is listed on its own (`JavaScript, TypeScript (Node.js)`, not
 `JavaScript/TypeScript`).
 
 **Header.** Name, headline, location, email, phone, LinkedIn, GitHub. Location reads `Bangalore, India · Open to relocation`
@@ -151,7 +150,7 @@ Give this section to the copy editor only; the cold readers (ATS, recruiter, aud
 - "with go-live fast approaching" / "found with go-live fast approaching" (P05, B06): the user's wording for urgency.
 - "expedited deadline" (B12, S02, C10), never "extended".
 - "around 50%" triage saving stated once; "onboarding its first set of assessors" (still in progress, present tense; "first set" is deliberate, no count).
-- Skills rows, labels and item wording (K01-K07) as set on 2026-10-01: all seven rows kept, `JavaScript, TypeScript (Node.js)`, no approach phrases, lowercase items. Do not rewrite the lists or drop rows.
+- Skills rows, labels and item wording (K01-K07) as set on 2026-10-01: all seven rows kept, `JavaScript, TypeScript (Node.js)`, no approach phrases, capitalised items. Do not rewrite the lists or drop rows.
 - E01 "graduate coursework, focused on adversarial AI/ML" (no degree is claimed; do not add one).
 - B17 opens with the clickable name "OSS" (link text, not the raw URL; 2026-10-01); B06, B17, B18, B21 shapes and lengths (B06 and B21 stay single bullets); both B18 links point to the Medium profile (the user's choice).
 - Role headings name every employer (Consultant: Synopsys / Black Duck / UltraViolet Cyber): the user's choice, for ATS and recruiter lookups.

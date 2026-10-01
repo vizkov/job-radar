@@ -350,7 +350,8 @@ share one link. So if an employer edits a job's title, it's reported as a new ro
 | `_find_link(p, s)`, `_content_id(...)`, `_has_company_line(line)` | A job ID from a link, or (for ID-less providers like Indeed) the provider's pinned redirect URL; a stable hash ID from title/company/location; whether a card line is "Company - Location". |
 | `parse_text(p, body)` | Plain-text cards: a short paragraph followed by the job URL. ID-less cards also need a company line; the alert's subject supplies the country for unknown towns (`to_postings`). |
 | `parse_html(p, body)` | HTML cards: from each job link (keyed by ID, or by the pinned redirect for ID-less providers), climb to the largest element containing only that job. The title is the shortest link text for that job (Indeed wraps the whole card in the same link); a "Company" line followed by "- Location" is joined, and ID-less cards need that company line. |
-| `to_postings(msg, p)` | Text first, HTML as fallback; URL **rebuilt from the job ID**. |
+| `is_match_mail(msg)`, `parse_match(body)` | Indeed "job match" mail (`@match.indeed.com`): one recommended job (title, company, location, then `View job:` with a `cts.indeed.com/v3/` tracking link, the only link accepted). |
+| `to_postings(msg, p)` | Match mail via `parse_match`; otherwise text first, HTML as fallback; URL **rebuilt from the job ID**. |
 | `_mailbox_units()` | Turns the fetcher's per-provider counts into health units: nothing from any provider at all, or provider mail only from unknown sender addresses. |
 | `AlertEmailSource` | `_messages()` reads `.alert_mail/*.eml` and fails if `_status.json` says the fetch failed; `fetch()` drops unknown senders and DKIM failures, and reports per provider: jobs, rejected, and emails that yielded no jobs (layout change), not counting account mail such as "your job alert is now active" (`_ACCOUNT_MAIL`); the failure message names up to three subjects of those empty emails. Unknown senders are informational (a bank notice is not a fault) unless the sender's address names a provider (the provider changed its sender), which is a failure. |
 
@@ -426,6 +427,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `auto_score_count(root)`, `auto_score_pick(rows, scored, items, n)`, `start_prep(refs)` | How many roles to score automatically; which (freshest unscored Tier 1, not closed/skipped); fetch their JDs in the background. |
 | `referral_notes(now)` | Asks unanswered after `referrals.wait_days`, as health notes (at most 5). |
 | `stale_days(root)` | `board.stale_days` from the config, for the brief's "looks closed" line. |
+| `skipped_refs(root)` | Refs whose latest logged Stage is Skipped/Rejected, so an archived skip (gone from the board read) is not auto-scored or counted unscored again. |
 | `start_archive(now)`, `LAST_ARCHIVE` | Once a day (stamp `work/.last_archive`), start `board_sync.py archive` detached (log `work/board_archive.log`) when any card is in Stage = Skipped. |
 | `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
 | `_CONTROL`, `_REF` | Characters stripped by `safe()`; the ref marker in issue bodies. |

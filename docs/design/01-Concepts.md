@@ -94,12 +94,12 @@ Skim it now; come back when a word is unclear.
 |---|---|---|---|
 | `P` | Profile / summary line | `master_resume.md` | CV sections |
 | `B` | Experience bullet | `master_resume.md` | CV sections |
-| `K` | Skills line | `master_resume.md` | nowhere directly; like every line, its words count as "in the career docs" for the skills and names checks |
+| `K` | Skills line | `master_resume.md` | CV skills section; its words also count as "in the career docs" for the skills and names checks |
 | `E` | Education / certification | `master_resume.md` | CV sections |
 | `S` | STAR story | `stories.md` | cover letter |
 | `C` | Cover-letter paragraph | `cover_blocks.md` | cover letter |
 
-Enforced by `SECTION_KINDS` (`P`, `B`, `E`) and `COVER_KINDS` (`C`, `S`) in `tools/jd_check.py`.
+Enforced by `SECTION_KINDS` (`P`, `B`, `E`, `K`) and `COVER_KINDS` (`C`, `S`) in `tools/jd_check.py`.
 
 ### Source names vs posting sources
 

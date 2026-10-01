@@ -66,8 +66,9 @@ user's CV genuinely lacks something, tell them.
 
 ## A JD can't be fetched
 
-`work/jd/<ref>/packet.md` says `unavailable: …`. LinkedIn, Indeed and Glassdoor are never
-fetched; JavaScript-only pages and robots.txt refusals can't be. Ask the user to paste the
+`work/jd/<ref>/packet.md` says `unavailable: …`. Indeed and Glassdoor are never
+fetched (`jd_prep.py` refuses LinkedIn too; for LinkedIn, Claude reads the one job page in Chrome, `CLAUDE.md` rule 4a);
+JavaScript-only pages and robots.txt refusals can't be fetched by the code. Read the page in Chrome, or ask the user to paste the
 JD, save it as `work/jd/<ref>/jd.txt`, and re-run `jd_prep.py --ref <ref>`.
 
 ## Publishing to the template didn't happen

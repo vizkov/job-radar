@@ -51,7 +51,7 @@ projects; job-radar uses roughly 450–750.
       Sort by → Posted, descending → Save view").
    5. **Stop the email flood.** On your repository page: **Watch → Participating and
       @mentions**. Otherwise GitHub emails you about every new job.
-Steps 3 to 6 are optional; do any of them after setup finishes, in any order.
+**Optional extras (steps 3 to 6).** Setup is complete without them; do any of them afterwards, in any order.
 
 3. **Job-alert emails** (LinkedIn, Indeed, Glassdoor jobs). See below.
 4. **Reed** (more UK jobs). See below.
@@ -86,6 +86,11 @@ What happens with it: three times a day GitHub's servers log in to that mailbox
 anything read, move or delete it. Emails that fail the sender's security signature are
 ignored. **Never paste the password into Claude or a file.**
 
+**Two separate Gmail accesses, don't mix them up.** (1) The alert mailbox above is read by GitHub's servers every
+run, over IMAP with its own app password, and only for alert emails. (2) Separately, when you ask "did anyone reply?",
+Claude reads *your* Gmail in the session through the Gmail connector in Claude (you approve it once; read-only). Use
+your normal inbox for (2): that is where employers answer.
+
 ## Optional: Reed (UK job board)
 
 1. Register for a free API key at **reed.co.uk/developers** (your own Reed account).
@@ -101,6 +106,10 @@ say **"switch on the LinkedIn lookup"**: it then reads LinkedIn's search results
 for one role at a time and only when you ask, and never connects, messages or follows anyone.
 **The risk:** LinkedIn's terms ban any automated use of the site, so this could get your LinkedIn account
 restricted, even at this low volume. Say "switch off the LinkedIn lookup" to stop it.
+
+**Separate and always on:** when Claude scores a role that comes from LinkedIn, it reads that one job page in your
+logged-in Chrome to get the description (one page at a time, read-only, no searching or browsing). Same risk. Say
+"don't open LinkedIn pages, I'll paste them" and it goes back to asking you to paste the description.
 
 ## What Claude can do in your browser
 

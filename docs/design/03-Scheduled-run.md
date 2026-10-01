@@ -96,7 +96,8 @@ For every posting from every source:
    (whole words), otherwise keep it only if a `title_include` keyword appears. Then
    **permanent only**: `not_permanent()` drops titles or ATS employment types saying contract,
    fixed-term, temporary, interim, freelance or internship. Exception to the title rule:
-   a "careers page changed" notice has no job title, so it always passes.
+   a "careers page changed" notice has no job title, so it always passes. Roles posted more than `max_age_days` ago (0 = no limit; no posted date always
+   passes) are dropped as "old" before the company check.
 3. **Company.** `matcher.resolve(p.company, p.company_hint)` looks the employer up in
    the target list (exact match after normalizing, or via an alias). ATS postings also
    carry a *hint*: the targets whose board this is, used if the posting's own company

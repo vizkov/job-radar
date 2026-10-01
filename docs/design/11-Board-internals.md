@@ -42,7 +42,7 @@ workflow is a manual step (see [Your part](../wiki/Your-part.md)).
 
 Projects has a built-in **Status** field (Todo / In Progress / Done) that its "Item closed" workflow
 sets to Done. job-radar tracks **Stage** instead. The session brief reconciles the two
-(`closed_cards()`), and the *Act now* view filters `is:open`, so a card the user closes leaves it.
+(`closed_cards()`), and the *Act now* view (Tier 1, still New or Shortlisted, posted 14+ days ago: the roles about to expire; filter in `VIEWS`, `board_sync.py`) filters `is:open`, so a card the user closes leaves it.
 
 ## What's on a card
 

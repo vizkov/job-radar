@@ -15,7 +15,10 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
   role and asks, Claude in Chrome may read LinkedIn people-search results in the user's own
   logged-in browser to find a recruiter or hiring manager. Read-only, a few searches, never
   connects or messages. It still breaches LinkedIn's terms (any automated access); the user
-  accepted that risk for their own account.
+  accepted that risk for their own account. A second exception, standing (the user's instruction of
+  2026-10-01, `CLAUDE.md` rule 4a): `score-roles` has Claude in Chrome read **one** LinkedIn job page at a time
+  for a role already on the list, saving only the description text; no search pages, no loops, no clicking.
+  `jd_prep.py` itself still never fetches LinkedIn.
 - Submit an application. `apply-assist` may pre-fill a form in the user's Chrome, page
   by page after they approve the values; the final Submit is always the user's click.
 - Email or message anyone on the user's behalf.
@@ -37,7 +40,7 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
 | Risk | Defence | Where |
 |---|---|---|
 | Names of people who help the user get published | Kept only in `profile/network.csv` and `data/referrals.jsonl`, both private (never on the publish allowlist) | `tools/public_template.py` |
-| Claude contacts them | Claude only drafts; the user sends every message. No lookups on LinkedIn/Indeed/Glassdoor | `referrals` skill, `CLAUDE.md` rules 3–4 |
+| Claude contacts them | Claude only drafts; the user sends every message. No lookups on Indeed/Glassdoor; LinkedIn only as in rule 4 (a) and (b) | `referrals` skill, `CLAUDE.md` rules 3–4 |
 
 ### 2. The mailbox password leaks
 

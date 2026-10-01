@@ -4,7 +4,7 @@
 **Read first:** [3.1, the workflow file](03-Scheduled-run.md#31-the-workflow-file-radaryml)  
 **Code:** `tools/fetch_alert_emails.py`, `jobradar/alert_providers.py`, `jobradar/sources/alert_email.py`, `radar.yml` step 3
 
-job-radar never logs in to LinkedIn, Indeed or Glassdoor and never scrapes them.
+job-radar's code never logs in to LinkedIn, Indeed or Glassdoor and never scrapes them. (Separately, Claude may read one LinkedIn job page in the user's own Chrome to score a role: CLAUDE.md rule 4a, see [Security model](13-Security-model.md).)
 Their terms prohibit scraping, and GitHub Actions IPs get blocked quickly.
 Instead, each site emails the user job alerts, and job-radar reads those emails.
 
@@ -91,7 +91,7 @@ The user-facing version is in [Your part](../wiki/Your-part.md). The details:
 3. **Create an app password** for it: Google Account → Security → App passwords.
 4. **Forward alerts from the user's main Gmail.** Settings → Forwarding → add the
    dedicated address and confirm. Then create a filter:
-   `from:(jobalerts-noreply@linkedin.com OR jobs-listings@linkedin.com OR indeed.com OR glassdoor.com)`
+   `from:(jobalerts-noreply@linkedin.com OR jobs-listings@linkedin.com OR jobs-noreply@linkedin.com OR indeed.com OR glassdoor.com)`
    → *Forward to* the dedicated address.
 5. **Add GitHub secrets** (repo → Settings → Secrets and variables → Actions):
    `JOBALERT_IMAP_USER` = the dedicated address, `JOBALERT_IMAP_PASSWORD` = the

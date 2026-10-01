@@ -26,6 +26,8 @@ it to true and commit. Never run it from the daily Action or in the background.
 
 ## The sweep
 
+0. **Companies the user names.** "Also search <company>": add it to `discovery.linkedin_posts.company_extra` in `profile/config.json` (keep the list
+   short; company searches are only `company_queries` of the session's searches, keyword searches stay the priority) and commit.
 1. **Queries.** `python tools/post_leads.py queries` prints the next searches, least recently run first and spread over titles
    and places (it marks them run). Open `https://www.linkedin.com/search/results/content/?keywords=<query>&sortBy="date_posted"`
    for each (URL-encode the query). Say which queries you ran.

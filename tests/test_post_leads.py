@@ -109,3 +109,11 @@ def test_company_rotation_survives_a_name_change_and_picks_up_new_employers():
     assert log["company|monzo"]["runs"] == 1 and log["company|amazon"]["runs"] in (1, 2)
     out2 = pl.next_queries(3, now="2026-10-03T00:00:00+00:00")
     assert sum(q.startswith("Amazon") for q in out + out2) == 2    # Amazon: once before the rename, once after, never twice in a row
+
+
+def test_company_extra_is_searched_first_and_each_employer_once(monkeypatch):
+    write_scores([{"company": "Amazon", "recommendation": "apply", "fit_score": 85}])
+    real = pl.settings()
+    monkeypatch.setattr(pl, "settings", lambda: {**real, "company_extra": ["Monzo", "Amazon UK"]})   # "Amazon UK" is the scored Amazon: not twice
+    assert pl.search_companies() == ["Monzo", "Amazon UK"]
+    assert pl.next_queries(2, now="2026-10-01T00:00:00+00:00")[0].startswith("Monzo ")

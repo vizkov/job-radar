@@ -44,7 +44,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 4, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 2, "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 2, "company_extra": [], "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
@@ -105,6 +105,17 @@ def fit_companies() -> list[str]:
     return [name for _, name in sorted(best.values(), key=lambda v: -v[0])]
 
 
+def search_companies() -> list[str]:
+    """The employers the company searches walk: the user's `company_extra` list (named in chat, searched even before any role of
+    theirs is scored) followed by the scored apply/maybe employers, each employer once."""
+    seen, out = set(), []
+    for name in list(settings()["company_extra"]) + fit_companies():
+        if normalize(name) not in seen:
+            seen.add(normalize(name))
+            out.append(name)
+    return out
+
+
 def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
     """The next `n` post searches, least recently run first; marks them run. `company_queries` of them are
     "<company> hiring security" for employers the user scored apply/maybe; the rest walk the title x place grid
@@ -118,7 +129,7 @@ def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
     # keyed by the normalised name, so "Amazon" and "Amazon Web Services" are one employer however the best-scored role names it;
     # the list itself is rebuilt from the scores each time, so new employers join (never run: first) and dropped ones leave
     ckey = lambda c: f"company|{normalize(c)}"  # noqa: E731
-    firms = sorted(fit_companies(), key=lambda c: (log.get(ckey(c)) or {}).get("last", ""))
+    firms = sorted(search_companies(), key=lambda c: (log.get(ckey(c)) or {}).get("last", ""))
     for c in firms[:min(s["company_queries"], n)]:
         out.append(f'{c} "we\'re hiring" security')
         log[ckey(c)] = {"last": stamp, "runs": (log.get(ckey(c)) or {}).get("runs", 0) + 1}

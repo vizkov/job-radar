@@ -93,7 +93,7 @@ item, including the first in a row. Separators: commas; a language is listed on 
 10. **Self-contained.** Every bullet reads alone: "the bank" / "the client" needs its referent introduced earlier in the same
     document.
 11. **Dates** only on job titles (education and volunteering years are exempt and stay).
-12. **No first person in CV lines** (no I, me, my, we, our; the user's rule, 2026-10-01): the fact belongs in the letter or the stories. Exception: B16, the user's approved wording.
+12. **No first person in CV lines** (no I, me, my, we, our; the user's rule, 2026-10-01): the fact belongs in the letter or the stories. No exceptions (B16 was reworded 2026-10-01).
 13. **Links.** Every mentioned publication or repository has a clickable link in its entry.
 
 ## 4. Tailoring limits (so a good JD match does not gut the CV)
@@ -153,6 +153,6 @@ Give this section to the copy editor only; the cold readers (ATS, recruiter, aud
 The user said (2026-10-01) that re-asking these wastes their time. Reviewers without context will keep raising them; verify against the stories, and answer from the record.
 
 - The timeline of technical oversight (8 assessors mid-2025 to mid-2026, bank team of 4 from August 2026), quality assurance and performance reviews for the bank team, the 100+ assessments and who highlighted what, the renewals and the account timeline: `stories.md` S01, S09 "Also true".
-- B16's wording about the thick-client paper, the "live exploit demonstrations where useful", the previous vendor's review, "6+ years": the user's approved wording; not open questions.
+- The "live exploit demonstrations where useful", the previous vendor's review, "6+ years": the user's approved wording; not open questions.
 - "Interviewed 10+ candidates" was removed (no story; 2026-10-01). Do not re-add it.
 - Around 50% triage saving: accepted as written.

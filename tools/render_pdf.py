@@ -129,7 +129,7 @@ h1 {{ font-size: 23pt; line-height: 1.15; margin: 0; font-weight: bold; }}
 .contact span {{ margin-right: 9pt; white-space: nowrap; }}
 .headline + .contact {{ margin-top: 5pt; }}
 .rule {{ border: 0; border-top: .75pt solid {INK}; margin: 7pt 0 0; }}
-h2 {{ color: {TEAL}; font-size: 9.5pt; letter-spacing: .09em; text-transform: uppercase; margin: 10.4pt 0 4pt;
+h2 {{ color: {TEAL}; font-size: 9.5pt; letter-spacing: 0; text-transform: uppercase; margin: 10.4pt 0 4pt;
      font-weight: bold; break-after: avoid; }}
 p {{ margin: 0; }}
 ul {{ margin: 0; padding-left: 12pt; }}
@@ -144,7 +144,7 @@ ul ul {{ list-style: circle; margin-top: 3pt; }}
 .sub {{ color: {GREY}; }}
 .block {{ margin-top: 8pt; }}
 .block + .block {{ margin-top: 10pt; }}
-.skills {{ display: grid; grid-template-columns: 110pt 1fr; column-gap: 8pt; row-gap: 4pt; }}
+.skills p {{ margin: 0 0 3pt; padding-left: 0; }}
 .skills b {{ font-weight: bold; }}
 .edu p {{ margin-top: 2pt; }}
 """
@@ -239,7 +239,7 @@ def resume_html(data: dict, career, contact: dict) -> str:
         rows = []
         for _, text in ks:
             label, rest = split_label(text)
-            rows.append(f"<b>{esc(label)}</b><span>{esc(rest)}</span>")
+            rows.append(f"<p><b>{esc(label)}:</b> {esc(rest)}</p>")
         out.append('<h2>Skills</h2><div class="skills">' + "".join(rows) + "</div>")
 
     proj = [(i, t) for i, t in chosen if i.startswith("B") and career.items[i].context.startswith("Projects")]

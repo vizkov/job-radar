@@ -67,7 +67,7 @@ def test_resume_layout_follows_the_design():
     assert 'class="desc">Security for banks and airlines.' in h        # the company's one-line description
     assert "OldCo <small>(now NewCo)</small>" in h and "Paris · Jan 2018 – Dec 2020" in h   # a 4-part role is its own company
     assert '<a href="https://github.com/alex/oss">github.com/alex/oss</a>: a code review method.' in h
-    assert "<b>Application security</b><span>pentesting, code review</span>" in h
+    assert "<p><b>Application security:</b> pentesting, code review</p>" in h
     assert 'Example University</b>: B.Sc. Computer Science' in h and ">2010 – 2014<" in h
     assert 'mailto:alex@example.com' in h and "linkedin.com/in/alex" in h and "size: A4" in h
 
@@ -84,11 +84,11 @@ def test_cover_letter_layout_follows_the_design():
 
 def test_skills_grid_uses_the_tailored_skill_lines_else_all_master_lines():
     c = career()
-    assert "<b>Languages</b><span>Python, Java</span>" in rp.resume_html(DATA, c, CONTACT)        # none chosen: every master line
+    assert "<p><b>Languages:</b> Python, Java</p>" in rp.resume_html(DATA, c, CONTACT)        # none chosen: every master line
     tailored = {**DATA, "sections": DATA["sections"] + [{"heading": "Skills", "bullets": [
         {"source_id": "K02", "text": "Languages: Java, Python"}]}]}
     h = rp.resume_html(tailored, c, CONTACT)
-    assert "<b>Languages</b><span>Java, Python</span>" in h and "Application security</b>" not in h   # chosen lines only, as worded
+    assert "<p><b>Languages:</b> Java, Python</p>" in h and "Application security:</b>" not in h   # chosen lines only, as worded
 
 
 def test_markdown_links_in_a_bullet_become_teal_links():

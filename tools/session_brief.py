@@ -249,9 +249,26 @@ def auto_score_count(root: Path) -> int:
     return 0
 
 
-def auto_score_pick(rows: list[dict], scored: dict, items: list[dict] | None, n: int) -> list[dict]:
+def skipped_refs(root: Path) -> set:
+    """Refs whose latest logged Stage is Skipped/Rejected. An archived card drops off the board read, so
+    without this a role skipped before it was ever scored (e.g. over max_age_days) re-appears every session."""
+    latest = {}
+    path = root / "data" / "pipeline_log.jsonl"
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            try:
+                e = json.loads(line)
+            except ValueError:
+                continue
+            if e.get("field") == "Stage" and e.get("ref"):
+                latest[e["ref"]] = e.get("value")
+    return {ref for ref, stage in latest.items() if stage in ("Skipped", "Rejected")}
+
+
+def auto_score_pick(rows: list[dict], scored: dict, items: list[dict] | None, n: int,
+                    skipped: set = frozenset()) -> list[dict]:
     """The freshest unscored Tier 1 roles on the list, skipping cards the user already closed or skipped."""
-    done = set()
+    done = set(skipped)
     for i in items or []:
         hit = _REF.search((i.get("content") or {}).get("body") or "")
         if hit and (i.get("stage") in ("Skipped", "Rejected", "Offer") or i.get("status") == "Done"):
@@ -488,6 +505,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
           closed_now: tuple[list[str], list[str]] = ((), ()), start_background: bool = False) -> str:
     rows = read_matches(root)
     scores = read_scores(root)
+    skipped = skipped_refs(root)
     by_ref = {r.get("ref"): r for r in rows}
     since_day = since.date().isoformat()
     new = [r for r in rows if r.get("date", "") >= since_day]  # matches.csv has dates, not times
@@ -495,7 +513,8 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
     t1_new = [r for r in new_on_list if str(r.get("tier")) == "1"]
     recent_cut = (now - timedelta(days=14)).date().isoformat()
     unscored_t1 = [r for r in rows if str(r.get("tier")) == "1" and r.get("on_list") == "yes"
-                   and r.get("date", "") >= recent_cut and r.get("ref") not in scores]
+                   and r.get("date", "") >= recent_cut and r.get("ref") not in scores
+                   and r.get("ref") not in skipped]
     fresh_cut = (now - timedelta(days=3)).date().isoformat()
     fresh_unscored = [r for r in unscored_t1 if (r.get("posted") or "") >= fresh_cut]
     last_run, problems, alert_row = status_info(root)
@@ -514,7 +533,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
                      f"· posted {_age(r.get('posted', ''), now.date())} · UK sponsor "
                      f"{safe(r.get('uk_sponsor'), 40) or '-'} · ref {r.get('ref', '')}")
     auto_n = auto_score_count(root)
-    pick = auto_score_pick(rows, scores, items, auto_n) if auto_n else []
+    pick = auto_score_pick(rows, scores, items, auto_n, skipped) if auto_n else []
     if pick:
         prep = start_prep([r["ref"] for r in pick]) if start_background else ""
         lines.append(f"- AUTO-SCORE (config scoring.auto_per_session={auto_n}): before answering the user's first "

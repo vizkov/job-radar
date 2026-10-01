@@ -25,7 +25,7 @@ do?" or type `/manual` (it's generated from the system itself).
 | You say | Claude does |
 |---|---|
 | "What's new?" / "How's my search going?" | Tells you the few roles most worth your time (freshest first), what's not yet scored, what's waiting on a reply, anything broken |
-| "Score this one" + a pasted job description | For LinkedIn, Indeed or Glassdoor roles, which Claude never opens: paste the description and it scores it like any other |
+| "Score this one" + a pasted job description | LinkedIn roles: Claude reads the description itself in your Chrome, one page at a time. Indeed and Glassdoor roles, which Claude never opens: paste the description and it scores it like any other |
 | "Which of these fit me?" / "Is the Bridewell role worth it?" | Reads each job description and compares it with your CV: a Fit score, which requirements you meet (and the CV line that proves it), blockers such as security clearance or right to work, and Apply / Maybe / Skip. Puts Fit and Recommendation on the card |
 
 ### Applying
@@ -69,9 +69,11 @@ do?" or type `/manual` (it's generated from the system itself).
 
 - Submit an application, or email or message anyone for you. It prepares; you send.
 - Add experience, skills, numbers or links you don't have. The checker rejects it.
-- Open LinkedIn, Indeed or Glassdoor pages. It asks you to paste those job descriptions. The only
-  exception is one you can switch on: finding a recruiter or hiring manager on LinkedIn for one role
-  you're about to apply to (see "Who should I contact" above).
+- Open Indeed or Glassdoor pages. It asks you to paste those job descriptions. LinkedIn has two narrow
+  exceptions, both read-only in your own logged-in Chrome: it reads the job description of a role it is
+  scoring, one page at a time (no searching or browsing LinkedIn), and, if you switch it on, it looks for a
+  recruiter or hiring manager for one role you're about to apply to (see "Who should I contact" above).
+  LinkedIn's terms ban automated access, so both carry a small risk to your LinkedIn account.
 - Ask for passwords in chat. Secrets go in GitHub's settings page, which you fill in yourself.
 
 ## What happens without you

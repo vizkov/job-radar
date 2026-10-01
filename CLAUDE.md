@@ -93,8 +93,16 @@ Never loop over refs with one call each.
 3. **Never submit an application, email or message anyone** on the user's behalf. With
    `apply-assist` you may pre-fill application forms in the user's Chrome, page by page after
    they approve the exact values; the final Submit is always the user's click.
-4. **Never fetch LinkedIn, Indeed or Glassdoor pages** (their terms prohibit scraping).
-   Ask the user to paste those job descriptions. One exception, opt-in: if
+4. **Never fetch Indeed or Glassdoor pages, and never bulk-fetch LinkedIn** (their terms prohibit scraping).
+   Ask the user to paste Indeed and Glassdoor job descriptions. Two LinkedIn exceptions, both read-only, in
+   the user's logged-in Chrome, never connecting, messaging or following:
+   (a) **Job descriptions (the user's standing instruction, 2026-10-01, knowing LinkedIn's terms ban automated
+   access):** `score-roles` reads **one** LinkedIn job page at a time with Claude in Chrome (open a tab,
+   `get_page_text`, wait and retry once if the description hasn't loaded, close the tab) and saves only the
+   job-description text to `work/jd/<ref>/jd.txt`. Only roles already on the list; no search pages, no
+   browsing "more jobs", no loops over many pages. If LinkedIn shows a login wall or a CAPTCHA, stop and
+   ask the user to paste it.
+   (b) **Referral lookups,** opt-in: if
    `referrals.linkedin_lookup` is true in `profile/config.json` (the user's own decision, knowing
    LinkedIn's terms ban automated access), the `referrals` skill may use Claude in Chrome, in the
    user's logged-in browser, to look up people at **one** company for **one** role the user is about

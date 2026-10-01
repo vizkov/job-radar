@@ -247,12 +247,16 @@ class AlertEmailSource:
     async def fetch(self) -> SourceResult:
         msgs = await asyncio.to_thread(self._messages)
         out = SourceResult(self.name)
-        per = {p.name: {"jobs": 0, "rejected": 0, "empty": 0, "mails": 0} for p in self.providers}
-        foreign = 0
+        per = {p.name: {"jobs": 0, "rejected": 0, "empty": 0, "mails": 0, "empty_subjects": []}
+               for p in self.providers}
+        foreign = lookalike = 0
         for msg in msgs:
             p = provider_for(msg)
             if p is None or p.name not in per:
                 foreign += 1
+                # a provider's mail from an address we don't know (the provider changed its sender) is a fault;
+                # a bank notice or a recruiter's mail is just not for us
+                lookalike += any(n in (msg.get("From") or "").lower() for n in PROVIDERS)
                 continue
             stats = per[p.name]
             stats["mails"] += 1
@@ -262,7 +266,9 @@ class AlertEmailSource:
             ps = to_postings(msg, p)
             stats["jobs"] += len(ps)
             # account mail ("your job alert is now active", welcome, verify) may list no jobs: not a layout change
-            stats["empty"] += not ps and not _ACCOUNT_MAIL.search(msg.get("Subject") or "")
+            if not ps and not _ACCOUNT_MAIL.search(msg.get("Subject") or ""):
+                stats["empty"] += 1
+                stats["empty_subjects"].append(" ".join((msg.get("Subject") or "").split())[:60])
             out.postings += ps
         for name, s in per.items():
             # a quiet week with no alerts is normal (track_empty=False)
@@ -274,10 +280,13 @@ class AlertEmailSource:
                                             error=f"{s['rejected']} of {s['mails']} {name} emails failed DKIM"))
             if s["empty"]:  # the provider changed its email layout
                 out.units.append(UnitStatus(f"{name}:parse", ok=False, label=f"{name} alert emails with no jobs",
-                                            error=f"{s['empty']} {name} emails yielded no jobs (layout change?)"))
+                                            error=f"{s['empty']} {name} emails yielded no jobs (layout change?): "
+                                                  + "; ".join(s["empty_subjects"][:3])))
         if foreign:
-            out.units.append(UnitStatus("foreign", ok=False, track_empty=False, label="emails from unknown senders",
-                                        error=f"{foreign} of {len(msgs)} emails ignored (unknown sender)"))
+            note = f"{foreign} of {len(msgs)} emails ignored (unknown sender)"
+            out.units.append(UnitStatus("foreign", ok=not lookalike, raw_count=foreign, track_empty=False,
+                                        label="emails from unknown senders",
+                                        error=note + f", {lookalike} naming a job site" if lookalike else ""))
         out.units += self._mailbox_units()
         return out
 

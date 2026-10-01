@@ -87,8 +87,9 @@ def test_source_rejects_spoofed_and_foreign_mail():
     assert not any(p.company == "Totally Real Bank" for p in res.postings)
     errors = {u.key: u.error for u in res.units if not u.ok}
     assert errors == {"linkedin:rejected": "1 of 3 linkedin emails failed DKIM",
-                      "indeed:rejected": "1 of 2 indeed emails failed DKIM",
-                      "foreign": "1 of 7 emails ignored (unknown sender)"}
+                      "indeed:rejected": "1 of 2 indeed emails failed DKIM"}
+    foreign = next(u for u in res.units if u.key == "foreign")
+    assert foreign.ok and foreign.raw_count == 1  # a recruiter's mail is not a fault
 
 
 def test_only_enabled_providers_are_read():
@@ -180,6 +181,16 @@ def test_account_mail_with_no_jobs_is_not_a_layout_change(tmp_path):
     res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["indeed"]}).fetch())
     unit = next(u for u in res.units if u.key == "indeed:parse")
     assert unit.error.startswith("1 indeed emails yielded no jobs")  # only the real alert counts
+    assert unit.error.endswith("5 new pen tester jobs in United Kingdom")  # names the subject to chase
+
+
+def test_unknown_sender_naming_a_job_site_is_a_fault(tmp_path):
+    (tmp_path / "_status.json").write_text(json.dumps({"ok": True, "fetched": 1, "mailbox": "INBOX", "providers": {}}))
+    mail = ["From: Indeed <alerts@new-sender.indeed.example>", "Subject: 5 new jobs", "", "body", ""]
+    (tmp_path / "a.eml").write_text(chr(10).join(mail), encoding="utf-8")
+    res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["indeed"]}).fetch())
+    unit = next(u for u in res.units if u.key == "foreign")
+    assert not unit.ok and "naming a job site" in unit.error
 
 
 def test_indeed_html_only_card_uses_redirect_and_shortest_title():

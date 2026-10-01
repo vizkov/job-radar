@@ -168,7 +168,7 @@ starts them from scratch (so both review timers reset).
 | Gmail IMAP | Alert emails | app password, GitHub secret, one workflow step only |
 | gov.uk content API, ind.nl | Sponsor registers | none |
 | GitHub (issues, Projects, Actions, GraphQL) | Board, scheduling | GITHUB_TOKEN in Actions; the user's `gh` login locally |
-| LinkedIn, Indeed, Glassdoor | **Never fetched.** Only their emails are read | n/a |
+| LinkedIn, Indeed, Glassdoor | **Never fetched by code.** Only their emails are read. Exception: Claude reads one LinkedIn job page at a time in the user's Chrome to score a role (CLAUDE.md rule 4a) | n/a |
 
 ## Dependencies
 

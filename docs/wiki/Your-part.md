@@ -118,7 +118,7 @@ only LinkedIn use is the opt-in contact lookup for referrals).
 |---|---|
 | Claude has a tailored CV or cover letter ready | Read it: Claude only reuses your own lines, but you're the one sending it |
 | Claude has filled an application form | Check each page; **you** click Submit |
-| A LinkedIn/Indeed/Glassdoor job needs scoring | Paste the job description (Claude never opens those sites) |
+| An Indeed/Glassdoor job needs scoring | Paste the job description (Claude never opens those sites). LinkedIn job descriptions it reads itself in your Chrome, one page at a time |
 | Claude proposes a settings change, new job boards or a fix | Say yes or no. Nothing changes without your yes |
 | Claude asks who can help at a company you'd apply to | Tell it the names. Message people you know yourself (Claude gives you the role links); for recruiters or hiring managers it drafts the note in the chat (never saved to a file) after a fresh reviewer has read it as the recruiter would. **You** send everything, then tell it what happened |
 | You get a new job, certification or achievement | Tell Claude; it adds it to your CV lines so future applications can use it |

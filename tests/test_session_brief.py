@@ -205,6 +205,19 @@ def test_auto_score_picks_freshest_unscored_tier1_not_skipped():
     assert sb.auto_score_pick(rows, {}, items, 1)[0]["ref"] in ("e" * 16, "b" * 16)
 
 
+def test_auto_score_skips_roles_skipped_in_the_log_even_if_archived(tmp_path):
+    (tmp_path / "data").mkdir()
+    a, b = "a" * 16, "b" * 16
+    entries = [{"ref": a, "field": "Stage", "value": "Skipped"}, {"ref": b, "field": "Stage", "value": "Skipped"},
+               {"ref": b, "field": "Stage", "value": "Shortlisted"}]
+    lines = [json.dumps(x) for x in entries]
+    (tmp_path / "data" / "pipeline_log.jsonl").write_text(chr(10).join(lines), encoding="utf-8")
+    skipped = sb.skipped_refs(tmp_path)
+    assert skipped == {a}
+    rows = [{"ref": r, "tier": "1", "on_list": "yes", "posted": "2026-09-28"} for r in (a, b)]
+    assert [r["ref"] for r in sb.auto_score_pick(rows, {}, [], 8, skipped)] == [b]
+
+
 def test_read_stamp_accepts_aware_and_naive_times(tmp_path):
     """work/.last_review is written by Claude with +00:00; the brief compares it with a naive `now`."""
     import session_brief as sb

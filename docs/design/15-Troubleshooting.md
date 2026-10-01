@@ -30,7 +30,7 @@ login lacks the `project` scope: `gh auth refresh -s project`.
 | `<source> (whole source)` | Crash or timeout | The error text is in `digests/status.md`; a timeout may just need a higher `timeout_seconds` |
 | `alert emails in the mailbox: no emails at all from …` | No alerts reached the mailbox: alerts not created, paused, sent to another address, or the secret points at a different mailbox | Check the alerts exist and go to the address in `JOBALERT_IMAP_USER`; the run log lists what the mailbox held |
 | `<provider> alert sender: … the alert sender may have changed` | The provider now sends alerts from an address not in `alert_providers.py` | Add the address shown to that provider's `senders` |
-| `<provider> alert emails with no jobs` | The provider changed its email layout | Save a real alert as a fixture and update the parser in `sources/alert_email.py` |
+| `<provider> alert emails with no jobs` | The provider changed its email layout (the status line names the subjects of the emails that yielded nothing) | Save a real alert as a fixture and update the parser in `sources/alert_email.py` |
 | `<provider> emails failing DKIM` | Forwarding broke signatures, or spoofing | Check one message's headers (Gmail → Show original) before turning `require_dkim` off |
 | careers page: "page layout changed" | Site redesign | Update the selectors in `profile/careers_pages.yaml` |
 

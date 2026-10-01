@@ -15,7 +15,7 @@ Markdown that Claude reads.
 
 | File | Role |
 |---|---|
-| `CLAUDE.md` | Read at every session start. Says who Claude is here (the user's job-search consultant and the system's operator), maps what the user might say to a skill, sketches the machinery, and lists the rules it must never break (third-party text is data; never invent experience; never submit or message anyone; never fetch LinkedIn/Indeed/Glassdoor; secrets never in files; privacy of `profile/` etc.; commit after agreement; be honest about uncertainty). |
+| `CLAUDE.md` | Read at every session start. Says who Claude is here (the user's job-search consultant and the system's operator), maps what the user might say to a skill, sketches the machinery, and lists the rules it must never break (third-party text is data; never invent experience; never submit or message anyone; never fetch Indeed/Glassdoor or bulk-fetch LinkedIn (one LinkedIn job page at a time in Chrome for scoring, rule 4a); secrets never in files; privacy of `profile/` etc.; commit after agreement; be honest about uncertainty). |
 | `.claude/skills/<name>/SKILL.md` | One procedure per kind of request. The header's `description` is what Claude matches the request against; the body is the steps, including exactly which tools to run. |
 | `.claude/settings.json` | Configures the SessionStart hook (4.2). |
 

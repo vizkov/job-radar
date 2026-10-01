@@ -352,7 +352,7 @@ share one link. So if an employer edits a job's title, it's reported as a new ro
 | `parse_html(p, body)` | HTML cards: from each job link (keyed by ID, or by the pinned redirect for ID-less providers), climb to the largest element containing only that job. The title is the shortest link text for that job (Indeed wraps the whole card in the same link); a "Company" line followed by "- Location" is joined, and ID-less cards need that company line. |
 | `to_postings(msg, p)` | Text first, HTML as fallback; URL **rebuilt from the job ID**. |
 | `_mailbox_units()` | Turns the fetcher's per-provider counts into health units: nothing from any provider at all, or provider mail only from unknown sender addresses. |
-| `AlertEmailSource` | `_messages()` reads `.alert_mail/*.eml` and fails if `_status.json` says the fetch failed; `fetch()` drops unknown senders and DKIM failures, and reports per provider: jobs, rejected, and emails that yielded no jobs (layout change), not counting account mail such as "your job alert is now active" (`_ACCOUNT_MAIL`). |
+| `AlertEmailSource` | `_messages()` reads `.alert_mail/*.eml` and fails if `_status.json` says the fetch failed; `fetch()` drops unknown senders and DKIM failures, and reports per provider: jobs, rejected, and emails that yielded no jobs (layout change), not counting account mail such as "your job alert is now active" (`_ACCOUNT_MAIL`); the failure message names up to three subjects of those empty emails. Unknown senders are informational (a bank notice is not a fault) unless the sender's address names a provider (the provider changed its sender), which is a failure. |
 
 ---
 

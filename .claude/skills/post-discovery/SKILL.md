@@ -90,12 +90,35 @@ it to true and commit. Never run it from the daily Action or in the background.
 - **Contract, clearance (DV/SC), no-sponsorship and physical-security posts** are the user's exclusions (title_exclude,
   employment_exclude, sponsorship): ignore them. Note posts that say "no sponsorship" outright; they are a `no` for this user.
 
-## Contacting the poster
+## What the second sweep taught us (2026-10-01, after tuning the keywords to the profile)
 
-The poster is a stranger (a recruiter or hiring manager): per the user's rule, **after** applying, with the tailored CV attached,
-through the `referrals` skill (`referrals.py ask --relation recruiter|hiring_manager`). This skill drafts nothing and sends
-nothing. If the poster is someone the user already knows (`referrals.py contacts "<company>"`), say so: that is a referral to ask
-for **before** applying.
+- **Always keep `"we're hiring"` in quotes.** The bare word `hiring` matches `#Hiring` hashtag spam (market-research bots, "open to work" posts):
+  a UK application-security query with it returned about 12 posts and none were hiring posts. With `"we're hiring"` the same query gave about 11, mostly real.
+- **`OR` between spellings works** (`("application security" OR appsec)`), and **`NOT (contract OR ...)` does filter on post text**, but contract roles
+  that only say "GBP/hr" slip through. Keep it; still check the post.
+- **Too many `OR` terms return nothing.** A company query with seven cities inside one OR returned no results. Company queries are
+  `<company> "we're hiring" security`, with no place list: filter by location when reading.
+- **Application-security posts in a single country are thin:** UK appsec had nothing newer than 40 days. Low yield there is the market, not the wording.
+- **Company queries for big employers return a lot of other regions** (Amazon: US roles, India roles). Read the location before anything else.
+- **A role being already on the radar is the usual result.** Check the board before treating a post as new (`lead` does this).
+
+## After a role is added: offer the contacts search for that role (the user's instruction, 2026-10-01)
+
+The goal of this skill is roles first. Contact research is a separate, explicit step for one specific role, run only when the user asks for it
+(never automatically, never for several roles at once):
+
+1. `score-roles` and `sponsorship-check` first. A role that comes out `skip` (or a sponsorship `no`) gets no contact search. For an
+   `apply` or `maybe` role, tell the user the poster's name and offer: "want me to run the contacts search for <role>?"
+2. When the user says yes, run the `referrals` skill's LinkedIn lookup for that ref, **seeded with what the sweep already found**, so nothing is
+   searched twice:
+   - **The poster is the first candidate.** Their post and profile are already read: give them the verdict (verified, unverified, not a route) with the
+     evidence you saw (current employer and function, what the post says, its date and locations). Don't search for them again. A reposter is the second.
+   - **Spend the searches on what is missing:** a recruiter for the role's own city and function, and an engineer or manager on the team in that city
+     (the person whose referral counts for that office). Skip the generic hiring-post search: the post is that search.
+   - The lookup's own limits stay (10 searches per role; stop at any LinkedIn challenge); the sweep's searches count against the sweep's cap.
+3. Order and sending are unchanged (the `referrals` skill): people the user knows first, before applying; recruiters, hiring managers and the poster
+   after applying, with the tailored CV attached. This skill drafts nothing and sends nothing. Log asks with `referrals.py`. If the poster is someone the
+   user already knows (`referrals.py contacts "<company>"`), say so: that is a referral for **before** applying.
 
 ## Posts the user pastes or forwards
 

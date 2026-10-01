@@ -81,9 +81,11 @@
       "max_scrolls": 4,
       "max_people_per_session": 8,
       "max_post_age_days": 30,
-      "titles": ["application security", "product security", "security engineer", "penetration tester", "devsecops", "security architect"],
+      "company_queries": 2,
+      "not_words": ["contract", "contractor", "freelance"],
+      "titles": ["(\"application security\" OR appsec)", "\"product security\"", "(\"penetration tester\" OR pentester OR \"pen tester\")", "(\"threat modelling\" OR \"threat modeling\")", "(\"AI security\" OR \"LLM security\")", "\"security consultant\"", "\"vulnerability management\"", "\"security architect\""],
       "places": ["United Kingdom", "London", "Netherlands", "Amsterdam", "Ireland", "Switzerland", "Germany", "Sweden"],
-      "phrases": ["we're hiring", "hiring", "join my team", "open role", "referral"]
+      "phrases": ["\"we're hiring\"", "\"visa sponsorship\"", "\"relocation\"", "\"join my team\""]
     }
   },
 

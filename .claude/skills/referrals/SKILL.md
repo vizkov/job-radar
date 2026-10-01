@@ -35,6 +35,9 @@ don't spend a referral on a role that can't sponsor the user.
 - **Switching it:** "switch on/off the LinkedIn lookup" sets `referrals.linkedin_lookup` in
   `profile/config.json`. Before switching it on, say the risk once, plainly: LinkedIn's terms ban any
   automated use, so the account could be restricted. Commit the change.
+- **Roles found through a hiring post (`post-discovery`):** when the user asks for the contacts search on such a role, seed it with the poster: the
+  poster is the first candidate (their post and profile are already read; reuse the evidence, don't search them again), a reposter the second; use the
+  searches on a local recruiter and a team engineer in the role's city; the post counts as the hiring-post search. Same limits and order of asking.
 - **LinkedIn lookup (opt-in, one role at a time).** Only if `referrals.linkedin_lookup` is true in
   `profile/config.json` and the user is applying to *this* role and asks. Otherwise give them 2-3
   LinkedIn people-search links to open themselves and ask them to paste what they see.

@@ -14,21 +14,39 @@ def write_matches(rows):
     pl.MATCHES.write_text("ref,company,title,location,countries,url,source,posted,tier\n" + "\n".join(rows) + "\n", encoding="utf-8")
 
 
+def write_scores(rows):
+    pl.SCORES.write_text("\n".join(json.dumps(r) for r in rows) + "\n", encoding="utf-8")
+
+
 def test_queries_rotate_and_do_not_repeat_until_the_grid_is_used():
     s = pl.settings()
     grid = len(s["titles"]) * len(s["places"])
     seen = []
     for _ in range(grid // 8):
         seen += pl.next_queries(8, now="2026-10-01T00:00:00+00:00")
-    pairs = {(q.split('" "')[1].split('"')[0], q.rsplit('" ', 1)[1]) for q in seen}
-    assert len(pairs) == len(seen)                       # nothing ran twice yet
-    assert len({q.split('" "')[1].split('"')[0] for q in seen[:8]}) > 1   # one session spans several titles
+    assert len(set(seen)) == len(seen)                   # nothing ran twice yet
+    first = pl.next_queries(8, now="2026-10-09T00:00:00+00:00")   # a later pass: same pairs, next phrase
+    assert not set(first) & set(seen)
+    titles_in_first_session = {t for t in s["titles"] if any(t in q for q in seen[:8])}
+    assert len(titles_in_first_session) > 1              # one session spans several titles
 
 
-def test_phrase_changes_when_a_pair_comes_round_again():
-    pl.next_queries(100000, now="2026-10-01T00:00:00+00:00")
-    first = pl.next_queries(1, now="2026-10-02T00:00:00+00:00")[0]
-    assert first.startswith('"hiring"')                  # second phrase in the list
+def test_grid_queries_use_the_title_as_written_and_exclude_contract_words():
+    q = pl.next_queries(1, now="2026-10-01T00:00:00+00:00")[0]
+    assert q.startswith('"we\'re hiring" ')
+    assert q.endswith("NOT (contract OR contractor OR freelance)")
+
+
+def test_company_queries_come_from_roles_the_user_scored_apply_or_maybe():
+    write_scores([{"company": "Amazon", "recommendation": "apply", "fit_score": 85},
+                  {"company": "Amazon UK", "recommendation": "apply", "fit_score": 70},
+                  {"company": "Solaris", "recommendation": "maybe", "fit_score": 58},
+                  {"company": "Nope Ltd", "recommendation": "skip", "fit_score": 90}])
+    assert pl.fit_companies() == ["Amazon", "Solaris"]          # "Amazon UK" is the same employer
+    out = pl.next_queries(4, now="2026-10-01T00:00:00+00:00")
+    assert out[:2] == ['Amazon "we\'re hiring" security', 'Solaris "we\'re hiring" security'] and len(out) == 4
+    out2 = pl.next_queries(3, now="2026-10-02T00:00:00+00:00")
+    assert out2[0] == 'Amazon "we\'re hiring" security'           # least recently run company comes first
 
 
 def test_people_are_read_longest_ago_first_and_marked_read():

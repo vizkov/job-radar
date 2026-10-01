@@ -44,10 +44,15 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 4, "max_people_per_session": 8, "max_post_age_days": 30,
-    "titles": ["application security", "product security", "security engineer", "penetration tester", "devsecops", "security architect"],
+    "company_queries": 2, "not_words": ["contract", "contractor", "freelance"],
+    # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
+    "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
+               '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
+               '"vulnerability management"', '"security architect"'],
     "places": ["United Kingdom", "London", "Netherlands", "Amsterdam", "Ireland", "Switzerland", "Germany", "Sweden"],
-    "phrases": ["we're hiring", "hiring", "join my team", "open role", "referral"],
+    "phrases": ['"we\'re hiring"', '"visa sponsorship"', '"relocation"', '"join my team"'],
 }
+SCORES = ROOT / "data" / "scores.jsonl"
 
 
 def settings() -> dict:
@@ -89,22 +94,40 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+def fit_companies() -> list[str]:
+    """Employers whose roles the user scored apply or maybe, best score first: where hiring posts are most worth finding."""
+    best: dict[str, tuple[int, str]] = {}
+    for r in _jsonl(SCORES):
+        if r.get("recommendation") in ("apply", "maybe") and r.get("company"):
+            key = normalize(r["company"])
+            if r.get("fit_score", 0) >= best.get(key, (-1, ""))[0]:
+                best[key] = (r.get("fit_score", 0), r["company"])
+    return [name for _, name in sorted(best.values(), key=lambda v: -v[0])]
+
+
 def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
-    """The next `n` post searches, least recently run first, spread over titles and places (a diagonal through
-    the title x place grid, so one session does not spend every search on one city). The phrase rotates each time
-    a (title, place) pair comes round again. Marks them as run."""
+    """The next `n` post searches, least recently run first; marks them run. `company_queries` of them are
+    "<company> hiring security" for employers the user scored apply/maybe; the rest walk the title x place grid
+    on a diagonal, so one session does not spend every search on one city. The phrase rotates each time a
+    (title, place) pair comes round again. `not_words` are appended as NOT (...) to the grid searches."""
     s = settings()
     n = s["max_searches"] if n is None else n
     log = _load(QUERIES, {})
-    titles, places, phrases = s["titles"], s["places"], s["phrases"]
-    pairs = [(ti, pi) for ti, pi in itertools.product(range(len(titles)), range(len(places)))]
-    pairs.sort(key=lambda p: ((log.get(f"{titles[p[0]]}|{places[p[1]]}") or {}).get("last", ""), (p[0] + p[1]) % len(titles), p[1]))
+    stamp = now or _now()
     out = []
-    for ti, pi in pairs[:n]:
+    firms = sorted(fit_companies(), key=lambda c: (log.get(f"company|{c}") or {}).get("last", ""))
+    for c in firms[:min(s["company_queries"], n)]:
+        out.append(f'{c} "we\'re hiring" security')
+        log[f"company|{c}"] = {"last": stamp, "runs": (log.get(f"company|{c}") or {}).get("runs", 0) + 1}
+    titles, places, phrases = s["titles"], s["places"], s["phrases"]
+    tail = f" NOT ({' OR '.join(s['not_words'])})" if s["not_words"] else ""
+    pairs = list(itertools.product(range(len(titles)), range(len(places))))
+    pairs.sort(key=lambda p: ((log.get(f"{titles[p[0]]}|{places[p[1]]}") or {}).get("last", ""), (p[0] + p[1]) % len(titles), p[1]))
+    for ti, pi in pairs[:n - len(out)]:
         key = f"{titles[ti]}|{places[pi]}"
         rec = log.get(key) or {"runs": 0}
-        out.append(f'"{phrases[rec["runs"] % len(phrases)]}" "{titles[ti]}" {places[pi]}')
-        log[key] = {"last": now or _now(), "runs": rec["runs"] + 1}
+        out.append(f"{phrases[rec['runs'] % len(phrases)]} {titles[ti]} {places[pi]}{tail}")
+        log[key] = {"last": stamp, "runs": rec["runs"] + 1}
     QUERIES.parent.mkdir(parents=True, exist_ok=True)
     QUERIES.write_text(json.dumps(log, indent=1, sort_keys=True), encoding="utf-8")
     return out

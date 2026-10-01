@@ -299,8 +299,9 @@ repost, or noise, **follows a repost to the original post** (the original's date
 current employer, and confirms the role on the company's own careers page. `post_leads.py lead` logs each post and says whether the
 radar already has the role (known), the post is too old (stale), it is a job-board repost, or the role is new; `add-role` turns a new
 one into a `matches.csv` row (`source = linkedin_post`, poster named) and a queued card, then `score-roles` and `sponsorship-check` run as
-for any role. `stats` shows how much the posts added over the other sources. Contacting the poster follows the `referrals` order (a
-stranger: after applying). Hard limits: CLAUDE.md rule 4c.
+for any role. `stats` shows how much the posts added over the other sources. For a role scored apply or maybe, Claude offers the `referrals` LinkedIn
+lookup; when the user says yes it runs for that one role, seeded with the poster (already read, not searched again) and a reposter, then a local
+recruiter and a team engineer; the order of asking is unchanged (the poster is a stranger: after applying). Hard limits: CLAUDE.md rule 4c.
 
 ## 4.9 Applying (`apply-assist`)
 

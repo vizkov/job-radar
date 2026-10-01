@@ -69,6 +69,27 @@ it to true and commit. Never run it from the daily Action or in the background.
    `python tools/post_leads.py stats` gives the running count of new versus already known: tell the user if the posts keep
    adding nothing the other sources don't, so the source can be dropped.
 
+## What the first test run taught us (2026-10-01; keep these in mind)
+
+- **Scroll, always.** Without scrolling a search showed 2 to 3 posts; two scrolls of 10 ticks showed up to about 12. Read `get_page_text`
+  after scrolling, not before. A search ends where "Are these results helpful?" appears with no spinner under it.
+- **Yield was low and mostly noise.** 8 searches gave about 41 posts: roughly a third were stale (older than 30 days, some from
+  2024 and 2025 when a query has few matches), a third were company-page auto-posts, and the rest were contract, physical security,
+  SAP/GRC, "open to work" or spam. Expect 0 to 3 usable leads per sweep. Report that plainly; don't pad.
+- **Company-page auto-posts are most of the fresh hits.** "We're #hiring a new <title> in <place>. Apply today" with a "View job" card
+  comes from a company or agency page (recruiters like Computappoint, Rothstein, ST Global) and mirrors a LinkedIn job. It has no
+  person and often no named employer. Log it with `--kind job_board`; if the radar doesn't have the role, tell the user it exists and
+  who posted it, and let them decide. Don't add agency roles with an unnamed end client without asking.
+- **Person posts that matter** look like Irina Ponomarenko (Tech Hiring at Solaris, 7 roles, "DM me if it's not on the careers page"):
+  the role was already on the radar via the careers page, but the person is a warm route. "already known" is a normal and useful result.
+- **Very narrow queries return nothing** ("we're hiring" "product security" Switzerland: no results). When a query returns 0 or only
+  old posts, say so; the rotation will come back with a different phrase. Don't retry it in the same session.
+- **Page text has no post permalinks.** Use the post's own link if you can get it (a profile's activity page links each post). If you
+  cannot, give the lead a stable pseudo-key, `linkedin-post:<company>-<author>-<yyyy-mm-dd>`, as `--post-url`, and say the real link is
+  missing. Don't open every post just to get a link.
+- **Contract, clearance (DV/SC), no-sponsorship and physical-security posts** are the user's exclusions (title_exclude,
+  employment_exclude, sponsorship): ignore them. Note posts that say "no sponsorship" outright; they are a `no` for this user.
+
 ## Contacting the poster
 
 The poster is a stranger (a recruiter or hiring manager): per the user's rule, **after** applying, with the tailored CV attached,

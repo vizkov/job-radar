@@ -5,7 +5,7 @@
 
 The rules are in .claude/skills/tailor-application/writing-rules.md. This finds what a pattern can find (meta-commentary,
 hedges, dangling hyphens, stacked hedges, repeated phrases, capitalisation, missing static sections or skills rows, a role cut
-too thin, an achievement that restates an experience bullet). Tone, tense and whether a section does its job are the copy-editor
+too thin, an achievement that restates an experience bullet, a Profile that is mostly the master's text). Tone, tense and whether a section does its job are the copy-editor
 reviewer's (application-review). Returns (errors, warnings) of plain strings; jd_check.py tailor fails on the errors.
 """
 from __future__ import annotations
@@ -198,7 +198,11 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
             wb = _content_words(chosen[b])
             if wa and wb and len(wa & wb) / min(len(wa), len(wb)) >= 0.6:
                 warns.append(f"Key achievement [{a}] restates experience bullet [{b}] ({len(wa & wb)} shared words): tell the event once, the bullet carries the method")
-    # repeated opening phrase across the CV
+    # Profile is the main place to converge with the JD: a Summary that is mostly the master's text was not tailored
+    summ = [s for s in chosen if s in career.items and career.items[s].section == "Summary" and s != "P00"]
+    changed = [s for s in summ if norm(chosen[s]) != norm(career.items[s].text)]
+    if len(summ) >= 3 and len(changed) < 3:
+        warns.append(f"Profile: only {len(changed)} of {len(summ)} Summary lines differ from the master; rewrite it for this role in the JD's vocabulary (writing-rules.md section 2) and list the converged terms")
     return errs, warns
 
 

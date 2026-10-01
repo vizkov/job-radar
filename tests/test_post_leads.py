@@ -69,3 +69,9 @@ def test_add_role_writes_row_with_poster_and_queues_a_card(monkeypatch):
     assert "Posted by: [Ana](https://www.linkedin.com/in/ana)" in row_payload(row)["body"]
     assert "not added" in pl.add_role(rec["id"], "NL")    # now status added: cannot be added twice
     assert pl.stats()["added"] == 1
+
+
+def test_closest_title_wins_when_an_employer_has_several_similar_roles():
+    write_matches(["a" * 16 + ",Solaris,Cyber Security Engineer - Vulnerability Management,Berlin,DE,u,ats,,1",
+                   "b" * 16 + ",Solaris,Cyber Security Staff Engineer - Application Security,Berlin,DE,u,ats,,1"])
+    assert pl.known_roles("Solaris", "Cyber Security Staff Engineer - Application Security")[0]["ref"] == "b" * 16

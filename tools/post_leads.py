@@ -163,9 +163,10 @@ def known_roles(company: str, title: str, path: Path | None = None) -> list[dict
         if not (key and other and (other == key or other.startswith(key + " ") or key.startswith(other + " "))):
             continue
         have = _title_words(row.get("title", ""))
-        if want and have and len(want & have) / min(len(want), len(have)) >= 0.6:
-            hits.append(row)
-    return hits
+        share = len(want & have) / min(len(want), len(have)) if want and have else 0
+        if share >= 0.6:
+            hits.append((share, len(want & have), row))
+    return [r for *_, r in sorted(hits, key=lambda h: h[:2], reverse=True)]   # closest title first
 
 
 def log_lead(post_url: str, author: str, company: str, title: str, location: str = "", posted: str = "",

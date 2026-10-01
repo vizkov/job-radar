@@ -20,7 +20,8 @@ description: Update an application's stage on the GitHub Projects board (shortli
    next daily run. Skipped cards are **archived daily** (session start, `board_sync.py archive`), and an
    archived card is invisible to `set`: to change one, tell the user to restore it from the Project's
    Archived items first.
-5. Moving to **Interview** → offer `interview-prep`. Cards labelled `possibly-closed` that the user
+5. Moving to **Applied** → offer the stranger outreach from `referrals` (the user's rule, 2026-10-01: recruiters and other strangers are contacted
+   *after* applying, with that role's tailored CV attached; the user writes to people they know before applying). Moving to **Interview** → offer `interview-prep`. Cards labelled `possibly-closed` that the user
    hasn't applied to → suggest Skipped.
 6. Confirm in one line. When relevant, suggest the next action (e.g. "want interview prep from your
    STAR stories for this role?").

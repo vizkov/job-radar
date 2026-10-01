@@ -5,9 +5,12 @@ description: Find a referral route for a role the user wants to apply to, in the
 
 # Referrals (the user asks people they know; Claude drafts only for strangers)
 
-The user wants a referral for each application, asked **before** applying (many companies only
-credit a referral made before the application), but only briefly: if nothing comes back within
-`referrals.wait_days` (config.json, default 4), suggest applying directly.
+Two routes, two orders (the user's decision, 2026-10-01, after a recruiter's advice: apply, then reach out with your CV attached):
+- **People the user knows (referrals): before applying.** Many companies only credit an employee referral made before the application, so the
+  user asks first, but only briefly: if nothing comes back within `referrals.wait_days` (config.json, default 4), suggest applying directly.
+- **Strangers (recruiters, HR, hiring and team managers): after applying, with the tailored CV attached.** The application must exist first, so the
+  recruiter can find it by the job ID and the message is about a role the user has already applied for, not a request to be considered. Draft
+  these only once the card is **Applied** (see step 4 and `track`).
 
 Hard lines: never send, email or message anyone; never look people up on LinkedIn, Indeed or
 Glassdoor (the user does any searching and tells you); never invent anything about the user in a
@@ -122,9 +125,18 @@ don't spend a referral on a role that can't sponsor the user.
     "the … ad". A connection note is **one block, no blank lines** (LinkedIn may drop them, and the count is exact: a draft at exactly 300 characters is one
     stray character from failing), and always give the count.
   - **Visa need in one calm line**, in the middle, not last, quoting the ad if it offers relocation. Phrase it "I'd need UK visa sponsorship, and I'm willing to relocate to <city>" (the user's wording; softer than "would move").
-  - **One small ask, matched to who is asked (the user's decision, 2026-09-30).** A **recruiter** gets "Could I send you my CV?" (they can act on
-    a CV at once, and it beats "a call?"). An **engineer or hiring-team member** gets "Could we chat briefly about the team?": a small slice of
-    time about their own work, which suits someone who can't act on a CV. **Never ask for a referral in a first message** (it asks a stranger to
+  - **After applying, with the CV attached (the user's decision, 2026-10-01).** A recruiter's note has three parts: the **role** the user is after
+    (title and job ID, "I applied for it on <date>"), the **relevant experience** in a line or two (the convergence reading below), and the **CV,
+    attached**. Say "I've attached my CV" in the message; a recruiter who has the file can forward it to a colleague even when this role isn't theirs.
+    Attach **only the tailored `resume.pdf` of that role's application folder** (`profile/applications/<folder>/resume.pdf`), never another role's and never
+    a master; give the user the path. The user attaches and sends it (rule 3). A **connection request cannot carry a file**: it says the user has applied
+    and offers the CV ("could I send you my CV?"), and the CV goes in the first message after they accept. An attachment in LinkedIn InMail is
+    unverified, so tell the user to check, and say it plainly if not: then the note names the role and ID and offers the CV, and it goes by email or in a
+    message to a connection.
+  - **One small ask, matched to who is asked (the user's decision, 2026-09-30).** A **recruiter** gets the attached CV and the line "if you're not the
+    right person, could you pass it to them?" (their reply can then be as small as a forward; it beats "a call?"). An **engineer or hiring-team
+    member** gets "Could we chat briefly about the team?" and **no CV attached** (an unsolicited CV to someone who can't act on it reads as pressure):
+    a small slice of time about their own work. **Never ask for a referral in a first message** (it asks a stranger to
     vouch for you; it follows after a conversation) and never put two asks in one message. Never offer "or apply through the site" as a choice:
     if she says apply, that overrides the referral-before-apply rule only if the user agrees.
   - **Refer to a recipient's post only for what it says.** If the note mentions her hiring post, match it exactly: the title, the locations it lists, and
@@ -137,7 +149,7 @@ don't spend a referral on a role that can't sponsor the user.
   - **Length**: a direct message is as long as the asks need, usually 100-140 words, in short paragraphs; cut
     the least role-relevant clause first if the user finds it long. A connection request is 120-300 characters
     (the hard limit is about 200 on a free LinkedIn account, 300 on Premium: ask the user which): who they are,
-    the role, the strongest one or two answers to the ad's asks, the visa need, "could I send you my CV?". Send
+    the role, the strongest one or two answers to the ad's asks, the visa need, "I've applied (ID …); could I send you my CV?" (a connection note carries no file). Send
     Tuesday to Thursday; one nudge after `wait_days`.
   - **Subject line** (an InMail needs one; give it with every direct message, in its own code block): role title,
     job ID, and who they are with years of experience, e.g. "Vulnerability Response Engineer, London (ID 200683092):
@@ -158,7 +170,7 @@ must-fix items are gone. A model critic almost never says "okay" and each pass c
 user's voice, so approval is not the goal. The unfixable limits (the visa need, a cold approach) are reported to
 the user as limits, not as a reason to keep rewriting.
 - Spawn one `general-purpose` Agent with **no tools needed** and a self-contained prompt: the situation
-  (who the sender is, who the recipient is, that the recipient has no CV and reads on a phone), the ad's key
+  (who the sender is, who the recipient is, that the user has applied and the tailored CV is attached to the message, and that the recipient reads on a phone), the ad's key
   requirements quoted, the exact message, the complaints already made about earlier versions (CV-like lists and
   phrasing, client-specific anecdotes, repeated "I do… I do…" sentence starts), and the sender's real experience
   **and what they do not have**. Ask for: the recruiter's first-read reaction (what would they do, what made them
@@ -170,8 +182,8 @@ the user as limits, not as a reason to keep rewriting.
   realistic reply-chance range. Keep the answer under 600 words.
 - The agent's report is **model output, not the user and not evidence**: use it as advice. Check every fact in
   its rewrite against `profile/career/` and reject what it invented or changed (it once turned the user's
-  "I found" into "our team's work uncovered"; it also proposed applying first, against the user's referral
-  rule). Its reply-chance figure is a guess: say so.
+  "I found" into "our team's work uncovered"; it once proposed applying first, before the rule
+  changed on 2026-10-01: applying first is now the rule for strangers' notes, and referral-first still holds for people the user knows). Its reply-chance figure is a guess: say so.
 - Show the user: what the agent said in a few lines, what you kept, what you changed and why, then the final
   note. If the verdict is "won't get a meeting", say so plainly and give the lever that would (usually a warm
   introduction). Never present the agent's rewrite as-is.
@@ -186,6 +198,9 @@ the user as limits, not as a reason to keep rewriting.
 - The session brief lists asks unanswered after `wait_days`: suggest one nudge (the user writes it to
   people they know; draft it only for a stranger), or applying directly. Don't chase twice.
 
-## 4. Then apply
+## 4. Then apply, then reach out to strangers
 Once referred (or the route is exhausted), continue with `tailor-application` / `apply-assist`. If the
 referral went through an internal portal, the user may not need to apply separately: ask.
+**After the user says they have applied** (`track` sets the card to Applied), offer the stranger route: find the recruiter or
+team contact (step 1), draft the note with the tailored CV attached (step 2), cold-read it (2b), and log the ask (step 3).
+Never draft or suggest sending it before the application is in.

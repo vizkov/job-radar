@@ -27,3 +27,5 @@ Evidence first: every recommendation must point at real job descriptions the use
    roles being targeted, missing STAR stories / cover blocks.
 5. **Report** the top 5 items: gap, how many target roles it affects, type, proposed action. Never add
    anything to the career docs the user hasn't confirmed is true.
+6. Stamp the cadence job: `python tools/cadence.py done cv_review` (the CADENCE block offers this review at most once a week,
+   while the brief shows recurring CV gaps).

@@ -38,7 +38,7 @@ capitalised anyway, so "Led the review" doesn't flag "Led" as a new name.
 `contact_line()` (email, phone, location and links joined with " | "), `to_markdown()` (CV as Markdown: name, contact line, bold headline, one `##` section per heading with bullets, and a Skills section unless one is already there), `cover_letter()` (the letter text: "Dear Hiring Manager,", the `cover_letter` paragraphs, "Kind regards,", the name), `to_docx()` (python-docx: title,
 contact line, headline, one heading per section, bullet list, skills), `main()` (refuses
 unless `validated.sha256` matches the current `tailored.json`). By default it writes only `resume.pdf` and
-`cover_letter.pdf` (via `tools/render_pdf.py`, below) and puts the Markdown in `work/apps/<folder>/` (`SCRATCH`) for the
+`cover_letter.pdf` (via `tools/render_pdf.py`, in the next section of this page) and puts the Markdown in `work/apps/<folder>/` (`SCRATCH`) for the
 reviewers; `--md` also writes it into the application folder, `--docx` adds the Word file. With no Chrome or Edge it
 falls back to Markdown in the folder.
 

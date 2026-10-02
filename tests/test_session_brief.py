@@ -274,3 +274,31 @@ def test_docs_review_is_a_cadence_job_not_a_note_that_waits_for_the_user_to_clos
     line = next(x for x in due.splitlines() if "Docs review:" in x)
     assert "DUE" in line and "docs-review" in line
     assert "· ok" in next(x for x in brief(root).splitlines() if "Docs review:" in x)
+
+
+def test_status_info_counts_only_real_problems_not_the_funnel_statistics(tmp_path):
+    digests = tmp_path / "digests"
+    digests.mkdir()
+    (digests / "status.md").write_text(
+        "**Last run:** 2026-10-05\n\n### \u26a0\ufe0f Sources that stopped returning results\n\n"
+        "- **ats** \u2014 Acme: https://example.com (returned 0 results)\n\n### Sources\n\n| ats | ok | 1/1 |\n\n"
+        "### What each source found, and why listings were dropped\n\n"
+        "- **ats**: 125953 found \u2192 111355 outside your countries \u00b7 **1 kept**\n", encoding="utf-8")
+    last, problems, _ = sb.status_info(tmp_path)
+    assert len(problems) == 1 and "returned 0 results" in problems[0]
+
+
+def test_health_and_cv_review_are_cadence_jobs_that_clear_once_stamped(tmp_path):
+    import cadence
+    kw = dict(radar_last="2026-10-05", new_total=0, new_on_board=0, new_skip=0, new_waiting=0, queued=0,
+              unscored_cards=0, auto_picks=0, awaiting=0, posts_enabled=False)
+    lines, due = cadence.block(NOW, tmp_path, cv_gaps="CV gaps across scored roles: Automation (4)", source_problems=2, **kw)
+    assert {"health", "cv_review"} <= set(due)
+    text = "\n".join(lines)
+    assert "Health: 2 source problem(s)" in text and "CV review: CV gaps across scored roles" in text
+    cadence.done("health", tmp_path, NOW - timedelta(hours=1))
+    cadence.done("cv_review", tmp_path, NOW - timedelta(hours=1))
+    _, due = cadence.block(NOW, tmp_path, cv_gaps="CV gaps across scored roles: Automation (4)", source_problems=2, **kw)
+    assert "health" not in due and "cv_review" not in due
+    _, due = cadence.block(NOW, tmp_path, **kw)
+    assert "health" not in due and "cv_review" not in due

@@ -120,7 +120,14 @@ def status_info(root: Path) -> tuple[str, list[str], str]:
         return "", [], ""
     lines = path.read_text(encoding="utf-8").splitlines()
     last = next((l.split("**", 2)[-1].strip() for l in lines if l.startswith("**Last run:**")), "")
-    bad = [safe(l, 140) for l in lines if "| FAILED" in l or l.startswith("- **")]
+    # Real problems: FAILED rows, and the bullets under the warning heading. The bullets under "What each source
+    # found" are funnel statistics (found, dropped, kept), not problems.
+    bad, in_warning = [], False
+    for l in lines:
+        if l.startswith("#"):
+            in_warning = l.startswith("### ⚠")
+        if "| FAILED" in l or (in_warning and l.startswith("- **")):
+            bad.append(safe(l, 140))
     alert = next((l for l in lines if l.startswith("| alert_email")), "")
     return last, bad, alert
 
@@ -513,7 +520,8 @@ def _age(posted: str, today: date) -> str:
 
 def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, items: list[dict] | None,
                   new_on_list: list[dict], last_run: str, auto_picks: int, by_ref: dict,
-                  views_drift: str | None = None, docs_review: str | None = None) -> list[str]:
+                  views_drift: str | None = None, docs_review: str | None = None, cv_gaps: str | None = None,
+                  source_problems: int = 0) -> list[str]:
     """The explicit CADENCE lines (tools/cadence.py): every recurring job, when it last ran, and whether it is due."""
     issue_map = _read_json(root / "state" / "issue_map.json", {})
     queued = len(_read_json(root / "state" / "board_queue.json", []))
@@ -536,7 +544,7 @@ def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, ite
                                 new_skip=len(skip), new_waiting=len(waiting), queued=queued,
                                 unscored_cards=unscored_cards, auto_picks=auto_picks, awaiting=awaiting,
                                 posts_enabled=posts_on, posts_fallback=fallback, views_drift=views_drift,
-                                docs_review=docs_review)
+                                docs_review=docs_review, cv_gaps=cv_gaps, source_problems=source_problems)
     return lines
 
 
@@ -587,7 +595,11 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append("- SPONSOR-CHECK (the user's standing rule: every role on the board gets a sponsorship verdict): "
                      "run the sponsorship-check skill on these apply/maybe cards, and tell them in one line what "
                      "you found: " + ", ".join(unchecked))
-    lines += cadence_block(root, now, rows, scores, items, new_on_list, last_run, len(pick), by_ref, design_note, docs_note)
+    checks = health_checks(root, now, rows, scores, last_run, alert_row, run_note)
+    cv_gaps = next((c.split(" — ")[0] for c in checks if c.startswith("CV gaps")), None)
+    checks = [c for c in checks if not c.startswith("CV gaps")]   # in the CADENCE block now, not repeated under Health
+    lines += cadence_block(root, now, rows, scores, items, new_on_list, last_run, len(pick), by_ref, design_note, docs_note,
+                           cv_gaps, len(problems))
     lines.append(f"- Unscored Tier 1 roles (last 14 days): {len(unscored_t1)}, of which {len(fresh_unscored)} "
                  "posted in the last 3 days (score and apply to these first)")
     if scores:
@@ -633,7 +645,6 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append("- System updated since last session (re-read CLAUDE.md / skills if relevant; tell the user "
                      "about new capabilities in one line):")
         lines += [f"  - {u}" for u in updates[:8]]
-    checks = health_checks(root, now, rows, scores, last_run, alert_row, run_note)
     checks += referral_notes(now)
     checks += calibration_notes(now)
     if design_note:

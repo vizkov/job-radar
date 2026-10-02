@@ -76,36 +76,67 @@ errors become one-line notes, and it always exits 0.
    dozens of API calls. A timestamp file stops it starting twice within 10 minutes. A field added later, such as Country, is
    therefore back-filled onto cards that already have a Stage ([page 11](11-Board-internals.md#where-each-card-value-comes-from)).
 8. **`start_archive()`**: once a day (stamp `work/.last_archive`), starts `board_sync.py archive` detached, which archives cards in Stage=Skipped (the Action's token can't reach the user's Project).
+9. **`template_status()`**: commits the public template gained since the last session
+   ("system updated": Claude should re-read the relevant skill), and any code here not yet
+   published (`public_template.drift()`).
+10. **Three values worked out as arguments to the `brief()` call** (still in `main()`, before any
+    text is printed):
+    - **`last_run_health()`**: the latest `job-radar` Actions run. If it failed, say so. If
+      the last scheduled slot (read from `radar.yml`'s cron, plus 1 hour grace) passed with no
+      run, GitHub skipped it: start one with `gh workflow run job-radar`.
+    - **`board_design_note()`**: `board_sync.design_diff()`: do the board's views still
+      match `VIEWS` in code? (Only when the board could be read.)
+    - **`docs_review_note()`**: whether enough code files changed since the last docs review
+      (the first run on a fresh copy only writes the starting stamp).
+11. **`brief()`** builds and prints the text (next section), then `main()` **writes
+    `work/.last_session`** with the current time. The whole of `main()` sits in a `try`, so any
+    error prints a one-line "session brief unavailable" and the session still starts.
+
+### What `brief()` prints, in order
+
+`brief()` is one function: it reads `matches.csv`, `scores.jsonl` and the board items it was
+given, and assembles the lines below. It has two side effects: `start_prep()` starts the
+background JD fetch for the auto-score roles, and `calibration_notes()` may run
+`calibrate.py apply`, which **rewrites the tier weights in `profile/config.json`** (reported in
+the brief with an undo line).
 
    **Lines in the brief that Claude must act on** (all built in `brief()`): AUTO-SCORE (score these refs before answering),
    SPONSOR-CHECK (live apply/maybe cards with no sponsorship verdict), INBOX-CHECK (applications awaiting an answer), and the
    CADENCE block (every recurring job, when it last ran, and which are DUE: `tools/cadence.py`). Its jobs: the radar search, new roles to
-   the board, scoring, the Gmail inbox check, the LinkedIn post sweep, board views vs code (DUE when the live views differ from `VIEWS`) and
-   the docs review (DUE when `docs_review_note()` fires, so it does not wait for the user to say they are closing the session).
-9. **`template_status()`**: commits the public template gained since the last session
-   ("system updated": Claude should re-read the relevant skill), and any code here not yet
-   published (`public_template.drift()`).
-10. **`last_run_health()`**: the latest `job-radar` Actions run. If it failed, say so. If
-   the last scheduled slot (read from `radar.yml`'s cron, plus 1 hour grace) passed with no
-   run, GitHub skipped it: start one with `gh workflow run job-radar`.
-11. **`board_design_note()`**: `board_sync.design_diff()`: do the board's views still
-   match `VIEWS` in code?
-12. **`brief()`** prints the result, and has two side effects: it starts the background JD fetch for the
-    auto-score roles (`start_prep()`), and `calibration_notes()` may run `calibrate.py apply`, which
-    **rewrites the tier weights in `profile/config.json`** (reported in the brief with an undo line).
-    It reports: new roles since last session (the top Tier 1 ones,
-    freshest first), unscored Tier 1 roles, score counts, board stage counts, cards that
-    look closed, cards the user moved, follow-ups due, system updates, and health notes
-    from `health_checks()`: missing career docs, alert emails failing or silent, runs not
-    completing, weekly review due, recurring CV gaps; `calibration_notes()`: weekly automatic tier tuning (`tools/calibrate.py apply`), reported with
-    an undo line; `referral_notes()`; and `docs_review_note()`, which no longer
-    appears in the health list: it feeds the CADENCE block's "Docs review:" line (due once 10+ code files changed since the last
-    review).
-13. **Auto-score:** `auto_score_pick()` (skipping roles the board shows closed and, via `skipped_refs()`, roles whose latest logged Stage is Skipped/Rejected, since an archived card vanishes from the board read) chooses up to `scoring.auto_per_session` freshest unscored Tier 1
-    roles; `start_prep()` fetches their job descriptions in the background (the virtualenv's Python, no
-    Claude usage), and the brief's **AUTO-SCORE** line tells Claude to score them before answering the
-    user's first message (`CLAUDE.md`, Session start). Claude can't act before the user types.
-14. Writes `work/.last_session` with the current time.
+   the board, scoring, the Gmail inbox check, the LinkedIn post sweep, board views vs code (DUE when the live views differ from `VIEWS`) 
+   the health check (DUE once a day while `status.md` lists source problems), the CV review (DUE at most weekly while the brief shows
+   recurring CV gaps) and the docs review (DUE when `docs_review_note()` fires, so it does not wait for the user to say they are
+   closing the session).
+
+1. **Header and run state:** the generated-at line, a warning if the `git pull` failed, and the
+   last scheduled run.
+2. **New roles since last session:** counts (on the user's list, Tier 1), then the top Tier 1 ones,
+   freshest first.
+3. **AUTO-SCORE:** `auto_score_pick()` (skipping roles the board shows closed and, via
+   `skipped_refs()`, roles whose latest logged Stage is Skipped/Rejected, since an archived card
+   vanishes from the board read) chooses up to `scoring.auto_per_session` freshest unscored Tier 1
+   roles; `start_prep()` fetches their job descriptions in the background (the virtualenv's Python,
+   no Claude usage), and the **AUTO-SCORE** line tells Claude to score them before answering the
+   user's first message (`CLAUDE.md`, Session start). Claude can't act before the user types.
+4. **SPONSOR-CHECK:** live apply/maybe cards with no sponsorship verdict.
+5. **CADENCE block:** one line per recurring job (the paragraph above).
+6. **Counts:** unscored Tier 1 roles (and how many were posted in the last 3 days), then scored
+   totals by recommendation.
+7. **Board:** stage counts, how many cards had no fields yet (and the fill started in step 7 of
+   `main()`), and cards that look closed (not listed by any source for `stale_days`).
+8. **What the user did on the board:** cards they moved (from `track_stage_changes()`) and cards
+   they closed (from `closed_cards()`).
+9. **INBOX-CHECK:** applications awaiting an answer, when the inbox check is due.
+10. **Follow-ups due** and **system updates** (from steps 6 and 9 of `main()`).
+11. **Health:** `health_checks()` (missing career docs, alert emails failing or silent, runs not
+    completing, weekly review due, recurring CV gaps), `referral_notes()`, `calibration_notes()`
+    (weekly automatic tier tuning, `tools/calibrate.py apply`, reported with an undo line) and
+    `docs_review_note()`, which no longer appears in the health list: it feeds the CADENCE block's
+    "Docs review:" line (due once 10+ code files changed since the last review); then the
+    views-drift note, code not yet published, and any source problems. The CV-gaps note from `health_checks()` also moves to the
+    CADENCE block ("CV review:" line) instead of repeating under Health; `status_info()` counts as source problems only the
+    FAILED rows and the bullets under the status page's warning heading, never the per-source funnel statistics.
+12. **A closing instruction** to start from the brief and not redo its steps.
 
 Every job title and company name in the brief passes through `safe()`: control
 characters, angle brackets and backticks are replaced by spaces, and the length is

@@ -9,6 +9,8 @@ stamp themselves when they finish:
     python tools/cadence.py done inbox_check      # after the inbox-check skill
     python tools/cadence.py done post_discovery   # after a LinkedIn post sweep
     python tools/cadence.py done auto_score       # after the session's automatic scoring
+    python tools/cadence.py done health           # after the health skill has dealt with the source problems
+    python tools/cadence.py done cv_review        # after the cv-review skill
     python tools/cadence.py done views_check      # after updating VIEWS to match the live board views
     python tools/cadence.py show                  # the ledger
 
@@ -23,7 +25,8 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-JOBS = {"inbox_check": 20, "post_discovery": 20, "auto_score": 4, "views_check": 24}   # name -> hours before it is due again
+JOBS = {"inbox_check": 20, "post_discovery": 20, "auto_score": 4, "views_check": 24,
+        "health": 24, "cv_review": 168}   # name -> hours before it is due again
 
 
 def _file(root: Path) -> Path:
@@ -77,7 +80,7 @@ def when(name: str, now: datetime, root: Path = ROOT, fallback: datetime | None 
 def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_board: int, new_skip: int,
           new_waiting: int, queued: int, unscored_cards: int, auto_picks: int, awaiting: int,
           posts_enabled: bool, posts_fallback: datetime | None = None, views_drift: str | None = None,
-          docs_review: str | None = None) -> tuple[list[str], list[str]]:
+          docs_review: str | None = None, cv_gaps: str | None = None, source_problems: int = 0) -> tuple[list[str], list[str]]:
     """(lines for the brief, names of the jobs that are due). Every job gets a line, due or not."""
     lines = ["- CADENCE (each recurring job and when it last ran). Run every one marked DUE, or tell the user in one "
              "line which you skipped and why; never skip one silently:"]
@@ -134,6 +137,28 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
                      "`cadence.py done views_check`")
     else:
         lines.append(f"  - Board views vs code: no drift; {when('views_check', now, root)} · ok")
+    # health: failing or silent sources. The details are in the brief's Health list; this makes the check a job that
+    # is run (or offered) every day until it has been dealt with, instead of a line that is easy to read past
+    if source_problems:
+        if is_due("health", now, root):
+            due.append("health")
+            lines.append(f"  - Health: {source_problems} source problem(s) in the last run; {when('health', now, root)} · DUE: "
+                         "after answering the first message (if they opened with a task, offer it in one line), run `health`, "
+                         "then `cadence.py done health`")
+        else:
+            lines.append(f"  - Health: {source_problems} source problem(s) in the last run; {when('health', now, root)} · ok")
+    else:
+        lines.append("  - Health: no source problems in the last run · ok")
+    # CV review: recurring gaps across scored roles, at most once a week
+    if cv_gaps:
+        if is_due("cv_review", now, root):
+            due.append("cv_review")
+            lines.append(f"  - CV review: {cv_gaps}; {when('cv_review', now, root)} · DUE: offer the `cv-review` skill in one "
+                         "line after the first message, then `cadence.py done cv_review`")
+        else:
+            lines.append(f"  - CV review: gaps listed; {when('cv_review', now, root)} · ok")
+    else:
+        lines.append("  - CV review: no recurring CV gaps · ok")
     # docs review: due once enough code changed since the last one. Part of the block (not a health note) so it does
     # not wait for the user to say "close the session"
     if docs_review:

@@ -63,7 +63,7 @@ do?" or type `/manual` (it's generated from the system itself).
 | (automatic) | At the start of each session, when you send your first message, Claude first scores up to 8 of the freshest unscored Tier 1 roles (2–4% of a session), then answers you. Say "don't auto-score" or ask Claude to change the number |
 | (automatic) | Once a week, when enough roles are scored, Claude adjusts how job titles are rated (the Tier) using how those roles actually scored, one small step at a time. It tells you what changed at the start of your next session, and one sentence undoes it. Your title filters, countries and companies only change when you say so |
 | "What could be better?" | Reviews the system and proposes fixes and new job boards for you to approve (Claude also offers this weekly) |
-| "Are the docs still right?" | Two fresh AI readers go through the guide and the technical docs as newcomers; Claude checks what they flag against the system and fixes it (also offered automatically after big changes) |
+| "Are the docs still right?" | Two fresh AI readers go through the guide and the technical docs as newcomers; Claude checks what they flag against the system and fixes it (Claude runs or offers it once enough of the system has changed) |
 | "Is anything broken?" | Checks the runs and every source; fixes or explains |
 
 ## What Claude will not do
@@ -87,6 +87,25 @@ anything broken. When you send your first message, Claude first scores up to 8 o
 roles (on by default; say "don't auto-score" to turn it off). Anything else, including tailoring, happens
 when you ask. Say "what's new?" when you
 sit down, or just look at the board.
+
+### The recurring jobs
+
+At the start of every session Claude gets a list of the recurring jobs, with when each last ran and which are due. Claude runs
+what is due without being asked, or, if you opened with a task of your own, offers it in one line. If it skips one it tells you which
+and why. Nothing runs while no session is open except the GitHub search: Claude can only reach your Gmail and Chrome when you
+have it open, so those checks happen then.
+
+| Job | Who runs it | When |
+|---|---|---|
+| Role search | GitHub, by itself | Three times a day, whether or not your computer is on |
+| New roles reach your board | GitHub creates the cards; Claude fills in their columns | Fields are filled at the start of your next session |
+| Scoring | Claude | A few of the freshest unscored roles at the start of a session (see above) |
+| Inbox check | Claude, through the Gmail connector (read-only) | About once a day, when you have applications waiting for an answer |
+| LinkedIn post sweep | Claude, in your Chrome | About once a day, only if you switched it on |
+| Board views check | Claude | When you've changed a view in GitHub: Claude copies your layout into the saved design (your column order is never touched) |
+| Docs review | Claude, with two fresh readers | When enough of the system's code has changed since the last review |
+| CV review | Claude offers it in one line | At most once a week, while your scored roles keep showing the same CV gaps |
+| Health check | Claude runs or offers it | Once a day, while the last run reports a source that stopped returning results |
 
 ## Costs
 

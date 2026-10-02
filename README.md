@@ -3,6 +3,7 @@
 </p>
 
 <p align="center">
+  <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/Licence-MIT-yellow"></a>
   <img alt="Python 3.13" src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white">
   <img alt="Built with Claude Code" src="https://img.shields.io/badge/Built%20with-Claude%20Code-D97757">
   <img alt="Runs on GitHub Actions" src="https://img.shields.io/badge/Runs%20on-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white">
@@ -154,6 +155,10 @@ optionally, a mail secret.
 | understand how it works, file by file | the design docs: [docs/design](docs/design/README.md) |
 | check what protects your data and accounts | [Security model](docs/design/13-Security-model.md) |
 | see what is planned | the open [issues](https://github.com/vizkov/job-radar/issues): [#1](https://github.com/vizkov/job-radar/issues/1) works for any profession and country, [#2](https://github.com/vizkov/job-radar/issues/2) versioned releases and safe updates |
+
+## Licence
+
+[MIT](LICENSE): use it, change it, share it. Your own search data never enters this repo: it lives in your private copy.
 
 ## Credits
 

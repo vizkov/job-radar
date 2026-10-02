@@ -86,7 +86,7 @@ is in [Architecture](02-Architecture.md). `examples/` has a public sample of eac
 ## Claude's instructions
 
 `CLAUDE.md` and `.claude/skills/*/SKILL.md` are prose, not code: see [page 4,
-4.1](04-Claude-session.md) for what each skill does and which tools it runs. When a
+section 4.1](04-Claude-session.md#41-how-claude-knows-what-to-do) for what each skill does and which tools it runs. When a
 capability changes, the rule in `CLAUDE.md` is to update `CLAUDE.md`, the skill and these
 docs in the same commit.
 

@@ -6,9 +6,9 @@ Your GitHub Project is the dashboard: one card per role, plus a "Radar status" c
 New cards arrive three times a day. (How they get there, for the curious:
 [Board internals](../design/11-Board-internals.md).)
 
-**If a view looks empty:** cards that arrived since your last Claude session may have blank Stage, Tier or
+**If a view looks empty:** cards that arrived since your last Claude session may have blank Stage, Tier, Country or
 Posted fields until Claude next opens (it fills them at the start of every session), and views filter on those.
-The **All Roles** view shows every card regardless.
+The **All Roles** view shows every card except the ones you've already applied to, so it still shows the blank ones.
 
 ## Fields
 
@@ -27,7 +27,8 @@ Cards that arrived since your last Claude session may have empty fields: GitHub 
 let the automatic runs write to your board's columns, so Claude fills them when you next
 open a session (it takes a minute or two, in the background). Until then, "Act now" and
 other views that filter on those columns won't show those cards yet; the "All Roles" view
-does. Nothing is lost in the meantime.
+does. Nothing is lost in the meantime. If a column you add later is empty on older cards, Claude
+notices at the start of the next session and fills it in by itself, wherever it can work the value out.
 
 Moving a role to Offer, Rejected or Skipped closes its issue. It works the other way too: if you
 **close a card** (or mark it Done) that you hadn't acted on, Claude sets its Stage to Skipped at your
@@ -74,8 +75,13 @@ can see it.
 | View | What it's for |
 |---|---|
 | **Act now** | Open roles you haven't applied to or skipped that are either brand new or posted 14 or more days ago (the ones about to expire: apply before they close), best fit first |
-| **All Roles** | Everything, best fit first |
+| **All Roles** | Every role you haven't applied to yet, best fit first |
 | **Pipeline** | A board with one column per Stage; drag cards as things happen |
+
+**Your layout is yours.** You can change a view's filter, columns or column order in GitHub whenever you like. Claude never
+reorders your columns. When you change a filter or add or remove a column, Claude notices at the start of the next session and
+copies your layout into the system's saved design, so it survives a rebuild of the board. Claude won't undo a change unless you say it was
+a mistake.
 
 Want another view, say "Tier 2 only" or "jobs whose ad may have been taken down"? Ask
 Claude. It adds the view to your board and saves it with your copy of job-radar, so it comes back if

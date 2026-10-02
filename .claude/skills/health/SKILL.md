@@ -23,3 +23,5 @@ description: Diagnose and fix job-radar problems — silent or failing sources, 
      cards exist but not on the board means the Project's Auto-add workflow is off (`setup` step).
    - **Workflow skipped with a "Public repository" warning** → the repo is public; it must be private.
 3. Fix what you can, verify with a dry run, commit, and tell the user what was wrong in one or two lines.
+4. Stamp the cadence job: `python tools/cadence.py done health` (the session brief's CADENCE block marks Health DUE once a day
+   while the status page lists source problems, so it is run or offered instead of read past).

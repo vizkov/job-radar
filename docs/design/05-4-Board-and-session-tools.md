@@ -72,10 +72,10 @@ The session brief's CADENCE block lists every recurring job and whether it is du
 
 | Name | Is |
 |---|---|
-| `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 20, `auto_score` 4, `views_check` 24. |
+| `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 20, `auto_score` 4, `views_check` 24, `health` 24, `cv_review` 168. |
 | `done(name, root, now)`, `last(name, root)`, `load(root)` | Stamp a job as just finished; read a stamp; read the ledger. CLI: `python tools/cadence.py done <name>` and `show`. |
 | `is_due(name, now, root)`, `when(name, now, root, fallback)` | True when never run or older than its interval; the "last ran … (Nh ago)" text. |
-| `block(now, root, …)` | Returns the brief's CADENCE lines (radar search, new roles to the board, scoring, inbox check, LinkedIn post sweep, board views vs code, docs review) and the names of the due jobs. Two arguments make a line DUE: `views_drift` (the brief's design-diff note: update `VIEWS` to the user's live layout, then `cadence.py done views_check`) and `docs_review` (the reason from `docs_review_note()`: run `docs-review`, which stamps `work/.last_docs_review` itself). `session_brief.cadence_block()` gathers its inputs from `matches.csv`, the issue map, the queue and the board, and passes both through. |
+| `block(now, root, …)` | Returns the brief's CADENCE lines (radar search, new roles to the board, scoring, inbox check, LinkedIn post sweep, board views vs code, health, CV review, docs review) and the names of the due jobs. Four arguments make a line DUE: `views_drift` (the brief's design-diff note: update `VIEWS` to the user's live layout, then `cadence.py done views_check`) and `docs_review` (the reason from `docs_review_note()`: run `docs-review`, which stamps `work/.last_docs_review` itself), `source_problems` (a count from `status_info()`; DUE when above 0 and the `health` job is older than a day: run `health`, then `cadence.py done health`) and `cv_gaps` (the "CV gaps" note from `health_checks()`; DUE when set and `cv_review` is older than a week: offer `cv-review`, then `cadence.py done cv_review`). `session_brief.cadence_block()` gathers its inputs from `matches.csv`, the issue map, the queue and the board, and passes both through. |
 
 ## `tools/session_brief.py`: the SessionStart hook (standard library only)
 

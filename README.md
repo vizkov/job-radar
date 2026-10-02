@@ -100,7 +100,9 @@ job description's own vocabulary only where your stories support it. It cannot i
   rejected, and a form-and-style linter enforces section rules (length, register, no filler).
 - **Four fresh readers review it** (`application-review`): an ATS, a recruiter, a consistency auditor and a copy editor,
   plus a cross-check that the CV, letter and stories agree with each other.
-- **You get two PDFs per application**, a two-page CV and a one-page cover letter, laid out like your own documents.
+- **You get two PDFs per application.** Today they are a two-page CV and a one-page cover letter in a layout based on the
+  author's own documents. Page length and layout are personal choices, so letting each user define them at setup (with
+  ready-made styles and a guide to make your own) is planned: [#6](https://github.com/vizkov/job-radar/issues/6).
 
 **Edit a master document and everything stays in step.** `master-update` re-checks the three documents as a set and
 refreshes every application built from the old versions, so no old CV is left saying something your masters no longer say.
@@ -151,12 +153,12 @@ about to expire) and **Pipeline**.
 
 <p align="center">
   <img src="docs/assets/board-pipeline.jpg" alt="The Pipeline view: cards in New, Shortlisted, Applied, Interview, Offer and Rejected columns, each showing tier, fit score, recommendation, sponsor verdict and posted date" width="100%">
-  <br><sub>The Pipeline view. Each column says what the stage means. Company and role names are replaced with fictional ones for this picture.</sub>
+  <br><sub>The Pipeline view (first three of its columns). Each column says what the stage means; each card shows tier, fit, recommendation, sponsor verdict and posted date. Company and role names are fictional in this picture.</sub>
 </p>
 
 <p align="center">
   <img src="docs/assets/board-table.jpg" alt="The All Roles view: a table of roles sorted by fit, with recommendation, sponsor, referral, stage, tier and country columns" width="100%">
-  <br><sub>The All Roles view, sorted by fit. Names replaced with fictional ones.</sub>
+  <br><sub>The All Roles view, sorted by fit (more columns scroll to the right). Names are fictional in this picture.</sub>
 </p>
 
 <details>

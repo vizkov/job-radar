@@ -262,3 +262,23 @@ def test_gh_reads_utf8_not_the_windows_default(monkeypatch):
         return R()
     monkeypatch.setattr(bs.subprocess, "run", fake_run)
     assert bs.Gh()("issue", "view", "1") == "Amazon — GBR" and seen["encoding"] == "utf-8"
+
+
+def _gap_board():
+    return {"fields": {"Country": {"options": {"nl": "o", "gb": "o"}}, "Posted": {"options": {}}}}
+
+
+def test_a_card_with_a_stage_but_no_country_is_a_gap_the_brief_can_see():
+    """A field added later must reach cards that already have a Stage, without a board read to find out."""
+    rows = {REF: {"countries": "NL,GB"}}
+    gaps = bs.fill_gaps(item(stage="Applied"), _gap_board(), rows, {REF: "2026-09-01"})
+    assert gaps == {"country": "NL", "posted": "2026-09-01"}
+
+
+def test_a_card_that_cannot_be_filled_is_not_a_gap():
+    """A country outside the Country options and an undatable role must not make every session start a fill."""
+    assert bs.fill_gaps(item(stage="Applied"), _gap_board(), {REF: {"countries": "FR"}}, {}) == {}
+    assert bs.fill_gaps(item(stage="Applied"), _gap_board(), {}, {}) == {}
+    done = item(stage="Applied")
+    done["country"], done["posted"] = "NL", "2026-09-01"
+    assert bs.fill_gaps(done, _gap_board(), {REF: {"countries": "NL"}}, {REF: "2026-09-01"}) == {}

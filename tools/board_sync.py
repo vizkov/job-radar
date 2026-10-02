@@ -682,32 +682,61 @@ def _row_sponsor(row: dict) -> str | None:
     return REGISTER_TO_SPONSOR.get((row.get(col) or "").split(" ")[0]) if col else None
 
 
+def fill_gaps(item: dict, board: dict, rows: dict, seen: dict) -> dict:
+    """What `fill` would set on one card, from data already in hand (no board read): {"stage": True, "country": "NL",
+    "posted": "2026-09-21"}. Empty when nothing can be filled: a card whose country isn't one of the Country options, or
+    that can't be dated, is not a gap, so it never makes the session brief start a fill. The brief's trigger and
+    fill_new both use this, so a field added later is back-filled onto existing cards without extra board reads."""
+    if "role" not in (item.get("labels") or []):
+        return {}
+    body = (item.get("content") or {}).get("body") or ""
+    ref = REF_RE.search(body)
+    row = rows.get(ref.group(1)) if ref else None
+    gaps: dict = {}
+    countries = ((row or {}).get("countries") or "").split(",")
+    if "Country" in board["fields"] and not item.get("country") and countries[0].lower() in board["fields"]["Country"]["options"]:
+        gaps["country"] = countries[0]
+    if "Posted" in board["fields"] and not item.get("posted") and (day := posted_date(body, seen)):
+        gaps["posted"] = day
+    if not item.get("stage"):
+        gaps["stage"] = True
+    return gaps
+
+
+def needs_fill(items: list[dict]) -> bool:
+    """True when `fill` has something to set on any card (see fill_gaps)."""
+    board = load_board()
+    if board is None:
+        return any(not i.get("stage") for i in items)
+    rows, seen = _match_rows(), _first_seen()
+    return any(fill_gaps(i, board, rows, seen) for i in items)
+
+
 def fill_new(gh: Gh) -> str:
     """Cards the scheduled run added have no field values (its token can't edit Projects). Tier and Sponsor come from
     the role's data/matches.csv row (a provisional tier: scoring sets the real one); cards from before the labels
-    were dropped still carry tier-*/sponsor-* labels, used when there is no row."""
+    were dropped still carry tier-*/sponsor-* labels, used when there is no row. Country and Posted are also
+    back-filled onto cards that already have a Stage (a field added later reaches existing cards)."""
     rows = _match_rows()
     board = load_board()
     if board is None:
         return "board not set up yet"
     done = dated = countried = 0
-    seen = None
+    seen = _first_seen()
     for item in _items(gh, board):
-        labels = set(item.get("labels") or [])
-        if "role" not in labels:
+        gaps = fill_gaps(item, board, rows, seen)
+        if not gaps:
             continue
+        labels = set(item.get("labels") or [])
         ref = REF_RE.search((item.get("content") or {}).get("body") or "")
         row = rows.get(ref.group(1)) if ref else None
-        country = ((row or {}).get("countries") or "").split(",")[0]
-        if "Country" in board["fields"] and not item.get("country") and country.lower() in board["fields"]["Country"]["options"]:
-            _edit(gh, board, item["id"], "Country", country)
+        if "country" in gaps:
+            _edit(gh, board, item["id"], "Country", gaps["country"])
             countried += 1
-        if "Posted" in board["fields"] and not item.get("posted"):
-            seen = _first_seen() if seen is None else seen
-            if (day := posted_date((item.get("content") or {}).get("body") or "", seen)):
-                _edit(gh, board, item["id"], "Posted", day)
-                dated += 1
-        if item.get("stage"):
+        if "posted" in gaps:
+            _edit(gh, board, item["id"], "Posted", gaps["posted"])
+            dated += 1
+        if not gaps.get("stage"):
             continue
         if row:
             tier, sponsor = row.get("tier") or None, _row_sponsor(row)

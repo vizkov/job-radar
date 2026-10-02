@@ -266,3 +266,11 @@ def test_cadence_flags_a_tier_1_role_with_no_card_and_no_issue(tmp_path):
     (root_state / "board_queue.json").write_text("[]")
     out = brief(root, items=[])
     assert "New roles to the board" in out and "1 without a card yet" in out and "board_sync.py roles" in out
+
+
+def test_docs_review_is_a_cadence_job_not_a_note_that_waits_for_the_user_to_close_the_session(tmp_path):
+    root = make_root(tmp_path, [row("a" * 16, "2026-10-02", company="Apple")])
+    due = brief(root, docs_note="docs review due: 10 code files changed since the last one (2026-10-01); offer the docs-review skill")
+    line = next(x for x in due.splitlines() if "Docs review:" in x)
+    assert "DUE" in line and "docs-review" in line
+    assert "· ok" in next(x for x in brief(root).splitlines() if "Docs review:" in x)

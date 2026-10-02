@@ -54,9 +54,10 @@ Never loop over refs with one call each.
 
 **Cadence (the user's rule, 2026-10-02: the recurring jobs ran silently and unevenly).** The brief's **CADENCE** block lists every
 recurring job with when it last ran: the radar search, new roles reaching the board, scoring, the Gmail inbox check and the LinkedIn
-post sweep. Anything marked **DUE** you run in the session (inbox check and post sweep after answering the first message unless the
-user opened with a task: then offer it in one line), and each of those skills stamps itself when finished with
-`python tools/cadence.py done <inbox_check|post_discovery|auto_score>`. If you skip a DUE job, say which one and why in one line;
+post sweep, the board-views check and the docs review. Anything marked **DUE** you run in the session (inbox check, post sweep and docs
+review after answering the first message unless the user opened with a task: then offer it in one line; never wait for the user to say
+they are closing the session), and each of those jobs stamps itself when finished with
+`python tools/cadence.py done <inbox_check|post_discovery|auto_score|views_check>` (the docs review stamps `work/.last_docs_review` itself). If you skip a DUE job, say which one and why in one line;
 never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the guarantee that an overdue job is visible, not that it ran.
 
 ## How the machinery fits together

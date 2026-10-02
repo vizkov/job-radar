@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 280" role="img" aria-labelledby="t d">
+  <title id="t">job-radar</title>
+  <desc id="d">A radar screen with blips, next to the name job-radar and the line: your job search, run by Claude.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1220"/>
+      <stop offset="1" stop-color="#0f2a33"/>
+    </linearGradient>
+    <radialGradient id="sweep" cx="0" cy="0" r="1">
+      <stop offset="0" stop-color="#2dd4bf" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#2dd4bf" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="280" rx="14" fill="url(#bg)"/>
+  <!-- radar -->
+  <g transform="translate(235 140)">
+    <circle r="112" fill="none" stroke="#2dd4bf" stroke-opacity="0.55" stroke-width="2"/>
+    <circle r="84" fill="none" stroke="#2dd4bf" stroke-opacity="0.35" stroke-width="1.5"/>
+    <circle r="56" fill="none" stroke="#2dd4bf" stroke-opacity="0.35" stroke-width="1.5"/>
+    <circle r="28" fill="none" stroke="#2dd4bf" stroke-opacity="0.35" stroke-width="1.5"/>
+    <line x1="-112" y1="0" x2="112" y2="0" stroke="#2dd4bf" stroke-opacity="0.25"/>
+    <line x1="0" y1="-112" x2="0" y2="112" stroke="#2dd4bf" stroke-opacity="0.25"/>
+    <path d="M0 0 L112 0 A112 112 0 0 0 79 -79 Z" fill="url(#sweep)"/>
+    <line x1="0" y1="0" x2="79" y2="-79" stroke="#5eead4" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="52" cy="-44" r="6" fill="#fbbf24"/>
+    <circle cx="-48" cy="-30" r="5" fill="#fbbf24" fill-opacity="0.8"/>
+    <circle cx="30" cy="52" r="5" fill="#fbbf24" fill-opacity="0.65"/>
+    <circle cx="-66" cy="44" r="4" fill="#fbbf24" fill-opacity="0.5"/>
+    <circle r="4" fill="#5eead4"/>
+  </g>
+  <!-- title -->
+  <text x="420" y="140" fill="#f8fafc" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="84" font-weight="700" letter-spacing="-1">job-radar</text>
+  <text x="424" y="190" fill="#99f6e4" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="30">Your job search, run by Claude.</text>
+  <text x="424" y="232" fill="#94a3b8" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="20">Finds roles · rates your fit · tailors your CV · tracks every application</text>
+</svg>

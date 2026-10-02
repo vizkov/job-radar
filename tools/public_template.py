@@ -54,7 +54,7 @@ NEVER_COPY = [".git/*", ".venv/*", ".claude/settings.local.json", "*/__pycache__
 # Only these paths are ever published. A new kind of file (private or not) stays private
 # until someone deliberately adds it here: safer than relying on PRIVATE alone.
 PUBLIC = [".claude/skills/*", ".claude/settings.json", ".github/*", ".githooks/*", "jobradar/*", "tools/*",
-          "tests/*", "docs/wiki/*", "docs/design/*", "examples/*", "CLAUDE.md", "README.md", "radar.py", "verify_boards.py",
+          "tests/*", "docs/wiki/*", "docs/design/*", "docs/assets/*", "examples/*", "CLAUDE.md", "README.md", "radar.py", "verify_boards.py",
           "requirements*.in", "requirements*.txt", "pytest.ini", ".gitignore", ".gitattributes"]
 
 

@@ -1,49 +1,133 @@
-# job-radar
+<p align="center">
+  <img src="docs/assets/banner.svg" alt="job-radar: your job search, run by Claude" width="100%">
+</p>
 
-A job-search assistant for AppSec, product security, pentest and security-consulting
-roles in Europe. Three times a day it checks the job boards of the companies you want to
-work for (plus public EU job portals and, optionally, your LinkedIn/Indeed/Glassdoor alert
-emails), keeps the roles that match, rates them, flags UK/NL visa sponsors, and puts each
-new one on your GitHub Projects board.
+<p align="center">
+  <img alt="Python 3.13" src="https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white">
+  <img alt="Built with Claude Code" src="https://img.shields.io/badge/Built%20with-Claude%20Code-D97757">
+  <img alt="Runs on GitHub Actions" src="https://img.shields.io/badge/Runs%20on-GitHub%20Actions-2088FF?logo=githubactions&logoColor=white">
+  <img alt="No API key" src="https://img.shields.io/badge/API%20key-not%20needed-2ea44f">
+  <img alt="Private by design" src="https://img.shields.io/badge/Your%20data-stays%20private-8957e5">
+</p>
 
-You use it through **two interfaces**:
+**job-radar finds the roles, Claude runs the search.** Three times a day it checks company job boards and public
+job portals, keeps what matches, rates it, flags visa sponsors, and drops each new role on a GitHub Projects
+board. You then just talk to Claude: it scores roles against your CV, tailors a CV and cover letter for each one,
+checks sponsorship, finds a referral route, fills in forms for you to review and tracks every application.
 
-1. **Claude** (Claude Code, in your private copy of this repo) acts as your recruitment
-   consultant and operates everything: setup, briefings, fit scoring against your CV,
-   tailored CVs and cover letters, tracking, tuning, fixes. It runs on your Claude
-   subscription: **no API key**.
-2. **A GitHub Projects board**: one card per role, moving from New to Offer.
+> [!NOTE]
+> It ships tuned for **AppSec, product security, pentest and security-consulting roles in Europe**, because that is
+> what it was built for. Titles, countries and companies are settings Claude changes for you. Making the whole
+> system work for any profession and country is tracked in [#1](https://github.com/vizkov/job-radar/issues/1).
+
+## How it works
+
+```mermaid
+flowchart LR
+  subgraph cloud["GitHub Actions: 3 times a day"]
+    direction TB
+    S["Company job boards<br/>EU and national portals<br/>alert emails"] --> F["Filter, de-duplicate, rate"]
+    F --> I["One issue per new role"]
+  end
+  I --> B[("Your Projects board")]
+  subgraph local["Your private copy, in Claude Code"]
+    C["Claude, your job-search consultant"]
+  end
+  C -->|"score, tailor, track"| B
+  U(["You"]) <-->|"just talk"| C
+  U -->|"drag cards"| B
+```
+
+You use it through **two things only**: a conversation with Claude, and the board. No scripts to run, no settings
+files to edit, no API key (it runs on your Claude subscription).
+
+## What you can ask Claude
+
+| You say | What happens |
+|---|---|
+| "What's new?" | A briefing: new roles, best matches, anything broken, what is waiting on you |
+| "Which of these fit me?" | Each role is scored against your CV with met and missing requirements, blockers and a recommendation: Apply, Maybe or Skip |
+| "Tailor my CV for this role" | A two-page CV and a one-page cover letter built from **your own lines**, checked by code so nothing is invented, then reviewed by four fresh readers (ATS, recruiter, consistency, copy editor) |
+| "Will they sponsor?" | A verdict with evidence: the ad, the country's rules, the UK and NL sponsor registers and the company's own pages |
+| "Who do I know there?" | Referral routes: people you know first, then recruiters and hiring managers, with drafts for you to send |
+| "Help me apply" | Pre-fills the application form in your Chrome, page by page. You approve every value and click Submit |
+| "Did anyone reply?" | Reads your inbox (read-only) for rejections, interviews and offers and suggests board updates |
+| "Prep me for the interview" | Likely questions built from the job description, answer outlines from your own stories, questions to ask |
+| "Check LinkedIn posts" | Finds hiring posts by recruiters and managers that job boards miss (opt-in) |
+| "Which skills am I missing?" | Compares what your target roles keep asking for with your CV and suggests what to strengthen |
+| "Too much noise" | Retunes titles, countries, companies and weights, and shows the effect before saving |
+| "Is anything broken?" | Diagnoses silent sources, failed runs and missing cards, and fixes them |
+
+Nineteen skills in all; `/manual` lists everything live.
+
+## The board
+
+One card per role, moving **New → Shortlisted → Applied → Interview → Offer** (or Rejected or Skipped). Each card
+carries:
+
+| Field | Meaning |
+|---|---|
+| Stage | Where the role is in your pipeline |
+| Tier | T1 apply early, T2 lower priority. A rule-based guess at first; once scored, Apply makes it T1 and Skip makes it T2 |
+| Fit and Recommendation | The score against your CV (0 to 100) and Apply, Maybe or Skip |
+| Sponsor | Visa sponsorship: register match first, then Confirmed, Likely or No after a sponsorship check |
+| Country, Posted, Referral | Where, when the ad went up, and how the referral ask is going |
+
+The views are code, so every copy gets the same ones: **All Roles**, **Act now** (open roles that are new or
+about to expire) and **Pipeline**.
 
 ## What it will never do
 
-- Log in to LinkedIn or any job portal with your credentials, or scrape LinkedIn, Indeed
-  or Glassdoor. Their own alert emails are read instead. (One opt-in exception you can switch
-  on: looking up a recruiter or hiring manager on LinkedIn for one role you're applying to.)
-- Submit an application, or email or message anyone. It can pre-fill a form for you to
-  check; you click Submit.
-- Invent experience. Tailored CVs only reuse your own lines, and code checks that.
-- Publish your job search. It runs from a private copy; the public repo holds code only.
+- **Log in to a job portal for you, or scrape LinkedIn, Indeed or Glassdoor.** Their own alert emails are read
+  instead. Two opt-in LinkedIn exceptions are read-only, one page at a time, in your own browser.
+- **Submit an application, or email or message anyone.** It can pre-fill a form; you click Submit.
+- **Invent experience.** Tailored CVs only reuse your own lines, and code rejects anything that isn't traceable to them.
+- **Publish your job search.** It runs from a private copy; this public repo holds code only.
+- **Follow instructions hidden in a job ad.** Ads and alert emails are treated as data, never as commands.
+
+<details>
+<summary><b>Where roles come from</b></summary>
+
+| Source | Covers |
+|---|---|
+| Company job boards (Greenhouse, Workday, Lever, Ashby and more) | Every verified employer board you track |
+| Careers pages | Employers without a standard job board |
+| Bundesagentur, JobTech, EURES | Germany, Sweden and EU-wide public employment services |
+| Reed | UK board, official API (optional) |
+| Job-alert emails | LinkedIn, Indeed and Glassdoor alerts, read from a dedicated mailbox (optional) |
+
+Roles are de-duplicated across sources, rated by fixed rules (no AI judges each ad), matched to the UK and NL
+sponsor registers, and aged out when no source lists them any more.
+</details>
+
+<details>
+<summary><b>What it costs and what it needs</b></summary>
+
+- A Claude subscription (Pro or Max). There is no separate API bill.
+- A free GitHub account. The daily runs use roughly 450 to 750 of the 2,000 free Actions minutes a month.
+- A private GitHub repository for your copy, a GitHub Projects board, and Chrome if you want form filling.
+</details>
 
 ## Get started
 
-1. Make a **private** copy: clone this repo, rename the remote to `template`, and push to
-   a new empty private repo (don't fork: a fork of a public repo can't be private).
-   Exact commands: [Setup and publishing](docs/design/14-Setup-and-publishing.md).
+1. Make a **private** copy: clone this repo, rename the remote to `template`, and push to a new empty private repo.
+   Don't fork: a fork of a public repo can't be private. Exact commands:
+   [Setup and publishing](docs/design/14-Setup-and-publishing.md).
 2. Open **Claude Code** in that folder and say **"set this up for me"**.
 
-Claude asks only for what it can't do itself: your CV and preferences, one GitHub login,
-two clicks on the board, and optionally a mail secret.
+Claude asks only for what it can't do itself: your CV and preferences, one GitHub login, two clicks on the board and,
+optionally, a mail secret.
 
-## Read next
+## Documentation
 
 | If you want to… | Read |
 |---|---|
 | use it | the user guide: [docs/wiki](docs/wiki/Home.md) (also in this repo's Wiki tab) |
 | understand how it works, file by file | the design docs: [docs/design](docs/design/README.md) |
 | check what protects your data and accounts | [Security model](docs/design/13-Security-model.md) |
+| see what is planned | the open [issues](https://github.com/vizkov/job-radar/issues): [#1](https://github.com/vizkov/job-radar/issues/1) works for any profession and country, [#2](https://github.com/vizkov/job-radar/issues/2) versioned releases and safe updates |
 
 ## Credits
 
-Built on [ats-scrapers](https://github.com/kalil0321/ats-scrapers) (fetching company job
-boards) and company→board mappings from ats-scrapers and
-[job-board-aggregator](https://github.com/Feashliaa/job-board-aggregator).
+Built on [ats-scrapers](https://github.com/kalil0321/ats-scrapers) (fetching company job boards) and company-to-board
+mappings from ats-scrapers and [job-board-aggregator](https://github.com/Feashliaa/job-board-aggregator).

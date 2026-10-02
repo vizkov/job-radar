@@ -80,7 +80,8 @@ def when(name: str, now: datetime, root: Path = ROOT, fallback: datetime | None 
 def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_board: int, new_skip: int,
           new_waiting: int, queued: int, unscored_cards: int, auto_picks: int, awaiting: int,
           posts_enabled: bool, posts_fallback: datetime | None = None, views_drift: str | None = None,
-          docs_review: str | None = None, cv_gaps: str | None = None, source_problems: int = 0) -> tuple[list[str], list[str]]:
+          docs_review: str | None = None, cv_gaps: str | None = None, source_problems: int = 0,
+          docs_review_job: bool = True) -> tuple[list[str], list[str]]:
     """(lines for the brief, names of the jobs that are due). Every job gets a line, due or not."""
     lines = ["- CADENCE (each recurring job and when it last ran). Run every one marked DUE, or tell the user in one "
              "line which you skipped and why; never skip one silently:"]
@@ -161,7 +162,9 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
         lines.append("  - CV review: no recurring CV gaps · ok")
     # docs review: due once enough code changed since the last one. Part of the block (not a health note) so it does
     # not wait for the user to say "close the session"
-    if docs_review:
+    if not docs_review_job:
+        pass   # the docs-review skill is maintainer-only: a copy without it has no such job
+    elif docs_review:
         due.append("docs_review")
         lines.append(f"  - Docs review: {docs_review} · DUE: after answering the first message (if they opened with a task, "
                      "offer it in one line), run `docs-review`; it stamps itself (`work/.last_docs_review`)")

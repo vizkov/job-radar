@@ -10,7 +10,7 @@ import public_template as pt  # noqa: E402
 
 @pytest.mark.parametrize("path", ["tools/radar_helper.py", "jobradar/board.py", ".claude/skills/manual/SKILL.md",
                                   "docs/wiki/Board.md", "examples/config.json", ".github/workflows/radar.yml",
-                                  ".githooks/post-commit", "CLAUDE.md", "requirements.txt", "radar.py"])
+                                  "CLAUDE.md", "requirements.txt", "radar.py"])
 def test_public_code(path):
     assert is_public(path)
 
@@ -64,3 +64,8 @@ def test_publish_uses_committed_content_only(tmp_path, monkeypatch):
     assert pt.committed_bytes("tools/b.py") == b"b = 'committed'\n"
     assert pt.committed_bytes("tools/a.py") == b"a = 1\n"                                # HEAD's version, not the edit
     assert pt.committed_bytes("tools/c.py") is None
+
+
+def test_maintainer_only_files_are_not_published():
+    for path in (".githooks/post-commit", ".claude/skills/docs-review/SKILL.md", ".claude/skills/system-review/SKILL.md"):
+        assert not is_public(path), path

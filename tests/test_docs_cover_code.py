@@ -6,6 +6,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 import board_sync  # noqa: E402
+from public_template import MAINTAINER_SKILLS  # noqa: E402
 
 DESIGN, WIKI = ROOT / "docs" / "design", ROOT / "docs" / "wiki"
 
@@ -56,5 +57,7 @@ def test_every_skill_has_a_row_in_the_user_guide():
     guide = read(WIKI / "Using-it.md")
     skills = sorted(p.parent.name for p in (ROOT / ".claude" / "skills").glob("*/SKILL.md"))
     for skill in skills:
+        if skill in MAINTAINER_SKILLS:
+            continue   # maintainer-only: not in the public template, so not in the user guide
         assert skill in USER_PHRASES, f"add {skill} to USER_PHRASES and a row in docs/wiki/Using-it.md"
         assert USER_PHRASES[skill] in guide, f"docs/wiki/Using-it.md has no row for {skill} ({USER_PHRASES[skill]!r})"

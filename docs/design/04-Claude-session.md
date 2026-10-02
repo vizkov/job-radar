@@ -37,11 +37,11 @@ The skills, and the tools each one runs:
 | `track` | "I applied to X" | `board_sync.py set <ref> Stage=Applied` |
 | `tune-radar` | "stop showing X", "add company Y" | edits `profile/`, `radar.py --dry-run`, `build_candidates.py`, `verify_boards.py` |
 | `health` | "is anything broken?" | `radar.py --dry-run --source X`, `verify_boards.py` |
-| `system-review` | brief says a weekly review is due | `discover_boards.py`, `board_sync.py design-diff`, reads logs |
+| `system-review` (maintainer-only) | brief says a weekly review is due | `discover_boards.py`, `board_sync.py design-diff`, reads logs |
 | `cv-review` | "how do I strengthen my CV?" | reads `scores.jsonl` "missing" requirements vs career docs |
 | `interview-prep` | "I have an interview with X" | reads the JD packet, STAR stories |
 | `manual` | "what can this do?", `/manual` | `tools/manual.py` |
-| `docs-review` | brief says a docs review is due | two read-only subagents read `docs/design` and `docs/wiki` cold; Claude verifies their findings against the code, then fixes |
+| `docs-review` (maintainer-only) | brief says a docs review is due | two read-only subagents read `docs/design` and `docs/wiki` cold; Claude verifies their findings against the code, then fixes |
 
 ## 4.2 Session start: `tools/session_brief.py`
 

@@ -64,7 +64,7 @@ Why three places:
 | `.github/workflows/` | The three scheduled workflows | public |
 | `.claude/` | `settings.json` (the SessionStart hook) and `skills/` (Claude's procedures) | public |
 | `CLAUDE.md` | Claude's operating manual for this repo | public |
-| `.githooks/` | The post-commit hook that publishes code to the template | public |
+| `.githooks/` | The post-commit hook that publishes code to the template | **maintainer-only**: not in the public template |
 | `docs/wiki/` | User guide: `Home.md`, `Your-part.md`, `Using-it.md`, `Board.md` (also mirrored to the GitHub Wiki tab) | public |
 | `docs/reviews.md` | Weekly system-review notes about the user's search | **private** (the one private file under `docs/`) |
 | `docs/design/` | These pages | public |

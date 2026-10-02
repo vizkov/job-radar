@@ -27,11 +27,11 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "check LinkedIn posts", "has anyone posted hiring?", the user pastes a hiring post, or a session starts with `discovery.linkedin_posts.enabled` | `post-discovery` (LinkedIn hiring posts and reposts by recruiters and hiring managers, read in Chrome; reposts traced to the original author; new roles become cards with the poster named; `tools/post_leads.py`) |
 | "stop showing …", "add company …", "also look in Germany", "too much noise", "pause/resume the radar" | `tune-radar` |
 | "is anything broken?", "why no new roles?", a source failing in the status issue | `health` |
-| brief says "weekly system review due", "what could be better?" | `system-review` |
+| brief says "weekly system review due", "what could be better?" | `system-review` (maintainer's copy only: not shipped in the public template) |
 | brief shows CV gaps, "how do I strengthen my CV?", "which certs matter?" | `cv-review` |
 | a card reaches Interview, "I have an interview with …" | `interview-prep` |
 | "what can this do?", "man", "help", "what am I missing?" | `manual` (runs `tools/manual.py`) |
-| brief says "docs review due", "are the docs still right?", after a big change | `docs-review` (two cold-reading subagents) |
+| brief says "docs review due", "are the docs still right?", after a big change | `docs-review` (two cold-reading subagents; maintainer's copy only: not shipped in the public template) |
 
 ## Session start
 

@@ -380,6 +380,8 @@ def board_design_note() -> str | None:
 def docs_review_note(now: datetime, runner=run) -> str | None:
     """Suggest the docs-review skill once enough code changed since the last one. The first
     time (no stamp yet) it only starts counting, so a fresh copy isn't nagged."""
+    if not (ROOT / ".claude" / "skills" / "docs-review").exists():
+        return None   # maintainer-only skill: a copy without it never asks for it
     stamp = _read_stamp(LAST_DOCS_REVIEW)
     if stamp is None:
         WORK.mkdir(exist_ok=True)
@@ -491,7 +493,8 @@ def health_checks(root: Path, now: datetime, rows: list[dict], scores: dict, las
                 notes.append("no roles from alert emails in the last 7 days (normal right after setup; "
                              "if alerts have been arriving, the email layout may have changed: check health)")
     review = _read_stamp(LAST_REVIEW)
-    if review is None or now - review >= timedelta(days=REVIEW_EVERY_DAYS):
+    if (root / ".claude" / "skills" / "system-review").exists() and (
+            review is None or now - review >= timedelta(days=REVIEW_EVERY_DAYS)):
         notes.append("weekly system review due: offer the system-review skill")
     missing_counts = Counter(m for s in scores.values() for m in s.get("missing", []))
     common = [f"{safe(m, 60)} ({n})" for m, n in missing_counts.most_common(3) if n >= 3]
@@ -521,7 +524,7 @@ def _age(posted: str, today: date) -> str:
 def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, items: list[dict] | None,
                   new_on_list: list[dict], last_run: str, auto_picks: int, by_ref: dict,
                   views_drift: str | None = None, docs_review: str | None = None, cv_gaps: str | None = None,
-                  source_problems: int = 0) -> list[str]:
+                  source_problems: int = 0, docs_review_job: bool = True) -> list[str]:
     """The explicit CADENCE lines (tools/cadence.py): every recurring job, when it last ran, and whether it is due."""
     issue_map = _read_json(root / "state" / "issue_map.json", {})
     queued = len(_read_json(root / "state" / "board_queue.json", []))
@@ -544,7 +547,8 @@ def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, ite
                                 new_skip=len(skip), new_waiting=len(waiting), queued=queued,
                                 unscored_cards=unscored_cards, auto_picks=auto_picks, awaiting=awaiting,
                                 posts_enabled=posts_on, posts_fallback=fallback, views_drift=views_drift,
-                                docs_review=docs_review, cv_gaps=cv_gaps, source_problems=source_problems)
+                                docs_review=docs_review, cv_gaps=cv_gaps, source_problems=source_problems,
+                                docs_review_job=(root / ".claude" / "skills" / "docs-review").exists())
     return lines
 
 

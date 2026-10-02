@@ -48,6 +48,15 @@ PRIVATE = [
     "data/registers/*",           # public data, but refreshed weekly in your copy: shipping it would
                                   # make `git pull template main` conflict; fetch with refresh_registers.py
 ]
+# Things only the maintainer of the public template uses: not shipped, and removed from the template by publish().
+# Skills are matched by the session brief only when they exist in a copy, so a copy without them never mentions them.
+MAINTAINER_ONLY = [
+    ".claude/skills/docs-review/*",    # tests the docs with cold readers: maintaining the repo itself
+    ".claude/skills/system-review/*",  # weekly design-gap review of the system itself
+    ".githooks/*",                     # the post-commit hook that publishes to the template
+]
+MAINTAINER_SKILLS = {"docs-review", "system-review"}
+PRIVATE += MAINTAINER_ONLY
 NEVER_COPY = [".git/*", ".venv/*", ".claude/settings.local.json", "*/__pycache__/*", "__pycache__/*", ".pytest_cache/*", "atss/*", "agg/*"]
 
 
@@ -130,12 +139,17 @@ def publish(template_dir: Path, message: str) -> None:
             dst.write_bytes(content)  # the committed version, never the working-tree one
         elif dst.exists():
             dst.unlink()  # deleted here, delete there
+    # files that used to ship but are maintainer-only now: drop them from the template (drift() only lists public files)
+    tracked = subprocess.run(["git", "ls-files"], cwd=template_dir, capture_output=True, text=True).stdout.splitlines()
+    for rel in tracked:
+        if any(fnmatch.fnmatch(rel, pat) for pat in MAINTAINER_ONLY) and (template_dir / rel).exists():
+            (template_dir / rel).unlink()
     tests = subprocess.run([sys.executable, "-m", "pytest", "-q", "-p", "no:cacheprovider"], cwd=template_dir,
                            capture_output=True, text=True)
     if tests.returncode != 0:
         raise SystemExit("tests failed in the template copy; nothing committed:\n" + tests.stdout[-2000:])
+    subprocess.run(["git", "add", "-A"], cwd=template_dir, check=True)   # before the check: it looks at what git tracks
     subprocess.run([sys.executable, "tools/public_template.py", "check"], cwd=template_dir, check=True)
-    subprocess.run(["git", "add", "-A"], cwd=template_dir, check=True)
     subprocess.run(["git", "commit", "-q", "-m", message], cwd=template_dir, check=True)
     subprocess.run(["git", "push", "-q", "origin", "main"], cwd=template_dir, check=True)
     print(f"published {len(files)} files: {', '.join(files)}\nnow run: git pull template main")

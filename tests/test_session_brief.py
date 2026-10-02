@@ -1,6 +1,7 @@
 import csv
 import json
 import sys
+import pytest
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -61,6 +62,7 @@ def test_health_checks(tmp_path):
     root = make_root(tmp_path, [row("a" * 16, "2026-10-04")], status="**Last run:** 2026-10-01\n"
                      "| alert_email | FAILED: RuntimeError: mail fetch failed: login | 0/0 |\n",
                      scores=[{"key": str(i), "missing": ["CREST CCT"]} for i in range(3)])
+    (root / ".claude" / "skills" / "system-review").mkdir(parents=True)   # the weekly review is offered only where the skill exists
     text = brief(root, run_note="the last scheduled job-radar run ended 'failure'")
     assert "career docs missing: STAR stories, cover-letter blocks" in text
     assert "no scheduled run has completed for 4 days" in text and "ended 'failure'" in text
@@ -157,6 +159,11 @@ def test_missed_scheduled_run_is_restarted():
     assert ["gh", "workflow", "run", "job-radar"] not in calls
 
 
+needs_docs_review_skill = pytest.mark.skipif(not (sb.ROOT / ".claude" / "skills" / "docs-review").exists(),
+                                             reason="docs-review is maintainer-only: not in the public template")
+
+
+@needs_docs_review_skill
 def test_docs_review_due_after_enough_code_changes():
     from datetime import datetime
     now = datetime(2026, 9, 28, 12, 0)
@@ -167,6 +174,7 @@ def test_docs_review_due_after_enough_code_changes():
     assert "docs review due: 10 code files" in note
 
 
+@needs_docs_review_skill
 def test_docs_review_git_since_is_utc():
     from datetime import datetime
     now = datetime(2026, 9, 28, 12, 0)
@@ -270,6 +278,7 @@ def test_cadence_flags_a_tier_1_role_with_no_card_and_no_issue(tmp_path):
 
 def test_docs_review_is_a_cadence_job_not_a_note_that_waits_for_the_user_to_close_the_session(tmp_path):
     root = make_root(tmp_path, [row("a" * 16, "2026-10-02", company="Apple")])
+    (root / ".claude" / "skills" / "docs-review").mkdir(parents=True)   # the job exists only where the skill does
     due = brief(root, docs_note="docs review due: 10 code files changed since the last one (2026-10-01); offer the docs-review skill")
     line = next(x for x in due.splitlines() if "Docs review:" in x)
     assert "DUE" in line and "docs-review" in line
@@ -302,3 +311,9 @@ def test_health_and_cv_review_are_cadence_jobs_that_clear_once_stamped(tmp_path)
     assert "health" not in due and "cv_review" not in due
     _, due = cadence.block(NOW, tmp_path, **kw)
     assert "health" not in due and "cv_review" not in due
+
+
+def test_a_copy_without_the_maintainer_skills_never_mentions_them(tmp_path):
+    root = make_root(tmp_path, [row("a" * 16, "2026-10-02", company="Apple")])
+    out = brief(root, docs_note="docs review due: 10 code files changed")
+    assert "Docs review" not in out and "system-review" not in out

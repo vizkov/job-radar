@@ -91,7 +91,7 @@ git init -b main && git add . && git commit -m "job-radar template"
 To keep the template current automatically, point git at the shipped hook and the template clone:
 
 ```bash
-git config core.hooksPath .githooks
+git config core.hooksPath .githooks   # the hook itself ships only in the maintainer's copy
 git config jobradar.templateDir ../job-radar-template
 ```
 

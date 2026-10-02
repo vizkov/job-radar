@@ -62,8 +62,6 @@ do?" or type `/manual` (it's generated from the system itself).
 | "How do I strengthen my CV?" / "Which certs matter?" | Looks across your scored roles for requirements you keep missing and suggests what to add or evidence better |
 | (automatic) | At the start of each session, when you send your first message, Claude first scores up to 8 of the freshest unscored Tier 1 roles (2–4% of a session), then answers you. Say "don't auto-score" or ask Claude to change the number |
 | (automatic) | Once a week, when enough roles are scored, Claude adjusts how job titles are rated (the Tier) using how those roles actually scored, one small step at a time. It tells you what changed at the start of your next session, and one sentence undoes it. Your title filters, countries and companies only change when you say so |
-| "What could be better?" | Reviews the system and proposes fixes and new job boards for you to approve (Claude also offers this weekly) |
-| "Are the docs still right?" | Two fresh AI readers go through the guide and the technical docs as newcomers; Claude checks what they flag against the system and fixes it (Claude runs or offers it once enough of the system has changed) |
 | "Is anything broken?" | Checks the runs and every source; fixes or explains |
 
 ## What Claude will not do
@@ -103,7 +101,6 @@ have it open, so those checks happen then.
 | Inbox check | Claude, through the Gmail connector (read-only) | About once a day, when you have applications waiting for an answer |
 | LinkedIn post sweep | Claude, in your Chrome | About once a day, only if you switched it on |
 | Board views check | Claude | When you've changed a view in GitHub: Claude copies your layout into the saved design (your column order is never touched) |
-| Docs review | Claude, with two fresh readers | When enough of the system's code has changed since the last review |
 | CV review | Claude offers it in one line | At most once a week, while your scored roles keep showing the same CV gaps |
 | Health check | Claude runs or offers it | Once a day, while the last run reports a source that stopped returning results |
 

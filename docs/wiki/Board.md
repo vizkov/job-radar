@@ -37,6 +37,10 @@ next session. If it was Applied or at Interview, Claude asks what happened inste
 on its card, the card moves to Skipped (its issue closes with a note). Cards you've shortlisted or
 applied to are never moved: those are your decisions.
 
+**Skipped or Rejected roles lose their tailored application.** If a role you skip or get rejected from has a folder in
+`profile/applications/` (the CV and cover letter Claude built), Claude deletes that folder and tells you. The job description
+and the score are kept. Roles you applied to, or that are at Interview or Offer, keep theirs.
+
 **Skipped cards are archived once a day.** The first time you open a session each day, cards in the
 Skipped stage are archived (up to 40 a day; a bigger backlog clears over the next days). Archiving
 hides a card from every view without deleting it: open the Project's menu, choose **Archived items**,

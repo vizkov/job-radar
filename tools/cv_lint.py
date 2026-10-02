@@ -130,6 +130,16 @@ def master_issues(career: Career) -> tuple[list[str], list[str]]:
     return errs, warns
 
 
+def taper_warnings(roles: list[tuple[str, int, int]]) -> list[str]:
+    """roles: (name, bullets kept, bullets the master has), most recent first. A more recent role should not
+    carry fewer bullets than an older one when it has more to give (the user, 2026-10-02: recency tapers)."""
+    out = []
+    for (new, kept_new, avail_new), (old, kept_old, _) in zip(roles, roles[1:]):
+        if kept_old > kept_new and avail_new > kept_new:
+            out.append(f"role \"{new}\" has {kept_new} bullets but the older role \"{old}\" has {kept_old}: taper with recency (the most recent role gets the most, 4-5; the next 3-4; older roles 2-3)")
+    return out
+
+
 def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
     errs, warns = [], []
     chosen: dict[str, str] = {}
@@ -185,6 +195,14 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
             warns.append(f"role \"{ctx.split(' — ')[0]}\" has {len(kept)} bullets; 3-5 reads best")
         if len(kept) < floor:
             errs.append(f"role \"{ctx.split(' — ')[0]}\" has {len(kept)} bullets; keep at least {floor} (master has {len(ids)}); dropped: {[i for i in ids if i not in chosen]}")
+    roles = [(ctx.split(' — ')[0], len([i for i in ids if i in chosen]), len(ids))
+             for ctx, ids in by_ctx.items() if not is_company_level(ctx, contexts)]
+    warns += taper_warnings(roles)
+    # Key achievements are headlines: about 35 words at most; a second proof point, a recognition or a follow-on belongs elsewhere (the user, 2026-10-02)
+    for a in (s for s in chosen if s[0] == "P" and career.items.get(s) and career.items[s].section == "Key achievements"):
+        n = len(chosen[a].split())
+        if n > 35:
+            warns.append(f"Key achievement [{a}] is {n} words; keep to 35 or fewer (one or two lines): state the outcome only, drop the secondary clause (a second proof point, a recognition, a follow-on, or how it landed, which the matching experience bullet carries) in this copy")
     # key achievement restates an experience bullet
     ach = [s for s in chosen if s[0] == "P" and career.items.get(s) and career.items[s].section == "Key achievements"]
     for a in ach:
@@ -196,6 +214,9 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
     # Profile is the main place to converge with the JD: a Summary that is mostly the master's text was not tailored
     summ = [s for s in chosen if s in career.items and career.items[s].section == "Summary" and s != "P00"]
     changed = [s for s in summ if norm(chosen[s]) != norm(career.items[s].text)]
+    n_prof = sum(len(chosen[s].split()) for s in summ)
+    if n_prof > 65:
+        warns.append(f"Profile is {n_prof} words; keep it to about 40-60 (2-3 sentences, three lines): keep who the person is and the one or two strengths the JD asks for, and leave the proof to Key achievements")
     if len(summ) >= 3 and len(changed) < 3:
         warns.append(f"Profile: only {len(changed)} of {len(summ)} Summary lines differ from the master; rewrite it for this role in the JD's vocabulary (writing-rules.md section 2) and list the converged terms")
     return errs, warns

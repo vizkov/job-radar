@@ -29,7 +29,7 @@ The same event can appear in all three, told for each one's job, in different wo
 contact line). They are copied from the master verbatim; the checker requires them. Fit the page by trimming the tailored
 sections, never these.
 
-**Profile** (P00-P04 and any P line under Summary; 3-5 sentences, roughly 50-100 words). **Tailored heavily, per role** (the user, 2026-10-01: the Profile is not
+**Profile** (P00-P04 and any P line under Summary; 2-3 sentences, about 40-60 words, three lines (the user, 2026-10-02: five lines was too long and repeated the achievements; `cv_lint.py` warns above 65)). **Tailored heavily, per role** (the user, 2026-10-01: the Profile is not
 static like the other sections; it converges a lot on the particular role). Who you are for *this* job: title, years, domain, the two or three strengths the JD
 asks for, your working level. Rewrite the P lines freely in the JD's own vocabulary (the checker only warns about heavy rewording here) as long as every
 statement is backed by the master lines and the stories: no new facts, numbers, employers or tools, and no JD term the stories do not support. It is the first
@@ -44,6 +44,7 @@ full. The matching experience bullet carries the *how* (the method, the technica
 never share a sentence. If a selected achievement and an experience bullet say nearly the same thing, reword the bullet
 toward method or drop it (keeping the role above its floor, section 4). The label ("Impact:", "Efficiency:") may be
 reworded toward the JD's word where the line supports it.
+**Length in a tailored CV (the user, 2026-10-02: the section was reading like a CV plus a cover letter).** The master keeps the full line; the tailored copy is a headline of **35 words at most** (`cv_lint.py` warns above 35, and the five together should stay near 150 words). **State the outcome only**: the finding or the result and its one proof of impact. How it landed (who was shown what, the demonstrations, the pushback) is method and belongs in the matching experience bullet, never in both; **drop the secondary clause** in this copy: a second proof point ("disproved assumptions in a previous vendor's review"), a recognition (RSUs, an award, a bonus) or a follow-on outcome ("the findings set the scope of the follow-on penetration testing"). A semicolon that joins a finding to a story about how it landed is the sign of a cover-letter sentence; keep it only when the second half is the outcome. Dropped clauses stay in the master and the story, so other roles can use them.
 
 **Experience** (B lines; one block per role, reverse-chronological, bullets grouped by context). The *scope and method*:
 what you were responsible for and what you did, then the result where the line has one. Verb first, past tense for
@@ -113,6 +114,7 @@ the long tail). Capitalisation: every item starts with a capital letter (Secure 
 - **Depth.** Each role keeps at least 3 bullets and at most 5, or all of its master bullets if the master has fewer (Senior
   Associate: 2). Cut inside a role by shortening wording before dropping a bullet; drop from the tail of the role first, never the line that
   names the role's distinct contribution (for Senior Associate: the thick-client white paper).
+- **Taper with recency (the user, 2026-10-02, after research: bullets per role fall as the role gets older).** The most recent role gets the most (4 to 5, up to 6 when it is the best match), the next 3 to 4, older roles 2 to 3, within the floor and cap above. A more recent role never carries fewer bullets than an older one while its master has more to give: when the page is full, cut from the oldest role first, not the newest. `cv_lint.py` warns when an older role has more bullets than a more recent one that could carry more.
 - **Two pages.** Fit by, in order: shorten wording in tailored sections; drop a bullet that restates a Key achievement
   (while the role stays above its floor); drop the least relevant bullet above the floor. Never cut a static section,
   a skills row, or a role. Tell the user exactly which lines went.
@@ -134,7 +136,7 @@ repetition, awkward constructions, whether a section is doing its job. Both run 
 
 - Key achievements block: 3-5 bullets, pulled from across a career, quantified; "if you can't attach a number or a concrete outcome it belongs in
   the experience bullets" (ResumeBuilder, Indeed, TopResume). Adopted. Experience: 3-5 bullets per role, action verb first, mostly achievements (TealHQ, Adobe). Adopted (floor 3, cap 5).
-- Summary: 3-5 sentences or about 50-100 words, job title and years first, two or three strengths that match the job, JD keywords without
+- Summary: 3-5 sentences or about 50-100 words in the sources (the user shortened it on 2026-10-02 to 2-3 sentences, about 40-60 words), job title and years first, two or three strengths that match the job, JD keywords without
   copying sentences, third person without I/me/my (Jobscan, Indeed, MyPerfectResume). Adopted.
 - Skills: group by label plus comma-separated list; 3-6 categories; about 12-20 skills is the sweet spot; mirror the JD's exact phrases
   (Resume Worded, Interview Guys). Adopted except: the user keeps all seven rows and a longer list, and approach phrases stay out of Skills
@@ -147,18 +149,20 @@ repetition, awkward constructions, whether a section is doing its job. Both run 
 
 Give this section to the copy editor only; the cold readers (ATS, recruiter, auditor) never see it. They must not re-propose rewrites of these choices; they may still report a decided line that causes a factual contradiction or a new problem. Problems no rule covers are never dropped: they are reported as "No rule yet" and the main session brings them to the user, who decides whether they become a rule.
 
-- "with go-live fast approaching" / "found with go-live fast approaching" (P05, B06): the user's wording for urgency.
-- "expedited deadline" (B12, S02, C10), never "extended".
-- "around 50%" triage saving stated once; "onboarding its first set of assessors" (still in progress, present tense; "first set" is deliberate, no count).
+- "with go-live fast approaching" (B06): the user's wording for urgency. P05 was reworded on 2026-10-02 to the outcome only ("Found four chained attack vectors in ... payment settlement platform; all accepted as high-severity risks and fixed before go-live").
+- "expedited deadline" (S02, C10), never "extended" (B12 was removed from the master on 2026-10-02; the story stays).
+- "around 50%" triage saving stated once ("onboarding its first set of assessors" was cut from P09 and B03 on 2026-10-02).
 - Skills rows, labels and item wording (K01-K07) as set on 2026-10-01: all seven rows kept, `JavaScript, TypeScript (Node.js)`, no approach phrases, capitalised items. Do not rewrite the lists or drop rows.
 - E01 "graduate coursework, focused on adversarial AI/ML" (no degree is claimed; do not add one).
 - B17 opens with the clickable name "OSS" (link text, not the raw URL; 2026-10-01); B06, B17, B18, B21 shapes and lengths (B06 and B21 stay single bullets); both B18 links point to the Medium profile (the user's choice).
 - Role headings name every employer (Consultant: Synopsys / Black Duck / UltraViolet Cyber): the user's choice, for ATS and recruiter lookups.
 - Role-heading dates only on titles; education and volunteering years stay.
-- "Fortune 100 global financial institution" is the defined term; "the bank" is used after it is introduced in the same document (tailoring fixes dangling referents, not the master).
+- "Fortune 100 global financial and banking institution" is the defined term; "the bank" is used after it is introduced in the same document (tailoring fixes dangling referents, not the master).
 - The masters carry no JD-specific terms (e.g. "security by design"); converged terms appear in tailored drafts only.
 - "Bangalore" is the city spelling everywhere (header, role lines, letters). Sponsorship stays out of the CV header (per-application choice, stated in the letter). The letters' structure (run-in block labels, "What I would bring to the team:", greeting) is the user's own cover-letter design: do not change it.
 - Skills items may converge to JD terms in drafts (see section 2); row headings stay.
+- The RSUs are not on the CV (2026-10-02: stories and cover letters only), and B10 says the user "won the Synopsys ACE Award for Customer Focus" without "with the team" (the award was the team's, 2022; the user will say so if asked). Do not flag either again.
+- B05 "quality assurance of every deliverable" for the bank team of 4, and B14 "communicating risks effectively to stakeholders" (2026-10-02): the user stands by the wording and will explain it from the stories if asked. Do not flag again.
 
 ## 8. Already answered in earlier sessions (main session: check `stories.md` "Also true" lines before asking the user anything)
 

@@ -83,7 +83,7 @@ For each `STALE` or `MISSING`/relevant `DIFFERS` application folder:
 
 ## Guardrails
 - Never invent experience to make documents agree (rule 2); rephrase, drop or ask.
-- Client and employer names never go into the masters ("a Fortune 100 global financial institution", "a global airline", "a credit and payments client").
+- Client and employer names never go into the masters ("a Fortune 100 global financial and banking institution", "a global airline", "a credit and payments client").
 - Never add a word to a master line just because a job ad uses it (the user's rule, 2026-10-01): the masters stay untailored; converged terms live in tailored drafts only. A genuinely new *fact* the user tells you goes into `stories.md` as an "Also true" line, and into a master line only if it is part of their record for every role.
 - Reviewers are read-only; never send or submit anything (rule 3). Master documents are private (rule 6).
 - Commit the master changes and the refreshed applications only after the user agrees (rule 7).

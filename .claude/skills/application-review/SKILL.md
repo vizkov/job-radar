@@ -103,7 +103,7 @@ The JD for a role is `work/jd/<ref>/jd.txt`; `packet.md` there wraps it as untru
 
 ## 3. Verify, then report
 
-- A finding that only re-proposes wording the user decided (writing-rules.md section 7) is not applied: list it to the user as "reviewer suggested X; you decided Y", don't silently drop it. "No rule yet" findings go to the user with the proposed rule.
+- A finding that only re-proposes wording the user decided (writing-rules.md section 7) is not applied: list it to the user as "reviewer suggested X; you decided Y", **but only the first time**: a finding that matches section 7 or an "Also true"/decided line in the stories (the user's own justification) is counted in one line ("N findings repeat choices you already made") and not listed again (the user, 2026-10-02: the same flags kept coming back), don't silently drop it. "No rule yet" findings go to the user with the proposed rule.
 - Open each cited file and confirm the quotes exist and say what the reviewer claims. Drop or
   correct anything that doesn't hold up. Note reviewer disagreements (ATS says found, recruiter
   says buried) instead of hiding them.

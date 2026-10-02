@@ -75,3 +75,39 @@ def test_location_destination_is_an_error():
     d = copy.deepcopy(test_tailor.GOOD)
     d["location"] = "Bengaluru, India · Open to relocation to Geneva"
     assert any("Open to relocation" in x for x in cv_lint.tailored_issues(d, test_tailor.CAREER)[0])
+
+
+def test_long_key_achievement_warns(monkeypatch):
+    # the example career has no Key achievements section, so treat P02 as one
+    monkeypatch.setattr(test_tailor.CAREER.items["P02"], "section", "Key achievements")
+    d = copy.deepcopy(test_tailor.GOOD)
+    d["sections"].append({"heading": "Key achievements", "bullets": [
+        {"source_id": "P02", "text": "Impact: " + " ".join(["word"] * 45)}]})
+    _, w = cv_lint.tailored_issues(d, test_tailor.CAREER)
+    assert any("[P02] is" in x and "keep to 35 or fewer" in x for x in w)
+    d["sections"][-1]["bullets"][0]["text"] = "Impact: " + " ".join(["word"] * 20)
+    _, w = cv_lint.tailored_issues(d, test_tailor.CAREER)
+    assert not any("keep to 35 or fewer" in x for x in w)
+
+
+def test_taper_with_recency_warns():
+    # newest first: (name, kept, available in the master)
+    assert cv_lint.taper_warnings([("Staff", 3, 5), ("Associate", 5, 6)])
+    assert not cv_lint.taper_warnings([("Staff", 5, 5), ("Consultant", 4, 4), ("Associate", 4, 6), ("Senior", 2, 2)])
+    # a recent role that has no more to give is not flagged
+    assert not cv_lint.taper_warnings([("Staff", 3, 3), ("Associate", 5, 6)])
+
+
+def test_long_profile_warns(monkeypatch):
+    # P01 and P02 are the example career's Summary lines
+    d = copy.deepcopy(test_tailor.GOOD)
+    for sec in d["sections"]:
+        if sec["heading"] == "Summary":
+            sec["bullets"] = [{"source_id": "P01", "text": "Application security engineer " + " ".join(["word"] * 70)}]
+    _, w = cv_lint.tailored_issues(d, test_tailor.CAREER)
+    assert any("Profile is" in x and "words" in x for x in w)
+    for sec in d["sections"]:
+        if sec["heading"] == "Summary":
+            sec["bullets"][0]["text"] = "Application security engineer with seven years in code review."
+    _, w = cv_lint.tailored_issues(d, test_tailor.CAREER)
+    assert not any("Profile is" in x for x in w)

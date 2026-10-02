@@ -61,9 +61,7 @@ FIELDS = {  # name -> single-select options, None for a number field, or DATE
 }
 REGISTER_TO_SPONSOR = {"yes": "Licensed", "unknown": "Unclear", "no": "Unlikely"}  # label -> Sponsor field
 FINAL_STAGES = {"Offer", "Rejected", "Skipped"}
-LABEL_COLORS = {"role": "0E8A16", "tier-1": "B60205", "tier-2": "FBCA04", "sponsor-yes": "0E8A16",
-                "sponsor-unknown": "C5DEF5", "sponsor-no": "D93F0B", STATUS_LABEL: "5319E7",
-                "possibly-closed": "BFD4F2"}
+LABEL_COLORS = {"role": "0E8A16", STATUS_LABEL: "5319E7", "possibly-closed": "BFD4F2"}
 LABEL_DESCRIPTIONS = {  # shown in GitHub's label picker; max 100 characters
     "role": "A job role the radar found: one issue per role; the Project auto-adds issues with this label",
     "possibly-closed": "No source has listed this role for several days: it may be closed",

@@ -34,7 +34,7 @@ projects; job-radar uses roughly 450–750.
    must live in a **private** copy that only you can see. Open Claude Code in an empty
    folder and say: *"Make me a private copy of https://github.com/vizkov/job-radar called
    my-job-radar."* Claude creates the private repository on your GitHub account and
-   copies the code into it; there's nothing for you to type. Don't use GitHub's "Fork"
+   copies the code into it; there's nothing for you to type. (`vizkov/job-radar` is the author's public template: it holds only code, never anyone's data.) Claude Code asks your permission before it runs commands or writes files; read what it proposes, and approve the ones for creating your repository and copying the project. Don't use GitHub's "Fork"
    button: a fork of a public project can't be made private.
 2. **Open Claude Code in your copy and say "set this up for me".** Claude does the work
    and pauses when it needs you:
@@ -174,6 +174,6 @@ session, read-only and capped. It breaches LinkedIn's terms like the contact loo
 | Pause the search | Tell Claude "pause the radar" (it switches off the scheduled runs), or on GitHub: Actions → job-radar → ⋯ → Disable workflow |
 | Revoke board access | GitHub → Settings → Applications → Authorized OAuth Apps → GitHub CLI → Revoke |
 | Revoke mailbox access | Delete the app password in your Google Account, and the two secrets in the repo settings |
-| Delete everything | Delete your private repository, its board and the folder on your computer. job-radar stores nothing anywhere else (Claude Code keeps its own conversation history on your computer) |
+| Delete everything | Delete your private repository, its board and the folder on your computer. job-radar stores nothing anywhere else. Two things sit outside it: Claude Code keeps its own conversation history on your computer, and what you paste into a Claude conversation (your CV, job descriptions) is processed by Anthropic under your account's data settings, so check those if that matters to you |
 
 **Next:** [2. Using it](Using-it.md)

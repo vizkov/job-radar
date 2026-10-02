@@ -215,8 +215,7 @@ Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
 | `stale_refs(board_refs, seen, today, days)` | `(stale refs, refs seen today)`. |
 | `load_queue`, `save_queue`, `enqueue` | Read/write the queue; append payloads whose ref isn't already queued. |
 
-**Watch out**: the tier is **not** in the title. It's a label (for the scheduled run) and a
-field (on the board); repeating it in the title would be a third copy.
+**Watch out**: the tier is **not** in the title. It's a board field only (no label; `fill` copies it from `matches.csv`); repeating it in the title would be a second copy.
 
 ### `jobradar/mdsafe.py`: escaping for GitHub Markdown
 
@@ -362,7 +361,7 @@ share one link. So if an employer edits a job's title, it's reported as a new ro
 ### `tools/board_sync.py`: GitHub issues and the Project (standard library only)
 
 Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
-`setup-project`, `fill`, `set`, `views`, `design-diff`, `refresh-bodies`, `archive` (local, need the `project` scope;
+`setup-project`, `fill`, `set`, `views`, `design-diff`, `describe`, `refresh-bodies`, `archive` (local, need the `project` scope;
 `archive_skipped(gh, max_n=ARCHIVE_MAX)` archives up to 40 cards with Stage = Skipped per run via `gh project
 item-archive`, idempotent because `item-list` omits archived items; `session_brief.start_archive` runs it once a day);
 `promote <ref> …` (local, queues cards for recorded roles; then `roles`).
@@ -372,6 +371,7 @@ item-archive`, idempotent because `item-list` omits archived items; `session_bri
 | Path constants | `QUEUE`, `ISSUE_MAP`, `STALE`, `FLAGGED`, `PIPELINE_LOG`, `STATUS_MD`, `MATCHES`, `BOARD_FILE`: every file it touches (tests redirect them all). |
 | `FIELDS`, `DATE` | The board's custom fields and their types/options (`DATE` marks a date field). |
 | `STATUS_LABEL`, `SPACING_SECONDS` | `radar-status` (the status issue's label); 2 s between issue creations. |
+| `LABEL_COLORS` | Colours for the labels job-radar creates: `role`, `radar-status`, `possibly-closed` (anything else is blue). |
 | `REGISTER_TO_SPONSOR` | Register label → provisional Sponsor value: yes → Licensed, unknown → Unclear, no → Unlikely. |
 | `FINAL_STAGES` | Offer, Rejected, Skipped: setting one closes the issue. |
 | `LABEL_COLORS` | Label colours; anything else is blue. |
@@ -399,7 +399,8 @@ item-archive`, idempotent because `item-list` omits archived items; `session_bri
 | `apply_views(gh)` | Create/update views; return what's left to click. |
 | `POSTED_RE`, `REF_RE`, `posted_date(body, first_seen)` | The Posted date from the issue body, else first seen. |
 | `_first_seen()` | `ref → posted or first-seen date` from `matches.csv`. |
-| `fill_new(gh)` | Posted on every undated card; Stage/Tier/Sponsor on cards with no Stage. |
+| `fill_new(gh)` | Country and Posted on every card that lacks them; Stage/Tier/Sponsor on cards with no Stage. Tier, Sponsor and Country come from the card's `matches.csv` row (`_match_rows()`, `_row_sponsor()`), falling back to old `tier-N`/`sponsor-…` labels. |
+| `describe(gh)`, `LABEL_DESCRIPTIONS`, `FIELD_DOCS`, `PROJECT_DESCRIPTION`, `PROJECT_README` | CLI `describe`: write label descriptions, every dropdown option's description (options are re-sent with their ids, so cards keep their values), the project description and the field-guide README to GitHub. Safe to re-run. |
 | `main(argv)` | The CLI. |
 
 **Watch out**: `setup_project()` resolves `@me` to the real login, because `gh project
@@ -420,10 +421,10 @@ The session brief's CADENCE block lists every recurring job and whether it is du
 
 | Name | Is |
 |---|---|
-| `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 20, `auto_score` 4. |
+| `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 20, `auto_score` 4, `views_check` 24. |
 | `done(name, root, now)`, `last(name, root)`, `load(root)` | Stamp a job as just finished; read a stamp; read the ledger. CLI: `python tools/cadence.py done <name>` and `show`. |
 | `is_due(name, now, root)`, `when(name, now, root, fallback)` | True when never run or older than its interval; the "last ran … (Nh ago)" text. |
-| `block(now, root, …)` | Returns the brief's CADENCE lines (radar search, new roles to the board, scoring, inbox check, LinkedIn post sweep) and the names of the due jobs. `session_brief.cadence_block()` gathers its inputs from `matches.csv`, the issue map, the queue and the board. |
+| `block(now, root, …)` | Returns the brief's CADENCE lines (radar search, new roles to the board, scoring, inbox check, LinkedIn post sweep, board views vs code) and the names of the due jobs. Its `views_drift` argument (the brief's design-diff note) makes the views line DUE: update `VIEWS` to the user's live layout, then `cadence.py done views_check`. `session_brief.cadence_block()` gathers its inputs from `matches.csv`, the issue map, the queue and the board. |
 
 ### `tools/session_brief.py`: the SessionStart hook (standard library only)
 

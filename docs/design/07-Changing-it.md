@@ -42,7 +42,7 @@ commit. In the maintainer's copy the post-commit hook publishes to the template.
    for a date).
 2. Create it on the live board: `setup-project` creates missing fields, or run
    `gh project field-create` and refresh `profile/board.json` with `_read_fields()`.
-3. Decide who sets it: `fill_new()` (from labels or the issue body) or
+3. Decide who sets it: `fill_new()` (from the role's `matches.csv` row or the issue body) or
    `set_role_fields()` (from a skill). The scheduled run can't set fields; if the data
    comes from `radar.py`, pass it as a label or in the issue body.
 4. Add it to the relevant views' `fields` in `VIEWS`.

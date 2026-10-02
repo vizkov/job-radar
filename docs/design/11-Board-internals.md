@@ -1,6 +1,6 @@
 # 11. Board internals
 
-**What this is:** How a role becomes a card, why data travels as labels first and fields later, and how the board's views are kept identical in every copy.  
+**What this is:** How a role becomes a card, why the run can't fill fields and a session does it later, and how the board's views are kept identical in every copy.  
 **Read first:** [3.3](03-Scheduled-run.md#33-after-radarpy-board_syncpy-in-actions) and [4.2](04-Claude-session.md#42-session-start-toolssession_briefpy)  
 **Code:** `jobradar/board.py`, `tools/board_sync.py`, `profile/board.json`
 
@@ -17,9 +17,11 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
 3. The Project's built-in **Auto-add to project** workflow (filter `is:issue label:role`)
    puts each issue on the board.
 4. The run can't edit Project fields (its built-in token has no access to user-owned
-   Projects), so labels are its only way to attach data. At session start Claude runs
+   Projects), so the issue carries only the `role` label and the data stays in `data/matches.csv`. At session start Claude runs
    `board_sync.py fill` with the user's local `gh` login (project scope): **Stage = New**,
-   **Tier** and **Sponsor** from the labels, **Posted** from the issue body (else the day first
+   **Tier** (provisional: scoring later sets T1 for Apply and T2 for Skip, Maybe keeps it), **Sponsor** (the register match:
+   Licensed, Unclear or Unlikely) and **Country** from the role's `matches.csv` row (found through the ref in the card; cards
+   from before labels were dropped fall back to their old `tier-N`/`sponsor-…` labels), **Posted** from the issue body (else the day first
    seen, from `data/matches.csv`). **Fit** and **Recommendation** are set separately, by
    `jd_check.py score --board` when a role is scored.
 5. `board_sync.py stale` labels roles no source has listed for `stale_days` as
@@ -42,13 +44,13 @@ workflow is a manual step (see [Your part](../wiki/Your-part.md)).
 
 Projects has a built-in **Status** field (Todo / In Progress / Done) that its "Item closed" workflow
 sets to Done. job-radar tracks **Stage** instead. The session brief reconciles the two
-(`closed_cards()`), and the *Act now* view (Tier 1, still New or Shortlisted, posted 14+ days ago: the roles about to expire; filter in `VIEWS`, `board_sync.py`) filters `is:open`, so a card the user closes leaves it.
+(`closed_cards()`), and the *Act now* view (open roles not yet Applied or Skipped and not `possibly-closed` or recommended Skip, that are either New or posted 14+ days ago; the user's own filter, kept in `VIEWS` in `board_sync.py`) filters `is:open`, so a card the user closes leaves it.
 
 ## What's on a card
 
 The issue body (`board.py: payload()`): company and location, the posting link, sponsor match,
-posted date, where else it was found, the Role ID and the hidden ref marker. The tier is a label
-and a field only; how it was computed stays in `data/matches.csv`.
+posted date, where else it was found, the Role ID and the hidden ref marker. The tier is a board
+field only (no label); how it was computed stays in `data/matches.csv`.
 
 Claude adds to it later:
 - **Fit breakdown** (`jd_check.py score --board` → `board_sync.set_fit_section()`): Matches, Partly,

@@ -207,7 +207,7 @@ after the status was written). If there isn't one, it creates it and pins it.
 
 **What happens next, outside our code:** the Project's built-in *Auto-add to project*
 workflow sees each new issue labelled `role` and puts it on the board. The card has
-labels but **empty fields**. Those are filled at the user's next Claude session
+**empty fields**. Those are filled at the user's next Claude session
 ([step 4](04-Claude-session.md)).
 
 ## 3.4 One role's journey
@@ -244,8 +244,9 @@ Penetration Tester* in London on its Workable board.
 9. **Record.** A row goes into `data/matches.csv` with the same ref.
 10. **Issue.** `board_sync.py roles` creates the issue; `issue_map.json` gets `ref → #12`.
 11. **Card.** Auto-add puts issue #12 on the board.
-12. **Fields.** At the next Claude session, `board_sync.py fill` reads the card's labels
-    and sets Stage=New, Tier=T1, Sponsor=Yes, and Posted from the body's "Posted:" line.
+12. **Fields.** At the next Claude session, `board_sync.py fill` reads the role's row in
+    `data/matches.csv` (found through the ref in the card) and sets Stage=New, Tier=T1 (provisional), Sponsor=Licensed (the
+    register match; `Yes` is not a Sponsor value), Country from the row's first country, and Posted from the body's "Posted:" line.
 13. **Later.** When the user asks Claude to score it, `jd_prep` fetches the JD into
     `work/jd/<ref>/`, Claude writes `score.json`, `jd_check score` validates it and sets
     Fit and Recommendation on the card. If Bridewell takes the ad down, after 5 days of

@@ -50,10 +50,10 @@ def payload(g: Group) -> dict:
     p, tier = g.best, g.tags.get("tier", 2)
     ref, cc = role_ref(g.key), primary_country(g)
     company = p.company_canonical or p.company or "(employer not disclosed)"
-    title = _plain(f"{company} — {p.title} ({cc})", 200)  # tier is a board field and a label, not title text
+    title = _plain(f"{company} — {p.title} ({cc})", 200)  # tier is a board field, not title text
     lines = [f"**{md(company)}** — {md(p.location) or cc}", "",
              f"[Open the job posting]({md_url(p.url)})", ""]
-    # The tier is a label and a board field; how it was computed stays in matches.csv (score_reasons).
+    # The tier is a board field only (set from matches.csv by fill); how it was computed stays in matches.csv (score_reasons).
     sp = g.tags.get("sponsor") or {}
     for code, key, label in (("GB", "uk", "UK sponsor"), ("NL", "nl", "NL sponsor")):
         if code in p.countries and key in sp:

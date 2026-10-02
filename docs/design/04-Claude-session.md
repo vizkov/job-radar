@@ -73,7 +73,13 @@ errors become one-line notes, and it always exits 0.
 7. **`start_fill()`**: if any card has no Stage yet (new since last time), starts
    `board_sync.py fill` as a **detached background process**, so the brief doesn't wait for
    dozens of API calls. A timestamp file stops it starting twice within 10 minutes.
+   It starts **only** when a card has no Stage, so a field added later (such as Country) is not back-filled onto cards that
+   already have a Stage unless `fill` is run by hand.
 8. **`start_archive()`**: once a day (stamp `work/.last_archive`), starts `board_sync.py archive` detached, which archives cards in Stage=Skipped (the Action's token can't reach the user's Project).
+
+   **Lines in the brief that Claude must act on** (all built in `brief()`): AUTO-SCORE (score these refs before answering),
+   SPONSOR-CHECK (live apply/maybe cards with no sponsorship verdict), INBOX-CHECK (applications awaiting an answer), and the
+   CADENCE block (every recurring job, when it last ran, and which are DUE: `tools/cadence.py`).
 9. **`template_status()`**: commits the public template gained since the last session
    ("system updated": Claude should re-read the relevant skill), and any code here not yet
    published (`public_template.drift()`).
@@ -110,6 +116,8 @@ third-party data, not instructions.
 - **Posted** (any card without it): the date from the issue body's `- Posted: YYYY-MM-DD`
   line (`posted_date()`); otherwise the `posted` or first-seen `date` from
   `data/matches.csv` (`_first_seen()`).
+- **Country** (any role card without it): the first country in the role's `data/matches.csv` row, if it is one of the
+  `FIELDS["Country"]` options (add an option there to track a new country).
 - **Stage, Tier, Sponsor** (only cards with no Stage yet): Stage = New; Tier and Sponsor from the role's
   `data/matches.csv` row (the tier is provisional: scoring sets T1 for a scored Apply, T2 for Skip, Maybe keeps it).
   Cards from before the change fall back to their old `tier-N`/`sponsor-…` labels.
@@ -353,8 +361,8 @@ When the user agrees to a change, Claude commits to the private repo (`origin`).
 .githooks`) then runs `public_template.py autopublish`:
 
 1. If `git config jobradar.templateDir` isn't set (any normal user), do nothing.
-2. `drift()`: files changed since the last merge of the template, plus uncommitted ones,
-   kept only if **public** (on the `PUBLIC` allowlist and not on the `PRIVATE` list). Git
+2. `drift()`: files changed since the last merge of the template (uncommitted edits are not
+   included; `dirty_public()` only reports them), kept only if **public** (on the `PUBLIC` allowlist and not on the `PRIVATE` list). Git
    is asked with `--no-renames` so a moved file shows under its old path too, and gets
    deleted from the template.
 3. `publish()`: copy those files into the template clone, **run the whole test suite

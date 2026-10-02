@@ -183,7 +183,7 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | `company_fit` | High | Also search the `targets.tsv` companies whose Fit column has this value (after the user's `company_extra` and the scored apply/maybe employers). Blank: none. `targets.tsv` may have a `Fit` column (High / Medium / Watch); older files without it simply add nothing |
 | `not_words` | contract, contractor, freelance | Appended to keyword searches as `NOT (...)`; filters on post text only |
 | `max_post_age_days` | 30 | A post whose original is older than this is stale unless the role is confirmed open |
-| `titles`, `places`, `phrases` | security titles; countries and cities; "we're hiring", "hiring", "join my team", "open role", "referral" | The grid the search rotation walks (`tools/post_leads.py queries`) |
+| `titles`, `places`, `phrases` | security titles; countries and cities; "we're hiring", "visa sponsorship", "relocation", "join my team" | The grid the search rotation walks (`tools/post_leads.py queries`) |
 
 ## Other `config.json` keys
 

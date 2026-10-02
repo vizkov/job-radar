@@ -502,7 +502,8 @@ def _age(posted: str, today: date) -> str:
 
 
 def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, items: list[dict] | None,
-                  new_on_list: list[dict], last_run: str, auto_picks: int, by_ref: dict) -> list[str]:
+                  new_on_list: list[dict], last_run: str, auto_picks: int, by_ref: dict,
+                  views_drift: str | None = None) -> list[str]:
     """The explicit CADENCE lines (tools/cadence.py): every recurring job, when it last ran, and whether it is due."""
     issue_map = _read_json(root / "state" / "issue_map.json", {})
     queued = len(_read_json(root / "state" / "board_queue.json", []))
@@ -524,7 +525,7 @@ def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, ite
     lines, _due = cadence.block(now, root, radar_last=last_run, new_total=len(new_on_list), new_on_board=len(on_board),
                                 new_skip=len(skip), new_waiting=len(waiting), queued=queued,
                                 unscored_cards=unscored_cards, auto_picks=auto_picks, awaiting=awaiting,
-                                posts_enabled=posts_on, posts_fallback=fallback)
+                                posts_enabled=posts_on, posts_fallback=fallback, views_drift=views_drift)
     return lines
 
 
@@ -575,7 +576,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append("- SPONSOR-CHECK (the user's standing rule: every role on the board gets a sponsorship verdict): "
                      "run the sponsorship-check skill on these apply/maybe cards, and tell them in one line what "
                      "you found: " + ", ".join(unchecked))
-    lines += cadence_block(root, now, rows, scores, items, new_on_list, last_run, len(pick), by_ref)
+    lines += cadence_block(root, now, rows, scores, items, new_on_list, last_run, len(pick), by_ref, design_note)
     lines.append(f"- Unscored Tier 1 roles (last 14 days): {len(unscored_t1)}, of which {len(fresh_unscored)} "
                  "posted in the last 3 days (score and apply to these first)")
     if scores:

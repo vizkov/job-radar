@@ -9,6 +9,7 @@ stamp themselves when they finish:
     python tools/cadence.py done inbox_check      # after the inbox-check skill
     python tools/cadence.py done post_discovery   # after a LinkedIn post sweep
     python tools/cadence.py done auto_score       # after the session's automatic scoring
+    python tools/cadence.py done views_check      # after updating VIEWS to match the live board views
     python tools/cadence.py show                  # the ledger
 
 Stamps live in work/.cadence.json (private, local). The radar search and the new-role additions are
@@ -22,7 +23,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-JOBS = {"inbox_check": 20, "post_discovery": 20, "auto_score": 4}   # name -> hours before it is due again
+JOBS = {"inbox_check": 20, "post_discovery": 20, "auto_score": 4, "views_check": 24}   # name -> hours before it is due again
 
 
 def _file(root: Path) -> Path:
@@ -75,7 +76,7 @@ def when(name: str, now: datetime, root: Path = ROOT, fallback: datetime | None 
 
 def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_board: int, new_skip: int,
           new_waiting: int, queued: int, unscored_cards: int, auto_picks: int, awaiting: int,
-          posts_enabled: bool, posts_fallback: datetime | None = None) -> tuple[list[str], list[str]]:
+          posts_enabled: bool, posts_fallback: datetime | None = None, views_drift: str | None = None) -> tuple[list[str], list[str]]:
     """(lines for the brief, names of the jobs that are due). Every job gets a line, due or not."""
     lines = ["- CADENCE (each recurring job and when it last ran). Run every one marked DUE, or tell the user in one "
              "line which you skipped and why; never skip one silently:"]
@@ -123,6 +124,15 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
             lines.append(f"  - LinkedIn post sweep: {when('post_discovery', now, root)} · ok")
     else:
         lines.append("  - LinkedIn post sweep: off (discovery.linkedin_posts.enabled is false)")
+    # board views: the user edits filters in GitHub's UI; the code (VIEWS) must follow
+    if views_drift:
+        due.append("views_check")
+        lines.append(f"  - Board views vs code: {views_drift} · DUE: run `board_sync.py design-diff`, then edit `VIEWS` in "
+                     "tools/board_sync.py to match the live views (the user edits them in GitHub on purpose; restore with "
+                     "`board_sync.py views` only if they say a change was a mistake), commit, "
+                     "`cadence.py done views_check`")
+    else:
+        lines.append(f"  - Board views vs code: no drift; {when('views_check', now, root)} · ok")
     return lines, due
 
 

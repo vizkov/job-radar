@@ -554,11 +554,12 @@ def refresh_bodies(gh: Gh) -> str:
 # gets the same board. GitHub's API sets name, layout, filter and columns; it can't set sort or
 # board grouping, so those are reported as one-time clicks (`sort`, `group`).
 VIEWS = [
-    {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "",
+    {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "-stage:Applied",
      "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
      "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},
-    # "Act now" = the roles about to expire: still open, posted 14+ days ago (the user's definition, 2026-09-30).
-    {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "is:open tier:T1 stage:New,Shortlisted -label:possibly-closed -recommendation:Skip posted:<=@today-14d",
+    # "Act now" = open roles not yet applied to/skipped that are brand new or posted 14+ days ago, so about to expire
+    # (the user changed it in GitHub, 2026-10-02; All Roles hides Applied cards).
+    {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "(is:open -stage:Applied,Skipped -label:possibly-closed -recommendation:Skip) AND (posted:<=@today-14d OR stage:New)",
      "fields": ["Title", "Stage", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
      "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},
     {"name": "Pipeline", "layout": "BOARD_LAYOUT", "filter": "",

@@ -70,16 +70,18 @@ errors become one-line notes, and it always exits 0.
    snapshot.
 6. **`stale_applications()`**: cards in *Applied* whose last logged stage change is 14+
    days old → "follow-up due".
-7. **`start_fill()`**: if any card has no Stage yet (new since last time), starts
+7. **`start_fill()`**: when `_needs_fill(items)` finds something `fill` can set (a card with no Stage, or without a Country or
+   Posted value that can be filled, found with `board_sync.fill_gaps()` and no extra board read), starts
    `board_sync.py fill` as a **detached background process**, so the brief doesn't wait for
-   dozens of API calls. A timestamp file stops it starting twice within 10 minutes.
-   It starts **only** when a card has no Stage, so a field added later (such as Country) is not back-filled onto cards that
-   already have a Stage unless `fill` is run by hand.
+   dozens of API calls. A timestamp file stops it starting twice within 10 minutes. A field added later, such as Country, is
+   therefore back-filled onto cards that already have a Stage ([page 11](11-Board-internals.md#where-each-card-value-comes-from)).
 8. **`start_archive()`**: once a day (stamp `work/.last_archive`), starts `board_sync.py archive` detached, which archives cards in Stage=Skipped (the Action's token can't reach the user's Project).
 
    **Lines in the brief that Claude must act on** (all built in `brief()`): AUTO-SCORE (score these refs before answering),
    SPONSOR-CHECK (live apply/maybe cards with no sponsorship verdict), INBOX-CHECK (applications awaiting an answer), and the
-   CADENCE block (every recurring job, when it last ran, and which are DUE: `tools/cadence.py`).
+   CADENCE block (every recurring job, when it last ran, and which are DUE: `tools/cadence.py`). Its jobs: the radar search, new roles to
+   the board, scoring, the Gmail inbox check, the LinkedIn post sweep, board views vs code (DUE when the live views differ from `VIEWS`) and
+   the docs review (DUE when `docs_review_note()` fires, so it does not wait for the user to say they are closing the session).
 9. **`template_status()`**: commits the public template gained since the last session
    ("system updated": Claude should re-read the relevant skill), and any code here not yet
    published (`public_template.drift()`).
@@ -96,8 +98,9 @@ errors become one-line notes, and it always exits 0.
     look closed, cards the user moved, follow-ups due, system updates, and health notes
     from `health_checks()`: missing career docs, alert emails failing or silent, runs not
     completing, weekly review due, recurring CV gaps; `calibration_notes()`: weekly automatic tier tuning (`tools/calibrate.py apply`), reported with
-    an undo line; `referral_notes()`; and `docs_review_note()`: a docs
-    review is due once 10+ code files changed since the last one.
+    an undo line; `referral_notes()`; and `docs_review_note()`, which no longer
+    appears in the health list: it feeds the CADENCE block's "Docs review:" line (due once 10+ code files changed since the last
+    review).
 13. **Auto-score:** `auto_score_pick()` (skipping roles the board shows closed and, via `skipped_refs()`, roles whose latest logged Stage is Skipped/Rejected, since an archived card vanishes from the board read) chooses up to `scoring.auto_per_session` freshest unscored Tier 1
     roles; `start_prep()` fetches their job descriptions in the background (the virtualenv's Python, no
     Claude usage), and the brief's **AUTO-SCORE** line tells Claude to score them before answering the
@@ -111,16 +114,7 @@ third-party data, not instructions.
 
 ### Filling the board: `board_sync.py fill`
 
-`fill_new()` walks all cards labelled `role`:
-
-- **Posted** (any card without it): the date from the issue body's `- Posted: YYYY-MM-DD`
-  line (`posted_date()`); otherwise the `posted` or first-seen `date` from
-  `data/matches.csv` (`_first_seen()`).
-- **Country** (any role card without it): the first country in the role's `data/matches.csv` row, if it is one of the
-  `FIELDS["Country"]` options (add an option there to track a new country).
-- **Stage, Tier, Sponsor** (only cards with no Stage yet): Stage = New; Tier and Sponsor from the role's
-  `data/matches.csv` row (the tier is provisional: scoring sets T1 for a scored Apply, T2 for Skip, Maybe keeps it).
-  Cards from before the change fall back to their old `tier-N`/`sponsor-…` labels.
+`fill_new()` walks the cards and, for each one with a gap (`fill_gaps()`), sets the values listed in [where each card value comes from](11-Board-internals.md#where-each-card-value-comes-from): Posted, Country, and, on cards with no Stage, Stage, Tier and Sponsor.
 
 Each value is set with `_edit()` → `gh project item-edit`, which needs the field's ID and,
 for single-selects, the option's ID. Those IDs come from `profile/board.json`, saved at

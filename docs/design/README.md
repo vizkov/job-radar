@@ -17,7 +17,7 @@ reference.
 | 2 | [Architecture](02-Architecture.md) | The three places code runs, the folders, and every data file: who writes it, who reads it |
 | 3 | [A scheduled run, step by step](03-Scheduled-run.md) | What happens three times a day in GitHub Actions, followed through the code, with one real role's journey |
 | 4 | [A Claude session, step by step](04-Claude-session.md) | What happens when the user opens Claude Code: the session brief, skills, scoring, tailoring, applying |
-| 5 | [Code reference](05-Code-reference.md) | Every file and every function, one line each, with the subtle lines called out. A lookup page: skim it now, come back to it when you open a file |
+| 5 | [Code reference](05-Code-reference.md) | Every file and every function, one line each, with the subtle lines called out. An index page plus six lookup pages (5.1 entry points, 5.2 the package, 5.3 sources, 5.4 board and session tools, 5.5 application tools, 5.6 setup tools and config): skim the index now, open a sub-page when you open a file |
 | 6 | [Tests](06-Tests.md) | How the tests are organised, what each covers, how they stay offline and isolated |
 | 7 | [Changing it](07-Changing-it.md) | Recipes: add a source, a setting, a board field or view, a skill, a dependency |
 

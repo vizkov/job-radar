@@ -4,7 +4,7 @@
 **Read first:** [3.1, the workflow file](03-Scheduled-run.md#31-the-workflow-file-radaryml)  
 **Code:** `tools/fetch_alert_emails.py`, `jobradar/alert_providers.py`, `jobradar/sources/alert_email.py`, `radar.yml` step 3
 
-job-radar's code never logs in to LinkedIn, Indeed or Glassdoor and never scrapes them. (Separately, Claude may read one LinkedIn job page in the user's own Chrome to score a role: CLAUDE.md rule 4a, see [Security model](13-Security-model.md).)
+job-radar's code never logs in to LinkedIn, Indeed or Glassdoor and never scrapes them. (Separately, Claude may read one LinkedIn job page in the user's own Chrome to score a role: the exceptions are listed once, in the [Security model](13-Security-model.md).)
 Their terms prohibit scraping, and GitHub Actions IPs get blocked quickly.
 Instead, each site emails the user job alerts, and job-radar reads those emails.
 

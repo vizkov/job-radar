@@ -43,8 +43,8 @@ Why three places:
 
 - **Finding roles must happen without the user**, so it runs in GitHub Actions on a
   schedule. Actions only has GITHUB_TOKEN, which can create issues but can't edit a
-  personal Project. So the scheduled run attaches data as **labels**, and fills in
-  nothing on the board itself.
+  personal Project. So the scheduled run only opens issues (labelled `role`) and fills in
+  nothing on the board itself; a session fills the fields ([page 11](11-Board-internals.md#where-each-card-value-comes-from)).
 - **Judgement needs Claude**, and Claude runs on the user's subscription only inside a
   Claude Code session on their machine, with no API key. So scoring, tailoring and
   setting **board fields** happen there, using the user's own `gh` login.

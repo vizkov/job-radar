@@ -4,7 +4,7 @@
 **Read first:** [3. A scheduled run](03-Scheduled-run.md)  
 **Code:** `jobradar/sources/`, `verify_boards.py`, `boards.json`, `profile/sources.yaml`, `profile/careers_pages.yaml`, `profile/overrides.csv`
 
-How the adapters are built is in the [code reference](05-Code-reference.md#53-jobradarsources-the-adapters); this page is about
+How the adapters are built is in the [code reference](05-3-Sources.md); this page is about
 running them. All sources are configured in `sources.yaml`. Each has `enabled`, a
 `timeout_seconds` cap for the whole source, and source-specific settings. A
 source that crashes or times out is reported on the Radar status card; the others still run.

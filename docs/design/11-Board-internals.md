@@ -17,19 +17,42 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
 3. The Project's built-in **Auto-add to project** workflow (filter `is:issue label:role`)
    puts each issue on the board.
 4. The run can't edit Project fields (its built-in token has no access to user-owned
-   Projects), so the issue carries only the `role` label and the data stays in `data/matches.csv`. At session start Claude runs
-   `board_sync.py fill` with the user's local `gh` login (project scope): **Stage = New**,
-   **Tier** (provisional: scoring later sets T1 for Apply and T2 for Skip, Maybe keeps it), **Sponsor** (the register match:
-   Licensed, Unclear or Unlikely) and **Country** from the role's `matches.csv` row (found through the ref in the card; cards
-   from before labels were dropped fall back to their old `tier-N`/`sponsor-…` labels), **Posted** from the issue body (else the day first
-   seen, from `data/matches.csv`). **Fit** and **Recommendation** are set separately, by
-   `jd_check.py score --board` when a role is scored.
+   Projects), so the issue carries only the `role` label and the data stays in `data/matches.csv`. At session start
+   `board_sync.py fill` copies it onto the card: see [where each card value comes from](#where-each-card-value-comes-from).
 5. `board_sync.py stale` labels roles no source has listed for `stale_days` as
    `possibly-closed` (and removes the label if they come back).
 6. **Archiving Skipped cards** (`board_sync.py archive`) is not in the Action: the Action's token has no
    access to the user's Project, so the session-start hook (`session_brief.start_archive`) runs it in the
    background at most once a day, capped at 40 cards a run. Archived cards leave `item-list`, so
    `find_item` (and `set`) can't see them until they're restored from the Project's Archived items.
+
+## Where each card value comes from
+
+This is the one account of how a role's data reaches its card; the other pages link here.
+
+The scheduled run cannot edit Project fields, so the issue it opens carries only the `role` label (the Project's auto-add
+filter). The data stays in `data/matches.csv`, one row per role, found again through the ref in the card's body. At session
+start `board_sync.py fill` (run with the user's own `gh` login, project scope) copies it onto the card; later steps change
+some values.
+
+| Field | First set by | Changed by later |
+|---|---|---|
+| **Stage** | `fill`: New | the user (dragging the card), `track`, scoring a role Skip (`jd_check.py score --board`) |
+| **Tier** | `fill`: the provisional rule-based tier from the row | `jd_check.py score --board`: Apply sets T1, Skip sets T2, Maybe keeps it |
+| **Sponsor** | `fill`: the register match for the role's first country (Licensed, Unclear or Unlikely) | `tools/sponsorship.py record` after a sponsorship check: Confirmed, Likely, Unlikely or No |
+| **Country** | `fill`: the first country in the row, if it is one of the `FIELDS["Country"]` options | not changed |
+| **Posted** | `fill`: the `- Posted:` line in the issue body, else the row's `posted` or first-seen `date` | not changed |
+| **Fit**, **Recommendation** | `jd_check.py score --board` | each re-score |
+| **Referral** | `tools/referrals.py` (the referrals skill) | each referral step |
+
+**When `fill` runs.** `session_brief._needs_fill(items)` asks `board_sync.needs_fill(items)`, which calls
+`board_sync.fill_gaps(item, board, rows, seen)` for each card using the cards the brief has already read (no extra board
+read). A gap is a card with no Stage, or without a Country or Posted value that `fill` can set. If there is one, the brief
+starts `fill` in the background (at most once per 10 minutes). So a field added later, such as Country, reaches cards that
+already have a Stage. A value `fill` cannot supply is not a gap, so it never makes every session start a fill: a country
+that is not among the Country options, or a role that cannot be dated. `fill_new()` does the writing and uses
+the same `fill_gaps()`. Cards from before the labels were dropped still carry `tier-N`/`sponsor-…` labels, which `fill` uses
+when a card has no row.
 
 **First run:** the baseline records every open role but only puts `baseline_tiers`
 (Tier 1) on the board.

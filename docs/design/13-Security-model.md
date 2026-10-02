@@ -6,7 +6,7 @@
 
 ## What job-radar will never do
 
-These are design limits, not settings. `CLAUDE.md` repeats them as rules for Claude.
+These are design limits, not settings. `CLAUDE.md` repeats them as rules for Claude (its rule 4 is the source Claude follows; this page is the one place in the design docs that lists the LinkedIn exceptions, and other pages link here).
 
 - Log in to LinkedIn or any job portal with the user's credentials.
 - Scrape LinkedIn, Indeed or Glassdoor (their terms forbid it; their alert emails are

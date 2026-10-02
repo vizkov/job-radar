@@ -27,7 +27,7 @@ Skim it now; come back when a word is unclear.
 | **Template repo** / **private copy** | job-radar's code lives in a public repo (the *template*, `vizkov/job-radar`). Each user runs their own *private copy*, which has the same code plus their personal settings and data. The private copy knows the public one as the git remote `template`. |
 | **Commit** / **push** / **pull** | Save a set of changes into history / send commits to GitHub / fetch commits from GitHub. |
 | **Issue** | A GitHub discussion item (title, body, labels). job-radar creates one issue per role. |
-| **Label** | A coloured tag on an issue: `role`, `possibly-closed`, `radar-status`. Tier, Sponsor and Country are board fields, set from `matches.csv` in the session, not labels. |
+| **Label** | A coloured tag on an issue: `role`, `possibly-closed`, `radar-status`. Tier, Sponsor and Country are board fields, not labels ([where each card value comes from](11-Board-internals.md#where-each-card-value-comes-from)). `matches.csv` is the private log of every role the radar has found ([page 2](02-Architecture.md)). |
 | **Project** / **board** | GitHub Projects: a spreadsheet- or kanban-like view over issues. Each issue on it is a **card** (an *item* in the API). |
 | **Field** | A column on a Project, with a value per card. job-radar's: *Stage*, *Tier*, *Country*, *Recommendation*, *Sponsor*, *Referral* (single-selects), *Fit* (a number), *Posted* (a date). Fields belong to the Project; labels belong to the issue. |
 | **View** | A saved way of looking at a Project: which columns show, which filter applies, sort order, and table or board layout. job-radar has *All Roles*, *Act now* and *Pipeline*. |
@@ -59,7 +59,7 @@ Skim it now; come back when a word is unclear.
 | **Radar status issue** | One pinned GitHub issue, rewritten each run with counts and source health (no job titles). It appears as a card on the board. | `radar.py: render_status()`, `board_sync.py: sync_status()` |
 | **REMOTE-EU** | A pseudo-country for "remote, Europe/EMEA/EU" locations; treated like a target country. | `common.py: _REMOTE_EUROPE` |
 | **Canary query** | A deliberately broad search each API source runs; if even that returns nothing, the API itself is probably broken. | `sources/search.py` |
-| **track_empty** | Per unit: whether zero results counts as a problem (False for narrow searches and quiet mailboxes). | `model.py: UnitStatus` |
+| **track_empty** | Per unit (one thing a source polls, defined just below; its health record is `UnitStatus`): whether zero results counts as a problem (False for narrow searches and quiet mailboxes). | `model.py: UnitStatus` |
 | **Design diff** | The difference between the board's actual views and the views defined in code (`VIEWS`). | `board_sync.py: design_diff()` |
 | **Source** / **adapter** | One place postings come from (`ats`, `bundesagentur`, `jobtech`, `eures`, `careers_page`, `alert_email`), and the code that reads it. Every adapter turns its input into `Posting` objects. | `jobradar/sources/` |
 | **Unit** | One thing a source polls: one ATS board, one search query, one careers page, one email provider. Health is tracked per unit. | `model.py: UnitStatus` |
@@ -72,7 +72,7 @@ Skim it now; come back when a word is unclear.
 | **ref** (Role ID) | The first 16 hex characters of the SHA-1 of the content key, e.g. `3140f52f7d4f47fc`. It links a role's issue, its `matches.csv` row, its JD folder, its score and its application. | `board.py: role_ref()` |
 | **Seen** | `state/seen.json` remembers every posting ID and content key already reported, with the last date seen. A role is "new" only if none of its keys were seen. | `radar.py: diff_seen()` |
 | **Baseline** | The very first run (empty `seen.json`). Everything open is recorded, but only Tier 1 goes to the board so the user doesn't start with hundreds of cards. | `board.py: select_for_board()` |
-| **Score** / **tier** | A rule-based number from title keywords, seniority, country, list membership, sponsor status and freshness. Tier 1 if score ≥ 6, else Tier 2. No AI involved. This is the provisional tier on the card; once a role is scored against the CV, Apply makes it T1 and Skip makes it T2 (`jd_check.TIER_FROM_SCORE`). | `tiering.py` |
+| **Score** / **tier** | A rule-based number from title keywords, seniority, country, list membership, sponsor status and freshness. Tier 1 if score ≥ 6, else Tier 2. No AI involved, and not the same as **Fit** (below), the AI-judged score. This is the provisional tier on the card; once a role is scored against the CV, Apply makes it T1 and Skip makes it T2 (`jd_check.TIER_FROM_SCORE`). | `tiering.py` |
 | **Fit** | A different, AI-judged score (0–100): Claude compares the JD with the user's CV. Set on the board as the *Fit* field. | `tools/jd_check.py` |
 | **Sponsorship verdict** | Claude's checked answer to "will this employer sponsor this role for this user?": confirmed, likely, licensed, unclear, unlikely, no, with evidence (ad quotes, register, company pages). Replaces the register-only value on the Sponsor field. | `tools/sponsorship.py`, `sponsorship-check` skill |
 | **Calibration** | Weekly automatic adjustment of tier title-keyword weights from Fit scores: one step, bounded, logged, reversible. | `tools/calibrate.py` |
@@ -91,7 +91,7 @@ Skim it now; come back when a word is unclear.
 
 ### Data shapes used from page 3 on
 
-Defined in `jobradar/model.py` and `jobradar/dedupe.py` (full detail on [page 5](05-Code-reference.md)):
+Defined in `jobradar/model.py` and `jobradar/dedupe.py` (full detail on [page 5.2](05-2-Package.md)):
 
 | Name | What it is |
 |---|---|

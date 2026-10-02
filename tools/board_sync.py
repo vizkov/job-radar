@@ -63,6 +63,75 @@ FINAL_STAGES = {"Offer", "Rejected", "Skipped"}
 LABEL_COLORS = {"role": "0E8A16", "tier-1": "B60205", "tier-2": "FBCA04", "sponsor-yes": "0E8A16",
                 "sponsor-unknown": "C5DEF5", "sponsor-no": "D93F0B", STATUS_LABEL: "5319E7",
                 "possibly-closed": "BFD4F2"}
+LABEL_DESCRIPTIONS = {  # shown in GitHub's label picker; max 100 characters
+    "role": "A job role the radar found: one issue per role; the Project auto-adds issues with this label",
+    "tier-1": "Tier 1 target: the user's top-priority employers/titles; apply early",
+    "tier-2": "Tier 2 target: worth applying to, lower priority than Tier 1",
+    "sponsor-yes": "Employer is on the country's visa-sponsor register (a legal-entity match, not a promise)",
+    "sponsor-unknown": "No register data for this employer: sponsorship unclear",
+    "sponsor-no": "Employer is not on the country's visa-sponsor register",
+    "possibly-closed": "No source has listed this role for several days: it may be closed",
+    STATUS_LABEL: "The pinned issue where the daily run reports sources and health",
+}
+LABEL_DESCRIPTIONS.update({f"country-{c}": f"Role located in {n}" for c, n in
+                           {"CH": "Switzerland", "DE": "Germany", "GB": "the United Kingdom", "IE": "Ireland",
+                            "NL": "the Netherlands", "SE": "Sweden"}.items()})
+PROJECT_DESCRIPTION = "Job-search pipeline: one card per role the radar found. Field guide in the README."
+FIELD_DOCS = {  # field -> option -> description (GitHub shows these in the dropdown; max 100 chars)
+    "Status": {  # GitHub's built-in field; job-radar does not use it, Stage is the pipeline
+        "Todo": "Unused: GitHub's default field. Use Stage instead",
+        "In Progress": "Unused: GitHub's default field. Use Stage instead",
+        "Done": "Unused: GitHub's default field. Use Stage instead",
+    },
+    "Stage": {
+        "New": "Radar found it; not looked at yet",
+        "Shortlisted": "Worth applying to: being prepared (sponsorship, referral, tailored CV)",
+        "Applied": "Application submitted; waiting for an answer",
+        "Interview": "A recruiter or employer has invited you to interview",
+        "Offer": "An offer was made",
+        "Rejected": "The employer said no",
+        "Skipped": "Not pursuing: poor fit, blocker, closed ad or not interested",
+    },
+    "Tier": {"T1": "Top-priority employer/title: apply early", "T2": "Lower priority than T1"},
+    "Recommendation": {
+        "Apply": "Strong fit, no blockers: worth applying now",
+        "Maybe": "Partial fit or a doubt (sponsorship, seniority, language): judge case by case",
+        "Skip": "Weak fit or a blocker (sponsorship refused, language, closed): don't apply",
+    },
+    "Sponsor": {
+        "Confirmed": "Evidence the employer sponsors this role (ad, company page): from sponsorship-check",
+        "Likely": "Good signs but no explicit statement: from sponsorship-check",
+        "Licensed": "On the visa-sponsor register: legal-entity match only, not a promise",
+        "Unclear": "No register data and no evidence either way",
+        "Unlikely": "Not on the register: sponsorship improbable",
+        "No": "Ad or company says it does not sponsor: the role is a Skip",
+    },
+    "Referral": {
+        "Finding contact": "Looking for someone who could refer you",
+        "Asked": "You asked someone for a referral; waiting for an answer",
+        "Referred": "Someone referred you",
+        "No route": "No contact found: apply directly",
+        "Not needed": "No referral needed for this role",
+    },
+}
+PROJECT_README = """# Job search board
+
+One card per role the radar found. Cards are filled in by the daily radar run and by Claude; move cards by
+changing **Stage**.
+
+## Fields
+- **Stage**: where the role is in your pipeline (New, Shortlisted, Applied, Interview, Offer, Rejected, Skipped).
+- **Tier**: T1 = top-priority employer/title, T2 = lower priority.
+- **Fit**: number, 0-100. How well your CV matches the job description (a judgement, not a measurement).
+- **Recommendation**: Apply / Maybe / Skip, from the fit score and any blockers.
+- **Sponsor**: visa sponsorship. Licensed/Unclear/Unlikely come from the sponsor register (legal-entity match only);
+  Confirmed/Likely/No come from a sponsorship check with evidence.
+- **Posted**: date the employer posted the role (else when the radar first saw it). Sort by it for freshness.
+- **Referral**: progress of asking someone for a referral.
+- **Status**: GitHub's built-in field. Not used; ignore it.
+
+Each option's meaning is in its dropdown description.
+"""
 SPACING_SECONDS = 2.0  # GitHub throttles bursts of issue creation
 
 
@@ -91,7 +160,38 @@ def _body_file(text: str) -> str:
 def ensure_labels(gh: Gh, labels: set[str]) -> None:
     for name in sorted(labels):
         color = LABEL_COLORS.get(name, "1D76DB")  # country-* and anything else: blue
-        gh("label", "create", name, "--color", color, "--force")
+        gh("label", "create", name, "--color", color, "--force",
+           "--description", LABEL_DESCRIPTIONS.get(name, ""))
+
+
+_FIELD_OPTIONS_QUERY = """query($id:ID!){node(id:$id){... on ProjectV2{fields(first:50){nodes{
+  ... on ProjectV2SingleSelectField{id name options{id name color description}}}}}}}"""
+_UPDATE_FIELD = """mutation($f:ID!,$o:[ProjectV2SingleSelectFieldOptionInput!]!){updateProjectV2Field(
+  input:{fieldId:$f,singleSelectOptions:$o}){clientMutationId}}"""
+
+
+def describe(gh: Gh) -> str:
+    """Write the descriptions in LABEL_DESCRIPTIONS / FIELD_DOCS / PROJECT_* to GitHub. Options are sent back
+    with their ids, so cards keep their values. Safe to re-run."""
+    board = load_board()
+    if board is None:
+        raise ValueError("no board yet: run setup-project first")
+    existing = {l["name"] for l in gh_json(gh, "label", "list", "--limit", "200", "--json", "name")}
+    ensure_labels(gh, {n for n in LABEL_DESCRIPTIONS if n in existing})
+    gh("project", "edit", board["number"], "--owner", board["owner"],
+       "--description", PROJECT_DESCRIPTION, "--readme", PROJECT_README)
+    data = gh_json(gh, "api", "graphql", "-f", f"query={_FIELD_OPTIONS_QUERY}", "-f", f"id={board['id']}")
+    done = []
+    for f in data["data"]["node"]["fields"]["nodes"]:
+        docs = FIELD_DOCS.get(f.get("name"))
+        if not docs:
+            continue
+        opts = [{"id": o["id"], "name": o["name"], "color": o["color"], "description": docs.get(o["name"], o["description"] or "")}
+                for o in f["options"]]
+        body = _body_file(json.dumps({"query": _UPDATE_FIELD, "variables": {"f": f["id"], "o": opts}}))
+        gh("api", "graphql", "--input", body)
+        done.append(f["name"])
+    return f"described: labels, project, fields {', '.join(done)}"
 
 
 def sync_roles(gh: Gh, max_per_run: int, sleep=time.sleep) -> tuple[int, int]:
@@ -600,7 +700,7 @@ def fill_new(gh: Gh) -> str:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("what", choices=["roles", "status", "setup-project", "fill", "set", "stale", "backfill-map",
-                                     "design-diff", "views", "refresh-bodies", "promote", "archive"])
+                                     "design-diff", "views", "refresh-bodies", "promote", "archive", "describe"])
     ap.add_argument("args", nargs="*", help="set: <ref> Field=Value …; promote: <ref> … (then run roles)")
     ap.add_argument("--repo", help="setup-project: OWNER/REPO of your private copy")
     ap.add_argument("--close", action="store_true", help="set: also close the role's issue")
@@ -632,6 +732,8 @@ def main(argv=None) -> int:
         print("\n".join(design_diff(gh)) or "board views match VIEWS")
     elif args.what == "views":
         print(apply_views(gh))
+    elif args.what == "describe":
+        print(describe(gh))
     elif args.what == "promote":
         print(promote(args.args, dry_run=args.dry_run))
     elif args.what == "refresh-bodies":

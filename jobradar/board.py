@@ -64,8 +64,8 @@ def payload(g: Group) -> dict:
     if g.also:
         lines.append("- Also on: " + ", ".join(f"[{md(a.source)}]({md_url(a.url)})" for a in g.also[:5]))
     lines += ["", f"Role ID: `{ref}`", MARKER.format(ref=ref)]
-    # Only the `role` label (the Project's auto-add filter). Tier and Sponsor come from matches.csv at session start
-    # (board_sync.py fill); the Action's token can't edit Project fields, and a label would go stale.
+    # Only the `role` label (the Project's auto-add filter). Tier, Sponsor and Country come from matches.csv at session
+    # start (board_sync.py fill); the Action's token can't edit Project fields, and a label would go stale.
     return {"ref": ref, "title": title, "body": "\n".join(lines), "labels": ["role"]}
 
 

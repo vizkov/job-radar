@@ -238,7 +238,7 @@ Penetration Tester* in London on its Workable board.
    on list 1 + sponsor 1 (+1 if posted in the last 3 days) = 9 or 10 → Tier 1.
 8. **Queue.** Tier 1, on list → `payload()`: ref = first 16 hex of
    `sha1("c:bridewell|seniorpenetrationtester|GB")`, title
-   `Bridewell — Senior Penetration Tester (GB)`, label `role` only (Tier and Sponsor are filled in
+   `Bridewell — Senior Penetration Tester (GB)`, label `role` only (Tier, Sponsor and Country are filled in
    the session from `matches.csv`), body with the link, sponsor match, posted date, Role ID (the tier's score reasons stay in `matches.csv`),
    and a hidden `<!-- job-radar:ref=… -->` marker.
 9. **Record.** A row goes into `data/matches.csv` with the same ref.

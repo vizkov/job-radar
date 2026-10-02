@@ -12,7 +12,7 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
    the ones for the board in `state/board_queue.json`: Tier 1 and 2 at companies on
    the list (`profile/config.json` → `board`).
 2. `tools/board_sync.py roles` opens one **issue** per queued role in the private
-   repo, labelled `role` (nothing else: the Action cannot edit Project fields, and a label copy of Tier/Sponsor goes stale).
+   repo, labelled `role` (no tier, sponsor or country label: the Action cannot edit Project fields, and a label copy of Tier/Sponsor goes stale).
    Up to 40 per run, 2 seconds apart (GitHub throttles bursts); the rest wait.
 3. The Project's built-in **Auto-add to project** workflow (filter `is:issue label:role`)
    puts each issue on the board.

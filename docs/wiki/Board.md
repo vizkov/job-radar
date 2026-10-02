@@ -15,7 +15,8 @@ The **All Roles** view shows every card regardless.
 | Field | Values | Set by |
 |---|---|---|
 | Stage | New, Shortlisted, Applied, Interview, Offer, Rejected, Skipped | Claude (from what you tell it), or you by dragging |
-| Tier | T1, T2 | Worked out automatically when the role is found; Claude copies it onto the card |
+| Country | CH, DE, GB, IE, NL, SE, REMOTE-EU | The first country the ad lists; Claude copies it onto the card |
+| Tier | T1, T2 | A rule-based guess when the role is found, copied onto the card by Claude. Once a role is scored, **Apply** makes it T1 and **Skip** makes it T2 |
 | Fit | 0-100 | Claude, after scoring |
 | Recommendation | Apply, Maybe, Skip | Claude, after scoring |
 | Sponsor | Confirmed, Likely, Licensed, Unclear, Unlikely, No | Starts as a **register match only** (Licensed, Unclear or Unlikely): the employer holds a UK/NL sponsor licence, which says it *can* sponsor, not that it will. When Claude checks a role (the ad, the country's rules, the company's own pages), it sets **Confirmed**, **Likely**, **Unlikely** or **No** and adds the evidence, with links, to the card |
@@ -72,7 +73,7 @@ can see it.
 
 | View | What it's for |
 |---|---|
-| **Act now** | Tier 1 roles posted 14 or more days ago that you haven't acted on or ruled out, best fit first: the ones about to expire (hence the name: apply before they close). Fresh roles are in All Roles, sorted by fit then newest first |
+| **Act now** | Open roles you haven't applied to or skipped that are either brand new or posted 14 or more days ago (the ones about to expire: apply before they close), best fit first |
 | **All Roles** | Everything, best fit first |
 | **Pipeline** | A board with one column per Stage; drag cards as things happen |
 

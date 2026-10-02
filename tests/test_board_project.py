@@ -150,7 +150,7 @@ def test_fill_reads_tier_and_sponsor_from_matches_csv_not_labels(board_file, tmp
     gh.items = [item(labels=("role",))]   # the Action now attaches only `role`
     assert bs.fill_new(gh).startswith("filled 1 new cards")
     opts = [c[-1] for c in gh.calls if c[:2] == ("project", "item-edit") and "--date" not in c]
-    assert opts == ["O_Stage_New", "O_Tier_T2", "O_Sponsor_Unlikely"]
+    assert opts == ["O_Country_NL", "O_Stage_New", "O_Tier_T2", "O_Sponsor_Unlikely"]
 
 
 def test_archive_archives_only_skipped_and_respects_cap(board_file):
@@ -212,7 +212,7 @@ def test_fill_dates_every_undated_role_card(board_file):
     dated = item(stage="Applied")
     dated["content"]["body"] = "- Posted: 2026-09-21\n" + dated["content"]["body"]
     gh.items = [dated, {**item(stage="New"), "posted": "2026-09-01"}]
-    assert bs.fill_new(gh).endswith("dated 1")
+    assert bs.fill_new(gh).endswith("dated 1, country set on 0")
     dates = [c for c in gh.calls if c[:2] == ("project", "item-edit") and "--date" in c]
     assert len(dates) == 1 and dates[0][-1] == "2026-09-21"
 

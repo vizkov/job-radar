@@ -50,6 +50,7 @@ DATE = "DATE"
 FIELDS = {  # name -> single-select options, None for a number field, or DATE
     "Stage": ["New", "Shortlisted", "Applied", "Interview", "Offer", "Rejected", "Skipped"],
     "Tier": ["T1", "T2"],
+    "Country": ["CH", "DE", "GB", "IE", "NL", "SE", "REMOTE-EU"],  # the role's first country in matches.csv; add one here to track a new country
     "Fit": None,
     "Recommendation": ["Apply", "Maybe", "Skip"],
     # Register match gives Licensed / Unclear / Unlikely automatically; Confirmed / Likely / No need the
@@ -84,6 +85,8 @@ FIELD_DOCS = {  # field -> option -> description (GitHub shows these in the drop
         "Rejected": "The employer said no",
         "Skipped": "Not pursuing: poor fit, blocker, closed ad or not interested",
     },
+    "Country": {"CH": "Switzerland", "DE": "Germany", "GB": "United Kingdom", "IE": "Ireland", "NL": "Netherlands",
+                "SE": "Sweden", "REMOTE-EU": "Remote, anywhere in Europe"},
     "Tier": {"T1": "Apply early. Rule-based guess until scored; then a scored Apply", "T2": "Lower priority. Rule-based guess until scored; then a scored Skip"},
     "Recommendation": {
         "Apply": "Strong fit, no blockers: worth applying now",
@@ -113,6 +116,7 @@ changing **Stage**.
 
 ## Fields
 - **Stage**: where the role is in your pipeline (New, Shortlisted, Applied, Interview, Offer, Rejected, Skipped).
+- **Country**: where the role is (the first country the ad lists).
 - **Tier**: T1 = apply early, T2 = lower priority. A rule-based guess at first; once scored, Apply makes it T1 and Skip makes it T2.
 - **Fit**: number, 0-100. How well your CV matches the job description (a judgement, not a measurement).
 - **Recommendation**: Apply / Maybe / Skip, from the fit score and any blockers.
@@ -683,12 +687,18 @@ def fill_new(gh: Gh) -> str:
     board = load_board()
     if board is None:
         return "board not set up yet"
-    done = dated = 0
+    done = dated = countried = 0
     seen = None
     for item in _items(gh, board):
         labels = set(item.get("labels") or [])
         if "role" not in labels:
             continue
+        ref = REF_RE.search((item.get("content") or {}).get("body") or "")
+        row = rows.get(ref.group(1)) if ref else None
+        country = ((row or {}).get("countries") or "").split(",")[0]
+        if "Country" in board["fields"] and not item.get("country") and country.lower() in board["fields"]["Country"]["options"]:
+            _edit(gh, board, item["id"], "Country", country)
+            countried += 1
         if "Posted" in board["fields"] and not item.get("posted"):
             seen = _first_seen() if seen is None else seen
             if (day := posted_date((item.get("content") or {}).get("body") or "", seen)):
@@ -696,8 +706,6 @@ def fill_new(gh: Gh) -> str:
                 dated += 1
         if item.get("stage"):
             continue
-        ref = REF_RE.search((item.get("content") or {}).get("body") or "")
-        row = rows.get(ref.group(1)) if ref else None
         if row:
             tier, sponsor = row.get("tier") or None, _row_sponsor(row)
         else:
@@ -709,7 +717,7 @@ def fill_new(gh: Gh) -> str:
         if sponsor:
             _edit(gh, board, item["id"], "Sponsor", sponsor)
         done += 1
-    return f"filled {done} new cards, dated {dated}"
+    return f"filled {done} new cards, dated {dated}, country set on {countried}"
 
 
 def main(argv=None) -> int:

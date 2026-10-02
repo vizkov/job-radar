@@ -1,5 +1,6 @@
 """Board views as code (VIEWS): drift check and apply, against a fake `gh` with live GraphQL shapes."""
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -73,3 +74,29 @@ def test_column_order_is_not_drift():
     spec = bs.VIEWS[0]
     gh = ViewsGh([node(v) for v in bs.VIEWS[1:]] + [node(spec, fields=list(reversed(spec["fields"])))])
     assert bs.design_diff(gh) == []
+
+
+def _updates(gh):
+    return [c[3] for c in gh.calls if c[:2] == ("api", "graphql") and "updateProjectV2View" in c[3]]
+
+
+def test_a_filter_change_never_sends_columns_when_the_set_matches():
+    """The user's column order is theirs: updating a view's filter must not reorder its columns."""
+    board(bs.BOARD_FILE)
+    spec = bs.VIEWS[0]
+    gh = ViewsGh([node(v) for v in bs.VIEWS[1:]]
+                 + [node({**spec, "filter": "old"}, fields=list(reversed(spec["fields"])))])
+    bs.apply_views(gh)
+    updates = _updates(gh)
+    assert len(updates) == 1 and "visibleFieldIds" not in updates[0]
+
+
+def test_adding_a_column_keeps_the_users_order_and_appends_the_new_one():
+    board(bs.BOARD_FILE)
+    spec = bs.VIEWS[0]
+    mine = [f for f in reversed(spec["fields"]) if f != "Fit"]
+    gh = ViewsGh([node(v) for v in bs.VIEWS[1:]] + [node(spec, fields=mine)])
+    bs.apply_views(gh)
+    (update,) = _updates(gh)
+    sent = [f for f in re.findall(r'"F_([^"]+)"', update)]
+    assert sent == mine + ["Fit"]

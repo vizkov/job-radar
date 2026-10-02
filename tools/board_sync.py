@@ -551,12 +551,12 @@ def refresh_bodies(gh: Gh) -> str:
 # board grouping, so those are reported as one-time clicks (`sort`, `group`).
 VIEWS = [
     {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "-stage:Applied",
-     "fields": ["Title", "Stage", "Tier", "Country", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
+     "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral", "Country"],
      "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},
     # "Act now" = open roles not yet applied to/skipped that are brand new or posted 14+ days ago, so about to expire
     # (the user changed it in GitHub, 2026-10-02; All Roles hides Applied cards).
     {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "(is:open -stage:Applied,Skipped -label:possibly-closed -recommendation:Skip) AND (posted:<=@today-14d OR stage:New)",
-     "fields": ["Title", "Stage", "Country", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
+     "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral", "Country"],
      "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},
     {"name": "Pipeline", "layout": "BOARD_LAYOUT", "filter": "",
      "fields": ["Title", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral"],
@@ -592,8 +592,8 @@ def _click_steps(spec: dict, have: dict) -> list[str]:
 
 
 def _same(key: str, have, want) -> bool:
-    """Columns compare as a set: GitHub keeps existing columns in place and appends new ones, whatever
-    order the API is given, so order differences are cosmetic and not drift."""
+    """Columns compare as a set: the user reorders columns in GitHub, and that order is theirs. Order differences
+    are not drift, and apply_views never sends an order for a view that already exists."""
     return set(have or []) == set(want) if key == "fields" else have == want
 
 
@@ -624,9 +624,13 @@ def apply_views(gh: Gh) -> str:
     have = {v["name"]: v for v in views(gh, board["owner"], board["number"])}
     changed, clicks = [], []
     for spec in VIEWS:
-        ids = [fields[n]["id"] for n in spec["fields"] if n in fields]
-        cfg = "configuration:{visibleFieldIds:[" + ",".join(json.dumps(i) for i in ids) + "]}"
         v = have.get(spec["name"])
+        # The user's column order is theirs: an existing view keeps its order (columns the spec drops are removed,
+        # new ones are appended), and its columns aren't sent at all when the set already matches.
+        names = list(spec["fields"]) if v is None else (
+            [n for n in v["fields"] if n in spec["fields"]] + [n for n in spec["fields"] if n not in v["fields"]])
+        ids = [fields[n]["id"] for n in names if n in fields]
+        cfg = "configuration:{visibleFieldIds:[" + ",".join(json.dumps(i) for i in ids) + "]}"
         if v is None:
             out = gh_json(gh, "api", "graphql", "-f", "query=mutation{createProjectV2View(input:{projectId:"
                           f"{json.dumps(board['id'])},name:{json.dumps(spec['name'])},layout:{spec['layout']},{cfg}}})"
@@ -635,8 +639,9 @@ def apply_views(gh: Gh) -> str:
                  "layout": spec["layout"]}
             changed.append(f"created '{spec['name']}'")
         if any(not _same(k, v.get(k), spec[k]) for k in API_KEYS):
+            columns = "" if _same("fields", v.get("fields"), spec["fields"]) else f",{cfg}"
             gh("api", "graphql", "-f", "query=mutation{updateProjectV2View(input:{viewId:"
-               f"{json.dumps(v['id'])},layout:{spec['layout']},filter:{json.dumps(spec['filter'])},{cfg}}})"
+               f"{json.dumps(v['id'])},layout:{spec['layout']},filter:{json.dumps(spec['filter'])}{columns}}})"
                "{projectV2View{id}}}")
             changed.append(f"updated '{spec['name']}'")
         clicks += _click_steps(spec, v)

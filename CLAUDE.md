@@ -83,6 +83,8 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
 - Board views are code (`VIEWS` in `tools/board_sync.py`): `board_sync.py views` builds/restores
   them, `design-diff` shows drift (the session brief checks it). Sort and board grouping can't be set
   by API: relay the clicks it prints. To change a view for good, edit `VIEWS` and commit.
+  **The user's column order is theirs (2026-10-02: adding a column reordered their views):** `apply_views` never sends an order for an
+  existing view (new columns are appended, set differences only); when the user rearranges or adds columns in GitHub, copy their order into `VIEWS`.
   Issues carry only the `role` label; Tier, Sponsor and Country are set from `matches.csv` by `fill` (Tier provisional until scoring: Apply→T1, Skip→T2, Maybe keeps it).
   Descriptions for labels, field options and the project live in `LABEL_DESCRIPTIONS`/`FIELD_DOCS`/`PROJECT_README` in
   `tools/board_sync.py`; `board_sync.py describe` writes them to GitHub (safe to re-run; card values are kept).

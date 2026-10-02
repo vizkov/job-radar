@@ -74,7 +74,7 @@ description: Score job descriptions against the user's CV (fit score, met/missin
    "No board card yet" on an `apply`/`maybe` role (usually Tier 2 found on the radar's first run, which only
    carded Tier 1): `python tools/board_sync.py promote <ref> …`, then `board_sync.py roles`, then re-run
    `jd_check.py score <ref> --board`. Skips aren't carded, and a `skip` on a card nobody has acted on moves
-   it to Stage=Skipped automatically (archived by the daily run); Shortlisted/Applied cards are never moved. If GitHub says "rate limit exceeded" with quota
+   it to Stage=Skipped automatically (archived by the daily run) and deletes that role's `profile/applications/<folder>/` if one exists (CLAUDE.md rule 10); Shortlisted/Applied cards are never moved. If GitHub says "rate limit exceeded" with quota
    left, it's the secondary limit: score without `--board` and apply the board updates later in one pass.
    For roles recommended `apply` or `maybe`, run `sponsorship-check` next, **always** (the user's standing
    rule: every role on the board gets a verdict; a role that won't sponsor isn't worth a referral; an ad

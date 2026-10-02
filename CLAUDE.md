@@ -168,3 +168,10 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
    a test that simulates only your side does not count. Never send a whole list or set where the user may have customised the order or
    the contents (view columns, options, labels); send only the difference. Anything that deletes, archives or reorders the user's
    things needs their word first.
+
+10. **Skipped or Rejected roles lose their application folder (the user, 2026-10-02: "it would be rare that a skipped role has a folder but
+    it's possible").** When a role's Stage becomes Skipped or Rejected (you set it, `track`, `score-roles`, or the session brief logs a card
+    the user dragged there), delete its `profile/applications/<folder>/` if one exists, then commit the deletion. Find the folder by ref:
+    `tailored.json` in each folder carries `"key": "<ref>"`. This is a standing word for application folders only: leave the JD packet in
+    `work/jd/`, the score, the issue and the card alone. Skipped/Rejected cards are archived and gone anyway; the folder is the only leftover.
+    Don't delete when the role is Applied/Interview/Offer, and tell the user in one line which folder you removed.

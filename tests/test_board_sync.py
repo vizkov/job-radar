@@ -152,7 +152,7 @@ def test_promote_queues_recorded_roles_not_on_the_board():
     assert [p["ref"] for p in q] == ["a" * 16]
     p = q[0]
     assert p["title"] == "Apple — Vulnerability Response Engineer (GB)"
-    assert p["labels"] == ["role", "tier-2", "country-GB", "sponsor-yes"]
+    assert p["labels"] == ["role"]
     assert "<!-- job-radar:ref=aaaaaaaaaaaaaaaa -->" in p["body"] and "- Posted: 2026-09-14" in p["body"]
     assert bs.promote(["aaaaaaaaaaaaaaaa"]).startswith("queued 0")  # already queued: no duplicate card
 

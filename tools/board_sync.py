@@ -65,17 +65,9 @@ LABEL_COLORS = {"role": "0E8A16", "tier-1": "B60205", "tier-2": "FBCA04", "spons
                 "possibly-closed": "BFD4F2"}
 LABEL_DESCRIPTIONS = {  # shown in GitHub's label picker; max 100 characters
     "role": "A job role the radar found: one issue per role; the Project auto-adds issues with this label",
-    "tier-1": "Tier 1 target: the user's top-priority employers/titles; apply early",
-    "tier-2": "Tier 2 target: worth applying to, lower priority than Tier 1",
-    "sponsor-yes": "Employer is on the country's visa-sponsor register (a legal-entity match, not a promise)",
-    "sponsor-unknown": "No register data for this employer: sponsorship unclear",
-    "sponsor-no": "Employer is not on the country's visa-sponsor register",
     "possibly-closed": "No source has listed this role for several days: it may be closed",
     STATUS_LABEL: "The pinned issue where the daily run reports sources and health",
 }
-LABEL_DESCRIPTIONS.update({f"country-{c}": f"Role located in {n}" for c, n in
-                           {"CH": "Switzerland", "DE": "Germany", "GB": "the United Kingdom", "IE": "Ireland",
-                            "NL": "the Netherlands", "SE": "Sweden"}.items()})
 PROJECT_DESCRIPTION = "Job-search pipeline: one card per role the radar found. Field guide in the README."
 FIELD_DOCS = {  # field -> option -> description (GitHub shows these in the dropdown; max 100 chars)
     "Status": {  # GitHub's built-in field; job-radar does not use it, Stage is the pipeline
@@ -92,7 +84,7 @@ FIELD_DOCS = {  # field -> option -> description (GitHub shows these in the drop
         "Rejected": "The employer said no",
         "Skipped": "Not pursuing: poor fit, blocker, closed ad or not interested",
     },
-    "Tier": {"T1": "Top-priority employer/title: apply early", "T2": "Lower priority than T1"},
+    "Tier": {"T1": "Apply early. Rule-based guess until scored; then a scored Apply", "T2": "Lower priority. Rule-based guess until scored; then a scored Skip"},
     "Recommendation": {
         "Apply": "Strong fit, no blockers: worth applying now",
         "Maybe": "Partial fit or a doubt (sponsorship, seniority, language): judge case by case",
@@ -121,7 +113,7 @@ changing **Stage**.
 
 ## Fields
 - **Stage**: where the role is in your pipeline (New, Shortlisted, Applied, Interview, Offer, Rejected, Skipped).
-- **Tier**: T1 = top-priority employer/title, T2 = lower priority.
+- **Tier**: T1 = apply early, T2 = lower priority. A rule-based guess at first; once scored, Apply makes it T1 and Skip makes it T2.
 - **Fit**: number, 0-100. How well your CV matches the job description (a judgement, not a measurement).
 - **Recommendation**: Apply / Maybe / Skip, from the fit score and any blockers.
 - **Sponsor**: visa sponsorship. Licensed/Unclear/Unlikely come from the sponsor register (legal-entity match only);
@@ -669,8 +661,25 @@ def _first_seen() -> dict[str, str]:
         return {r["ref"]: (r.get("posted") or r.get("date") or "")[:10] for r in csv.DictReader(fh) if r.get("ref")}
 
 
+def _match_rows() -> dict[str, dict]:
+    if not MATCHES.exists():
+        return {}
+    with open(MATCHES, encoding="utf-8") as fh:
+        return {r["ref"]: r for r in csv.DictReader(fh) if r.get("ref")}
+
+
+def _row_sponsor(row: dict) -> str | None:
+    """Sponsor field value from the register match for the role's first country (UK or NL), else None."""
+    cc = next((c for c in (row.get("countries") or "").split(",") if c), "")
+    col = {"GB": "uk_sponsor", "NL": "nl_sponsor"}.get(cc)
+    return REGISTER_TO_SPONSOR.get((row.get(col) or "").split(" ")[0]) if col else None
+
+
 def fill_new(gh: Gh) -> str:
-    """Cards the scheduled run added have labels but no field values (it can't edit Projects)."""
+    """Cards the scheduled run added have no field values (its token can't edit Projects). Tier and Sponsor come from
+    the role's data/matches.csv row (a provisional tier: scoring sets the real one); cards from before the labels
+    were dropped still carry tier-*/sponsor-* labels, used when there is no row."""
+    rows = _match_rows()
     board = load_board()
     if board is None:
         return "board not set up yet"
@@ -687,8 +696,13 @@ def fill_new(gh: Gh) -> str:
                 dated += 1
         if item.get("stage"):
             continue
-        tier = next((l.split("-")[1] for l in labels if l.startswith("tier-")), None)
-        sponsor = next((REGISTER_TO_SPONSOR.get(l.split("-", 1)[1]) for l in labels if l.startswith("sponsor-")), None)
+        ref = REF_RE.search((item.get("content") or {}).get("body") or "")
+        row = rows.get(ref.group(1)) if ref else None
+        if row:
+            tier, sponsor = row.get("tier") or None, _row_sponsor(row)
+        else:
+            tier = next((l.split("-")[1] for l in labels if l.startswith("tier-")), None)
+            sponsor = next((REGISTER_TO_SPONSOR.get(l.split("-", 1)[1]) for l in labels if l.startswith("sponsor-")), None)
         _edit(gh, board, item["id"], "Stage", "New")
         if tier:
             _edit(gh, board, item["id"], "Tier", f"T{tier}")

@@ -83,6 +83,7 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
 - Board views are code (`VIEWS` in `tools/board_sync.py`): `board_sync.py views` builds/restores
   them, `design-diff` shows drift (the session brief checks it). Sort and board grouping can't be set
   by API: relay the clicks it prints. To change a view for good, edit `VIEWS` and commit.
+  Issues carry only the `role` label; Tier and Sponsor are set from `matches.csv` by `fill` (Tier provisional until scoring: Apply→T1, Skip→T2, Maybe keeps it).
   Descriptions for labels, field options and the project live in `LABEL_DESCRIPTIONS`/`FIELD_DOCS`/`PROJECT_README` in
   `tools/board_sync.py`; `board_sync.py describe` writes them to GitHub (safe to re-run; card values are kept).
 - Scoring a role `skip` moves its card to Stage=Skipped (only if the user hasn't acted on it: Shortlisted/

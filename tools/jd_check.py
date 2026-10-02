@@ -167,12 +167,15 @@ def cmd_score(ref: str, board: bool, gh=None) -> int:
     if board:
         from board_sync import Gh, set_fit_section, set_role_fields  # tools/ is on sys.path as a script
         gh = gh or Gh()
-        print(set_role_fields(gh, ref, {"Fit": str(data["fit_score"]),
-                                        "Recommendation": data["recommendation"].capitalize()}))
+        fields = {"Fit": str(data["fit_score"]), "Recommendation": data["recommendation"].capitalize()}
+        if data["recommendation"] in TIER_FROM_SCORE:   # a scored Apply/Skip settles the rule-based guess; Maybe keeps it
+            fields["Tier"] = TIER_FROM_SCORE[data["recommendation"]]
+        print(set_role_fields(gh, ref, fields))
         print(set_fit_section(gh, ref, data, record["scored_at"][:10]))
     return 0
 
 
+TIER_FROM_SCORE = {"apply": "T1", "skip": "T2"}
 APPS = ROOT / "profile" / "applications"
 _NUM = re.compile(r"\d+(?:[.,]\d+)?")
 # Capitalised words that aren't the first word of a sentence, and acronyms: employer,

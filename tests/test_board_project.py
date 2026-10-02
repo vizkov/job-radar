@@ -142,6 +142,17 @@ def test_fill_sets_new_cards_only(board_file):
     assert opts == ["O_Stage_New", "O_Tier_T1", "O_Sponsor_Licensed"]  # register match = Licensed, not "Yes"
 
 
+def test_fill_reads_tier_and_sponsor_from_matches_csv_not_labels(board_file, tmp_path, monkeypatch):
+    gh, _ = setup(board_file)
+    csv_path = tmp_path / "matches.csv"
+    csv_path.write_text(f"ref,countries,tier,uk_sponsor,nl_sponsor\n{REF},NL,2,,no (not on register)\n", encoding="utf-8")
+    monkeypatch.setattr(bs, "MATCHES", csv_path)
+    gh.items = [item(labels=("role",))]   # the Action now attaches only `role`
+    assert bs.fill_new(gh).startswith("filled 1 new cards")
+    opts = [c[-1] for c in gh.calls if c[:2] == ("project", "item-edit") and "--date" not in c]
+    assert opts == ["O_Stage_New", "O_Tier_T2", "O_Sponsor_Unlikely"]
+
+
 def test_archive_archives_only_skipped_and_respects_cap(board_file):
     gh, _ = setup(board_file)
     def skipped(n):

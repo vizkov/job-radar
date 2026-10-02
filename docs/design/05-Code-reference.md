@@ -374,7 +374,7 @@ item-archive`, idempotent because `item-list` omits archived items; `session_bri
 | `STATUS_LABEL`, `SPACING_SECONDS` | `radar-status` (the status issue's label); 2 s between issue creations. |
 | `REGISTER_TO_SPONSOR` | Register label → provisional Sponsor value: yes → Licensed, unknown → Unclear, no → Unlikely. |
 | `FINAL_STAGES` | Offer, Rejected, Skipped: setting one closes the issue. |
-| `LABEL_COLORS` | Label colours; anything else (country-XX) is blue. |
+| `LABEL_COLORS` | Label colours; anything else is blue. |
 | `Gh` | Runs `gh` with an argument list (no shell), reading its output as UTF-8 (Windows' default code page would garble text written back to GitHub); `dry_run` prints instead. Tests replace it. |
 | `_body_file(text)` | Writes issue text to a temp file for `--body-file`. |
 | `ensure_labels(gh, labels)` | `gh label create --force` for each. |

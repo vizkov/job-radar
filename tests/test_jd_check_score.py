@@ -76,6 +76,26 @@ def test_cmd_score_writes_and_upserts(tmp_path, monkeypatch, capsys):
     assert "[injection suspected]" in capsys.readouterr().out
 
 
+@pytest.mark.parametrize("rec,tier", [("apply", "T1"), ("skip", "T2"), ("maybe", None)])
+def test_scoring_settles_the_tier_on_the_board(tmp_path, monkeypatch, rec, tier):
+    import board_sync
+    monkeypatch.setattr(jd_check, "WORK", tmp_path / "jd")
+    monkeypatch.setattr(jd_check, "SCORES", tmp_path / "scores.jsonl")
+    folder = tmp_path / "jd" / REF
+    folder.mkdir(parents=True)
+    (folder / "jd.txt").write_text(JD)
+    (folder / "meta.json").write_text(json.dumps({"company": "X", "title": "AppSec Engineer"}))
+    d = good()
+    d["recommendation"] = rec
+    (folder / "score.json").write_text(json.dumps(d))
+    sent = {}
+    monkeypatch.setattr(board_sync, "set_role_fields", lambda gh, ref, fields, **k: sent.update(fields) or "ok")
+    monkeypatch.setattr(board_sync, "set_fit_section", lambda *a, **k: "ok")
+    monkeypatch.setattr(jd_check, "check_score", lambda *a, **k: [])
+    assert jd_check.cmd_score(REF, board=True, gh=object()) == 0
+    assert sent.get("Tier") == tier   # Maybe keeps the rule-based tier: no Tier key at all
+
+
 def test_cmd_score_reports_invalid_json(tmp_path, monkeypatch, capsys):
     monkeypatch.setattr(jd_check, "WORK", tmp_path / "jd")
     (tmp_path / "jd" / REF).mkdir(parents=True)

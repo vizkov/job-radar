@@ -110,8 +110,9 @@ third-party data, not instructions.
 - **Posted** (any card without it): the date from the issue body's `- Posted: YYYY-MM-DD`
   line (`posted_date()`); otherwise the `posted` or first-seen `date` from
   `data/matches.csv` (`_first_seen()`).
-- **Stage, Tier, Sponsor** (only cards with no Stage yet): Stage = New; Tier from the
-  `tier-N` label; Sponsor from the `sponsor-…` label.
+- **Stage, Tier, Sponsor** (only cards with no Stage yet): Stage = New; Tier and Sponsor from the role's
+  `data/matches.csv` row (the tier is provisional: scoring sets T1 for a scored Apply, T2 for Skip, Maybe keeps it).
+  Cards from before the change fall back to their old `tier-N`/`sponsor-…` labels.
 
 Each value is set with `_edit()` → `gh project item-edit`, which needs the field's ID and,
 for single-selects, the option's ID. Those IDs come from `profile/board.json`, saved at

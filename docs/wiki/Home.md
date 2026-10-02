@@ -46,7 +46,7 @@ developers and for Claude.
 | **Role ID** | A 16-character code on each card. Mention it (or just the company and role) and Claude finds everything about that job. |
 | **Target companies** | The list of employers you want. Roles at other employers are left off your board, wherever they were found, unless you ask otherwise. |
 | **Repository (repo)** | Your project's folder on GitHub. Yours is **private**: only you (and anyone you invite) can see it, its issues and its board. |
-| **Issue** / **label** | GitHub's name for a discussion item, and a coloured tag on it. Each card on your board is an issue; labels like `tier-1` or `possibly-closed` are how the automatic runs pass information to it. |
+| **Issue** / **label** | GitHub's name for a discussion item, and a coloured tag on it. Each card on your board is an issue; labels like `role` or `possibly-closed` are how the automatic runs pass information to it. |
 | **GitHub Actions** | GitHub's service that runs job-radar's automatic search on its servers, on a schedule, without your computer being on. |
 | **Secret** | A password stored encrypted in your repo's settings, readable only by the automatic runs. |
 | **Session** | One conversation with Claude in Claude Code. Each one starts with a short briefing. Separately, Claude plans limit how much you can use Claude in each few-hour window; costs below are given as a share of that allowance, and typing `/usage` in Claude Code shows how much is left. |

@@ -64,12 +64,9 @@ def payload(g: Group) -> dict:
     if g.also:
         lines.append("- Also on: " + ", ".join(f"[{md(a.source)}]({md_url(a.url)})" for a in g.also[:5]))
     lines += ["", f"Role ID: `{ref}`", MARKER.format(ref=ref)]
-    labels = ["role", f"tier-{tier}"]
-    if cc:
-        labels.append(f"country-{cc}")
-    if (s := sponsor_status(g)):
-        labels.append(f"sponsor-{s}")
-    return {"ref": ref, "title": title, "body": "\n".join(lines), "labels": labels}
+    # Only the `role` label (the Project's auto-add filter). Tier and Sponsor come from matches.csv at session start
+    # (board_sync.py fill); the Action's token can't edit Project fields, and a label would go stale.
+    return {"ref": ref, "title": title, "body": "\n".join(lines), "labels": ["role"]}
 
 
 def row_payload(row: dict) -> dict:
@@ -93,11 +90,8 @@ def row_payload(row: dict) -> dict:
     if row.get("also_on"):
         lines.append(f"- Also on: {md(row['also_on'])}")
     lines += ["", f"Role ID: `{row['ref']}`", MARKER.format(ref=row["ref"])]
-    labels = ["role", f"tier-{row.get('tier') or 2}"] + ([f"country-{cc}"] if cc else [])
-    if status in ("yes", "unknown", "no"):
-        labels.append(f"sponsor-{status}")
     return {"ref": row["ref"], "title": _plain(f"{company} — {row.get('title', '')} ({cc})", 200),
-            "body": "\n".join(lines), "labels": labels}
+            "body": "\n".join(lines), "labels": ["role"]}
 
 
 def select_for_board(new: list[Group], cfg: dict, baseline: bool) -> list[Group]:

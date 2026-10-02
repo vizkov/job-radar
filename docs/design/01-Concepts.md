@@ -27,7 +27,7 @@ Skim it now; come back when a word is unclear.
 | **Template repo** / **private copy** | job-radar's code lives in a public repo (the *template*, `vizkov/job-radar`). Each user runs their own *private copy*, which has the same code plus their personal settings and data. The private copy knows the public one as the git remote `template`. |
 | **Commit** / **push** / **pull** | Save a set of changes into history / send commits to GitHub / fetch commits from GitHub. |
 | **Issue** | A GitHub discussion item (title, body, labels). job-radar creates one issue per role. |
-| **Label** | A coloured tag on an issue: `role`, `tier-1`, `country-GB`, `sponsor-yes`, `possibly-closed`. |
+| **Label** | A coloured tag on an issue: `role`, `possibly-closed`, `radar-status`. Tier and Sponsor are board fields, set from `matches.csv` in the session, not labels. |
 | **Project** / **board** | GitHub Projects: a spreadsheet- or kanban-like view over issues. Each issue on it is a **card** (an *item* in the API). |
 | **Field** | A column on a Project, with a value per card. job-radar's: *Stage*, *Tier*, *Recommendation*, *Sponsor*, *Referral* (single-selects), *Fit* (a number), *Posted* (a date). Fields belong to the Project; labels belong to the issue. |
 | **View** | A saved way of looking at a Project: which columns show, which filter applies, sort order, and table or board layout. job-radar has *All Roles*, *Act now* and *Pipeline*. |

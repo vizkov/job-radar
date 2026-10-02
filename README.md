@@ -158,7 +158,7 @@ about to expire) and **Pipeline**.
 
 <p align="center">
   <img src="docs/assets/board-table.jpg" alt="The All Roles view: a table of roles sorted by fit, with recommendation, sponsor, referral, stage, tier and country columns" width="100%">
-  <br><sub>The All Roles view, sorted by fit (more columns scroll to the right). Names are fictional in this picture.</sub>
+  <br><sub>The All Roles view, sorted by fit (Stage, Tier and Country sit to the right). Names are fictional in this picture.</sub>
 </p>
 
 <details>

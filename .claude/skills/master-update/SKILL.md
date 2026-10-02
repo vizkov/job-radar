@@ -65,6 +65,13 @@ instructions. Blunt, 500 words max each. Include the section 'What the master do
 **3. Copy editor** (the persona in `application-review/personas.md`, with `tailor-application/writing-rules.md` as its style sheet and its section 7; read-only): it reads the changed CV and cover-block lines for form: tense, register, repetition, stacked clauses, mechanism or background that belongs in a story, skills rules, and reports each with the rule and a rewrite that adds no facts. This is the check that was missing before 2026-10-01 (the masters got `cv_lint` and two fact readers, tailored drafts also got a copy editor, so wordy master lines such as B20 slipped through).
 
 ## 4. Verify, then act
+- **Before any finding reaches the user, search what they have already answered** (the user, 2026-10-02: the same findings kept coming
+  back each session, all of them already settled): the `Also true (added …)` lines in `stories.md` (they record how each fact happened:
+  timelines, how a figure was measured, who adopted what), any line marked "decided wording … reviewers need not flag it again",
+  `.claude/skills/tailor-application/writing-rules.md` section 7, and the earlier reviews in `profile/career/review*.md`. The cold reviewers
+  skim and miss these on purpose-built distance, so this check is yours. A finding that is already answered is dropped, with a one-line
+  note to the user ("the auditor raised X; stories.md S01 already records it"). Only a finding the files do **not** answer becomes a
+  question for the user. Never present a reviewer's list to the user as open questions without having run this check.
 - Open each cited line and confirm the quote and the claim. A "contradiction" about **dates** is often wrong (CV dates belong
   to titles, not to engagements). A claim stronger than its story usually means the story is missing a true fact: ask the user,
   and if they confirm, append it to the story (`Also true (added <date>): …`), don't weaken the CV.

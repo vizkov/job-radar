@@ -155,6 +155,23 @@ def publish(template_dir: Path, message: str) -> None:
     print(f"published {len(files)} files: {', '.join(files)}\nnow run: git pull template main")
 
 
+def maintainer_only_files(root: Path = ROOT) -> list[str]:
+    """Tracked files in this copy that are maintainer-only (see MAINTAINER_ONLY)."""
+    out = subprocess.run(["git", "ls-files"], cwd=root, capture_output=True, text=True).stdout.splitlines()
+    return [f for f in out if any(fnmatch.fnmatch(f, pat) for pat in MAINTAINER_ONLY)]
+
+
+def restore_maintainer_only(before: str, tracked: list[str], root: Path = ROOT) -> list[str]:
+    """After merging the template back: the template deliberately does not have the maintainer-only files, so the merge
+    deletes them here. Put back any that vanished (from the commit before the merge) and commit that."""
+    missing = [f for f in tracked if not (root / f).exists()]
+    if missing:
+        subprocess.run(["git", "checkout", before, "--", *missing], cwd=root, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "Keep maintainer-only files (the template merge removed them)"],
+                       cwd=root, check=True)
+    return missing
+
+
 def autopublish() -> None:
     """Run by .githooks/post-commit: publish public code changes, then merge the template back.
     Never raises: a commit must not fail because publishing did."""
@@ -168,7 +185,11 @@ def autopublish() -> None:
         subject = subprocess.run(["git", "log", "-1", "--format=%s"], cwd=ROOT, capture_output=True,
                                  text=True).stdout.strip()
         publish(template_dir, f"{subject}\n\n(auto-published from a private job-radar copy)")
+        before = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        tracked = maintainer_only_files()
         subprocess.run(["git", "pull", "-q", "--no-rebase", "--no-edit", "template", "main"], cwd=ROOT)
+        if restore_maintainer_only(before, tracked):
+            print("note: the template merge removed maintainer-only files here; they were restored")
         if (left := dirty_public()):
             print(f"note: {len(left)} public file(s) have uncommitted changes and were NOT published: {', '.join(left)}")
         mirror_wiki(template_dir)

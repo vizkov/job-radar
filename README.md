@@ -149,6 +149,16 @@ carries:
 The views are code, so every copy gets the same ones: **All Roles**, **Act now** (open roles that are new or
 about to expire) and **Pipeline**.
 
+<p align="center">
+  <img src="docs/assets/board-pipeline.jpg" alt="The Pipeline view: cards in New, Shortlisted, Applied, Interview, Offer and Rejected columns, each showing tier, fit score, recommendation, sponsor verdict and posted date" width="100%">
+  <br><sub>The Pipeline view. Each column says what the stage means. Company and role names are replaced with fictional ones for this picture.</sub>
+</p>
+
+<p align="center">
+  <img src="docs/assets/board-table.jpg" alt="The All Roles view: a table of roles sorted by fit, with recommendation, sponsor, referral, stage, tier and country columns" width="100%">
+  <br><sub>The All Roles view, sorted by fit. Names replaced with fictional ones.</sub>
+</p>
+
 <details>
 <summary><b>Quieter features that run in the background</b></summary>
 

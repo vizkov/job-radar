@@ -69,3 +69,37 @@ def test_publish_uses_committed_content_only(tmp_path, monkeypatch):
 def test_maintainer_only_files_are_not_published():
     for path in (".githooks/post-commit", ".claude/skills/docs-review/SKILL.md", ".claude/skills/system-review/SKILL.md"):
         assert not is_public(path), path
+
+
+def test_merge_back_cannot_delete_the_maintainers_own_files(tmp_path):
+    """The template does not have the maintainer-only files, so merging it back deletes them: autopublish must restore them."""
+    import os
+    import subprocess
+    import public_template as pt
+
+    def git(*a):
+        subprocess.run(["git", "-c", "user.name=t", "-c", "user.email=t@example.com", *a], cwd=tmp_path, check=True,
+                       capture_output=True)
+
+    git("init", "-q")
+    skill = tmp_path / ".claude" / "skills" / "docs-review" / "SKILL.md"
+    skill.parent.mkdir(parents=True)
+    skill.write_text("x", encoding="utf-8")
+    git("add", "-A")
+    git("commit", "-q", "-m", "one")
+    before = subprocess.run(["git", "rev-parse", "HEAD"], cwd=tmp_path, capture_output=True, text=True).stdout.strip()
+    tracked = pt.maintainer_only_files(tmp_path)
+    assert tracked == [".claude/skills/docs-review/SKILL.md"]
+    git("rm", "-q", "-r", ".claude")          # what the merge-back does
+    git("commit", "-q", "-m", "merge removed it")
+    assert not skill.exists()
+    pt_env = {"GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.com", "GIT_COMMITTER_NAME": "t",
+              "GIT_COMMITTER_EMAIL": "t@example.com"}
+    old = {k: os.environ.get(k) for k in pt_env}
+    os.environ.update(pt_env)
+    try:
+        assert pt.restore_maintainer_only(before, tracked, tmp_path) == tracked
+    finally:
+        for k, v in old.items():
+            os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
+    assert skill.read_text(encoding="utf-8") == "x"

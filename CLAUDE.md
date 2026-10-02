@@ -83,6 +83,8 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
 - Board views are code (`VIEWS` in `tools/board_sync.py`): `board_sync.py views` builds/restores
   them, `design-diff` shows drift (the session brief checks it). Sort and board grouping can't be set
   by API: relay the clicks it prints. To change a view for good, edit `VIEWS` and commit.
+  Descriptions for labels, field options and the project live in `LABEL_DESCRIPTIONS`/`FIELD_DOCS`/`PROJECT_README` in
+  `tools/board_sync.py`; `board_sync.py describe` writes them to GitHub (safe to re-run; card values are kept).
 - Scoring a role `skip` moves its card to Stage=Skipped (only if the user hasn't acted on it: Shortlisted/
   Applied stay). Then it's archived, once a day, by the SessionStart hook (`board_sync.py archive`; the Action's
   token can't reach the user's Project). An archived card is invisible to `set`: restore it first.

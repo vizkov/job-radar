@@ -47,6 +47,23 @@ def _content_words(text: str) -> set[str]:
     return {w for w in re.findall(r"[a-z][a-z0-9+/'-]{3,}", text.lower()) if w not in STOP}
 
 
+def _phrases(text: str) -> set[tuple]:
+    """Content three-word phrases of a line (no "and", not all stop words): what the within-line check counts."""
+    words = re.findall(r"[a-z']+", re.sub(r"https?://\S+", " ", text.lower()))
+    return {t for i in range(len(words) - 2) if not (set(t := tuple(words[i:i + 3])) <= STOP) and "and" not in t}
+
+
+def cross_line_repeats(lines: dict[str, str]) -> list[tuple[str, str, str]]:
+    """(id, id, phrase) for every three-word phrase two different lines share: the within-line check cannot see these."""
+    ids, out = list(lines), []
+    ph = {i: _phrases(lines[i]) for i in ids}
+    for a in range(len(ids)):
+        for b in range(a + 1, len(ids)):
+            if shared := sorted(ph[ids[a]] & ph[ids[b]]):
+                out.append((ids[a], ids[b], " ".join(shared[0])))
+    return out
+
+
 def line_issues(sid: str, text: str) -> tuple[list[str], list[str]]:
     """(errors, warnings) for one CV/letter line."""
     errs, warns = [], []
@@ -209,6 +226,12 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
         kept = [i for i in ids if i in chosen]
         if len(kept) > 5:
             warns.append(f"role \"{ctx.split(' — ')[0]}\" has {len(kept)} bullets; 3-5 reads best")
+        # the user, 2026-10-02 (a relevant bullet was dropped for page fit): every master bullet of a role stays unless it matches nothing in the JD;
+        # a drop needs its reason in tailored.json "dropped"; only the cap of 5 lets a role with more than 5 master bullets drop some freely
+        why = data.get("dropped") if isinstance(data.get("dropped"), dict) else {}
+        unexplained = [i for i in ids if i not in chosen and not re.match(r"no JD match:\s*\S.{10,}", str(why.get(i, "")))]
+        if len(unexplained) > max(0, len(ids) - 5):
+            errs.append(f"role \"{ctx.split(' — ')[0]}\": master bullet(s) {unexplained} dropped without a reason. Keep every master bullet unless it matches nothing in the JD (page fit is not a reason: shorten wording); to drop one, record \"dropped\": {{\"{unexplained[0]}\": \"no JD match: what the JD asks for that this line does not touch\"}} in tailored.json")
         if len(kept) < floor:
             errs.append(f"role \"{ctx.split(' — ')[0]}\" has {len(kept)} bullets; keep at least {floor} (master has {len(ids)}); dropped: {[i for i in ids if i not in chosen]}")
     roles = [(ctx.split(' — ')[0], len([i for i in ids if i in chosen]), len(ids))
@@ -227,6 +250,12 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
             wb = _content_words(chosen[b])
             if wa and wb and len(wa & wb) / min(len(wa), len(wb)) >= 0.6:
                 warns.append(f"Key achievement [{a}] restates experience bullet [{b}] ({len(wa & wb)} shared words): tell the event once, the bullet carries the method")
+    # a phrase repeated across Profile lines (the user, 2026-10-02: "large-scale systems" twice in one Profile): the Profile is read
+    # as one paragraph. Not checked against the bullets: an achievement and its experience bullet name the same event by design,
+    # and the Profile may name a skill the bullets also show.
+    summ_lines = {s: chosen[s] for s in chosen if s in career.items and career.items[s].section == "Summary" and s != "P00"}
+    for a, b, ph in cross_line_repeats(summ_lines):
+        warns.append(f"Profile lines [{a}] and [{b}] both say \"{ph}\": say it once, reword the second")
     # Profile is the main place to converge with the JD: a Summary that is mostly the master's text was not tailored
     summ = [s for s in chosen if s in career.items and career.items[s].section == "Summary" and s != "P00"]
     changed = [s for s in summ if norm(chosen[s]) != norm(career.items[s].text)]

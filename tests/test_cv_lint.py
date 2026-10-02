@@ -121,3 +121,31 @@ def test_the_bank_needs_the_defined_term_first():
     d["sections"].insert(0, {"heading": "Key achievements", "bullets": [
         {"source_id": "P05", "text": "Found four chained attack vectors in a Fortune 100 global financial and banking institution's platform."}]})
     assert not any("appears before" in e for e in cv_lint.tailored_issues(d, test_tailor.CAREER)[0])
+
+
+def test_cross_line_repeats_catch_the_profile_case():
+    # the 2026-10-02 case: "large-scale systems" in two Profile lines
+    p01 = "Performs application security reviews on high-risk payments and large-scale systems, with 6+ years of penetration testing."
+    p11 = "Builds LLM-based threat modelling workflows and security methodologies for distributed, large-scale systems."
+    hits = cv_lint.cross_line_repeats({"P01": p01, "P11": p11})
+    assert hits and hits[0][:2] == ("P01", "P11") and "large scale systems" in hits[0][2]
+    # different wording, or only stop words in common: nothing
+    assert not cv_lint.cross_line_repeats({"P01": p01, "P11": "Builds LLM-based threat modelling workflows for distributed systems."})
+    assert not cv_lint.cross_line_repeats({"A": "It is the of the by it", "B": "It is the of the by it"})
+
+
+def test_dropped_master_bullet_needs_a_reason():
+    d = copy.deepcopy(test_tailor.GOOD)
+    kept = {b["source_id"] for s in d["sections"] for b in s["bullets"]}
+    # pick a role bullet and drop it from the CV
+    role_ids = [i for i, it in test_tailor.CAREER.items.items() if cv_lint.sid_is_role(it) and i in kept]
+    victim = role_ids[0]
+    for s in d["sections"]:
+        s["bullets"] = [b for b in s["bullets"] if b["source_id"] != victim]
+    e, _ = cv_lint.tailored_issues(d, test_tailor.CAREER)
+    assert any("dropped without a reason" in x and victim in x for x in e)
+    d["dropped"] = {victim: "page fit"}                       # not a reason
+    assert any("dropped without a reason" in x for x in cv_lint.tailored_issues(d, test_tailor.CAREER)[0])
+    d["dropped"] = {victim: "no JD match: the ad asks for nothing about this kind of work"}
+    assert not any("dropped without a reason" in x for x in cv_lint.tailored_issues(d, test_tailor.CAREER)[0])
+

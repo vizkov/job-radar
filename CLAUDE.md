@@ -175,3 +175,8 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
     `tailored.json` in each folder carries `"key": "<ref>"`. This is a standing word for application folders only: leave the JD packet in
     `work/jd/`, the score, the issue and the card alone. Skipped/Rejected cards are archived and gone anyway; the folder is the only leftover.
     Don't delete when the role is Applied/Interview/Offer, and tell the user in one line which folder you removed.
+
+11. **No relevant bullet is dropped from an application (the user, 2026-10-02: B11 was cut from the Amazon CVs although the ad's duties fit it).**
+    A tailored CV keeps every master bullet of a role unless it matches nothing in the JD at all; page fit is never the reason (shorten wording,
+    or ask). A dropped master bullet needs `"dropped": {"<id>": "no JD match: <why>"}` in `tailored.json`; `tools/cv_lint.py` (run by
+    `jd_check.py tailor`) errors without it. Roles whose master has more than 5 bullets may drop down to 5. See `tailor-application`.

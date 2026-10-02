@@ -59,7 +59,7 @@ competence**: techniques, standards, tools, languages. Not approach phrases, sen
 "federated and shared-responsibility architectures", "agent and MCP tool permissions" are experience or profile language, not
 skills. Do not list a skill its parent already covers ("authentication and authorisation testing" sits under OWASP Top 10).
 Mirror the JD's exact words for genuine skill nouns and tools (ATS match on exact phrases, and a dedicated skills block carries weight). Put the core, most-asked items first (secure code review, secure design review, SAST/DAST, business-logic testing before
-the long tail). Capitalisation: every item starts with a capital letter (Secure code review, Bug bounty triage, AWS, Burp Suite; the user, 2026-10-01, replacing the earlier lowercase rule), including the first in a row; items inside a parenthesis keep their own case. Separators: commas; a language is listed on its own (`JavaScript, TypeScript (Node.js)`, not
+the long tail). Capitalisation: every word of a row label and of an item starts with a capital letter (Secure Code Review, Bug Bounty Triage, Business-Logic Testing, AWS, Burp Suite; the user, 2026-10-02, replacing 2026-10-01's first-letter-only rule; the short joiners and/for stay lowercase); the masters carry it, so it is not linted (the user: update the masters and nothing has to be caught); items inside a parenthesis are capitalised the same way (MCP Plugins) except acronyms and file names (HTTP, Node.js). Separators: commas; a language is listed on its own (`JavaScript, TypeScript (Node.js)`, not
 `JavaScript/TypeScript`).
 
 **Header.** Name, headline, location, email, phone, LinkedIn, GitHub. Location reads `Bangalore, India · Open to relocation`
@@ -80,7 +80,8 @@ the long tail). Capitalisation: every item starts with a capital letter (Secure 
 5. **Tense.** Finished = past. Ongoing = present ("Lead", "Provide"). One tense per bullet; a role that has ended has no
    present-tense bullets. "Having onboarded" for finished onboarding, "onboarding" only while it is in progress.
 6. **No repeated phrase** within a bullet, a section or a page ("by the end ... by the end of the engagement"). Reword the
-   second. Also no pet phrases reused across neighbouring bullets ("end to end", "across").
+   second. Also no pet phrases reused across neighbouring bullets ("end to end", "across"). The Profile is read as one paragraph: no
+   phrase may appear in two of its lines ("large-scale systems" twice, the user, 2026-10-02); `cv_lint.py` warns (`cross_line_repeats`).
 7. **Strip what is implied.** "my own team", "(from other teams)", "the client's development teams confirmed" when
    "confirmed exploitable" is enough. Keep qualifiers only where dropping them makes the claim false.
 8. **Precise words.** `expedited deadline`, not `extended`, where that is what happened; "go-live fast approaching" for
@@ -112,9 +113,9 @@ the long tail). Capitalisation: every item starts with a capital letter (Secure 
 ## 4. Tailoring limits (so a good JD match does not gut the CV)
 
 - **Depth.** Each role keeps at least 3 bullets and at most 5, or all of its master bullets if the master has fewer (Senior
-  Associate: 2). Cut inside a role by shortening wording before dropping a bullet; drop from the tail of the role first, never the line that
+  Associate: 2). **No relevant bullet is dropped (the user, 2026-10-02, after B11 was cut from the Amazon CVs although the ad's duties fit it):** a role keeps every master bullet unless the line matches nothing in the JD at all, and the cut is recorded with its reason in `tailored.json` (`"dropped": {"B11": "no JD match: ..."}`); `cv_lint.py` errors without it. A role whose master has more than 5 bullets may drop down to 5 freely. Cut inside a role by shortening wording, never by losing a relevant line; never the line that
   names the role's distinct contribution (for Senior Associate: the thick-client white paper).
-- **Taper with recency (the user, 2026-10-02, after research: bullets per role fall as the role gets older).** The most recent role gets the most (4 to 5, up to 6 when it is the best match), the next 3 to 4, older roles 2 to 3, within the floor and cap above. A more recent role never carries fewer bullets than an older one while its master has more to give: when the page is full, cut from the oldest role first, not the newest. `cv_lint.py` warns when an older role has more bullets than a more recent one that could carry more.
+- **Taper with recency (the user, 2026-10-02, after research: bullets per role fall as the role gets older).** The most recent role gets the most (4 to 5, up to 6 when it is the best match), the next 3 to 4, older roles 2 to 3, within the floor and cap above. A more recent role never carries fewer bullets than an older one while its master has more to give. The taper never justifies dropping a relevant bullet: it only decides which role gets the extra space when a master has more than 5. `cv_lint.py` warns when an older role has more bullets than a more recent one that could carry more.
 - **Two pages.** Fit by, in order: shorten wording in tailored sections; drop a bullet that restates a Key achievement
   (while the role stays above its floor); drop the least relevant bullet above the floor. Never cut a static section,
   a skills row, or a role. Tell the user exactly which lines went.
@@ -152,7 +153,7 @@ Give this section to the copy editor only; the cold readers (ATS, recruiter, aud
 - "with go-live fast approaching" (B06): the user's wording for urgency. P05 was reworded on 2026-10-02 to the outcome only ("Found four chained attack vectors in ... payment settlement platform; all accepted as high-severity risks and fixed before go-live").
 - "expedited deadline" (S02, C10), never "extended" (B12 was removed from the master on 2026-10-02; the story stays).
 - "around 50%" triage saving stated once ("onboarding its first set of assessors" was cut from P09 and B03 on 2026-10-02).
-- Skills rows, labels and item wording (K01-K07) as set on 2026-10-01: all seven rows kept, `JavaScript, TypeScript (Node.js)`, no approach phrases, capitalised items. Do not rewrite the lists or drop rows.
+- Skills rows, labels and item wording (K01-K07) as set on 2026-10-01: all seven rows kept, `JavaScript, TypeScript (Node.js)`, no approach phrases, every word capitalised (2026-10-02). Do not rewrite the lists or drop rows.
 - E01 "graduate coursework, focused on adversarial AI/ML" (no degree is claimed; do not add one).
 - B17 opens with the clickable name "OSS" (link text, not the raw URL; 2026-10-01); B06, B17, B18, B21 shapes and lengths (B06 and B21 stay single bullets); both B18 links point to the Medium profile (the user's choice).
 - Role headings name every employer (Consultant: Synopsys / Black Duck / UltraViolet Cyber): the user's choice, for ATS and recruiter lookups.

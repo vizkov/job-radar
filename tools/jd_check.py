@@ -206,11 +206,13 @@ def check_tailor(data: dict, career: Career) -> tuple[list[str], list[str]]:
     """Returns (errors, warnings)."""
     errs, warns = [], []
     allowed = {"key", "headline", "sections", "skills", "cover_letter"}
-    optional = {"location"}   # per-copy header location (e.g. names the role's city); the user's decision
+    optional = {"location", "dropped"}   # location: per-copy header location (the user's decision); dropped: {id: "no JD match: why"} for a master bullet left out (tools/cv_lint.py)
     if extra := set(data) - allowed - optional:
         errs.append(f"unexpected fields: {sorted(extra)}")
     if missing := allowed - set(data):
         return errs + [f"missing fields: {sorted(missing)}"], warns
+    if "dropped" in data and not (isinstance(data["dropped"], dict) and all(isinstance(k, str) and isinstance(v, str) for k, v in data["dropped"].items())):
+        errs.append("dropped must map a master bullet ID to a reason string")
     if not re.fullmatch(r"[0-9a-f]{16}", str(data["key"])):
         errs.append("key must be the role ID (16 hex characters)")
     contact = career.contact_tokens()

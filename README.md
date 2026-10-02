@@ -58,7 +58,35 @@ files to edit, no API key (it runs on your Claude subscription).
 | "Too much noise" | Retunes titles, countries, companies and weights, and shows the effect before saving |
 | "Is anything broken?" | Diagnoses silent sources, failed runs and missing cards, and fixes them |
 
-Nineteen skills in all; `/manual` lists everything live.
+Each of these is a **skill**: a packaged routine Claude follows. There are nineteen, listed below, and `/manual` prints
+the current list live.
+
+<details>
+<summary><b>All 19 skills</b></summary>
+
+| Skill | What it does |
+|---|---|
+| `setup` | First-time setup: profile, career documents, target companies, sponsor registers, board, optional alert emails, and switching on the daily run |
+| `consultant-brief` | The briefing: new roles since last time, best matches, pipeline status, anything broken |
+| `score-roles` | Scores job descriptions against your CV (fit, met and missing requirements, blockers) and puts the result on the board |
+| `sponsorship-check` | Decides whether an employer will actually sponsor a work visa for a role, with evidence recorded on the card |
+| `referrals` | Finds a referral route in your order (people you know first, then recruiters and hiring managers), drafts messages to strangers and tracks every ask |
+| `tailor-application` | Builds a tailored, ATS-safe CV and cover letter from your own career documents, validates them and renders two PDFs in your layout |
+| `application-review` | Reviews CV, cover letter and stories as a set with four fresh read-only readers (ATS, recruiter, consistency auditor, copy editor) |
+| `master-update` | After your master documents change, re-checks them for consistency and refreshes every application built from the old versions |
+| `apply-assist` | Pre-fills an application form in your Chrome, page by page; you approve every value and click Submit |
+| `inbox-check` | Reads your inbox (read-only) for rejections, interviews and offers and suggests board updates for you to confirm |
+| `track` | Moves a card along the board when you report progress: shortlisted, applied, interview, offer, rejected, skipped |
+| `interview-prep` | Likely technical and behavioural questions, answer outlines from your own stories, questions to ask, company context |
+| `post-discovery` | Finds roles announced in LinkedIn hiring posts and reposts, traces them to the original author and turns new ones into cards (opt-in) |
+| `cv-review` | Compares what your target roles keep asking for with your CV and suggests improvements, missing evidence and worthwhile certifications |
+| `tune-radar` | Changes what the radar looks for (titles, exclusions, countries, companies, sources, weights) and shows the effect before saving |
+| `health` | Diagnoses and fixes silent or failing sources, failed workflow runs and cards that don't appear |
+| `system-review` | A weekly review of sources, coverage gaps, noisy filters and unused features, with a ranked list of fixes to approve |
+| `docs-review` | Tests the documentation by having two fresh readers read it cold, then fixes what they found |
+| `manual` | Shows every capability, generated live from the skills and tools so it is always current |
+
+</details>
 
 ## The board
 

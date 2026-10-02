@@ -4,6 +4,8 @@ score = best-matching title keyword weight
       + every matching seniority word
       + best target-country weight
       + on_target_list bonus (employer is in targets.tsv)
+      + target_fit_high bonus (the employer's Fit column in targets.tsv is High: a generic title like "Security Engineer"
+        at a company you rate highly should not sit below a specialist title elsewhere)
       + sponsor_yes bonus (licensed sponsor in the posting's UK/NL country)
       + fresh_bonus when the role was posted within fresh_days
 Tier 1 when score >= tier1_min_score, else Tier 2.
@@ -18,7 +20,7 @@ _SENIORITY = [(keyword_re([k]), w) for k, w in (_CFG.get("seniority_keywords") o
 
 
 def score(title: str, countries, on_list: bool, sponsor: dict | None = None,
-          age_days: int | None = None) -> tuple[int, list[str]]:
+          age_days: int | None = None, high_fit: bool = False) -> tuple[int, list[str]]:
     """Returns (score, reasons); reasons go to data/matches.csv to make tuning debuggable."""
     reasons, total = [], 0
     t = max(((w, rx.pattern) for rx, w in _TITLE if rx.search(title or "")), default=(0, ""))
@@ -35,6 +37,9 @@ def score(title: str, countries, on_list: bool, sponsor: dict | None = None,
     if on_list:
         total += _CFG.get("on_target_list", 0)
         reasons.append("on-list")
+    if on_list and high_fit and _CFG.get("target_fit_high", 0):
+        total += _CFG["target_fit_high"]
+        reasons.append("high-fit")
     sponsor = sponsor or {}
     relevant = []
     if "GB" in countries:

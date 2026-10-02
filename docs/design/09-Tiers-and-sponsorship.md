@@ -70,6 +70,7 @@ Score (rules in `config.json` → `tiering`):
 | Best country | GB, NL, IE +2; CH, DE, SE, remote-Europe +1 |
 | Employer on your list | +1 |
 | Licensed sponsor in the role's country (UK/NL) | +1 |
+| Employer's `Fit` column in `targets.tsv` is High | +`target_fit_high` (1): a generic title such as "Security Engineer" at a company you rate highly (Meta, 2026-10-02) should not rank below a specialist title elsewhere |
 | Posted within `fresh_days` (3) | +`fresh_bonus` (1): applying early matters |
 
 Tier 1 when the score ≥ `tier1_min_score` (6). Examples:

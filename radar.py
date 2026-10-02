@@ -32,7 +32,9 @@ from jobradar.board import enqueue, load_queue, payload, role_ref, save_queue, s
 from jobradar.common import CONFIG, ROOT, not_permanent, target_countries, title_matches
 from jobradar.dedupe import Group, group_postings
 from jobradar.health import BROKEN_AFTER_RUNS, update_health
-from jobradar.matching import default_matcher
+from functools import lru_cache
+
+from jobradar.matching import default_matcher, load_high_fit, normalize
 from jobradar.mdsafe import md, md_url  # noqa: F401 (tests use radar.md)
 from jobradar.model import Posting, SourceResult
 from jobradar.sources import build_sources, load_sources_config, run_sources
@@ -108,6 +110,15 @@ def diff_seen(groups: list[Group], seen: dict, today: str) -> list[Group]:
     return new
 
 
+@lru_cache(maxsize=1)
+def high_fit_targets() -> frozenset:
+    """Companies marked Fit = High in targets.tsv (read once per run)."""
+    try:
+        return frozenset(load_high_fit())
+    except OSError:
+        return frozenset()
+
+
 def enrich(new: list[Group], sponsors=None) -> None:
     """Sponsor-register tags and fit tier for each new group (after dedupe, so only a few lookups)."""
     if not new:
@@ -119,7 +130,8 @@ def enrich(new: list[Group], sponsors=None) -> None:
         p = g.best
         sp = sponsors.tag(p.company, p.company_canonical)
         age = (date.today() - p.posted_at.date()).days if p.posted_at else None
-        total, reasons = fit_score(p.title, p.countries, bool(p.company_canonical), sp, age_days=age)
+        high = bool(p.company_canonical) and normalize(p.company_canonical) in high_fit_targets()
+        total, reasons = fit_score(p.title, p.countries, bool(p.company_canonical), sp, age_days=age, high_fit=high)
         g.tags = {"sponsor": sp, "score": total, "tier": fit_tier(total), "reasons": reasons}
 
 

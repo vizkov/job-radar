@@ -239,3 +239,30 @@ def test_inbox_check_line_lists_applications_awaiting_an_answer(tmp_path):
     line = next(x for x in out.splitlines() if "INBOX-CHECK" in x)
     assert "2 applications await an answer" in line and "Apple" in line and "Sonar" in line and "Other" not in line
     assert "INBOX-CHECK" not in brief(root, items=[item("c" * 16, "Shortlisted")])
+
+
+def test_cadence_block_lists_every_recurring_job_and_its_due_state(tmp_path):
+    root = make_root(tmp_path, [row("a" * 16, "2026-10-02", company="Apple")])
+    out = brief(root, items=[item("a" * 16, "Applied")])
+    assert "CADENCE" in out
+    for job in ("Radar search", "New roles to the board", "Scoring", "Inbox check", "LinkedIn post sweep"):
+        assert job in out
+    assert "Inbox check (Gmail): 1 application(s) await an answer; never run · DUE" in out
+
+
+def test_cadence_stamp_clears_the_due_flag(tmp_path):
+    import cadence
+    root = make_root(tmp_path, [row("a" * 16, "2026-10-02", company="Apple")])
+    cadence.done("inbox_check", root, NOW - timedelta(hours=2))
+    out = brief(root, items=[item("a" * 16, "Applied")])
+    assert "last ran 2026-" in out and "· ok" in out.split("Inbox check")[1].splitlines()[0]
+    assert "INBOX-CHECK" not in out
+
+
+def test_cadence_flags_a_tier_1_role_with_no_card_and_no_issue(tmp_path):
+    root = make_root(tmp_path, [row("a" * 16, "2026-10-02")])
+    root_state = root / "state"
+    root_state.mkdir()
+    (root_state / "board_queue.json").write_text("[]")
+    out = brief(root, items=[])
+    assert "New roles to the board" in out and "1 without a card yet" in out and "board_sync.py roles" in out

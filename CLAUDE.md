@@ -42,9 +42,8 @@ from it; don't redo those steps. Mention health items briefly and offer the matc
 prioritise the freshest Tier 1 roles, since applying early matters to this user. If the brief has an
 **AUTO-SCORE** line, run `score-roles` on those refs before answering the user's first message (they
 chose this; `scoring.auto_per_session` in config.json sets how many, 0 turns it off), then answer.
-If `discovery.linkedin_posts.enabled` is true in `profile/config.json`, run `post-discovery` once per day (the sweep marks its queries
-run in `state/post_queries.json`) after answering the user's first message, unless they opened with a specific task: then offer it. It is
-how the user finds roles that recruiters and hiring managers announce in LinkedIn posts and reposts before, or instead of, a posting.
+`post-discovery` (when `discovery.linkedin_posts.enabled` is true) is how the user finds roles that recruiters and hiring managers
+announce in LinkedIn posts and reposts before, or instead of, a posting; the CADENCE block says when it is due.
 Likewise, **standing rule (the user's):** every role that gets a card on the board gets a
 `sponsorship-check` verdict. Run it right after you score a role `apply`/`maybe`, after you `promote`
 roles to the board, and for any **SPONSOR-CHECK** line in the brief (live apply/maybe cards with no verdict).
@@ -52,6 +51,13 @@ The ad's own statement wins: a "does not offer sponsorship" ad is verdict `no`, 
 GitHub's rate limit is real: every board read is costly and a burst trips a throttle. Pass **several refs in one
 call** (`jd_check.py score r1 r2 … --board`, `sponsorship.py record r1 r2 … --board`): they share one board read.
 Never loop over refs with one call each.
+
+**Cadence (the user's rule, 2026-10-02: the recurring jobs ran silently and unevenly).** The brief's **CADENCE** block lists every
+recurring job with when it last ran: the radar search, new roles reaching the board, scoring, the Gmail inbox check and the LinkedIn
+post sweep. Anything marked **DUE** you run in the session (inbox check and post sweep after answering the first message unless the
+user opened with a task: then offer it in one line), and each of those skills stamps itself when finished with
+`python tools/cadence.py done <inbox_check|post_discovery|auto_score>`. If you skip a DUE job, say which one and why in one line;
+never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the guarantee that an overdue job is visible, not that it ran.
 
 ## How the machinery fits together
 
@@ -80,6 +86,19 @@ Never loop over refs with one call each.
 - Scoring a role `skip` moves its card to Stage=Skipped (only if the user hasn't acted on it: Shortlisted/
   Applied stay). Then it's archived, once a day, by the SessionStart hook (`board_sync.py archive`; the Action's
   token can't reach the user's Project). An archived card is invisible to `set`: restore it first.
+  **Board changes need the user's word (2026-10-02, after nine archived roles were restored unasked):** "new roles" means the roles
+  the session brief lists as new since the last session, nothing else; if they are all on the board already, say so and stop.
+  **The board changes while you work (2026-10-02: card #112 appeared mid-session).** The brief's board list is a snapshot from session start;
+  background jobs (`fill`, `archive`, JD prep) and the GitHub run keep adding cards and filling fields. Before any board-wide step (listing
+  cards, counting, "rescore the board", deciding what is new), re-read the live board (`gh project item-list`, as `session_brief.board_items`
+  does), and when a card shows up that your working list lacks, score it like any other new card and mention it. A `board_sync.py` process
+  reads the board once and caches it for that process only, so start a new command to see later changes.
+  **Closed or skip-scored cards are removed (the user, 2026-10-02):** an ad that says it is no longer accepting applications, or a role that
+  scores Skip with no action from the user, gets its card moved to Skipped with a short note; the daily archive then removes it from the board.
+  Never unarchive, restore, re-add or change the Stage of a role the user did not name, and never build a new command or tool for
+  it unasked: say what you found and ask. A role scored apply/maybe but archived is not a bug to fix; the age rule put it there.
+  A role can have an issue and a score but no live card (aged out by `max_age_days`, then archived, even if later scored apply):
+  "the roles on the board" always means what `gh project item-list` returns, never `state/issue_map.json` or `matches.csv`.
   `max_age_days` in `profile/config.json` drops roles posted longer ago than that (0 = no limit).
 - User guide: `docs/wiki/`. Design reference (yours): `docs/design/`, starting at its README:
   concepts, architecture, a run and a session step by step, and every file and function.

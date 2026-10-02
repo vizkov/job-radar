@@ -83,6 +83,14 @@ def load_targets(path: Path | None = None) -> list[str]:
         return [r["Company"].strip() for r in csv.DictReader(fh, delimiter="\t") if r.get("Company")]
 
 
+def load_high_fit(path: Path | None = None) -> set[str]:
+    """Normalised names of the targets.tsv companies whose Fit column is High (empty when there is no Fit column)."""
+    path = path or profile_path("targets.tsv")
+    with open(path, encoding="utf-8") as fh:
+        return {normalize(r["Company"]) for r in csv.DictReader(fh, delimiter="	")
+                if r.get("Company") and (r.get("Fit") or "").strip().lower() == "high"}
+
+
 def load_aliases(path: Path | None = None) -> list[tuple[str, str]]:
     path = path or profile_path("aliases.csv")
     if not path.exists():

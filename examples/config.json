@@ -47,6 +47,7 @@
                            "junior": -2, "associate": -1, "graduate": -3, "entry level": -3},
     "country": {"GB": 2, "NL": 2, "IE": 2, "CH": 1, "DE": 1, "SE": 1, "REMOTE-EU": 1},
     "on_target_list": 1,
+    "target_fit_high": 1,
     "sponsor_yes": 1,
     "fresh_days": 3,
     "fresh_bonus": 1

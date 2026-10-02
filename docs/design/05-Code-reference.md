@@ -176,7 +176,7 @@ source polls). Run monthly by `verify.yml`, and after target or override changes
 
 | Name | Is |
 |---|---|
-| `score(title, countries, on_list, sponsor, age_days)` | Best title keyword + all seniority words + best country + on-list bonus + sponsor bonus + freshness bonus; returns `(total, reasons)`. |
+| `score(title, countries, on_list, sponsor, age_days, high_fit)` | Best title keyword + all seniority words + best country + on-list bonus + `target_fit_high` bonus (employer's Fit column in targets.tsv is High) + sponsor bonus + freshness bonus; returns `(total, reasons)`. `matching.load_high_fit()` reads the Fit = High names; `radar.high_fit_targets()` caches them. |
 | `tier(total)` | 1 if total ≥ `tier1_min_score`, else 2. |
 
 Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
@@ -413,6 +413,17 @@ itself: the `setup-project` command runs `setup_project()` then `apply_views()`.
 `--dry-run` (print the `gh` commands; nothing changes and no stage changes are logged; `promote` reports
 what it would queue),
 `--max N` (roles: issues per run). `sync_roles()` takes the queue oldest first.
+
+### `tools/cadence.py`: the cadence ledger (standard library only)
+
+The session brief's CADENCE block lists every recurring job and whether it is due, so none runs silently. Jobs Claude runs (they need Gmail or Chrome, which a hook cannot drive) stamp themselves in `work/.cadence.json` when finished.
+
+| Name | Is |
+|---|---|
+| `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 20, `auto_score` 4. |
+| `done(name, root, now)`, `last(name, root)`, `load(root)` | Stamp a job as just finished; read a stamp; read the ledger. CLI: `python tools/cadence.py done <name>` and `show`. |
+| `is_due(name, now, root)`, `when(name, now, root, fallback)` | True when never run or older than its interval; the "last ran … (Nh ago)" text. |
+| `block(now, root, …)` | Returns the brief's CADENCE lines (radar search, new roles to the board, scoring, inbox check, LinkedIn post sweep) and the names of the due jobs. `session_brief.cadence_block()` gathers its inputs from `matches.csv`, the issue map, the queue and the board. |
 
 ### `tools/session_brief.py`: the SessionStart hook (standard library only)
 

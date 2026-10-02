@@ -32,6 +32,10 @@ SCORES = ROOT / "data" / "scores.jsonl"
 MET = {"yes", "partial", "no"}
 BLOCKER_TYPES = {"clearance", "right_to_work", "language", "location", "seniority", "other"}
 RECOMMENDATIONS = {"apply", "maybe", "skip"}
+LEVELS = {"below", "at", "above"}  # the role's level against the user's record; optional, "below" lowers the ceiling
+# The fit score is a judgement, but it may not float above what the must-have table supports (2026-10-02: a role
+# whose table listed only the met requirements scored 85 while an ATS-style count gave 65-75%).
+BLOCKER_PENALTY, LEVEL_PENALTY, FIT_SLACK = 15, 10, 8
 
 
 def _norm(s: str) -> str:
@@ -40,10 +44,11 @@ def _norm(s: str) -> str:
 
 def check_score(data: dict, ref: str, jd_text: str, career: Career) -> list[str]:
     errs = []
-    allowed = {"key", "fit_score", "must_haves", "blockers", "summary", "recommendation", "injection_suspected"}
+    required = {"key", "fit_score", "must_haves", "blockers", "summary", "recommendation", "injection_suspected"}
+    allowed = required | {"level"}
     if extra := set(data) - allowed:
         errs.append(f"unexpected fields: {sorted(extra)}")
-    if missing := allowed - set(data):
+    if missing := required - set(data):
         errs.append(f"missing fields: {sorted(missing)}")
         return errs
     if data["key"] != ref:
@@ -83,6 +88,15 @@ def check_score(data: dict, ref: str, jd_text: str, career: Career) -> list[str]
     if not isinstance(bl, list):
         errs.append("blockers must be a list")
         bl = []
+    if "level" in data and data["level"] not in LEVELS:
+        errs.append(f"level must be one of {sorted(LEVELS)}")
+    if mh and isinstance(data["fit_score"], int) and not isinstance(data["fit_score"], bool):
+        coverage = sum({"yes": 1.0, "partial": 0.5}.get(m.get("met"), 0.0) for m in mh if isinstance(m, dict)) / len(mh) * 100
+        ceiling = coverage - BLOCKER_PENALTY * len(bl) - (LEVEL_PENALTY if data.get("level") == "below" else 0)
+        if data["fit_score"] > ceiling + FIT_SLACK:
+            errs.append(f"fit_score {data['fit_score']} is above what the must-haves support (coverage {coverage:.0f}%, "
+                        f"ceiling {max(ceiling, 0):.0f} + {FIT_SLACK}): list every Basic Qualification (unmet ones as "
+                        "'no'), or lower the score")
     jd_norm = _norm(jd_text)
     for i, b in enumerate(bl):
         if not isinstance(b, dict) or set(b) != {"type", "quote"}:
@@ -94,6 +108,22 @@ def check_score(data: dict, ref: str, jd_text: str, career: Career) -> list[str]
         if len(q) < 8 or q not in jd_norm:
             errs.append(f"blockers[{i}].quote must be copied verbatim from the JD (8+ characters)")
     return errs
+
+
+def score_warnings(data: dict, jd_text: str) -> list[str]:
+    """Hints, never errors: a must-have table with no gap on a long ad usually means requirements were left out."""
+    warns = []
+    mh = data.get("must_haves") or []
+    m = re.search(r"basic qualifications(.*?)(preferred qualifications|$)", jd_text, re.I | re.S)
+    quals = [ln for ln in (m.group(1).splitlines() if m else []) if ln.strip().startswith(("-", "•", "*"))]
+    if len(quals) >= 5 and not any(x.get("met") in ("no", "partial") for x in mh if isinstance(x, dict)):
+        warns.append(f"the ad lists {len(quals)} basic qualifications but no must-have is partial or no: "
+                     "was every requirement listed, including the ones the user cannot show?")
+    if len(quals) >= 6 and len(mh) < len(quals) // 2:
+        warns.append(f"{len(mh)} must-haves for {len(quals)} basic qualifications: merging hides gaps; list each one")
+    if "level" not in data:
+        warns.append("no level (below|at|above): say whether the role's level is above the user's record")
+    return warns
 
 
 def upsert_score(record: dict, path: Path | None = None) -> None:
@@ -121,9 +151,12 @@ def cmd_score(ref: str, board: bool, gh=None) -> int:
     if errs:
         print("INVALID score.json:\n" + "\n".join(f"  - {e}" for e in errs))
         return 1
+    for w in score_warnings(data, jd_text):
+        print(f"WARNING: {w}")
     missing = [m["requirement"] for m in data["must_haves"] if m["met"] == "no"]
     record = {"key": ref, "company": meta.get("company", ""), "title": meta.get("title", ""),
               "fit_score": data["fit_score"], "recommendation": data["recommendation"],
+              **({"level": data["level"]} if "level" in data else {}),
               "blockers": sorted({b["type"] for b in data["blockers"]}), "missing": missing,
               "injection_suspected": data["injection_suspected"], "summary": data["summary"],
               "scored_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}

@@ -172,3 +172,4 @@ The user said (2026-10-01) that re-asking these wastes their time. Reviewers wit
 - The live exploit demonstrations (the VPs saw them; "where useful" was dropped 2026-10-01), the previous vendor's review, "6+ years": the user's approved wording; not open questions.
 - "Interviewed 10+ candidates" was removed (no story; 2026-10-01). Do not re-add it.
 - Around 50% triage saving: accepted as written.
+- K03 starts with the US spelling "Threat modeling" beside the British row label "Threat modelling" (2026-10-02, the user's decision after the ATS reader found exact-phrase "threat modeling" missing). It is the one deliberate exception to British spelling, and a tailored K03 keeps the US item somewhere in the row. Do not flag it as a stutter or a spelling error.

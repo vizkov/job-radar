@@ -155,6 +155,7 @@ contract (anything else is rejected):
 ```text
 {"key": "<the role's ref>",
  "fit_score": 0-100 (integer),
+ "level": "below | at | above"                           // optional; warned about when missing
  "must_haves": [{"requirement": "1-300 chars",
                  "met": "yes | partial | no",
                  "evidence": ["B03", "S01"]}],          // 1-30 items; the skill asks for 3-10
@@ -172,7 +173,11 @@ contract (anything else is rejected):
 fields are missing or extra; `fit_score` isn't an integer 0–100; an evidence ID isn't in
 the career docs; a requirement is marked met with no evidence; a blocker quote isn't
 **literally in the JD** (after collapsing whitespace and case); there's no JD text at
-all. If valid, `upsert_score()` replaces that ref's line in `data/scores.jsonl`, and with
+all; or `fit_score` is above what the must-have table supports (coverage = yes plus half
+the partials over all must-haves, minus `BLOCKER_PENALTY` 15 per blocker and `LEVEL_PENALTY`
+10 for `level: below`, plus `FIT_SLACK` 8). `score_warnings()` adds hints, never errors: a long
+"Basic Qualifications" list with no partial or no row, fewer rows than half the bullets, a
+missing `level`. If valid, `upsert_score()` replaces that ref's line in `data/scores.jsonl`, and with
 `--board` it calls `board_sync.set_role_fields()` to set Fit and Recommendation, and
 `board_sync.set_fit_section()` to write the breakdown onto the issue body (Matches, Partly,
 Doesn't match with blockers first, quoted), between `<!-- job-radar:fit -->` markers so a

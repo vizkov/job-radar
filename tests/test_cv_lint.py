@@ -111,3 +111,13 @@ def test_long_profile_warns(monkeypatch):
             sec["bullets"][0]["text"] = "Application security engineer with seven years in code review."
     _, w = cv_lint.tailored_issues(d, test_tailor.CAREER)
     assert not any("Profile is" in x for x in w)
+
+
+def test_the_bank_needs_the_defined_term_first():
+    d = {"sections": [{"heading": "Experience", "bullets": [
+        {"source_id": "B05", "text": "Provide technical oversight for the bank's assessment team of 4."}]}], "cover_letter": []}
+    errs = cv_lint.tailored_issues(d, test_tailor.CAREER)[0]
+    assert any("appears before" in e for e in errs)
+    d["sections"].insert(0, {"heading": "Key achievements", "bullets": [
+        {"source_id": "P05", "text": "Found four chained attack vectors in a Fortune 100 global financial and banking institution's platform."}]})
+    assert not any("appears before" in e for e in cv_lint.tailored_issues(d, test_tailor.CAREER)[0])

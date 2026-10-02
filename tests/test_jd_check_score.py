@@ -18,7 +18,7 @@ CAREER = load_career(EXAMPLES / "career")
 
 
 def good():
-    return {"key": REF, "fit_score": 72, "recommendation": "maybe", "injection_suspected": True,
+    return {"key": REF, "fit_score": 50, "recommendation": "maybe", "injection_suspected": True,
             "summary": "Strong code-review and threat-modeling match; SC clearance is a blocker for a non-UK national.",
             "must_haves": [{"requirement": "Threat modeling", "met": "yes", "evidence": ["B02", "K04"]},
                            {"requirement": "Java code review", "met": "yes", "evidence": ["B03"]},
@@ -71,7 +71,7 @@ def test_cmd_score_writes_and_upserts(tmp_path, monkeypatch, capsys):
     assert jd_check.cmd_score(REF, board=False) == 0          # re-scoring replaces, doesn't duplicate
     lines = (tmp_path / "scores.jsonl").read_text().splitlines()
     rec = json.loads(lines[0])
-    assert len(lines) == 1 and rec["fit_score"] == 72 and rec["blockers"] == ["clearance"]
+    assert len(lines) == 1 and rec["fit_score"] == 50 and rec["blockers"] == ["clearance"]
     assert rec["missing"] == ["UK SC clearance"] and rec["injection_suspected"] is True
     assert "[injection suspected]" in capsys.readouterr().out
 
@@ -82,3 +82,31 @@ def test_cmd_score_reports_invalid_json(tmp_path, monkeypatch, capsys):
     (tmp_path / "jd" / REF / "score.json").write_text("{not json")
     assert jd_check.cmd_score(REF, board=False) == 1
     assert "not valid JSON" in capsys.readouterr().out
+
+
+def test_fit_score_cannot_float_above_the_must_have_table():
+    d = good()
+    d["fit_score"] = 90                       # table: 2 yes, 1 no, 1 blocker -> ceiling about 52 + slack
+    assert any("above what the must-haves support" in e for e in jd_check.check_score(d, REF, JD, CAREER))
+
+
+def test_level_below_lowers_the_ceiling_and_bad_level_rejected():
+    d = good()
+    d["blockers"] = []
+    d["must_haves"][2] = {"requirement": "UK SC clearance", "met": "yes", "evidence": ["B03"]}
+    d["fit_score"] = 99
+    assert jd_check.check_score(d, REF, JD, CAREER) == []          # full coverage, nothing lowers the ceiling
+    d["level"] = "below"                                            # ceiling 100 - 10, slack 8: 98 is the most allowed
+    assert any("above what the must-haves support" in e for e in jd_check.check_score(d, REF, JD, CAREER))
+    d["fit_score"] = 98
+    assert jd_check.check_score(d, REF, JD, CAREER) == []
+    d["level"] = "sideways"
+    assert any("level must be" in e for e in jd_check.check_score(d, REF, JD, CAREER))
+
+
+def test_warns_when_a_long_ad_has_no_gap_listed():
+    jd = "Basic Qualifications\n- a\n- b\n- c\n- d\n- e\nPreferred Qualifications\n- f"
+    d = good()
+    d["must_haves"] = [{"requirement": "x", "met": "yes", "evidence": ["B03"]}]
+    ws = jd_check.score_warnings(d, jd)
+    assert any("no must-have is partial or no" in w for w in ws) and any("no level" in w for w in ws)

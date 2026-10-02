@@ -140,6 +140,10 @@ def taper_warnings(roles: list[tuple[str, int, int]]) -> list[str]:
     return out
 
 
+BANK_TERM = "a Fortune 100 global financial and banking institution"
+DEFINED_BANK = r"fortune 100 global financial and banking institution"
+
+
 def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
     errs, warns = [], []
     chosen: dict[str, str] = {}
@@ -161,6 +165,18 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
             e, w = line_issues(str(c["source_id"]), str(c.get("text", "")))
             errs += e
             warns += w
+    # "the bank" must come after the defined term in the same document (the user, 2026-10-02: B05, B06 and B10 say "the bank")
+    cv_lines = [str(b.get("text", "")) for sec in data.get("sections", []) if isinstance(sec, dict)
+                for b in sec.get("bullets", []) if isinstance(b, dict)]
+    letter_lines = [str(c.get("text", "")) for c in data.get("cover_letter", []) if isinstance(c, dict)]
+    for doc, lines in (("CV", cv_lines), ("cover letter", letter_lines)):
+        for t in lines:
+            if re.search(DEFINED_BANK, t, re.I):
+                break
+            if re.search(r"\bthe bank\b", t, re.I):
+                errs.append(f"{doc}: \"the bank\" appears before \"{BANK_TERM}\" introduces it: keep an earlier line with "
+                            "the defined term (Key achievements P05, P10, P08 or P12), or spell the term out")
+                break
     loc = data.get("location", "")
     if isinstance(loc, str) and re.search(r"relocation to\b", loc, re.I):
         errs.append("location: write \"Open to relocation\" with no destination")

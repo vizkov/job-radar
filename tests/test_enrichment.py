@@ -104,3 +104,13 @@ def test_fresh_roles_get_a_bonus():
     base = score("Pentester", {"GB"}, False, {}, age_days=None)[0]
     assert score("Pentester", {"GB"}, False, {}, age_days=1) == (base + 1, ["title+4", "country+2", "fresh"])
     assert score("Pentester", {"GB"}, False, {}, age_days=10)[0] == base
+
+
+def test_high_fit_employer_lifts_a_generic_title_to_tier_1(monkeypatch):
+    from jobradar import tiering
+    monkeypatch.setitem(tiering._CFG, "target_fit_high", 1)
+    low, _ = score("Security Engineer", ["GB"], True, None, age_days=1)             # 1 title + 2 country + 1 list + 1 fresh = 5
+    high, reasons = score("Security Engineer", ["GB"], True, None, age_days=1, high_fit=True)
+    assert tier(low) == 2 and tier(high) == 1 and "high-fit" in reasons
+    off, _ = score("Security Engineer", ["GB"], False, None, age_days=1, high_fit=True)   # not on the list: no bonus
+    assert off == low - 1

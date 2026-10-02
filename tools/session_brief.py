@@ -31,6 +31,9 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))   # tools/ for cadence.py when imported from elsewhere
+import cadence  # noqa: E402
+
 WORK = ROOT / "work"
 LAST = WORK / ".last_session"
 LAST_REVIEW = WORK / ".last_review"
@@ -498,6 +501,33 @@ def _age(posted: str, today: date) -> str:
         return "date unknown"
 
 
+def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, items: list[dict] | None,
+                  new_on_list: list[dict], last_run: str, auto_picks: int, by_ref: dict) -> list[str]:
+    """The explicit CADENCE lines (tools/cadence.py): every recurring job, when it last ran, and whether it is due."""
+    issue_map = _read_json(root / "state" / "issue_map.json", {})
+    queued = len(_read_json(root / "state" / "board_queue.json", []))
+    board_refs = {m.group(1) for i in (items or []) for m in [_REF.search((i.get("content") or {}).get("body") or "")] if m}
+    on_board = [r for r in new_on_list if r.get("ref") in board_refs]
+    skip = [r for r in new_on_list if r.get("ref") not in board_refs
+            and (scores.get(r.get("ref")) or {}).get("recommendation") == "skip"]
+    waiting = [r for r in new_on_list if str(r.get("tier")) == "1" and r.get("ref") not in board_refs
+               and r not in skip and r.get("ref") not in issue_map]
+    awaiting = sum(1 for i in (items or []) if i.get("stage") in ("Applied", "Interview")
+                   and _REF.search((i.get("content") or {}).get("body") or ""))
+    unscored_cards = sum(1 for ref in board_refs if ref not in scores)
+    cfg = _read_json(root / "profile" / "config.json", {}) if (root / "profile" / "config.json").exists() else {}
+    posts_on = bool(((cfg.get("discovery") or {}).get("linkedin_posts") or {}).get("enabled"))
+    fallback = None
+    for rec in (_read_json(root / "state" / "post_queries.json", {}) or {}).values():
+        at = cadence._naive((rec or {}).get("last", ""))
+        fallback = at if at and (fallback is None or at > fallback) else fallback
+    lines, _due = cadence.block(now, root, radar_last=last_run, new_total=len(new_on_list), new_on_board=len(on_board),
+                                new_skip=len(skip), new_waiting=len(waiting), queued=queued,
+                                unscored_cards=unscored_cards, auto_picks=auto_picks, awaiting=awaiting,
+                                posts_enabled=posts_on, posts_fallback=fallback)
+    return lines
+
+
 def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, items: list[dict] | None,
           board_note: str | None, fill_note: str | None, changes: list[dict], follow_ups: list[tuple[str, int]],
           run_note: str | None, updates: list[str] = (), unpublished: list[str] = (),
@@ -545,6 +575,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append("- SPONSOR-CHECK (the user's standing rule: every role on the board gets a sponsorship verdict): "
                      "run the sponsorship-check skill on these apply/maybe cards, and tell them in one line what "
                      "you found: " + ", ".join(unchecked))
+    lines += cadence_block(root, now, rows, scores, items, new_on_list, last_run, len(pick), by_ref)
     lines.append(f"- Unscored Tier 1 roles (last 14 days): {len(unscored_t1)}, of which {len(fresh_unscored)} "
                  "posted in the last 3 days (score and apply to these first)")
     if scores:
@@ -557,7 +588,9 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append("- Board: " + ", ".join(f"{k} {v}" for k, v in sorted(stages.items())))
         missing = sum(1 for i in items if not i.get("stage"))
         if missing:
-            lines.append(f"  - {missing} new cards had no fields yet; fill {fill_note}")
+            lines.append(f"  - {missing} new cards had no fields yet; fill {fill_note}. The board keeps changing while background "
+                         "jobs and the daily run work (new cards appear, stages and fields are filled): this list is a snapshot, "
+                         "so re-read the live board before you list, count or rescore cards")
         closed = [i for i in items if "possibly-closed" in (i.get("labels") or []) and i.get("stage") in
                   (None, "", "New", "Shortlisted")]
         if closed:
@@ -576,7 +609,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append(f"- You closed {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)} while it was in "
                      "progress: ask whether it was a rejection, an offer or a withdrawal, then `track` it")
     awaiting = [i for i in (items or []) if i.get("stage") in ("Applied", "Interview") and _REF.search((i.get("content") or {}).get("body") or "")]
-    if awaiting:
+    if awaiting and cadence.is_due("inbox_check", now, root):
         names = ", ".join(sorted({safe((by_ref.get(_REF.search(i["content"]["body"]).group(1)) or {}).get("company"), 24) for i in awaiting}))
         lines.append(f"- INBOX-CHECK: {len(awaiting)} applications await an answer ({names}); once per session, run the "
                      "`inbox-check` skill (Gmail connector, read-only; suggest only, the user confirms)")

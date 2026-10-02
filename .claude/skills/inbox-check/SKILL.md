@@ -35,6 +35,7 @@ mailbox for them, **read-only**, and **suggests** board changes. It never moves 
    `python tools/inbox_outcomes.py seen <message-id>` so the email is not suggested again. For an interview, offer `interview-prep`.
    A rejection: offer to look at what to learn from it (the role's must-haves vs the CV) and the next best role.
 7. Emails the user says are wrong (a different role, an auto-reply) go into `seen` too.
+8. **Stamp the cadence** when the check is finished (even if nothing was found): `python tools/cadence.py done inbox_check`. The session brief's CADENCE block shows this job as DUE until you do.
 
 ## Limits to state honestly
 - This finds emails only in the connected mailbox; replies sent elsewhere, or by phone or LinkedIn, are invisible.

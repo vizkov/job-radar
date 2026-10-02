@@ -103,3 +103,48 @@ def test_merge_back_cannot_delete_the_maintainers_own_files(tmp_path):
         for k, v in old.items():
             os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
     assert skill.read_text(encoding="utf-8") == "x"
+
+
+def test_a_real_template_merge_back_cannot_delete_maintainer_only_files(tmp_path):
+    """The round trip, not a simulation: a private repo with a maintainer-only file, a template clone that does not have
+    it, and a genuine `git pull` of the template back into the private repo, the way autopublish does it."""
+    import os
+    import subprocess
+    import public_template as pt
+
+    env = {**os.environ, "GIT_AUTHOR_NAME": "t", "GIT_AUTHOR_EMAIL": "t@example.com",
+           "GIT_COMMITTER_NAME": "t", "GIT_COMMITTER_EMAIL": "t@example.com"}
+
+    def git(cwd, *a):
+        return subprocess.run(["git", *a], cwd=cwd, check=True, capture_output=True, text=True, env=env).stdout.strip()
+
+    private, template = tmp_path / "private", tmp_path / "template"
+    private.mkdir()
+    git(private, "init", "-q", "-b", "main")
+    (private / "tools").mkdir()
+    (private / "tools" / "a.py").write_text("print(1)\n", encoding="utf-8")
+    skill = private / ".claude" / "skills" / "docs-review" / "SKILL.md"
+    skill.parent.mkdir(parents=True)
+    skill.write_text("maintainer only\n", encoding="utf-8")
+    git(private, "add", "-A")
+    git(private, "commit", "-q", "-m", "one")
+    git(tmp_path, "clone", "-q", str(private), str(template))
+    git(template, "rm", "-q", "-r", ".claude")                      # what publish() does to the template
+    (template / "tools" / "a.py").write_text("print(2)\n", encoding="utf-8")
+    git(template, "commit", "-q", "-am", "published without the maintainer-only files")
+    git(private, "remote", "add", "template", str(template))
+    git(private, "fetch", "-q", "template")
+
+    before = git(private, "rev-parse", "HEAD")
+    tracked = pt.maintainer_only_files(private)
+    git(private, "pull", "-q", "--no-rebase", "--no-edit", "template", "main")
+    assert not skill.exists(), "the merge is expected to remove it: that is the hazard this guards against"
+    old = {k: os.environ.get(k) for k in ("GIT_AUTHOR_NAME", "GIT_AUTHOR_EMAIL", "GIT_COMMITTER_NAME", "GIT_COMMITTER_EMAIL")}
+    os.environ.update({k: env[k] for k in old})
+    try:
+        assert pt.restore_maintainer_only(before, tracked, private) == tracked
+    finally:
+        for k, v in old.items():
+            os.environ.pop(k, None) if v is None else os.environ.__setitem__(k, v)
+    assert skill.read_text(encoding="utf-8") == "maintainer only\n"
+    assert (private / "tools" / "a.py").read_text(encoding="utf-8") == "print(2)\n"   # the real template change still arrived

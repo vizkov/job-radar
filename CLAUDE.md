@@ -160,3 +160,11 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
 8. Be honest about uncertainty: a register match (Sponsor = Licensed) is a legal-entity match, not a
    promise to sponsor; only `sponsorship-check` sets Confirmed/Likely/No, with evidence; a fit score is a
    judgement, a board field may not be set yet. Say so.
+9. **Sync boundaries (the user, 2026-10-02: "why does this keep happening?" after view columns were reordered, archived roles were
+   restored and the template merge deleted maintainer-only files from their copy).** Anything that syncs between places (the template
+   publish and merge-back, the board and its views and fields, labels, the Action's commits) changes the *user's own copy*, not just the
+   side you edited. Before changing such code, name every place the change lands, run the round trip for real in a scratch copy
+   (a temporary repo and clone, a `--dry-run`, a read of the live board), and check what the user's copy and board look like afterwards;
+   a test that simulates only your side does not count. Never send a whole list or set where the user may have customised the order or
+   the contents (view columns, options, labels); send only the difference. Anything that deletes, archives or reorders the user's
+   things needs their word first.

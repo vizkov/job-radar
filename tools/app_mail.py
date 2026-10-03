@@ -40,6 +40,8 @@ STRONG_INTERVIEW = re.compile(r"schedul|invite you|phone screen|would like to (?
                               r"calendly|your availability", re.I)
 NEEDS_ACTION = re.compile(r"please (?:complete|reply|respond|confirm|submit|upload|book|select|provide)|action required|"
                           r"within \d+ (?:hours?|days?|business days)|assessment|calendly|availability|deadline", re.I)
+DEFINITE_REJECTION = re.compile(r"unfortunately|regret to inform|decided (?:to (?:proceed|move forward|go forward) with|not to)|"
+                                r"position has been filled|will not be (?:moving|proceeding)", re.I)
 _CONTROL = re.compile(r"[\x00-\x1f\x7f]")
 
 
@@ -51,11 +53,13 @@ def safe(text, limit: int = 80) -> str:
 def classify_mail(subject: str, text: str) -> tuple[str, str, bool, bool]:
     """(type, matched phrase, strong, needs_action). type: rejection | offer | interview | receipt | referral | unknown.
 
-    A rejection or offer in the text wins. Otherwise a receipt-like subject ("Thank you for applying") makes it a receipt even
+    A definite rejection or an offer in the text wins. Otherwise a receipt-like subject ("Thank you for applying") makes it a receipt even
     when the body talks about interviews, which receipts routinely do."""
     label, phrase = inbox_outcomes.classify(subject, text)
     subject_label, _ = inbox_outcomes.classify(subject, "")
-    if label not in ("rejection", "offer") and subject_label in ("acknowledgement", "referral"):
+    if subject_label in ("acknowledgement", "referral") and (label not in ("rejection", "offer") or (
+            label == "rejection" and not DEFINITE_REJECTION.search(text))):
+        # receipts say "if you are not selected, we will keep your details" and "an interview may follow"
         label = subject_label
     kind = {"acknowledgement": "receipt"}.get(label, label)
     body = f"{subject}\n{text}"

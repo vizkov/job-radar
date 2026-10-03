@@ -8,7 +8,7 @@ with `python -I -S`. It reads the mailbox read-only (EXAMINE, BODY.PEEK[]), so n
 It looks for mail about roles whose card is Shortlisted, Applied or Interview (from data/pipeline_snapshot.json,
 data/pipeline_log.jsonl and data/matches.csv in the checkout): mail from a recruiting system, or from a sender or with a
 subject that names the company. Sign-in codes, password resets, security alerts, job-alert mail and bulk promotions are
-skipped without being read. For each kept message it saves headers, Gmail's thread id and the first ~1500 characters of
+skipped without being read. For each kept message it saves headers, Gmail's thread id and the first ~2500 characters of
 the text part to <out>/messages.json (never committed). `tools/app_mail.py ingest` then classifies them without any
 secret and writes the ledger, which holds no message text.
 
@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import email
 import email.policy
+import html
 import imaplib
 import json
 import os
@@ -35,10 +36,11 @@ sys.path.insert(0, str(ROOT / "tools"))
 from fetch_alert_emails import all_mail_name  # noqa: E402  (stdlib-only)
 from jobradar import application_mail as am  # noqa: E402  (stdlib-only)
 
-SNIPPET_CHARS = 1500
+SNIPPET_CHARS = 2500
 MAX_CANDIDATES = 120   # per run: each one is a fetch, and a busy mailbox must not make the step slow
 THREAD = re.compile(rb"X-GM-THRID (\d+)")
 TAGS = re.compile(r"<[^>]+>")
+BLOCKS = re.compile(r"(?is)<(style|script|head)\b.*?</\1>")   # CSS and scripts would fill the snippet
 
 
 def _text(msg: email.message.Message) -> str:
@@ -52,7 +54,7 @@ def _text(msg: email.message.Message) -> str:
         except Exception:
             continue
         if kind == "html":
-            body = TAGS.sub(" ", body)
+            body = html.unescape(TAGS.sub(" ", BLOCKS.sub(" ", body)))
         return re.sub(r"\s+", " ", body).strip()[:SNIPPET_CHARS]
     return ""
 

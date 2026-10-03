@@ -79,7 +79,7 @@ The user kept missing replies, so the scheduled run now watches the mailbox for 
   and password resets in `NOISE_SUBJECT`, job-alert senders and bulk mail with `List-Unsubscribe` are skipped); `resolve()` ties an email to a role:
   `exact` (the role's full title is in the text, longest title wins), `company` (only one watched role at that company), `ambiguous` or `none`.
 - `tools/fetch_application_mail.py` (run `python -I -S` before `pip install`, the second step that sees the mailbox password): read-only `EXAMINE` of All Mail,
-  `BODY.PEEK[]`, headers first, then Gmail's thread id and the first 1,500 characters of text for candidates only (capped at 120 a run). Writes
+  `BODY.PEEK[]`, headers first, then Gmail's thread id and the first 2,500 characters of text for candidates only (capped at 120 a run). Writes
   `.app_mail/messages.json` and `_status.json` (never committed); a failure is reported, never raised.
 - `tools/app_mail.py` (no secret): `ingest` classifies those messages (`classify_mail()` reuses `inbox_outcomes.classify`; a receipt-like subject
   keeps a receipt a receipt even when its body mentions interviews; only an invitation to speak or schedule counts as a `strong` interview) and appends

@@ -249,3 +249,28 @@ def test_fetch_step_reports_missing_credentials_without_raising(root, tmp_path, 
     assert fam.main(["--out", str(tmp_path / "o")]) == 0
     assert "JOBALERT_IMAP_USER" in json.loads((tmp_path / "o" / "_status.json").read_text())["error"]
     assert "app-password" not in capsys.readouterr().out
+
+
+# --- regressions from the first live run ---------------------------------------------------------------------
+
+def test_receipt_boilerplate_about_not_being_selected_is_not_a_rejection():
+    kind, _, _, _ = app_mail.classify_mail("Thank you for your application to Sonar",
+                                           "If you are not selected for this role we will keep your details on file.")
+    assert kind == "receipt"
+    # ...but a definite rejection under the same kind of subject still is one
+    assert app_mail.classify_mail("Thank you for your application to Sonar",
+                                  "Unfortunately we have decided not to move forward.")[0] == "rejection"
+
+
+def test_amazon_notices_are_not_left_unclassified():
+    assert app_mail.classify_mail("Keep track of your application", "")[0] == "receipt"
+    assert app_mail.classify_mail("You have been referred for a role at Amazon", "")[0] == "referral"
+
+
+def test_html_only_mail_starts_at_the_message_not_at_its_css():
+    import email.policy
+    from email import message_from_bytes
+    raw = (b"From: a@b.c\r\nSubject: s\r\nContent-Type: text/html\r\n\r\n<html><head><style>.x{color:red}" + b"p{}" * 900 +
+           b"</style></head><body><p>We&#39;ve received your application for the Security Engineer, SDO AppSec</p></body></html>")
+    text = fam._text(message_from_bytes(raw, policy=email.policy.default))
+    assert text.startswith("We've received your application") and "color" not in text

@@ -34,7 +34,7 @@ RULES: list[tuple[str, list[str]]] = [
         r"will not be taking your application", r"decided not to (?:move|proceed)",
     ]),
     ("offer", [r"pleased to offer", r"delighted to offer", r"offer of employment", r"extend (?:you )?an offer", r"offer letter"]),
-    ("referral", [r"has referred you", r"referred you for"]),   # "X referred you; you are welcome to apply": not an outcome
+    ("referral", [r"has referred you", r"referred you for", r"you have been referred"]),   # "X referred you; you are welcome to apply": not an outcome
     ("interview", [
         r"\binterview\b", r"schedule a (?:call|chat|conversation)", r"next steps?\b", r"invite you to", r"phone screen",
         r"coding (?:challenge|assessment|test)", r"technical assessment", r"would like to (?:speak|talk|chat|meet)", r"take-?home",
@@ -42,7 +42,8 @@ RULES: list[tuple[str, list[str]]] = [
     ("acknowledgement", [
         r"thank(?:s| you) for (?:applying|(?:thinking of us|your (?:application|interest)))", r"thanks for your interest",
         r"(?:we(?:'ve| have)? )?(?:just )?received your (?:application|resume|cv)",
-        r"application (?:has been )?received", r"we will (?:review|be in touch)",
+        r"application (?:has been )?received", r"we will (?:review|be in touch)", r"keep track of your application",
+        r"now with us",
     ]),
 ]
 

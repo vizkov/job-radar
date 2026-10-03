@@ -34,11 +34,13 @@ also why the public template never runs anything.
 | 1 | `actions/checkout@<sha>` | Downloads the repo | run fails |
 | 2 | `actions/setup-python@<sha>` | Installs Python 3.13 | run fails |
 | 3 | Fetch job-alert emails | `python -I -S tools/fetch_alert_emails.py --out .alert_mail --days 3 --providers linkedin,indeed,glassdoor` with the two mail secrets in its environment | ignored (`continue-on-error`); the failure shows in the Radar status card |
+| 3b | Fetch application mail | `python -I -S tools/fetch_application_mail.py --out .app_mail --days 4`, same two secrets | ignored; the failure shows in the brief's CADENCE line |
 | 4 | `pip install --require-hashes -r requirements.txt` | Installs dependencies; refuses any file whose hash doesn't match the lock file | run fails |
 | 5 | `python radar.py --quiet` | The pipeline (3.2 below) | run fails |
 | 6 | `board_sync.py roles` | Queued roles → issues | ignored, so the commit still happens |
 | 7 | `board_sync.py stale` | Label roles no longer listed | ignored |
 | 8 | `board_sync.py status` | Update the pinned "Radar status" issue | ignored |
+| 8b | Log application mail | `python tools/app_mail.py ingest --dir .app_mail` (no secrets) | ignored |
 | 9 | Commit state | `git add state digests data/matches.csv`, commit, then up to 3 tries of `git pull --rebase` + `git push` | run fails |
 
 Three details that matter:

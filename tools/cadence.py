@@ -81,7 +81,8 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
           new_waiting: int, queued: int, unscored_cards: int, auto_picks: int, awaiting: int,
           posts_enabled: bool, posts_fallback: datetime | None = None, views_drift: str | None = None,
           docs_review: str | None = None, cv_gaps: str | None = None, source_problems: int = 0,
-          docs_review_job: bool = True) -> tuple[list[str], list[str]]:
+          docs_review_job: bool = True,
+          mail_scan: tuple[str, bool] | None = None) -> tuple[list[str], list[str]]:
     """(lines for the brief, names of the jobs that are due). Every job gets a line, due or not."""
     lines = ["- CADENCE (each recurring job and when it last ran). Run every one marked DUE, or tell the user in one "
              "line which you skipped and why; never skip one silently:"]
@@ -118,6 +119,11 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
         lines.append(f"  - Inbox check (Gmail): {awaiting} application(s) await an answer; {when('inbox_check', now, root)} · {state}")
     else:
         lines.append("  - Inbox check (Gmail): no application awaits an answer · ok")
+    # application mail: the Action's daily scan fills the ledger (tools/app_mail.py); a silent scan hides replies
+    if mail_scan:
+        lines.append(mail_scan[0])
+        if mail_scan[1]:
+            due.append("app_mail_scan")
     # LinkedIn post sweep
     if posts_enabled:
         if is_due("post_discovery", now, root):

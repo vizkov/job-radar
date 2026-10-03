@@ -59,6 +59,16 @@ jobs:
           JOBALERT_IMAP_USER: ${{ secrets.JOBALERT_IMAP_USER }}
           JOBALERT_IMAP_PASSWORD: ${{ secrets.JOBALERT_IMAP_PASSWORD }}
 
+      # Same rules: the second (and last) step that sees the mailbox password. It saves emails about the roles you
+      # applied to (receipts, replies, interview invitations) to .app_mail/ (never committed); the ledger step below
+      # classifies them without secrets.
+      - name: Fetch application mail
+        continue-on-error: true
+        run: python -I -S tools/fetch_application_mail.py --out .app_mail --days 4
+        env:
+          JOBALERT_IMAP_USER: ${{ secrets.JOBALERT_IMAP_USER }}
+          JOBALERT_IMAP_PASSWORD: ${{ secrets.JOBALERT_IMAP_PASSWORD }}
+
       - run: pip install --require-hashes -r requirements.txt
 
       - id: radar
@@ -85,6 +95,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python tools/board_sync.py status
+
+      - name: Log application mail
+        continue-on-error: true
+        run: python tools/app_mail.py ingest --dir .app_mail
 
       - name: Commit state
         run: |

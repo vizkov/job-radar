@@ -71,7 +71,7 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
   (`profile/applications/<folder>/`).
 - Tools you run (all have `--help`): `radar.py`, `verify_boards.py`,
   `tools/board_sync.py`, `tools/jd_prep.py`, `tools/jd_check.py`, `tools/render_resume.py`,
-  `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/cv_lint.py` (form and section rules: `.claude/skills/tailor-application/writing-rules.md`), `tools/master_drift.py` (which applications no longer match the master documents), `tools/inbox_outcomes.py` (applications awaiting an answer; phrase classifier for outcome emails), `tools/build_candidates.py`, `tools/public_template.py`,
+  `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/cv_lint.py` (form and section rules: `.claude/skills/tailor-application/writing-rules.md`), `tools/master_drift.py` (which applications no longer match the master documents), `tools/inbox_outcomes.py` (applications awaiting an answer; phrase classifier for outcome emails), `tools/fetch_application_mail.py` + `tools/app_mail.py` (the Action's daily mailbox scan and the application-mail ledger `state/application_mail.jsonl`: the brief's **MAIL** lines), `tools/build_candidates.py`, `tools/public_template.py`,
   `tools/post_leads.py` (query rotation, recruiter list, lead log and add-role for LinkedIn hiring posts),
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
 - Tailoring always starts from `profile/career/` (never from another application's `tailored.json`); the CV header location is always

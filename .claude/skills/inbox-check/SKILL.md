@@ -18,6 +18,7 @@ mailbox for them, **read-only**, and **suggests** board changes. It never moves 
 - Quote at most a short subject or one line per email; don't paste bodies or personal details into the chat or into files.
 
 ## Steps
+0. **Start from the ledger.** The daily scan (`tools/app_mail.py`) already logged emails about your roles; the brief's **MAIL** lines are its plan. Handle those first (`python tools/app_mail.py plan`): `auto` items are moved with `track` and reported in one line each, `ask` items wait for the user's yes, `action needed` items are told to the user first; after each, `python tools/app_mail.py ack <id>`. The steps below add what the scan cannot see (it only sees the Action's mailbox, and only mail it could match to a role): use them to verify and to read a whole thread.
 1. **What is waiting for an answer:** `python tools/inbox_outcomes.py pending` lists roles in Stage Applied or Interview with the date
    they moved there and a Gmail search for each (`"Company" after:YYYY/MM/DD`). Nothing pending: say so and stop.
 2. **Connect Gmail.** Load the Gmail tools with ToolSearch (`+gmail`). If only `authenticate` shows, the user has not connected it: call it,

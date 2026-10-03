@@ -66,8 +66,32 @@ lines to fit, and the renderer never shrinks the type.
 
 Used by the `inbox-check` skill ([4.10](04-Claude-session.md)). No mailbox access and no LLM. `pending()` lists refs in Stage Applied or Interview
 (`latest_stages()` overlays the stage log on `data/pipeline_snapshot.json`; `applied_dates()` gives the date each moved there) with a Gmail
-search string; `classify()` matches phrase rules in the order rejection, offer, interview, acknowledgement (unknown otherwise); `seen_ids()` and
+search string; `classify()` matches phrase rules in the order rejection, offer, referral ("X has referred you"), interview, acknowledgement (unknown otherwise); `seen_ids()` and
 `add_seen()` keep `state/inbox_seen.json`; `main()` is the CLI (`pending`, `classify`, `seen`).
+
+## `tools/fetch_application_mail.py`, `tools/app_mail.py`, `jobradar/application_mail.py`: the application-mail ledger
+
+The user kept missing replies, so the scheduled run now watches the mailbox for them ([4.10](04-Claude-session.md)). Three standard-library-only files:
+
+- `jobradar/application_mail.py` (no secrets, imported by the password-holding step): `targets()` lists roles whose card is Shortlisted, Applied or Interview
+  (`latest_stages()` overlays the stage log on the committed snapshot; Shortlisted is included because the receipt is often the first sign the user applied);
+  `candidate()` is the header-only filter (recruiting-system senders in `ATS_DOMAINS`, or the company named in the sender or subject; sign-in codes
+  and password resets in `NOISE_SUBJECT`, job-alert senders and bulk mail with `List-Unsubscribe` are skipped); `resolve()` ties an email to a role:
+  `exact` (the role's full title is in the text, longest title wins), `company` (only one watched role at that company), `ambiguous` or `none`.
+- `tools/fetch_application_mail.py` (run `python -I -S` before `pip install`, the second step that sees the mailbox password): read-only `EXAMINE` of All Mail,
+  `BODY.PEEK[]`, headers first, then Gmail's thread id and the first 1,500 characters of text for candidates only (capped at 120 a run). Writes
+  `.app_mail/messages.json` and `_status.json` (never committed); a failure is reported, never raised.
+- `tools/app_mail.py` (no secret): `ingest` classifies those messages (`classify_mail()` reuses `inbox_outcomes.classify`; a receipt-like subject
+  keeps a receipt a receipt even when its body mentions interviews; only an invitation to speak or schedule counts as a `strong` interview) and appends
+  new ones to `state/application_mail.jsonl`: sender address, subject, date, thread id, type, matched role. **No message text is stored.** It also writes
+  `state/application_mail_status.json` (the scan's health). `plan()` sorts unhandled mail into `auto` (an exact-title rejection, an interview invitation or an
+  offer tied to one role: the session makes the move and tells the user), `ask` (a rejection that is not an exact match, a receipt for a card still
+  Shortlisted, an unmatched offer: wait for the user's yes), `action` (assessments, scheduling, anything the user must do) and `info` (receipts and
+  referral notices from the last 3 days). `ack` appends an acknowledgement row so an item stops being listed. `brief_lines()` and `scan_line()` feed the
+  session brief (`MAIL` lines and the CADENCE line for the scan).
+
+**Watch out:** the Action cannot move board cards (its token cannot reach the Project), so the ledger is acted on in the next session. The
+snapshot the Action reads is only as fresh as the user's last push, which is why Shortlisted roles are watched too.
 
 ## `tools/master_drift.py`: which applications no longer match the master documents
 

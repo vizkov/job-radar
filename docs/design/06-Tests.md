@@ -59,6 +59,7 @@ exposed insight lines being read as job titles. Indeed and Glassdoor still have 
 | `test_eu_sources.py` | `bundesagentur`, `jobtech`, `eures`, `reed` | Parsing, JobTech phrase quoting, EURES title search, one failing query keeps the rest |
 | `test_careers_page.py` | `sources/careers_page` | Each real page, hash stability, missing anchor is an error, JSON/RSS feeds, XML entity-expansion rejected, robots.txt |
 | `test_cv_lint.py` | `tools/cv_lint` | Form and section rules from `writing-rules.md` |
+| `test_app_mail.py` | `jobradar/application_mail`, `tools/app_mail`, `tools/fetch_application_mail` | Header filter (codes, alerts, bulk mail skipped), role matching (exact / company / ambiguous), receipts that mention interviews stay receipts, only exact-title rejections move automatically, ledger holds no message text, ack, scan-health line, fetch step read-only with PEEK and missing credentials reported not raised |
 | `test_inbox_outcomes.py` | `tools/inbox_outcomes` | Pending applications, phrase classifier, seen ids |
 | `test_master_clearance.py` | `tools/master_drift`, `jd_check tailor` | Submitted applications listed as `SUBMITTED`, not STALE (`--all` checks them); applications refused until the masters are cleared |
 | `test_render_pdf.py` | `tools/render_pdf` | CV and cover-letter PDF layout |

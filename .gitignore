@@ -3,4 +3,5 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .alert_mail/
+.app_mail/
 work/

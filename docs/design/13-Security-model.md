@@ -53,6 +53,7 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
 | A compromised Python package reads it from the environment | The secret exists only in the one step that fetches mail, which runs **before** `pip install` and with `python -I -S`: no third-party code is on the machine or in the process. A test proves the fetcher imports only the standard library | `radar.yml` step 3, `tools/fetch_alert_emails.py`, `jobradar/alert_providers.py` |
 | It's written to a file, a commit or the chat | It lives only in GitHub Actions secrets; the fetcher never prints it (a test checks) | `fetch_alert_emails.py`, `CLAUDE.md` rule 5 |
 | It's used to change the mailbox | Read-only IMAP (`EXAMINE`, `BODY.PEEK[]`): nothing is marked read, moved or deleted | `fetch_alert_emails.py: fetch()` |
+| The application-mail scan reads more of the mailbox than alerts do | `fetch_application_mail.py` lists headers only, reads the body of messages from recruiting systems or naming a watched company, skips sign-in codes, password resets and bulk mail, and the ledger stores no message text | `application_mail.py: candidate()`, `app_mail.py: ingest()` |
 | A leak exposes the user's whole inbox | Recommended: a dedicated mailbox that only holds forwarded alerts ([12](12-Job-alert-emails.md)) | user's choice |
 
 ### 3. A malicious job ad or email attacks the system

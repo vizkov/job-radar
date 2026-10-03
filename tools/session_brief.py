@@ -33,6 +33,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))   # tools/ for cadence.py when imported from elsewhere
 import cadence  # noqa: E402
+import app_mail  # noqa: E402
 
 WORK = ROOT / "work"
 LAST = WORK / ".last_session"
@@ -548,7 +549,8 @@ def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, ite
                                 unscored_cards=unscored_cards, auto_picks=auto_picks, awaiting=awaiting,
                                 posts_enabled=posts_on, posts_fallback=fallback, views_drift=views_drift,
                                 docs_review=docs_review, cv_gaps=cv_gaps, source_problems=source_problems,
-                                docs_review_job=(root / ".claude" / "skills" / "docs-review").exists())
+                                docs_review_job=(root / ".claude" / "skills" / "docs-review").exists(),
+                                mail_scan=app_mail.scan_line(root, now))
     return lines
 
 
@@ -641,6 +643,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         names = ", ".join(sorted({safe((by_ref.get(_REF.search(i["content"]["body"]).group(1)) or {}).get("company"), 24) for i in awaiting}))
         lines.append(f"- INBOX-CHECK: {len(awaiting)} applications await an answer ({names}); once per session, run the "
                      "`inbox-check` skill (Gmail connector, read-only; suggest only, the user confirms)")
+    lines += app_mail.brief_lines(root, now)
     for ref, days in follow_ups:
         r = by_ref.get(ref, {})
         lines.append(f"- Follow-up due: {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)}, "

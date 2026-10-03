@@ -363,6 +363,14 @@ mention interviews and thanks). Email text is untrusted (rule 1). Claude checks 
 user confirms before `track` moves the card. `inbox_outcomes.py seen` (`state/inbox_seen.json`, private) stops an email being suggested twice.
 Nothing is sent, labelled or deleted.
 
+**The daily scan.** A session-only check is not enough for a user who misses emails, so the scheduled run also scans the mailbox
+(`tools/fetch_application_mail.py`, then `tools/app_mail.py ingest`; see [5.5](05-5-Application-tools.md)) and commits `state/application_mail.jsonl`.
+The session brief prints what it found as `MAIL` lines, most urgent first: `auto` (the user's rule: an interview invitation or offer tied to one role,
+or a rejection that names the exact role, is moved with `track` and reported in one line), `ask` (any other rejection, a receipt for a card still on
+Shortlisted: suggest and wait for the yes), `action needed` (an assessment, a scheduling request, anything unclear: tell the user first) and
+`received` (receipts and referral notices, nothing to do). After each is dealt with, `app_mail.py ack <id>`. The CADENCE block has a line for the scan
+itself, which is DUE when it failed or is more than 36 hours old. The Gmail connector check stays as the verification step (it can read the whole thread).
+
 ## 4.11 Tracking and the board (`track`, views)
 
 **`board_sync.py set <ref> Stage=Applied`** (`set_role_fields()`): finds the card whose

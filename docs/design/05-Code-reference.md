@@ -35,6 +35,8 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 | `tools/render_resume.py` | CV and cover letter files | [5.5](05-5-Application-tools.md) |
 | `tools/render_pdf.py` | the CV and cover letter as PDFs in the user's Claude Design layout | [5.5](05-5-Application-tools.md) |
 | `tools/inbox_outcomes.py` | applications awaiting an answer, and an outcome-email classifier | [5.5](05-5-Application-tools.md) |
+| `tools/fetch_application_mail.py` | the scheduled run's mailbox scan for replies about applied roles (standard library only) | [5.5](05-5-Application-tools.md) |
+| `tools/app_mail.py` | application-mail ledger, plan and brief lines (standard library only) | [5.5](05-5-Application-tools.md) |
 | `tools/master_drift.py` | which applications no longer match the master documents | [5.5](05-5-Application-tools.md) |
 | `tools/cv_lint.py` | form and section rules for CV and letter text | [5.5](05-5-Application-tools.md) |
 | `tools/consistency_check.py` | cross-check CV, cover letter and STAR stories | [5.5](05-5-Application-tools.md) |

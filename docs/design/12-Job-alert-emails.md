@@ -16,8 +16,10 @@ LinkedIn / Indeed / Glassdoor ──alert email──▶ your main Gmail
 
 ## Where the password goes (and doesn't)
 
-The mailbox password exists in exactly one place: the **"Fetch job-alert emails"**
-step of `radar.yml`. That step:
+The mailbox password exists in exactly two places, both steps of `radar.yml` with the same rules: **"Fetch job-alert emails"**
+(this page) and **"Fetch application mail"** (`tools/fetch_application_mail.py`, which looks for receipts, replies and interview
+invitations about roles the user applied to; see [5.5](05-5-Application-tools.md) and [13](13-Security-model.md)). The mailbox
+behind the secrets must be the one employers write to for the second step to see anything. The first step:
 
 - runs **before** `pip install`, so no third-party package is on the machine yet;
 - runs `python -I -S`, so Python loads no site-packages and no startup hooks;
@@ -98,7 +100,7 @@ The user-facing version is in [Your part](../wiki/Your-part.md). The details:
    app password.
 6. **Turn it on:** set `alert_email: enabled: true` in `profile/sources.yaml` (the
    sample in `examples/` ships with it off). The workflow already
-   passes both secrets to the fetch step only.
+   passes both secrets to the two fetch steps only (alert mail, application mail).
    To use fewer providers, trim `--providers` in that step and `providers` in
    `sources.yaml`.
 

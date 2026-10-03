@@ -50,7 +50,7 @@ Three details that matter:
 - Step 3 runs **before** step 4. At that moment no third-party Python package exists on
   the machine, and `-I -S` makes Python ignore any site-packages and startup hooks. So the
   only code that ever shares a process with the mailbox password is the standard library
-  plus two small files in this repo. See [Job-alert emails](12-Job-alert-emails.md).
+  plus a few small files in this repo (`jobradar/alert_providers.py`, `jobradar/application_mail.py`, `tools/fetch_alert_emails.py`). Two steps see the password: the alert fetch and the application-mail fetch. See [Job-alert emails](12-Job-alert-emails.md).
 - Step 9 retries because the user may push from their machine while the run is going
   (GitHub rejects a push that isn't based on the latest commit).
 

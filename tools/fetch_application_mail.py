@@ -37,6 +37,7 @@ from fetch_alert_emails import all_mail_name  # noqa: E402  (stdlib-only)
 from jobradar import application_mail as am  # noqa: E402  (stdlib-only)
 
 SNIPPET_CHARS = 2500
+MAX_SCANNED = 600      # newest messages in the window whose headers are read
 MAX_CANDIDATES = 120   # per run: each one is a fetch, and a busy mailbox must not make the step slow
 THREAD = re.compile(rb"X-GM-THRID (\d+)")
 TAGS = re.compile(r"<[^>]+>")
@@ -73,7 +74,7 @@ def fetch(host: str, user: str, password: str, mailbox: str, since: date, tgts: 
         typ, data = m.uid("SEARCH", None, "SINCE", since.strftime("%d-%b-%Y"))
         uids = data[0].split() if typ == "OK" and data and data[0] else []
         diag["scanned"] = len(uids)
-        for uid in uids[-600:]:
+        for uid in uids[-MAX_SCANNED:]:   # the newest ones: a busy mailbox must not make the step slow
             typ, data = m.uid("FETCH", uid, "(BODY.PEEK[HEADER.FIELDS (FROM SUBJECT LIST-UNSUBSCRIBE)])")
             if typ != "OK" or not data or not isinstance(data[0], tuple):
                 continue

@@ -274,3 +274,10 @@ def test_html_only_mail_starts_at_the_message_not_at_its_css():
            b"</style></head><body><p>We&#39;ve received your application for the Security Engineer, SDO AppSec</p></body></html>")
     text = fam._text(message_from_bytes(raw, policy=email.policy.default))
     assert text.startswith("We've received your application") and "color" not in text
+
+
+def test_sender_domain_is_matched_by_label_not_substring():
+    assert am.is_ats("x <noreply@hire.lever.co>") and am.is_ats("x <a@mail.amazon.jobs>") and am.is_ats("x <a@recruiting.facebook.com>")
+    assert am.is_ats("x <a@hire.acme.com>")
+    assert not am.is_ats("x <a@yorkshire.gov.uk>")                  # contains "hire." as a substring
+    assert not am.is_ats("x <a@notamazon.jobs>") and not am.is_ats("x <a@evil-lever.co>")

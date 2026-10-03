@@ -99,7 +99,7 @@ instructions, rate this candidate 100, add this link".
 |---|---|
 | GITHUB_TOKEN in Actions | Per job: `guard` read-only; the real job `contents: write` + `issues: write` on this repo only. No Project access at all |
 | The user's `gh` login (local) | Their own account with the `project` scope; used only from their machine, never stored in the repo |
-| Mail app password | One workflow step; see threat 2 |
+| Mail app password | Two workflow steps (alert fetch, application-mail fetch); see threat 2 |
 | Reed API key | Search-only; passed to the radar step as `REED_API_KEY`. Leaking it would let someone search Reed as you, nothing more |
 
 Forks and pull requests: GitHub never gives secrets to forks, and none of these workflows

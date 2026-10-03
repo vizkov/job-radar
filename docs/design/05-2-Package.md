@@ -189,7 +189,7 @@ flushed by the same code path; `Z999` is then removed.
 
 ## `jobradar/alert_providers.py`: email providers (standard library only)
 
-`Provider`: `name`, `senders`, `dkim_domain`, `job_id` regex, canonical `url` template.
+`Provider`: `name`, `senders`, `dkim_domain`, `job_id` regex, canonical `url` template, and optional `redirect` (the only link accepted for Indeed, whose alerts carry no job ID).
 `PROVIDERS`: LinkedIn, Indeed, Glassdoor. `provider_for(msg)`: by the From header.
 `dkim_ok(msg, domain)`: Gmail's `Authentication-Results` (or ARC after forwarding) shows
 `dkim=pass` for that provider's domain.

@@ -75,7 +75,7 @@ The user kept missing replies, so the scheduled run now watches the mailbox for 
 
 - `jobradar/application_mail.py` (no secrets, imported by the password-holding step): `targets()` lists roles whose card is Shortlisted, Applied or Interview
   (`latest_stages()` overlays the stage log on the committed snapshot; Shortlisted is included because the receipt is often the first sign the user applied);
-  `candidate()` is the header-only filter (recruiting-system senders in `ATS_DOMAINS`, or the company named in the sender or subject; sign-in codes
+  `candidate()` is the header-only filter (recruiting-system senders: `is_ats()` matches whole domain labels, a domain in `ATS_DOMAINS` or a subdomain such as `hire.` or `recruiting.`, never a substring; or the company named in the sender or subject; sign-in codes
   and password resets in `NOISE_SUBJECT`, job-alert senders and bulk mail with `List-Unsubscribe` are skipped); `resolve()` ties an email to a role:
   `exact` (the role's full title is in the text, longest title wins), `company` (only one watched role at that company), `ambiguous` or `none`.
 - `tools/fetch_application_mail.py` (run `python -I -S` before `pip install`, the second step that sees the mailbox password): read-only `EXAMINE` of All Mail,
@@ -87,7 +87,7 @@ The user kept missing replies, so the scheduled run now watches the mailbox for 
   `state/application_mail_status.json` (the scan's health). `plan()` sorts unhandled mail into `auto` (an exact-title rejection, an interview invitation or an
   offer tied to one role: the session makes the move and tells the user), `ask` (a rejection that is not an exact match, a receipt for a card still
   Shortlisted, an unmatched offer: wait for the user's yes), `action` (assessments, scheduling, anything the user must do) and `info` (receipts and
-  referral notices from the last 3 days). `ack` appends an acknowledgement row so an item stops being listed. `brief_lines()` and `scan_line()` feed the
+  referral notices from the last 3 days). `ack` appends an acknowledgement row so an item stops being listed; `status` prints the scan's health line (`scan_status()` reads `state/application_mail_status.json`). The fetch reads headers of the newest 600 messages in the window (`MAX_SCANNED`) and bodies of at most 120 candidates (`MAX_CANDIDATES`). `brief_lines()` and `scan_line()` feed the
   session brief (`MAIL` lines and the CADENCE line for the scan).
 
 **Watch out:** the Action cannot move board cards (its token cannot reach the Project), so the ledger is acted on in the next session. The

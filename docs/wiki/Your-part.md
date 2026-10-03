@@ -81,7 +81,7 @@ and job-radar reads the alert emails.
 1. Create the alerts on each site (Claude suggests the searches).
 2. Choose the mailbox. **Recommended: a new Gmail account used only for alerts**, with a
    filter in your main Gmail forwarding alerts to it. You *can* use your main Gmail, but
-   then the password below unlocks your whole inbox if it ever leaked.
+   then the password below unlocks your whole inbox if it ever leaked (the trade-off: only your normal inbox lets the reply tracking work, see "Which mailbox?" below).
 3. Turn on 2-Step Verification for that account (Google requires it), then create an
    **app password**: Google Account → Security → App passwords. It's a separate password
    just for this, and you can revoke it any time without changing your real one.
@@ -91,14 +91,21 @@ and job-radar reads the alert emails.
    and are never shown again, not even to Claude.
 
 What happens with it: three times a day GitHub's servers log in to that mailbox
-**read-only**, fetch only emails from LinkedIn, Indeed and Glassdoor, and never mark
-anything read, move or delete it. Emails that fail the sender's security signature are
-ignored. **Never paste the password into Claude or a file.**
+**read-only** and never mark anything read, move or delete it. They do two things. (1) Fetch the emails from
+LinkedIn, Indeed and Glassdoor (emails that fail the sender's security signature are ignored). (2) Look for emails about
+the roles you have shortlisted or applied to: receipts, rejections, interview invitations, assessments. Only the sender,
+subject, date and a link are kept (in your private repository), never the email text, and sign-in codes, password resets
+and newsletters are skipped. Claude tells you what it found at the start of a session, so a reply cannot hide in a busy
+inbox. **Never paste the password into Claude or a file.**
 
-**Two separate Gmail accesses, don't mix them up.** (1) The alert mailbox above is read by GitHub's servers every
-run, over IMAP with its own app password, and only for alert emails. (2) Separately, when you ask "did anyone reply?",
-Claude reads *your* Gmail in the session through the Gmail connector in Claude (you approve it once; read-only). Use
-your normal inbox for (2): that is where employers answer.
+**Which mailbox?** For (2) to see replies, the mailbox behind the app password must be the one employers write to (your
+normal address). With a separate alert-only mailbox, (1) works and (2) finds nothing; use your normal inbox if you want
+the reply tracking.
+
+**Two separate Gmail accesses, don't mix them up.** (1) The mailbox above is read by GitHub's servers every
+run, over IMAP with its own app password. (2) Separately, when you ask "did anyone reply?",
+Claude reads *your* Gmail in the session through the Gmail connector in Claude (you approve it once; read-only), which
+can read a whole conversation and check what the scan classified.
 
 ## Optional: Reed (UK job board)
 

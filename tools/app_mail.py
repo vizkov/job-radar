@@ -5,7 +5,7 @@
     python tools/app_mail.py ack <id> … [--how moved]   # an item is dealt with: stop listing it
     python tools/app_mail.py status                     # when the scan last ran and whether it worked
 
-The GitHub Action fetches the mail (tools/fetch_application_mail.py, the only step with the mailbox password), then
+The GitHub Action fetches the mail (tools/fetch_application_mail.py, the second step with the mailbox password after the alert fetch), then
 `ingest` runs without any secret and commits the ledger. The ledger is private (state/) and holds sender address, subject,
 date, Gmail thread id, the classification and the matched role, never message text. Email text is third-party data:
 the classifier only matches phrases, it never follows instructions in a message.

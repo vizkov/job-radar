@@ -13,7 +13,8 @@ committed to the repo and through GitHub (issues, the board).
 ```
  ┌──────────────── 1. GitHub Actions (GitHub's servers, no human) ────────────────┐
  │ radar.yml, 3x a day                                                            │
- │   fetch_alert_emails.py ─▶ .alert_mail/*.eml   (only step with the mail secret)│
+ │   fetch_alert_emails.py ─▶ .alert_mail/*.eml   (one of two steps with the mail secret)│
+ │   fetch_application_mail.py ─▶ .app_mail/ ─▶ app_mail.py ingest ─▶ state/application_mail.jsonl │
  │   radar.py ─▶ poll sources ─▶ filter ─▶ match ─▶ dedupe ─▶ new? ─▶ tier/sponsor│
  │           ─▶ data/matches.csv, state/*, digests/status.md, state/board_queue   │
  │   board_sync.py roles|stale|status ─▶ GitHub issues (labels) ─────────┐        │
@@ -126,6 +127,7 @@ doesn't match `PRIVATE`.
 | `data/matches.csv` | One row per new role ever found: ref, date, company, title, location, countries, url, source, posted, on_list, tier, score, score_reasons, uk/nl sponsor, also_on, ats, ats_slug, external_id | `radar.py: append_matches()` | `jd_prep.py`, `session_brief.py`, `board_sync.py` (Posted fallback), Claude |
 | `data/scores.jsonl` | One JSON line per scored role: fit_score, recommendation, blockers, missing requirements, summary, injection flag | `jd_check.py score` | `session_brief.py`, `jd_prep.py` (skip scored), `cv-review` |
 | `data/pipeline_log.jsonl` | Every stage change: `{ref, field, value, by: claude|board, at, from?, note?}` | `board_sync.py set`, `session_brief.py` | `session_brief.py` (follow-ups) |
+| `state/application_mail.jsonl`, `state/application_mail_status.json` | Emails about roles applied to (sender, subject, date, thread id, type, matched role; acknowledgements as `{ack, at, how}` rows) and when the scan last ran and whether it worked | `tools/app_mail.py ingest` (in the Action) | `tools/app_mail.py`, `session_brief.py` |
 | `data/post_leads.jsonl`, `data/post_people.jsonl`, `state/post_queries.json` | LinkedIn hiring posts logged (`{id, post_url, author, author_url, reposter, company, title, location, posted, status: new|known|stale|job_board|added, ref, …}`), recruiters and managers worth re-reading, and when each post search last ran | `tools/post_leads.py` | `tools/post_leads.py` |
 | `data/referrals.jsonl` | Every referral ask and answer: `{ref, person, relation?, channel?, status: asked|referred|declined|no_reply|finding|none|not_needed, note, at}` | `tools/referrals.py` | `tools/referrals.py`, `session_brief.py` (reminders) |
 | `data/sponsorship.jsonl` | One checked sponsorship verdict per role, with evidence and URLs | `tools/sponsorship.py record` | `sponsorship.py company` (reuse), Claude |
@@ -166,7 +168,7 @@ starts them from scratch (so both review timers reset).
 | Bundesagentur, JobTech, EURES APIs | Job search | none / published public key |
 | Company careers pages | Job lists | none; robots.txt respected |
 | Reed Jobs API | UK job search | free API key, GitHub secret `REED_API_KEY`, radar step only |
-| Gmail IMAP | Alert emails | app password, GitHub secret, one workflow step only |
+| Gmail IMAP | Alert emails; replies about applied roles | app password, GitHub secret, two workflow steps only (both `python -I -S`, stdlib only) |
 | gov.uk content API, ind.nl | Sponsor registers | none |
 | GitHub (issues, Projects, Actions, GraphQL) | Board, scheduling | GITHUB_TOKEN in Actions; the user's `gh` login locally |
 | LinkedIn, Indeed, Glassdoor | **Never fetched by code.** Only their emails are read. Exception: Claude reads one LinkedIn job page at a time in the user's Chrome to score a role (CLAUDE.md rule 4a) | n/a |

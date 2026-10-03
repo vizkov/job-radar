@@ -19,12 +19,13 @@ WATCHED = ("Shortlisted", "Applied", "Interview")
 
 # Sender domains of recruiting systems and big employers' no-reply senders. Mail from these is considered even when the
 # company's name is not in the sender (Lever and Greenhouse send for many companies).
-ATS_DOMAINS = (
+ATS_DOMAINS = (   # the sender's domain is one of these or a subdomain of one
     "lever.co", "greenhouse.io", "myworkday.com", "myworkdayjobs.com", "ashbyhq.com", "smartrecruiters.com", "icims.com",
-    "successfactors", "taleo.net", "workable.com", "recruitee.com", "teamtailor.com", "jobvite.com", "bamboohr.com",
-    "pinpointhq.com", "eightfold.ai", "phenompeople.com", "oraclecloud.com", "hire.", "recruiting.", "careers.", "jobs.",
-    "mail.amazon.jobs", "email.apple.com", "recruiting.facebook.com",
+    "successfactors.com", "successfactors.eu", "taleo.net", "workable.com", "recruitee.com", "teamtailor.com", "jobvite.com",
+    "bamboohr.com", "pinpointhq.com", "eightfold.ai", "phenompeople.com", "amazon.jobs", "email.apple.com",
 )
+# A subdomain label that recruiting systems use in front of a company's own domain (hire.acme.com, recruiting.facebook.com).
+ATS_LABELS = ("hire", "recruiting", "careers", "jobs", "talent", "apply")
 
 # Mail that must never reach the ledger: sign-in codes, password resets and security alerts.
 NOISE_SUBJECT = re.compile(
@@ -55,7 +56,9 @@ def sender_domain(from_header: str) -> str:
 
 def is_ats(from_header: str) -> bool:
     domain = sender_domain(from_header)
-    return any(d in domain for d in ATS_DOMAINS)
+    labels = domain.split(".")
+    return (any(domain == d or domain.endswith("." + d) for d in ATS_DOMAINS)
+            or any(label in ATS_LABELS for label in labels[:-2]))   # whole labels: yorkshire.gov.uk is not "hire."
 
 
 def _json(path: Path, default):

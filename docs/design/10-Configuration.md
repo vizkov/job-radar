@@ -178,7 +178,7 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | `max_searches` | 8 | Post searches per session |
 | `max_scrolls` | 4 | Scrolls per search, to read past the first screen |
 | `max_people_per_session` | 8 | Profiles opened (known people's posts, original authors) per session |
-| `company_queries` | 2 | How many of the session's searches are `<company> "we're hiring" security`; the rest are keyword searches (the priority) |
+| `company_queries` | 6 | How many of the session's searches are `<company> "we're hiring" security`, walked in this order: companies in `profile/network.csv` that are also good fits first, then other scored apply/maybe employers, then `company_fit` targets; the rest are keyword searches (a small safety net; the user found keyword-only sweeps nearly useless) |
 | `company_extra` | [] | Companies the user wants searched even before any of their roles is scored (named in chat; Claude edits the list). Searched in the same company slots, ahead of the scored apply/maybe employers; each employer once |
 | `company_fit` | High | Also search the `targets.tsv` companies whose Fit column has this value (after the user's `company_extra` and the scored apply/maybe employers). Blank: none. `targets.tsv` may have a `Fit` column (High / Medium / Watch); older files without it simply add nothing |
 | `not_words` | contract, contractor, freelance | Appended to keyword searches as `NOT (...)`; filters on post text only |

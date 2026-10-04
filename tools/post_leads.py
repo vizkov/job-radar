@@ -44,7 +44,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 4, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 2, "company_extra": [], "company_fit": "High", "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 6, "company_extra": [], "company_fit": "High", "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
@@ -115,21 +115,42 @@ def fit_targets(fit: str) -> list[str]:
                 if r.get("Company") and (r.get("Fit") or "").strip().lower() == fit.strip().lower()]
 
 
-def search_companies() -> list[str]:
-    """The employers the company searches walk, each once, in this order: the user's `company_extra` (named in chat), the scored
-    apply/maybe employers, then the targets.tsv companies whose Fit is `company_fit` (default High)."""
+def _has_contact(company: str) -> bool:
+    """True if `profile/network.csv` lists someone the user knows at `company` (same loose match as `referrals.py contacts`)."""
+    from referrals import contacts
+    return bool(contacts(company))
+
+
+def ranked_companies() -> list[tuple[int, str]]:
+    """(tier, company) for every employer the company searches walk, each once. Tier 0: named in chat (`company_extra`).
+    Tier 1: the user knows someone there AND it is a good fit (scored apply/maybe, or a `company_fit` target): a hiring post
+    there leads to a referral before applying. Tier 2: scored apply/maybe, no contact. Tier 3: `company_fit` targets, no contact."""
     s = settings()
+    scored, targets = fit_companies(), fit_targets(s["company_fit"])
+    good = {normalize(c) for c in scored + targets}
     seen, out = set(), []
-    for name in list(s["company_extra"]) + fit_companies() + fit_targets(s["company_fit"]):
-        if normalize(name) not in seen:
+    for tier_of, names in ((lambda c: 0, list(s["company_extra"])),
+                           (lambda c: 1 if _has_contact(c) else 9, scored + targets),
+                           (lambda c: 2, scored), (lambda c: 3, targets)):
+        for name in names:
+            if normalize(name) in seen or normalize(name) not in good and tier_of(name) != 0:
+                continue
+            t = tier_of(name)
+            if t == 9:
+                continue   # no contact: left for the tier 2/3 passes, in their own order
             seen.add(normalize(name))
-            out.append(name)
+            out.append((t, name))
     return out
+
+
+def search_companies() -> list[str]:
+    """The employers the company searches walk, best first: see `ranked_companies`."""
+    return [name for _, name in ranked_companies()]
 
 
 def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
     """The next `n` post searches, least recently run first; marks them run. `company_queries` of them are
-    "<company> hiring security" for employers the user scored apply/maybe; the rest walk the title x place grid
+    "<company> hiring security", employers with a contact of the user's first (`ranked_companies`); the rest walk the title x place grid
     on a diagonal, so one session does not spend every search on one city. The phrase rotates each time a
     (title, place) pair comes round again. `not_words` are appended as NOT (...) to the grid searches."""
     s = settings()
@@ -140,7 +161,7 @@ def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
     # keyed by the normalised name, so "Amazon" and "Amazon Web Services" are one employer however the best-scored role names it;
     # the list itself is rebuilt from the scores each time, so new employers join (never run: first) and dropped ones leave
     ckey = lambda c: f"company|{normalize(c)}"  # noqa: E731
-    firms = sorted(search_companies(), key=lambda c: (log.get(ckey(c)) or {}).get("last", ""))
+    firms = [c for _, c in sorted(ranked_companies(), key=lambda tc: (tc[0], (log.get(ckey(tc[1])) or {}).get("last", "")))]
     for c in firms[:min(s["company_queries"], n)]:
         out.append(f'{c} "we\'re hiring" security')
         log[ckey(c)] = {"last": stamp, "runs": (log.get(ckey(c)) or {}).get("runs", 0) + 1}

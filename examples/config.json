@@ -82,7 +82,7 @@
       "max_scrolls": 4,
       "max_people_per_session": 8,
       "max_post_age_days": 30,
-      "company_queries": 2,
+      "company_queries": 6,
       "company_extra": [],
       "company_fit": "High",
       "not_words": ["contract", "contractor", "freelance"],

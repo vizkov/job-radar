@@ -49,6 +49,17 @@ def test_company_queries_come_from_roles_the_user_scored_apply_or_maybe():
     assert out2[0] == 'Amazon "we\'re hiring" security'           # least recently run company comes first
 
 
+def test_companies_with_a_contact_are_searched_first_even_if_searched_recently(monkeypatch):
+    write_scores([{"company": "Amazon", "recommendation": "apply", "fit_score": 85},
+                  {"company": "Solaris", "recommendation": "maybe", "fit_score": 58},
+                  {"company": "Nope Ltd", "recommendation": "skip", "fit_score": 90}])
+    monkeypatch.setattr(pl, "_has_contact", lambda c: c == "Solaris")   # the user knows someone at Solaris only
+    assert pl.ranked_companies() == [(1, "Solaris"), (2, "Amazon")]     # contact first; a contact at a non-fit company never counts
+    pl.next_queries(1, now="2026-10-01T00:00:00+00:00")                 # Solaris searched
+    out = pl.next_queries(1, now="2026-10-02T00:00:00+00:00")
+    assert out[0].startswith("Solaris")                                  # still first: tier beats "least recently run"
+
+
 def test_people_are_read_longest_ago_first_and_marked_read():
     pl.add_person("Ana", "https://www.linkedin.com/in/ana/?trk=x", "Acme", "Security recruiter", "security")
     pl.add_person("Bo", "https://www.linkedin.com/in/bo", "Acme")

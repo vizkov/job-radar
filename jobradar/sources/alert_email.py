@@ -49,7 +49,7 @@ _NOISE = re.compile(r"^(easy apply|apply with .*|actively recruiting|promoted|be
 
 
 _ACCOUNT_MAIL = re.compile(r"\b(is now active|confirm|verify|welcome|has been (created|updated|deleted)|"
-                           r"unsubscribed|password|sign in|code|security alert)\b", re.I)
+                           r"unsubscribed|password|sign in|code|security alert|looking for a new job)\b", re.I)
 
 
 def _part(msg: Message, ctype: str) -> str:
@@ -187,7 +187,11 @@ def parse_match(body: str) -> list[dict]:
         hit = _MATCH_LINK.search(para[0]) if para[0].lower().startswith("view job") else None
         if not hit or i == 0:
             continue
-        card = [l for l in paras[i - 1] if not _NOISE.match(l) and not _MATCH_SKIP.match(l)]
+        j = i - 1
+        # a "Benefits:" list can sit in its own paragraph between the card and "View job:": step back over it
+        while j > 0 and all(_MATCH_SKIP.match(l) or l.startswith(("-", "•")) for l in paras[j]):
+            j -= 1
+        card = [l for l in paras[j] if not _NOISE.match(l) and not _MATCH_SKIP.match(l)]
         if len(card) >= 2:
             title, company, location = card[0], card[1], (card[2] if len(card) > 2 else "")
             jobs.append({"id": _content_id(title, company, location), "link": hit.group(0),

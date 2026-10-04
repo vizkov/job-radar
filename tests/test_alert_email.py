@@ -219,6 +219,20 @@ def test_indeed_match_mail_is_one_job_and_other_links_are_not_jobs():
     assert [j.external_id for j in to_postings(load("real/indeed_match_2026_09.eml"), INDEED)] == [jobs[0].external_id]
 
 
+def test_indeed_match_mail_with_a_benefits_paragraph():
+    """2026-10: Indeed put "Benefits:" and its bullets in a paragraph of their own between the card and "View job:",
+    so the parser took the bullet as the card and found no job (health: 'indeed alert emails with no jobs')."""
+    from jobradar.sources.alert_email import parse_match
+    link = "https://cts.indeed.com/v3/FAKE_TOKEN_view-1/FAKE_SIG_a"
+    body = ("Hi A,\n\nYour background could be a strong match for this role at Example Ltd. Apply now.\n\n"
+            "Penetration Tester (India)\nExample Ltd\nIndia\nJob type: Full-time\n\n"
+            f"Benefits:\n  - Health insurance\n\nView job: {link}\nApply now: {link}\n\n"
+            "Keep your Indeed profile up to date\nA B\n")
+    jobs = parse_match(body)
+    assert [(j["title"], j["company"], j["location"], j["link"]) for j in jobs] == [
+        ("Penetration Tester (India)", "Example Ltd", "India", link)]
+
+
 def test_indeed_sign_in_code_mail_is_not_a_layout_change(tmp_path):
     (tmp_path / "_status.json").write_text(json.dumps({"ok": True, "fetched": 1, "mailbox": "INBOX", "providers": {}}))
     (tmp_path / "a.eml").write_text(

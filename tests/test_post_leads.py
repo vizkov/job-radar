@@ -61,6 +61,22 @@ def test_companies_with_a_contact_are_searched_first_even_if_searched_recently(m
     assert out[0].startswith("Palantir")                                  # still first: tier beats "least recently run"
 
 
+def test_company_lines_use_the_author_company_filter_once_the_id_is_known(tmp_path):
+    ids = tmp_path / "ids.json"
+    url, hint = pl.search_url('Meta "we\'re hiring" security', ids)
+    assert "authorCompany" not in url and "company-id" in hint            # no id yet: the old keyword search, plus how to get the id
+    assert "recorded" in pl.set_company_id("Meta", "10667", ids)
+    url, hint = pl.search_url('Meta "we\'re hiring" security', ids)
+    assert url.endswith("&authorCompany=%5B%2210667%22%5D") and "keywords=hiring%20security&" in url and hint == ""
+    url, _ = pl.search_url('"we\'re hiring" "security consultant" Amsterdam', ids)    # keyword grid lines are untouched
+    assert "authorCompany" not in url
+    try:
+        pl.set_company_id("Meta", "not-a-number", ids)
+        raise AssertionError("a non-numeric id must be refused")
+    except SystemExit:
+        pass
+
+
 def test_people_are_read_longest_ago_first_and_marked_read():
     pl.add_person("Ana", "https://www.linkedin.com/in/ana/?trk=x", "Acme", "Security recruiter", "security")
     pl.add_person("Bo", "https://www.linkedin.com/in/bo", "Acme")

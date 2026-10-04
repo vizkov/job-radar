@@ -1,6 +1,8 @@
 """LinkedIn hiring-post discovery: the bookkeeping behind the `post-discovery` skill. Standard library only.
 
-    python tools/post_leads.py queries [--n N]          # the next searches to run (least recently run first); marks them run
+    python tools/post_leads.py queries [--n N] [--urls] # the next searches to run (least recently run first); marks them run;
+                                                        # --urls also prints the LinkedIn link (author-company filter when the id is known)
+    python tools/post_leads.py company-id "<company>" <digits>   # record a company's LinkedIn id (from the Author company filter)
     python tools/post_leads.py person add --name "…" --url <profile> --company "…" [--headline "…"] [--function "…"]
     python tools/post_leads.py person next [--n N]      # known recruiters/managers whose posts were read longest ago
     python tools/post_leads.py person read <profile url>   # mark one person's posts as read now
@@ -28,6 +30,7 @@ import itertools
 import json
 import re
 import sys
+from urllib.parse import quote
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
@@ -38,6 +41,7 @@ from jobradar.matching import normalize, normalize_words  # noqa: E402  (stdlib-
 from jobradar.paths import profile_path  # noqa: E402
 
 QUERIES = ROOT / "state" / "post_queries.json"
+COMPANY_IDS = ROOT / "state" / "linkedin_company_ids.json"   # {normalised company: LinkedIn company id}, read once from the filter
 PEOPLE = ROOT / "data" / "post_people.jsonl"
 LEADS = ROOT / "data" / "post_leads.jsonl"
 MATCHES = ROOT / "data" / "matches.csv"
@@ -157,6 +161,37 @@ def ranked_companies() -> list[tuple[int, str]]:
 def search_companies() -> list[str]:
     """The employers the company searches walk, best first: see `ranked_companies`."""
     return [name for _, name in ranked_companies()]
+
+
+def company_id(company: str, path: Path | None = None) -> str:
+    """LinkedIn's numeric id for `company` ('' if not recorded yet), for the post-search `authorCompany` filter."""
+    return str(_load(path or COMPANY_IDS, {}).get(normalize(company), ""))
+
+
+def set_company_id(company: str, cid: str, path: Path | None = None) -> str:
+    path = path or COMPANY_IDS
+    if not re.fullmatch(r"\d{1,12}", cid):
+        raise SystemExit("the company id is the number in the address bar after authorCompany=%5B%22 (digits only)")
+    ids = _load(path, {})
+    ids[normalize(company)] = cid
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(ids, indent=1, sort_keys=True), encoding="utf-8")
+    return f"{company}: LinkedIn company id {cid} recorded"
+
+
+def search_url(line: str, path: Path | None = None) -> tuple[str, str]:
+    """(url, hint) for one line from `next_queries`. A company line whose LinkedIn id is known becomes `hiring security` with the
+    `authorCompany` filter: only posts written by people who work there (the user's idea, 2026-10-04; tested on Meta: 3 of 6 posts were
+    by Meta staff, 2 real hiring posts, against none from a company-name keyword search). Without an id the hint says how to get one."""
+    base = "https://www.linkedin.com/search/results/content/?keywords={}&sortBy=%22date_posted%22"
+    m = re.fullmatch(r"""(.+?) "we're hiring" security""", line)
+    if m:
+        cid = company_id(m.group(1), path)
+        if cid:
+            return base.format(quote("hiring security")) + f"&authorCompany=%5B%22{cid}%22%5D", ""
+        return base.format(quote(line)), (f"no LinkedIn id for {m.group(1)}: open All filters > Author company, pick the company, read the digits "
+                                          f"after authorCompany in the address bar, then `post_leads.py company-id \"{m.group(1)}\" <digits>`")
+    return base.format(quote(line)), ""
 
 
 def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
@@ -344,7 +379,8 @@ def stats(days: int = 30, now: datetime | None = None) -> dict:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    q = sub.add_parser("queries"); q.add_argument("--n", type=int)
+    q = sub.add_parser("queries"); q.add_argument("--n", type=int); q.add_argument("--urls", action="store_true")
+    ci = sub.add_parser("company-id"); ci.add_argument("company"); ci.add_argument("id")
     p = sub.add_parser("person"); ps = p.add_subparsers(dest="what", required=True)
     pa = ps.add_parser("add"); pa.add_argument("--name", required=True); pa.add_argument("--url", required=True)
     pa.add_argument("--company", required=True); pa.add_argument("--headline", default=""); pa.add_argument("--function", default="")
@@ -360,7 +396,13 @@ def main(argv=None) -> int:
     a = ap.parse_args(argv)
     if a.cmd == "queries":
         for line in next_queries(a.n):
-            print(line)
+            if a.urls:
+                url, hint = search_url(line)
+                print(f"{line}\n  {url}" + (f"\n  NOTE: {hint}" if hint else ""))
+            else:
+                print(line)
+    elif a.cmd == "company-id":
+        print(set_company_id(a.company, a.id))
     elif a.cmd == "person":
         if a.what == "add":
             print(add_person(a.name, a.url, a.company, a.headline, a.function))

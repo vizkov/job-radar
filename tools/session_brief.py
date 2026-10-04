@@ -317,6 +317,33 @@ def sponsor_check_pick(scores: dict, checked: set, items: list[dict] | None, n: 
     return out[:n]
 
 
+def referral_route_pick(root: Path, scores: dict, items: list[dict] | None, by_ref: dict, n: int = 8) -> list[str]:
+    """Lines for live board cards scored apply/maybe at a company where the user knows someone (profile/network.csv) and
+    that have no referral ask or route logged yet: the user asks people they know BEFORE applying, so these are
+    the roles to raise first (the user, 2026-10-04: flag roles at contact companies automatically)."""
+    try:
+        sys.path.insert(0, str(ROOT / "tools"))
+        import referrals  # stdlib-only
+        handled = {r.get("ref") for r in referrals.records(root / "data" / "referrals.jsonl")}
+        network = root / "profile" / "network.csv"
+        out = []
+        for i in items or []:
+            hit = _REF.search((i.get("content") or {}).get("body") or "")
+            ref = hit.group(1) if hit else None
+            if not ref or ref in handled or i.get("stage") not in (None, "", "New", "Shortlisted") or i.get("status") == "Done":
+                continue
+            if (scores.get(ref) or {}).get("recommendation") not in ("apply", "maybe"):
+                continue
+            row = by_ref.get(ref) or {}
+            people = referrals.contacts(row.get("company") or "", network)
+            if people:
+                names = ", ".join(sorted({safe(p["name"], 20) for p in people}))
+                out.append(f"{safe(row.get('company'), 30)} — {safe(row.get('title'), 60)} (ref {ref}): you know {names} there")
+        return out[:n]
+    except Exception:
+        return []   # a missing network file or log must not stop the brief
+
+
 def read_sponsor_keys(root: Path) -> set:
     path, keys = root / "data" / "sponsorship.jsonl", set()
     if path.exists():
@@ -601,6 +628,10 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append("- SPONSOR-CHECK (the user's standing rule: every role on the board gets a sponsorship verdict): "
                      "run the sponsorship-check skill on these apply/maybe cards, and tell them in one line what "
                      "you found: " + ", ".join(unchecked))
+    routes = referral_route_pick(root, scores, items, by_ref)
+    if routes:
+        lines.append("- REFERRAL-ROUTE (roles worth a referral ask before applying: you know someone at the company, nothing asked "
+                     "yet; mention them to the user in one line each and offer the `referrals` skill): " + "; ".join(routes))
     checks = health_checks(root, now, rows, scores, last_run, alert_row, run_note)
     cv_gaps = next((c.split(" — ")[0] for c in checks if c.startswith("CV gaps")), None)
     checks = [c for c in checks if not c.startswith("CV gaps")]   # in the CADENCE block now, not repeated under Health

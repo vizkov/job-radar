@@ -119,6 +119,7 @@ the brief with an undo line).
    no Claude usage), and the **AUTO-SCORE** line tells Claude to score them before answering the
    user's first message (`CLAUDE.md`, Session start). Claude can't act before the user types.
 4. **SPONSOR-CHECK:** live apply/maybe cards with no sponsorship verdict.
+   **REFERRAL-ROUTE:** live apply/maybe cards at a company where `profile/network.csv` lists someone the user knows and no referral ask or route is logged (`referral_route_pick`); Claude names the contact and offers `referrals`.
 5. **CADENCE block:** one line per recurring job (the paragraph above).
 6. **Counts:** unscored Tier 1 roles (and how many were posted in the last 3 days), then scored
    totals by recommendation.

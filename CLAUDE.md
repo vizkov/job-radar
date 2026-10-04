@@ -48,6 +48,10 @@ Likewise, **standing rule (the user's):** every role that gets a card on the boa
 `sponsorship-check` verdict. Run it right after you score a role `apply`/`maybe`, after you `promote`
 roles to the board, and for any **SPONSOR-CHECK** line in the brief (live apply/maybe cards with no verdict).
 The ad's own statement wins: a "does not offer sponsorship" ad is verdict `no`, and the role becomes Skip.
+A **REFERRAL-ROUTE** line lists live apply/maybe cards at companies where `profile/network.csv` has someone the user knows and no ask is
+logged yet (the user, 2026-10-04): mention each in one line with the contact's name and offer the `referrals` skill; people the user knows
+are asked before applying. The names in `network.csv` are placeholders, not real people: never search LinkedIn or anywhere else for them;
+the contacts only decide which companies come first (`post-discovery` company searches use LinkedIn's Author-company filter, not names).
 GitHub's rate limit is real: every board read is costly and a burst trips a throttle. Pass **several refs in one
 call** (`jd_check.py score r1 r2 … --board`, `sponsorship.py record r1 r2 … --board`): they share one board read.
 Never loop over refs with one call each.

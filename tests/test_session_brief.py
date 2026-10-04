@@ -132,6 +132,21 @@ def test_sponsor_check_lists_live_apply_maybe_cards_without_a_verdict(tmp_path):
     assert sb.read_sponsor_keys(tmp_path / "nowhere") == set()
 
 
+def test_referral_route_lists_live_apply_maybe_cards_at_contact_companies_with_no_ask(tmp_path):
+    a, b, c, d = ("a" * 16, "b" * 16, "c" * 16, "d" * 16)
+    scores = {a: {"recommendation": "apply"}, b: {"recommendation": "maybe"}, c: {"recommendation": "apply"}, d: {"recommendation": "skip"}}
+    by_ref = {a: {"company": "Acme Ltd", "title": "AppSec"}, b: {"company": "Globex", "title": "PSE"},
+              c: {"company": "Acme", "title": "Asked already"}, d: {"company": "Acme", "title": "Skip scored"}}
+    items = [item(a, "New"), item(b, "New"), item(c, "Shortlisted"), item(d, "New")]
+    (tmp_path / "profile").mkdir()
+    (tmp_path / "profile" / "network.csv").write_text("name,company,added\nAnna,Acme,2026-10-01\n", encoding="utf-8")
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "referrals.jsonl").write_text(json.dumps({"ref": c, "person": "Anna", "status": "asked"}) + "\n")
+    out = sb.referral_route_pick(tmp_path, scores, items, by_ref)
+    assert len(out) == 1 and out[0].startswith("Acme Ltd — AppSec") and "you know Anna" in out[0]   # Globex: no contact; c: asked; d: skip
+    assert sb.referral_route_pick(tmp_path / "nowhere", scores, items, by_ref) == []
+
+
 def test_archive_started_once_a_day(monkeypatch):
     started = []
     monkeypatch.setattr(sb.subprocess, "Popen", lambda cmd, **kw: started.append(cmd))

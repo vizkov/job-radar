@@ -86,6 +86,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `FOLLOW_UP_DAYS`, `REVIEW_EVERY_DAYS`, `GRACE` | 14, 7, 1 hour. |
 | (maintainer-only, `docs-review` skill) `DOCS_REVIEW_AFTER_FILES`, `CODE_PATHS`, `LAST_DOCS_REVIEW`, `docs_review_note(now, runner)` | Returns the reason when `docs-review` is due, once 10 distinct files changed under `CODE_PATHS` (`radar.py`, `verify_boards.py`, `jobradar/`, `tools/`, `.claude/skills/`, `.github/workflows/`; docs and settings don't count) since `work/.last_docs_review`, per `git log --since` (the stamp is UTC and passed with `+00:00`). On a fresh copy the first call only writes the stamp. Called from `main()`. |
 | `calibration_notes(now)`, `LAST_CALIBRATION` | Run `calibrate.apply` at most weekly; report each change with its undo command and a reminder to commit the config. |
+| `referral_route_pick(root, scores, items, by_ref, n)` | The brief's REFERRAL-ROUTE line: live (New/Shortlisted, not Done) cards scored apply/maybe at an employer with a contact in `profile/network.csv` (`referrals.contacts`) and no record in `data/referrals.jsonl`, at most 8. Any error returns no lines (a missing network file must not stop the brief). |
 | `sponsor_check_pick(scores, checked, items, n)`, `read_sponsor_keys(root)` | The brief's SPONSOR-CHECK line: live (New/Shortlisted, not Done) board cards scored apply/maybe with no record in `data/sponsorship.jsonl`, at most 10; Claude runs `sponsorship-check` on them (standing rule: every role on the board gets a verdict). |
 | `auto_score_count(root)`, `auto_score_pick(rows, scored, items, n)`, `start_prep(refs)` | How many roles to score automatically; which (freshest unscored Tier 1, not closed/skipped); fetch their JDs in the background. |
 | `referral_notes(now)` | Asks unanswered after `referrals.wait_days`, as health notes (at most 5). |
@@ -158,9 +159,11 @@ out of date.
 
 | Name | Is |
 |---|---|
-| `QUERIES`, `PEOPLE`, `LEADS`, `MATCHES` | `state/post_queries.json`, `data/post_people.jsonl`, `data/post_leads.jsonl`, `data/matches.csv` |
+| `QUERIES`, `COMPANY_IDS`, `PEOPLE`, `LEADS`, `MATCHES` | `state/post_queries.json`, `state/linkedin_company_ids.json` (LinkedIn's numeric id per company), `data/post_people.jsonl`, `data/post_leads.jsonl`, `data/matches.csv` |
 | `KINDS`, `DEFAULTS`, `settings()` | Lead kinds (`person`, `job_board`); the defaults for `config.json` → `discovery.linkedin_posts`; the merged settings |
 | `fit_companies()`, `fit_targets(fit)`, `search_companies()` | Employers scored apply/maybe, best first; `targets.tsv` companies with a given Fit; the company-search list: `company_extra`, then the scored employers, then the High-fit targets, each employer once |
+| `network_companies()`, `ranked_companies()`, `_has_contact` | Employers in `profile/network.csv`; `(tier, company)` for the company searches: 0 named in chat, 1 a contact there, 2 scored apply/maybe, 3 `company_fit` targets; `search_companies()` is the names only |
+| `company_id`, `set_company_id`, `search_url(line)` | LinkedIn's id per company; the post-search link for a query line, with the `authorCompany` filter (posts written by employees) when the id is known, else a note on how to read the id |
 | `next_queries(n, now)` | The next post searches, least recently run first, spread over a title x place diagonal; the phrase rotates when a pair comes round again; marks them run |
 | `people()`, `add_person`, `next_people`, `mark_read` | The recruiters and managers worth re-reading: latest record per profile URL, longest unread first |
 | `leads()`, `lead_id(url)`, `_clean_url` | Every lead by id (later records overwrite fields); id = hash of the post URL without tracking parameters |
@@ -168,7 +171,7 @@ out of date.
 | `log_lead(...)` | Log one post; status `known`, `job_board`, `stale` (older than `max_post_age_days` and not confirmed open) or `new`; one record per post |
 | `add_role(id, countries)` | A `new` lead becomes a `matches.csv` row (new columns `poster`, `poster_url`) and a queued card via `board_sync.promote`; the ref is the hash of the radar's own `c:company|title|country` key, so a later radar hit lands on the same card |
 | `stats(days)` | Counts of new, added, known, stale and job-board leads, and known people |
-| `main` | The CLI (`queries`, `person add/next/read`, `lead`, `add-role`, `stats`) |
+| `main` | The CLI (`queries [--urls]`, `company-id`, `person add/next/read`, `lead`, `add-role`, `stats`) |
 
 **Watch out**: this file never touches LinkedIn; Claude does the reading (CLAUDE.md rule 4c). `jobradar/board.py` `row_payload` adds a "Posted by" line when a row has a `poster`.
 

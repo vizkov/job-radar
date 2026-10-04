@@ -36,7 +36,7 @@ it to true and commit. Never run it from the daily Action or in the background.
 
 0. **Which companies get searched (the user's instruction, 2026-10-04: keyword searches were nearly useless; aim at high-fit companies where they
    have contacts who can refer them).** `post_leads.py queries` walks `ranked_companies()`: the user's `company_extra`; then companies that are
-   good fits (scored apply/maybe, or `targets.tsv` Fit = `company_fit`) **and** have someone the user knows in `profile/network.csv`; then other
+   employers where the user knows someone in `profile/network.csv` (a contact makes any employer a fit, the user's word 2026-10-04); then other
    scored apply/maybe employers; then the remaining High-fit targets. `company_queries` (6 of the 8 searches) go to this list, a tier before
    "least recently run"; the other 2 are the keyword grid, kept as a safety net. When a company search finds a hiring post, **say who the user
    knows there** (`python tools/referrals.py contacts "<company>"`): that is a referral route for before applying. The network list is only as good

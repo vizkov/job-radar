@@ -53,11 +53,12 @@ def test_companies_with_a_contact_are_searched_first_even_if_searched_recently(m
     write_scores([{"company": "Amazon", "recommendation": "apply", "fit_score": 85},
                   {"company": "Solaris", "recommendation": "maybe", "fit_score": 58},
                   {"company": "Nope Ltd", "recommendation": "skip", "fit_score": 90}])
-    monkeypatch.setattr(pl, "_has_contact", lambda c: c == "Solaris")   # the user knows someone at Solaris only
-    assert pl.ranked_companies() == [(1, "Solaris"), (2, "Amazon")]     # contact first; a contact at a non-fit company never counts
+    monkeypatch.setattr(pl, "network_companies", lambda: ["Solaris", "Palantir"])
+    monkeypatch.setattr(pl, "_has_contact", lambda c: c in ("Solaris", "Palantir"))
+    assert pl.ranked_companies() == [(1, "Solaris"), (1, "Palantir"), (2, "Amazon")]   # a contact makes any employer a fit
     pl.next_queries(1, now="2026-10-01T00:00:00+00:00")                 # Solaris searched
     out = pl.next_queries(1, now="2026-10-02T00:00:00+00:00")
-    assert out[0].startswith("Solaris")                                  # still first: tier beats "least recently run"
+    assert out[0].startswith("Palantir")                                  # still first: tier beats "least recently run"
 
 
 def test_people_are_read_longest_ago_first_and_marked_read():

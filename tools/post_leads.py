@@ -121,16 +121,27 @@ def _has_contact(company: str) -> bool:
     return bool(contacts(company))
 
 
+def network_companies() -> list[str]:
+    """Employers listed in `profile/network.csv`, once each, in the order the user told Claude."""
+    from referrals import NETWORK
+    if not NETWORK.exists():
+        return []
+    with open(NETWORK, encoding="utf-8", newline="") as fh:
+        names = [r.get("company", "").strip() for r in csv.DictReader(fh)]
+    return list(dict.fromkeys(n for n in names if n))
+
+
 def ranked_companies() -> list[tuple[int, str]]:
     """(tier, company) for every employer the company searches walk, each once. Tier 0: named in chat (`company_extra`).
-    Tier 1: the user knows someone there AND it is a good fit (scored apply/maybe, or a `company_fit` target): a hiring post
+    Tier 1: the user knows someone there (any employer in `network.csv`: knowing someone makes it a fit; the user's word, 2026-10-04): a hiring post
     there leads to a referral before applying. Tier 2: scored apply/maybe, no contact. Tier 3: `company_fit` targets, no contact."""
     s = settings()
     scored, targets = fit_companies(), fit_targets(s["company_fit"])
-    good = {normalize(c) for c in scored + targets}
+    known = network_companies()
+    good = {normalize(c) for c in scored + targets + known}
     seen, out = set(), []
     for tier_of, names in ((lambda c: 0, list(s["company_extra"])),
-                           (lambda c: 1 if _has_contact(c) else 9, scored + targets),
+                           (lambda c: 1 if _has_contact(c) else 9, known + scored + targets),
                            (lambda c: 2, scored), (lambda c: 3, targets)):
         for name in names:
             if normalize(name) in seen or normalize(name) not in good and tier_of(name) != 0:

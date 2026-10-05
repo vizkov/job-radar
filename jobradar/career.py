@@ -20,7 +20,7 @@ from jobradar.paths import profile_path
 
 ID_RE = re.compile(r"\[([A-Z]\d{2,3})\]")
 _LINE_ID = re.compile(r"^\s*-\s*\[([A-Z]\d{2,3})\]\s*(.+?)\s*$")
-_HEADING_ID = re.compile(r"^##\s*\[([A-Z]\d{2,3})\]\s*(.+?)\s*$")
+_HEADING_ID = re.compile(r"^##\s*\[([A-Z]\d{2,3})\]\s*(.*?)\s*$")   # the title is optional: cover blocks carry labels, not titles
 _COMMENT = re.compile(r"<!--.*?-->", re.S)
 EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 URL_RE = re.compile(r"https?://[^\s)>\]]+", re.I)

@@ -154,11 +154,13 @@ def test_cover_letter_paragraph_used_twice_is_rejected():
     assert any("used twice" in e for e in check(d)[0])
 
 
-def test_cover_letter_label_is_optional_but_must_be_plain_words():
+def test_cover_letter_label_is_optional_but_must_be_plain_words(monkeypatch):
     d = json.loads(json.dumps(GOOD))
     d["cover_letter"][1]["label"] = "Finding what tooling misses"
     assert check(d) == ([], [])
     d["cover_letter"][1]["label"] = "A very long sentence. With a full stop."
     assert any("label must be" in e for e in check(d)[0])
     del d["cover_letter"][1]["label"]
-    assert any("no per-letter label" in w for w in check(d)[1])
+    assert check(d) == ([], [])                       # a story with its own title needs no label
+    monkeypatch.setattr(CAREER.items["S01"], "section", "")
+    assert any("have no label" in e for e in check(d)[0])

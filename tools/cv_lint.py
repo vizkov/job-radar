@@ -189,9 +189,10 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
             errs.append(f"cover letter uses the optional sub-point [{sid}]: a letter is a fast read, so no sub-bullets; say it inside the parent block")
     # a block covers several angles, so its master title is only a default: each letter labels the angle it uses (the user, 2026-10-05)
     unlabeled = [c.get("source_id") for c in data.get("cover_letter", []) if isinstance(c, dict)
-                 and c.get("source_id") not in ("C01", "C02", "C12", "C13", "C14") and not c.get("label")]
+                 and c.get("source_id") not in ("C01", "C02", "C12", "C13", "C14") and not c.get("label")
+                 and not (career.has(c.get("source_id", "")) and career.items[c["source_id"]].section)]
     if unlabeled:
-        warns.append(f"cover letter blocks {unlabeled} have no per-letter label: the master title is a default; label the angle each block serves for this job")
+        errs.append(f"cover letter blocks {unlabeled} have no label: master cover blocks carry candidate labels, not titles; set a \"label\" naming the job need each block answers in this letter")
     # "the bank" must come after the defined term in the same document (the user, 2026-10-02: B05, B06 and B10 say "the bank")
     cv_lines = [str(b.get("text", "")) for sec in data.get("sections", []) if isinstance(sec, dict)
                 for b in sec.get("bullets", []) if isinstance(b, dict)]

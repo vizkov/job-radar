@@ -233,8 +233,13 @@ def check_tailor(data: dict, career: Career) -> tuple[list[str], list[str]]:
         errs.append(f"headline names things not in your career docs: {names}")
 
     def check_line(where: str, item, kinds: set[str]) -> None:
-        if not isinstance(item, dict) or set(item) != {"source_id", "text"}:
-            errs.append(f"{where} needs exactly source_id, text")
+        if not isinstance(item, dict) or not ({"source_id", "text"} <= set(item) <= {"source_id", "text", "label"}):
+            errs.append(f"{where} needs source_id and text (and optionally a cover-letter label)")
+            return
+        label = item.get("label")
+        if label is not None and (not isinstance(label, str) or not 2 <= len(label) <= 40 or re.search(r"[.:;!?]", label)
+                                  or new_names(label, career.raw_text)):
+            errs.append(f"{where} label must be 2-40 characters of plain words (no punctuation, no new names)")
             return
         sid, text = str(item["source_id"]), item["text"]
         if not career.has(sid):

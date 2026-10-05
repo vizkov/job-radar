@@ -25,7 +25,7 @@ GOOD = {
         {"heading": "Certifications", "bullets": [{"source_id": "E01", "text": CAREER.items["E01"].text}]}],
     "skills": ["Burp Suite", "Semgrep", "STRIDE"],
     "cover_letter": [{"source_id": "C01", "text": CAREER.items["C01"].text},
-                     {"source_id": "S01", "text": "Before a payments launch I found an authorisation bypass in "
+                     {"source_id": "S01", "label": "Delivering under pressure", "text": "Before a payments launch I found an authorisation bypass in "
                                                   "code review that SAST missed; the pattern became a Semgrep rule."}],
 }
 
@@ -152,3 +152,13 @@ def test_cover_letter_paragraph_used_twice_is_rejected():
     d = copy.deepcopy(GOOD)
     d["cover_letter"].append(copy.deepcopy(d["cover_letter"][0]))
     assert any("used twice" in e for e in check(d)[0])
+
+
+def test_cover_letter_label_is_optional_but_must_be_plain_words():
+    d = json.loads(json.dumps(GOOD))
+    d["cover_letter"][1]["label"] = "Finding what tooling misses"
+    assert check(d) == ([], [])
+    d["cover_letter"][1]["label"] = "A very long sentence. With a full stop."
+    assert any("label must be" in e for e in check(d)[0])
+    del d["cover_letter"][1]["label"]
+    assert any("no per-letter label" in w for w in check(d)[1])

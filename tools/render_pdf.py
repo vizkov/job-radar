@@ -294,6 +294,7 @@ def cover_html(data: dict, career, contact: dict, role_title: str = "", company:
     today = today or date.today()
     when = f"{today.day} {today:%B %Y}"
     paras = [(c["source_id"], c["text"]) for c in data["cover_letter"]]
+    labels = {c["source_id"]: c["label"] for c in data["cover_letter"] if c.get("label")}   # per-letter run-in labels
     opening = " ".join(t for i, t in paras if i in OPENING)
     body = [header_html(contact, pretty_headline(data["headline"]))]
     body.append(f'<p class="addr">{esc(when)}</p>' + (f'<p class="addr">{esc(company)}</p>' if company else ""))
@@ -313,7 +314,7 @@ def cover_html(data: dict, career, contact: dict, role_title: str = "", company:
                 continue
             if cur:
                 body.append(cur + "</ul></li>")
-            cur = f'<li><b>{esc(title)}.</b> {esc(t)}<ul>'
+            cur = f'<li><b>{esc(labels.get(i) or title)}.</b> {esc(t)}<ul>'
         body.append(cur + "</ul></li></ul>")
     for i, t in paras:
         if i in CLOSING:

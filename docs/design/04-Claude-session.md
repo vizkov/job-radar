@@ -246,7 +246,7 @@ The `tailored.json` contract:
  "sections": [{"heading": "1-80 chars",
                "bullets": [{"source_id": "P/B/E/K id", "text": "1-450 chars, or no longer than its own master line"}]}],
  "skills": ["each must appear in the career docs"],
- "cover_letter": [{"source_id": "C/S id", "text": "1-450 chars, or no longer than its own master line"}],
+ "cover_letter": [{"source_id": "C/S id", "text": "1-450 chars, or no longer than its own master line", "label": "optional, 2-40 plain characters: this letter's run-in label for the block (the master title is only the default; cv_lint warns when a body block has none)"}],
  "location": "optional per-copy header location; must start with the master CV's city and country"}
 ```
 

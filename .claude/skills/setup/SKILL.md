@@ -27,6 +27,9 @@ plain language; do the typing yourself.
    relay those to the user.
    Walk them through the one manual step it prints (Project → Workflows → Auto-add, filter
    `is:issue label:role`), and optionally "Item closed → Done".
+4b. **LinkedIn job pages (ask, default off).** Say the risk plainly: LinkedIn's terms ban automated access, so reading job pages in their
+   logged-in Chrome could get the account restricted, even one page at a time. Ask whether to switch it on; set `scoring.linkedin_job_pages`
+   in `profile/config.json` to `true` only on a clear yes, otherwise leave it `false` (scoring then asks them to paste LinkedIn descriptions).
 5. **Alert emails (optional).** Explain why a dedicated Gmail is needed (docs/design/12-Job-alert-emails.md),
    guide them through alerts, forwarding filter and app password, and adding the two secrets in the GitHub
    UI themselves. Never ask them to paste the password into chat or a file.

@@ -71,7 +71,9 @@
 
   "scoring": {
     "_comment": "Roles Claude scores automatically at the start of each session (freshest unscored Tier 1 first), before answering. 0 = only when asked. Each role costs 0.25-0.5% of a session (measured on Pro).",
-    "auto_per_session": 8
+    "auto_per_session": 8,
+    "_linkedin_job_pages_comment": "true: when scoring a role whose ad is on LinkedIn, Claude in Chrome may read that one job page in your logged-in browser to get the description (one page at a time, read-only). LinkedIn's terms ban automated access; this is your risk to accept. false: Claude asks you to paste the description.",
+    "linkedin_job_pages": false
   },
 
   "discovery": {

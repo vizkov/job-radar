@@ -27,7 +27,7 @@ description: Score job descriptions against the user's CV (fit score, met/missin
      the posting is closed: say so in one line, don't keep retrying, and skip the role: move its card to Skipped with a
      note (`board_sync.py set <ref> Stage=Skipped --note "ad closed"`; the daily archive removes it; the user's standing
      instruction, 2026-10-02) unless the user has already acted on the card (Shortlisted, Applied), in which case ask. Handle this yourself; the user asked not to be asked about these (2026-09-30).
-   - **LinkedIn job page** (the user's standing instruction, 2026-10-01; rule 4a): read it yourself with Claude in
+   - **LinkedIn job page** (opt-in: only if `scoring.linkedin_job_pages` is true in `profile/config.json`; otherwise ask the user to paste the description; the user's standing instruction, 2026-10-01; rule 4a): read it yourself with Claude in
      Chrome, **one page at a time**: open a tab, wait 5 s, **scroll down about 5 ticks** (the description is lazy-loaded
      and only renders once the page is scrolled; a plain `get_page_text` right after navigating returns the header
      and footer with no "About the job", which is not a failure), wait a few more seconds, then `get_page_text`; take a

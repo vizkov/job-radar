@@ -131,7 +131,7 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
 4. **Never fetch Indeed or Glassdoor pages, and never bulk-fetch LinkedIn** (their terms prohibit scraping).
    Ask the user to paste Indeed and Glassdoor job descriptions. Two LinkedIn exceptions, both read-only, in
    the user's logged-in Chrome, never connecting, messaging or following:
-   (a) **Job descriptions (the user's standing instruction, 2026-10-01, knowing LinkedIn's terms ban automated
+   (a) **Job descriptions (opt-in: `scoring.linkedin_job_pages` in `profile/config.json`, asked at setup, default off in the template; the user's copy has it on; the user's standing instruction, 2026-10-01, knowing LinkedIn's terms ban automated
    access):** `score-roles` reads **one** LinkedIn job page at a time with Claude in Chrome (open a tab,
    `get_page_text`, wait and retry once if the description hasn't loaded, close the tab) and saves only the
    job-description text to `work/jd/<ref>/jd.txt`. Only roles already on the list; no search pages, no

@@ -123,9 +123,10 @@ for one role at a time and only when you ask, and never connects, messages or fo
 **The risk:** LinkedIn's terms ban any automated use of the site, so this could get your LinkedIn account
 restricted, even at this low volume. Say "switch off the LinkedIn lookup" to stop it.
 
-**Separate and always on:** when Claude scores a role that comes from LinkedIn, it reads that one job page in your
-logged-in Chrome to get the description (one page at a time, read-only, no searching or browsing). Same risk. Say
-"don't open LinkedIn pages, I'll paste them" and it goes back to asking you to paste the description.
+**LinkedIn job pages (off unless you switch it on; setup asks you):** when Claude scores a role that comes from LinkedIn, it can read
+that one job page in your logged-in Chrome to get the description (one page at a time, read-only, no searching or browsing).
+Same risk as above: LinkedIn's terms ban automated use, so your account could be restricted. Setup asks, and the default is no:
+then Claude asks you to paste the description. Say "switch on the LinkedIn job-page reading" or "switch it off" at any time.
 
 ## What Claude can do in your browser
 

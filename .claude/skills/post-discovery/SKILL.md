@@ -18,8 +18,8 @@ it to true and commit. Never run it from the daily Action or in the background.
 
 - Claude in Chrome, a tab you open, the user's session. Never type credentials. A login wall, CAPTCHA, "unusual activity" or
   security prompt: **stop the whole sweep**, tell the user, hand it over.
-- At most `max_searches` post searches per session. On each, scroll **up to `max_scrolls` times** (scrolling is allowed: the
-  user wants good coverage), reading as you go, and stop early when posts get older than `max_post_age_days` or start to repeat.
+- At most `max_searches` post searches per session. On each, **scroll until the results pass `max_post_age_days` (the user, 2026-10-06: scroll to cover the whole 30-day window, not a
+  fixed number of screens)**: results are newest first, so keep scrolling and reading until the posts are older than the window, then stop; `max_scrolls` (12) is only the ceiling that stops a runaway, and a search also stops when posts start to repeat or the list ends. Read `get_page_text` after the scrolls (it returns all posts loaded so far).
   Opening an original post or a profile is a page view too: at most `max_people_per_session` profiles in total.
 - **Throttle every request (the user's instruction, 2026-10-02, after Cloudflare "Error 1200: temporarily rate limited" hit the third search of a sweep
   that ran two searches per batch with seconds between them).** One search per tool batch, never two. Pad the intervals with `computer wait`:

@@ -176,7 +176,7 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 |---|---|---|
 | `enabled` | false | true lets the `post-discovery` skill use Claude in Chrome, in the user's logged-in browser, to read LinkedIn **post** searches and known recruiters' posts at the start of a session. Read-only; never reacts, comments, connects or messages. LinkedIn's terms ban automated access, so this is the user's risk to accept |
 | `max_searches` | 8 | Post searches per session |
-| `max_scrolls` | 4 | Scrolls per search, to read past the first screen |
+| `max_scrolls` | 12 | The ceiling on scrolls per search. A search scrolls until the newest-first results pass `max_post_age_days` (30), so the whole window is read; the ceiling only stops a runaway |
 | `max_people_per_session` | 8 | Profiles opened (known people's posts, original authors) per session |
 | `company_queries` | 6 | How many of the session's searches are `<company> "we're hiring" security`, walked in this order: companies in `profile/network.csv` that are also good fits first, then other scored apply/maybe employers, then `company_fit` targets; the rest are keyword searches (a small safety net; the user found keyword-only sweeps nearly useless) |
 | `company_extra` | [] | Companies the user wants searched even before any of their roles is scored (named in chat; Claude edits the list). Searched in the same company slots, ahead of the scored apply/maybe employers; each employer once |

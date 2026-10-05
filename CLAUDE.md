@@ -146,7 +146,7 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
    hiring posts and reposts by recruiters and hiring managers; opt-in via `discovery.linkedin_posts.enabled`, knowing
    LinkedIn's terms ban automated access):** the `post-discovery` skill may read LinkedIn **post-search results** and known
    recruiters' own posts in the user's logged-in Chrome, at the start of a session or when asked. Capped by
-   `max_searches`, `max_scrolls` and `max_people_per_session`; scrolling is allowed up to that cap. Read-only: no reacting,
+   `max_searches`, `max_scrolls` and `max_people_per_session`; scrolling is allowed until the results pass the 30-day window (`max_scrolls` is the ceiling). Read-only: no reacting,
    commenting, reposting, following, connecting or messaging; stop at any login wall, CAPTCHA or security prompt. Never from
    the daily Action or in the background. Still no Indeed or Glassdoor, no LinkedIn job-search pages and no bulk job-page fetching.
 5. **Secrets never go in files, commits or chat.** The Gmail app password lives only in

@@ -170,3 +170,11 @@ def test_letter_sentence_over_40_words_is_an_error():
     d = json.loads(json.dumps(GOOD))
     d["cover_letter"][1]["text"] = "word " * 41 + "end."
     assert any("limit 40" in e for e in check(d)[0])
+
+
+def test_letter_jargon_and_wall_of_text_are_warnings():
+    d = json.loads(json.dumps(GOOD))
+    d["cover_letter"][1]["text"] = "The attack surface was large. " + "word " * 125
+    warns = check(d)[1]
+    assert any("terms a recruiter may not know" in w for w in warns)
+    assert any("aim for about 100" in w for w in warns)

@@ -193,6 +193,15 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
             for sent in re.split(r"(?<=[.!?])\s+", str(c.get("text", ""))):
                 if len(sent.split()) > 40:
                     errs.append(f"cover letter [{c['source_id']}] has a sentence of {len(sent.split())} words (limit 40): split it: \"{sent[:60]}...\"")
+    # plain language and skim-ability for a recruiter (the user, 2026-10-05, after the Apple review)
+    jargon = ("attack surface", "sibling codebase", "confused-deputy", "confused deputy", "xss", "ssrf", "idor", "gateway", "subscriber-push")
+    for c in data.get("cover_letter", []):
+        if isinstance(c, dict) and str(c.get("source_id", ""))[:1] in ("C", "S"):
+            low = str(c.get("text", "")).lower()
+            if hits := [w for w in jargon if w in low]:
+                warns.append(f"cover letter [{c['source_id']}] uses terms a recruiter may not know {hits}: say what it meant in plain words (the CV keeps the technical terms)")
+            if c["source_id"] not in ("C01", "C02", "C12", "C13", "C14") and len(str(c.get("text", "")).split()) > 120:
+                warns.append(f"cover letter [{c['source_id']}] is {len(str(c.get('text', '')).split())} words: a block is a fast read, aim for about 100 and keep the top details only")
     # a block covers several angles, so its master title is only a default: each letter labels the angle it uses (the user, 2026-10-05)
     unlabeled = [c.get("source_id") for c in data.get("cover_letter", []) if isinstance(c, dict)
                  and c.get("source_id") not in ("C01", "C02", "C12", "C13", "C14") and not c.get("label")

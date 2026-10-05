@@ -26,7 +26,7 @@ install, open a **new** terminal window and run the check command; it should pri
 Stuck on any of these? Once Claude Code runs, say "check my setup" and Claude tells you what's missing and walks you through it.
 
 GitHub's free plan includes 2,000 minutes a month of automated runs for private
-projects; job-radar uses roughly 450–750.
+projects; job-radar uses roughly 450–750 a month (15–25 minutes a day across its three daily runs).
 
 ## Setup, in order
 

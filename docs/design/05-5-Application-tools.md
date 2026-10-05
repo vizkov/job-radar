@@ -47,7 +47,7 @@ falls back to Markdown in the folder.
 Called by `render_resume.py` (the default). No LLM, nothing to pip install: HTML is printed to PDF with headless Chrome or
 Edge (`find_browser()`, `print_pdf()` with a throwaway user-data dir so an open browser doesn't interfere). The
 look (Arial, A4 CV with 43 pt side margins, US Letter cover letter with 54 pt margins, teal `#005477` headings,
-10 pt body at a 1.43 line height, a rule under the header, right-aligned city and dates, a two-column skills grid)
+10 pt body at a 1.43 line height for the CV (the letter uses 10.5 pt at 1.5), a rule under the header, right-aligned city and dates, a two-column skills grid)
 was measured from the user's `Downloads/cv.pdf` and `cover.pdf`; change `CSS` and the `@page` rules to change it.
 Small helpers: `all_names()` turns "X (formerly part of A, then B)" into "X / A / B"; `smart_title()` title-cases a phrase but keeps acronyms, mixed case and small words like "and"; `short_link()` strips `https://www.` and a trailing slash for display; `split_label()` splits "Label: text" into its two parts (empty label if no colon); `header_html()` builds the name, headline, contact lines and rule; `role_and_company()` looks up a ref's title and company in `data/matches.csv`.
 `resume_html(data, career, contact)` takes the **tailored text** and the **structure from the master CV**:

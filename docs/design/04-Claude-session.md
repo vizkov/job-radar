@@ -28,8 +28,8 @@ The skills, and the tools each one runs:
 | `score-roles` | "which of these fit me?" | `jd_prep.py`, then Claude writes `score.json`, then `jd_check.py score --board` |
 | `tailor-application` | "tailor my CV for X" | Claude writes `tailored.json`, `jd_check.py tailor`, `render_resume.py` |
 | `inbox-check` | brief has an `INBOX-CHECK` line, or the user asks whether anyone replied | `inbox_outcomes.py pending`, the Gmail connector (search and read only), `inbox_outcomes.py classify`; suggests, the user confirms, then `track` (see [4.10](#410-reading-replies-inbox-check)) |
-| `master-update` | a master document (`master_resume.md`, `cover_blocks.md`, `stories.md`) changed, by the user or by Claude | `consistency_check.py` on the masters and `master_drift.py`, then two read-only subagents (master consistency auditor, cold reader); stale applications are rebuilt from the current masters and re-reviewed (see [4.5](#45-when-the-master-documents-change-master-update)) |
-| `application-review` | "review my application", the user provides or updates CV/cover/STAR drafts; runs automatically after `tailor-application` | `consistency_check.py`, then four read-only subagents (ATS, recruiter, consistency auditor, copy editor); Claude verifies their findings and reports ranked fixes in chat (no `review.md` is written) |
+| `master-update` | a master document (`master_resume.md`, `cover_blocks.md`, `stories.md`) changed, by the user or by Claude | `consistency_check.py` on the masters and `master_drift.py`, then (only on the user's word, rule 12) two read-only subagents (master consistency auditor, cold reader); `cover_sync.py` and the masters-clear gate (`master_drift.py status`) are the only automatic steps; stale applications are rebuilt from the current masters once the masters are cleared (see [4.5](#45-when-the-master-documents-change-master-update)) |
+| `application-review` | "review my application", the user provides or updates CV/cover/STAR drafts; offered after `tailor-application`, run only on the user's word (CLAUDE.md rule 12) | `consistency_check.py`, then four read-only subagents (ATS, recruiter, consistency auditor, copy editor); Claude verifies their findings and reports ranked fixes in chat (no `review.md` is written) |
 | `sponsorship-check` | "will they sponsor?", roles recommended apply/maybe | reads the ad, applies country rules, checks registers, WebSearch/WebFetch on company pages (never LinkedIn/Indeed/Glassdoor); `tools/sponsorship.py record --board` |
 | `referrals` | "who do I know at …", a role recommended apply, an unanswered ask in the brief | `tools/referrals.py contacts/ask/result/route/pending`; messages to strangers are drafted in chat only, never saved to a file |
 | `post-discovery` | `discovery.linkedin_posts.enabled` at session start, "check LinkedIn posts", the user pastes a hiring post | `tools/post_leads.py queries/person/lead/add-role/stats`; Claude in Chrome reads post searches read-only; new roles become cards with the poster named |
@@ -76,7 +76,7 @@ errors become one-line notes, and it always exits 0.
    `board_sync.py fill` as a **detached background process**, so the brief doesn't wait for
    dozens of API calls. A timestamp file stops it starting twice within 10 minutes. A field added later, such as Country, is
    therefore back-filled onto cards that already have a Stage ([page 11](11-Board-internals.md#where-each-card-value-comes-from)).
-8. **`start_archive()`**: when any card is in Stage=Skipped, and at most once a day (stamp `work/.last_archive`), starts `board_sync.py archive` detached, which archives cards in Stage=Skipped (the Action's token can't reach the user's Project).
+8. **`start_archive()`**: when any card is in Stage=Skipped or Rejected, and at most once a day (stamp `work/.last_archive`), starts `board_sync.py archive` detached, which archives cards in Stage=Skipped and Rejected cards older than 30 days (`REJECTED_ARCHIVE_DAYS`) (the Action's token can't reach the user's Project).
 9. **`template_status()`**: commits the public template gained since the last session
    ("system updated": Claude should re-read the relevant skill), and any code here not yet
    published (`public_template.drift()`).
@@ -279,8 +279,7 @@ usually means a true fact is missing from the story, which the user confirms and
 
 `jd_check.py tailor` proves each bullet came from the user's own lines; it cannot tell whether the CV,
 cover letter and STAR stories *agree*, or whether the package would get shortlisted. This skill does
-both, and runs automatically as step 6 of `tailor-application` (also when the user provides or updates
-the three documents).
+both, and is offered at step 6 of `tailor-application` and when the user provides or updates the three documents; it runs only on the user's word (CLAUDE.md rule 12: no check passes unasked).
 
 1. **Deterministic pass:** `tools/cv_lint.py` (form and section rules) and `tools/consistency_check.py` list figures, years and names that only one
    document has, CV figures no story backs up, and leftover placeholders. Candidates, not verdicts.

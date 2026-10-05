@@ -12,7 +12,7 @@ Part of the [5. Code reference](05-Code-reference.md) (the index of every file a
 
 Sub-commands: `roles`, `status`, `stale`, `backfill-map` (Actions or local);
 `setup-project`, `fill`, `set`, `views`, `design-diff`, `describe`, `refresh-bodies`, `archive` (local, need the `project` scope;
-`archive_skipped(gh, max_n=ARCHIVE_MAX)` archives up to 40 cards with Stage = Skipped per run via `gh project
+`archive_skipped(gh, max_n=ARCHIVE_MAX)` archives up to 40 cards per run with Stage = Skipped, or Stage = Rejected for more than `REJECTED_ARCHIVE_DAYS` (30) days (read from the stage log by `_rejected_on`), via `gh project
 item-archive`, idempotent because `item-list` omits archived items; `session_brief.start_archive` runs it once a day);
 `promote <ref> …` (local, queues cards for recorded roles; then `roles`).
 
@@ -32,7 +32,7 @@ item-archive`, idempotent because `item-list` omits archived items; `session_bri
 | `_load`, `_remember_issue` | JSON read helper; record `ref → issue number`. |
 | `backfill_map(gh)` | Rebuild `issue_map.json` from every role issue's hidden marker. |
 | `sync_stale(gh)` | Add/remove `possibly-closed`. It also labels issues already closed (the issue map holds every ref); harmless, since closed cards are out of the working views. |
-| `log_stage(ref, field, value, by)` | Append to `data/pipeline_log.jsonl`. |
+| `log_stage(ref, field, value, by, note="")` | Append to `data/pipeline_log.jsonl`. |
 | `sync_status(gh)` | Update or create-and-pin the "Radar status" issue. |
 | `gh_json`, `load_board`, `_read_fields`, `_save_board` | JSON output of gh; read `profile/board.json`; field and option IDs; save board.json. |
 | `setup_project(gh, repo)` | Create or adopt the "Job search" Project, create missing fields, link the repo, save IDs. |
@@ -68,7 +68,7 @@ what it would queue),
 
 ## `tools/jd_cleanup.py`: trim the JD packets of roles you are done with
 
-`candidates(root, now)` lists `work/jd/<ref>/` folders whose `jd.txt` and `packet.md` are past their retention: Stage Skipped 14 days after it was skipped, Rejected 30 days after, scored skip with no stage change 14 days after the score (days overridable in `profile/config.json` `cleanup`). `run(root, now, dry)` removes those two files (never `score.json`, `meta.json` or `sponsorship.json`) and stamps the `jd_cleanup` cadence job; the SessionStart hook calls it once a day and the CADENCE block has a line for it. Roles in New, Shortlisted, Applied, Interview or Offer are never touched.
+`candidates(root, now)` lists `work/jd/<ref>/` folders whose `jd.txt` and `packet.md` are past their retention: Stage Skipped 14 days after it was skipped, Rejected 30 days after, scored skip with no stage change 14 days after the score (days overridable in `profile/config.json` `cleanup`). `run(root, now, dry)` removes those two files (never `score.json`, `meta.json` or `sponsorship.json`) and stamps the `jd_cleanup` cadence job; the SessionStart hook calls it daily (the cadence marks it due after 48 hours) and the CADENCE block has a line for it. Roles in New, Shortlisted, Applied, Interview or Offer are never touched.
 
 ## `tools/cadence.py`: the cadence ledger (standard library only)
 
@@ -76,7 +76,7 @@ The session brief's CADENCE block lists every recurring job and whether it is du
 
 | Name | Is |
 |---|---|
-| `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 20, `auto_score` 4, `views_check` 24, `health` 24, `cv_review` 168. |
+| `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 20, `auto_score` 4, `views_check` 24, `health` 24, `cv_review` 168, `jd_cleanup` 48 (seven jobs). |
 | `done(name, root, now)`, `last(name, root)`, `load(root)` | Stamp a job as just finished; read a stamp; read the ledger. CLI: `python tools/cadence.py done <name>` and `show`. |
 | `is_due(name, now, root)`, `when(name, now, root, fallback)` | True when never run or older than its interval; the "last ran … (Nh ago)" text. |
 | `block(now, root, …)` | Returns the brief's CADENCE lines (radar search, new roles to the board, scoring, inbox check, LinkedIn post sweep, board views vs code, health, CV review, docs review) and the names of the due jobs. Four arguments make a line DUE: `views_drift` (the brief's design-diff note: update `VIEWS` to the user's live layout, then `cadence.py done views_check`) and `docs_review` (the reason from `docs_review_note()`: run `docs-review`, which stamps `work/.last_docs_review` itself), `source_problems` (a count from `status_info()`; DUE when above 0 and the `health` job is older than a day: run `health`, then `cadence.py done health`) and `cv_gaps` (the "CV gaps" note from `health_checks()`; DUE when set and `cv_review` is older than a week: offer `cv-review`, then `cadence.py done cv_review`). `session_brief.cadence_block()` gathers its inputs from `matches.csv`, the issue map, the queue and the board, and passes both through. |

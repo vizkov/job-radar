@@ -149,3 +149,26 @@ def test_dropped_master_bullet_needs_a_reason():
     d["dropped"] = {victim: "no JD match: the ad asks for nothing about this kind of work"}
     assert not any("dropped without a reason" in x for x in cv_lint.tailored_issues(d, test_tailor.CAREER)[0])
 
+
+def test_key_achievements_capital_after_label(monkeypatch):
+    # the user, 2026-10-05: "Chained logic flaws: found" beside "AI security: Found" went unflagged
+    for sid in ("P01", "P02"):
+        monkeypatch.setattr(test_tailor.CAREER.items[sid], "section", "Key achievements")
+    d = copy.deepcopy(test_tailor.GOOD)
+    d["sections"].append({"heading": "Key achievements", "bullets": [
+        {"source_id": "P01", "text": "Impact: found a flaw"}, {"source_id": "P02", "text": "Scale: Became the contact"}]})
+    e, _ = cv_lint.tailored_issues(d, test_tailor.CAREER)
+    assert any("mix capital and lower-case" in x for x in e)
+    d["sections"][-1]["bullets"][0]["text"] = "Impact: Found a flaw"
+    e, _ = cv_lint.tailored_issues(d, test_tailor.CAREER)
+    assert not any("mix capital and lower-case" in x for x in e)
+
+
+def test_letter_optional_sub_point_is_an_error(monkeypatch):
+    # the user, 2026-10-05: sub-bullets are wrong in a cover letter (a fast read)
+    d = copy.deepcopy(test_tailor.GOOD)
+    sid = d["cover_letter"][0]["source_id"]
+    monkeypatch.setattr(test_tailor.CAREER.items[sid], "section", "Parent block: detail (optional)")
+    e, _ = cv_lint.tailored_issues(d, test_tailor.CAREER)
+    assert any("optional sub-point" in x for x in e)
+

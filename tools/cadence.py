@@ -12,6 +12,7 @@ stamp themselves when they finish:
     python tools/cadence.py done health           # after the health skill has dealt with the source problems
     python tools/cadence.py done cv_review        # after the cv-review skill
     python tools/cadence.py done views_check      # after updating VIEWS to match the live board views
+    python tools/cadence.py done jd_cleanup       # stamped by tools/jd_cleanup.py itself (the hook runs it daily)
     python tools/cadence.py show                  # the ledger
 
 Stamps live in work/.cadence.json (private, local). The radar search and the new-role additions are
@@ -26,7 +27,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 JOBS = {"inbox_check": 20, "post_discovery": 20, "auto_score": 4, "views_check": 24,
-        "health": 24, "cv_review": 168}   # name -> hours before it is due again
+        "health": 24, "cv_review": 168, "jd_cleanup": 48}   # name -> hours before it is due again
 
 
 def _file(root: Path) -> Path:
@@ -166,6 +167,12 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
             lines.append(f"  - CV review: gaps listed; {when('cv_review', now, root)} · ok")
     else:
         lines.append("  - CV review: no recurring CV gaps · ok")
+    # JD packet cleanup: the SessionStart hook runs tools/jd_cleanup.py daily; this line makes a silent failure visible
+    if is_due("jd_cleanup", now, root):
+        due.append("jd_cleanup")
+        lines.append(f"  - JD packet cleanup: {when('jd_cleanup', now, root)} · DUE: run `python tools/jd_cleanup.py run` (it stamps itself)")
+    else:
+        lines.append(f"  - JD packet cleanup: {when('jd_cleanup', now, root)} · ok")
     # docs review: due once enough code changed since the last one. Part of the block (not a health note) so it does
     # not wait for the user to say "close the session"
     if not docs_review_job:

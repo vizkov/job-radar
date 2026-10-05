@@ -38,6 +38,7 @@ The skills, and the tools each one runs:
 | `tune-radar` | "stop showing X", "add company Y" | edits `profile/`, `radar.py --dry-run`, `build_candidates.py`, `verify_boards.py` |
 | `health` | "is anything broken?" | `radar.py --dry-run --source X`, `verify_boards.py` |
 | `system-review` (maintainer-only) | brief says a weekly review is due | `discover_boards.py`, `board_sync.py design-diff`, reads logs |
+| `rejection-review` | a card moves to Rejected, "why was it rejected?" | reads the role's `score.json`, sponsorship verdict, the stage log, the application mail ledger and the sponsorship/relocation answers; read-only |
 | `cv-review` | "how do I strengthen my CV?" | reads `scores.jsonl` "missing" requirements vs career docs |
 | `interview-prep` | "I have an interview with X" | reads the JD packet, STAR stories |
 | `manual` | "what can this do?", `/manual` | `tools/manual.py` |

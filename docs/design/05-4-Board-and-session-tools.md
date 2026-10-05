@@ -66,6 +66,10 @@ itself: the `setup-project` command runs `setup_project()` then `apply_views()`.
 what it would queue),
 `--max N` (roles: issues per run). `sync_roles()` takes the queue oldest first.
 
+## `tools/jd_cleanup.py`: trim the JD packets of roles you are done with
+
+`candidates(root, now)` lists `work/jd/<ref>/` folders whose `jd.txt` and `packet.md` are past their retention: Stage Skipped 14 days after it was skipped, Rejected 30 days after, scored skip with no stage change 14 days after the score (days overridable in `profile/config.json` `cleanup`). `run(root, now, dry)` removes those two files (never `score.json`, `meta.json` or `sponsorship.json`) and stamps the `jd_cleanup` cadence job; the SessionStart hook calls it once a day and the CADENCE block has a line for it. Roles in New, Shortlisted, Applied, Interview or Offer are never touched.
+
 ## `tools/cadence.py`: the cadence ledger (standard library only)
 
 The session brief's CADENCE block lists every recurring job and whether it is due, so none runs silently. Jobs Claude runs (they need Gmail or Chrome, which a hook cannot drive) stamp themselves in `work/.cadence.json` when finished.

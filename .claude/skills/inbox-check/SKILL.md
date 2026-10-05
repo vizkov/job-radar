@@ -34,7 +34,7 @@ mailbox for them, **read-only**, and **suggests** board changes. It never moves 
    suggested change (Rejected, Interview, or Offer). Roles with no reply: say "no reply yet" and give the days since applying.
 6. **On the user's yes:** run `track` (Stage=Rejected / Interview / Offer, with a short dated `--note`), then
    `python tools/inbox_outcomes.py seen <message-id>` so the email is not suggested again. For an interview, offer `interview-prep`.
-   A rejection: offer to look at what to learn from it (the role's must-haves vs the CV) and the next best role.
+   A rejection: offer the `rejection-review` skill (the role's must-haves vs the CV, the timing, sponsorship and location) and the next best role.
 7. Emails the user says are wrong (a different role, an auto-reply) go into `seen` too.
 8. **Stamp the cadence** when the check is finished (even if nothing was found): `python tools/cadence.py done inbox_check`. The session brief's CADENCE block shows this job as DUE until you do.
 

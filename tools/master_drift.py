@@ -31,7 +31,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from jobradar.career import career_dir, clear_masters, load_career, masters_cleared  # noqa: E402
+from jobradar.career import career_dir, clear_masters, cover_blocks_stale, cover_sync_message, load_career, masters_cleared  # noqa: E402
 
 APPS = ROOT / "profile" / "applications"
 MASTER_FILES = ("master_resume.md", "cover_blocks.md", "stories.md")
@@ -81,6 +81,9 @@ def main() -> int:
         print("masters cleared: applications may be built or refreshed" if ok else f"masters NOT cleared: {why}")
         return 0 if ok else 1
     if args.action == "clear":
+        if stale := cover_blocks_stale():
+            print(cover_sync_message(stale))
+            return 1
         print(f"masters recorded as cleared ({clear_masters()[:12]}): run this only after the master-update check found nothing left to fix")
         return 0
     career = load_career()

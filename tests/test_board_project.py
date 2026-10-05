@@ -282,3 +282,26 @@ def test_a_card_that_cannot_be_filled_is_not_a_gap():
     done = item(stage="Applied")
     done["country"], done["posted"] = "NL", "2026-09-01"
     assert bs.fill_gaps(done, _gap_board(), {REF: {"countries": "NL"}}, {REF: "2026-09-01"}) == {}
+
+
+def test_rejected_cards_are_archived_only_after_30_days(board_file, tmp_path, monkeypatch):
+    # the user, 2026-10-05: rejected cards stay a month as the record, then leave the board so it does not bloat
+    import json
+    from datetime import datetime, timedelta
+    now = datetime(2026, 11, 10, 12, 0)
+    old_ref, new_ref = "a" * 16, "b" * 16
+    log = tmp_path / "log.jsonl"
+    log.write_text(json.dumps({"ref": old_ref, "field": "Stage", "value": "Rejected", "at": (now - timedelta(days=40)).isoformat()}) + "\n"
+                   + json.dumps({"ref": new_ref, "field": "Stage", "value": "Rejected", "at": (now - timedelta(days=3)).isoformat()}) + "\n",
+                   encoding="utf-8")
+    monkeypatch.setattr(bs, "PIPELINE_LOG", log)
+    gh, _ = setup(board_file)
+    def rejected(n, ref):
+        i = item(stage="Rejected")
+        i["id"] = f"PVTI_{n}"
+        i["content"] = {"type": "Issue", "url": f"https://github.com/me/r/issues/{n}", "body": f"... <!-- job-radar:ref={ref} -->"}
+        return i
+    gh.items = [rejected(1, old_ref), rejected(2, new_ref), item(stage="Applied")]
+    msg = bs.archive_skipped(gh, sleep=lambda s: None, now=now)
+    assert [c[-1] for c in gh.calls if c[:2] == ("project", "item-archive")] == ["PVTI_1"]
+    assert msg == "archived 0 Skipped card(s) and 1 Rejected card(s) older than 30 days"

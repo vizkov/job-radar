@@ -93,6 +93,10 @@ The user kept missing replies, so the scheduled run now watches the mailbox for 
 **Watch out:** the Action cannot move board cards (its token cannot reach the Project), so the ledger is acted on in the next session. The
 snapshot the Action reads is only as fresh as the user's last push, which is why Shortlisted roles are watched too.
 
+## `tools/cover_sync.py`: the cover blocks follow the stories and CV lines
+
+Each cover block in `profile/career/cover_blocks.md` has a metadata comment naming the CV lines (anchor) and stories (sources) it expands. `jobradar/career.py` fingerprints those lines (`cover_blocks_stale`, `record_cover_sync`, `cover_sync_message`; the record is `profile/career/.cover_sync.json`). `python tools/cover_sync.py status` lists the blocks whose sources changed, `done` records the sync after they are reviewed. `jd_check.py tailor` and `master_drift.py clear` refuse while any block is stale. Blocks without metadata, and the example career, are ignored.
+
 ## `tools/master_drift.py`: which applications no longer match the master documents
 
 Two more actions: `status` says whether the masters are **cleared** (they passed the `master-update` check exactly as they are now) and `clear` records it. `jobradar/career.py` holds the stamp: `masters_digest()` (SHA-256 of the three masters, line endings ignored), `masters_cleared()`, `clear_masters()`; the stamp is `profile/career/.master_cleared`. `tools/jd_check.py tailor` calls `masters_cleared()` and refuses (removing the validation stamp, so `render_resume.py` refuses too) when the masters changed after the last clean check.

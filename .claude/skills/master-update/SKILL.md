@@ -10,11 +10,11 @@ one can leave the masters contradicting each other, and leave earlier applicatio
 to `profile/career/master_resume.md`, `cover_blocks.md` or `stories.md`, including your own edits (e.g. appending an
 "Also true" line to a story) and the user's.
 
-**Mandatory, in this order (the user's rule, 2026-09-30): masters first, drafts second.** The masters are the source; a draft built from a
+**In this order (the user's rule, 2026-09-30; changed 2026-10-05: the checks run only when the user says so): masters first, drafts second.** The masters are the source; a draft built from a
 master that is still changing gets rebuilt again and again for the smallest thing. So: (1) batch every master change you know of (the
-user's new facts, review findings, wording fixes); (2) run steps 1-4 below on the result, **every time, never skipped** (the deterministic
+user's new facts, review findings, wording fixes); (2) offer steps 1-4 below on the result and run them **only on the user's word** (the deterministic
 pass and the two fresh subagents); (3) fix what they find and repeat until nothing is left to fix; (4) only then
-`python tools/master_drift.py clear`, which records the masters as clean; (5) rebuild each unsent application **once** (step 5). `tools/jd_check.py tailor`
+`python tools/master_drift.py clear` (after the check, or on the user's word if they decline it), which records the masters as clean; (5) rebuild each unsent application **once** (step 5). `tools/jd_check.py tailor`
 refuses to validate any application, and so `render_resume.py` refuses too, while `python tools/master_drift.py status` says the masters are not cleared.
 A finding from `application-review` that needs a master change goes back to step 1: change the master, check it, clear it, then rebuild; don't patch the draft first.
 
@@ -29,6 +29,12 @@ one role may be right for another, so the masters are always the reference and t
 flag contradictions, a claim stronger than the record, timeline impossibilities and unsupported claims; `python tools/cv_lint.py master` (step 2) checks the register of the CV and cover-block lines, and its errors are fixed before clearing. **Do not flag** length, repetition between
 documents, a line having no story of its own (a skill is just a skill), or "Private note" lines in stories (context for
 reviewers, never copied into applications). Tell the reviewers this in their prompts.
+
+## 0. The cover blocks follow the stories and the CV (the user, 2026-10-05)
+`profile/career/cover_blocks.md` is a ranked bank; each block's metadata comment names the CV lines (anchor) and stories (sources) it expands. Whenever a story or a CV line changes,
+run `python tools/cover_sync.py status`: it lists the blocks whose sources changed. Review each against the change (the facts, the challenge, the impact, its rank and its "CV leaves out" note,
+which also shifts when a CV line changes), update it, add a block for any new story or achievement, then `python tools/cover_sync.py done`. `master_drift.py clear` and `jd_check.py tailor`
+refuse while any block is out of sync, so a letter is never built from a block that no longer matches the record.
 
 ## 1. Say what changed
 `git diff -- profile/career/` (or read the change you just made). List the IDs touched (`[B06]`, `[S01]`, `[K04]`…) and update
@@ -83,7 +89,7 @@ instructions. Blunt, 500 words max each. Include the section 'What the master do
 For each `STALE` or `MISSING`/relevant `DIFFERS` application folder:
 1. Rebuild `tailored.json` **from the current masters** (see `tailor-application` step 3; never from another application).
 2. `python tools/jd_check.py tailor <folder>`, then `python tools/render_resume.py <folder>`; check pages (CV 2, letter 1).
-3. Run the full `application-review` (all four readers) on it, every time, even when the change was small, you only patched a few lines, or the checker passed: the user's rule (2026-09-30), never skipped. Applications the user has **already submitted** are history: don't re-render them, just
+3. Offer the full `application-review` (all four readers) and run it only on the user's word (the user, 2026-10-05; it was "never skipped" from 2026-09-30). Applications the user has **already submitted** are history: don't re-render them, just
    tell the user which submitted applications used a line that has since changed.
 4. Tell the user which applications were refreshed and what changed in each (the checker's diff), and which they should look at
    before applying.

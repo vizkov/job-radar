@@ -23,6 +23,8 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 |---|---|---|
 | `tools/board_sync.py` | GitHub issues and the Project (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/cadence.py` | the cadence ledger (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
+| `tools/cover_sync.py` | the cover blocks follow the stories and CV lines they expand (`status`, `done`) | [5.5](05-5-Application-tools.md) |
+| `tools/jd_cleanup.py` | trims `jd.txt` and `packet.md` of skipped and rejected roles after 14 and 30 days | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/session_brief.py` | the SessionStart hook (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/public_template.py` | keep the public template current and clean | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/manual.py` | the `man` page | [5.4](05-4-Board-and-session-tools.md) |

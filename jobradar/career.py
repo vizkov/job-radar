@@ -11,6 +11,7 @@ letter may draw from; tools/jd_check.py enforces that by ID.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -146,3 +147,69 @@ def load_career(folder: Path | None = None) -> Career:
     career.items.pop("Z999", None)
     career.raw_text = "\n".join(texts)
     return career
+
+
+# --- cover blocks follow the stories and the CV (the user, 2026-10-05) -----------------------------------------------------
+# Every cover block that carries a metadata comment (rank | anchor B06 | ... | sources S01) is tied to the CV lines and stories it
+# expands. When one of those changes, the block is out of date until someone reviews it and records the sync.
+COVER_SYNC_FILE = ".cover_sync.json"
+_SOURCE_ID = re.compile(r"\b([SBPKE]\d{2})\b")
+
+
+def _cover_block_sources(directory: Path) -> dict[str, list[str]]:
+    path = directory / "cover_blocks.md"
+    if not path.exists():
+        return {}
+    out: dict[str, list[str]] = {}
+    lines = path.read_text(encoding="utf-8").splitlines()
+    for n, line in enumerate(lines):
+        m = _HEADING_ID.match(line)
+        if not m or n + 1 >= len(lines):
+            continue
+        meta = lines[n + 1].strip()
+        if meta.startswith("<!--") and meta.endswith("-->"):
+            ids = sorted(set(_SOURCE_ID.findall(meta)))
+            if ids:
+                out[m.group(1)] = ids
+    return out
+
+
+def _source_hashes(career: "Career", ids: list[str]) -> dict[str, str]:
+    return {i: (hashlib.sha256(" ".join(career.items[i].text.split()).encode()).hexdigest()[:16] if i in career.items else "missing")
+            for i in ids}
+
+
+def cover_blocks_stale(directory: Path | None = None) -> list[tuple[str, list[str]]]:
+    """[(block id, changed source ids)] for cover blocks whose CV lines or stories changed since the last recorded sync."""
+    d = directory or career_dir()
+    blocks = _cover_block_sources(d)
+    if not blocks:
+        return []
+    career = load_career(d)
+    snap_path = d / COVER_SYNC_FILE
+    snap = json.loads(snap_path.read_text(encoding="utf-8")) if snap_path.exists() else {}
+    stale = []
+    for bid, ids in sorted(blocks.items()):
+        cur, old = _source_hashes(career, ids), snap.get(bid)
+        if old is None:
+            stale.append((bid, ["not recorded yet"]))
+        elif changed := sorted(i for i in set(cur) | set(old) if cur.get(i) != old.get(i)):
+            stale.append((bid, changed))
+    return stale
+
+
+def record_cover_sync(directory: Path | None = None) -> int:
+    """Record that every cover block matches the CV lines and stories it expands as they are now; returns the block count."""
+    d = directory or career_dir()
+    blocks = _cover_block_sources(d)
+    career = load_career(d)
+    snap = {bid: _source_hashes(career, ids) for bid, ids in blocks.items()}
+    (d / COVER_SYNC_FILE).write_text(json.dumps(snap, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    return len(snap)
+
+
+def cover_sync_message(stale: list[tuple[str, list[str]]]) -> str:
+    rows = "; ".join(f"[{b}] <- {', '.join(ids)}" for b, ids in stale)
+    return (f"COVER BLOCKS OUT OF SYNC: {rows}. The CV lines or stories these cover blocks expand changed. Review each block against them "
+            "(challenge, what you did, impact, and its rank and 'CV leaves out' note), update it, then  python tools/cover_sync.py done")
+

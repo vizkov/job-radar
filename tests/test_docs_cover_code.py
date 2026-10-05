@@ -47,7 +47,7 @@ def test_every_config_section_is_documented():
 USER_PHRASES = {
     "apply-assist": "Help me apply", "application-review": "Review my application", "consultant-brief": "What's new?", "cv-review": "How do I strengthen my CV?",
     "docs-review": "Are the docs still right?", "health": "Is anything broken?", "inbox-check": "Did anyone reply?", "interview-prep": "I have an interview",
-    "manual": "/manual", "post-discovery": "Check LinkedIn posts", "master-update": "I updated my CV / cover letter / stories", "referrals": "Who do I know at", "score-roles": "Which of these fit me?",
+    "manual": "/manual", "post-discovery": "Check LinkedIn posts", "master-update": "I updated my CV / cover letter / stories", "referrals": "Who do I know at", "rejection-review": "Why was it rejected?", "score-roles": "Which of these fit me?",
     "setup": "Set this up for me", "sponsorship-check": "sponsor my visa", "system-review": "What could be better?",
     "tailor-application": "Tailor my CV", "track": "I applied to", "tune-radar": "Stop showing",
 }

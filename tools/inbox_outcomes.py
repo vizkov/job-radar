@@ -29,7 +29,7 @@ AWAITING = ("Applied", "Interview")
 RULES: list[tuple[str, list[str]]] = [
     ("rejection", [
         r"\bunfortunately\b", r"not (?:be )?(?:moving|proceeding) forward", r"will not be (?:moving|proceeding)",
-        r"decided to (?:proceed|move forward|go forward) with (?:other|another)", r"regret to inform", r"not been successful",
+        r"decided to (?:proceed|progress|move forward|go forward) with (?:other|another)", r"regret to inform", r"not been successful",
         r"not (?:been )?selected", r"position has been filled", r"no longer (?:being )?considered", r"unable to (?:offer|move)",
         r"will not be taking your application", r"decided not to (?:move|proceed)",
     ]),

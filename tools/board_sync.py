@@ -12,7 +12,7 @@ Local only (your `gh` login needs the project scope: gh auth refresh -s project)
     python tools/board_sync.py views                             # create/update the board's views (VIEWS)
     python tools/board_sync.py design-diff                       # how the board's views differ from VIEWS
     python tools/board_sync.py refresh-bodies                    # tidy role cards; add fit breakdowns from scores
-    python tools/board_sync.py archive                           # archive cards in Stage=Skipped (max 40 a run; the
+    python tools/board_sync.py archive                           # archive cards in Stage=Skipped, and Rejected ones after 30 days (max 40 a run; the
                                                                  #   session-start hook runs it once a day)
 
 In GitHub Actions `gh` uses GITHUB_TOKEN (issues: write). Issues labelled `role`
@@ -30,6 +30,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -452,19 +453,55 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: s
 ARCHIVE_MAX = 40  # per run: each archive is a GraphQL call, and a big first backlog can trip GitHub's rate limit
 
 
-def archive_skipped(gh: Gh, max_n: int = ARCHIVE_MAX, sleep=time.sleep) -> str:
-    """Archive cards whose Stage is Skipped: they leave the board's views but aren't deleted (the Project's
-    Archive keeps them, and they can be restored there). `item-list` never returns archived items, so
-    running this daily is idempotent; what's over the cap waits for the next run."""
+REJECTED_ARCHIVE_DAYS = 30   # a Rejected card stays on the board this long (the user, 2026-10-05: it would bloat), then it is archived
+
+
+def _rejected_on(ref: str) -> "datetime | None":
+    """When this role was last set to Rejected, from the stage log (None if it is not logged as Rejected)."""
+    when = None
+    if PIPELINE_LOG.exists():
+        for line in PIPELINE_LOG.read_text(encoding="utf-8").splitlines():
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if r.get("ref") == ref and r.get("field") == "Stage":
+                try:
+                    at = datetime.fromisoformat(r.get("at", "")).replace(tzinfo=None) if r.get("value") == "Rejected" else None
+                except ValueError:
+                    at = None
+                when = at
+    return when
+
+
+def archive_skipped(gh: Gh, max_n: int = ARCHIVE_MAX, sleep=time.sleep, now: "datetime | None" = None,
+                    rejected_days: int = REJECTED_ARCHIVE_DAYS) -> str:
+    """Archive cards whose Stage is Skipped, and Rejected cards rejected more than `rejected_days` ago: they leave the
+    board's views but aren't deleted (the Project's Archive keeps them, and they can be restored there). `item-list`
+    never returns archived items, so running this daily is idempotent; what's over the cap waits for the next run."""
     board = load_board()
     if board is None:
         return "board not set up yet (python tools/board_sync.py setup-project --repo OWNER/REPO)"
-    todo = [i for i in _items(gh, board) if i.get("stage") == "Skipped"]
+    now = now or datetime.now(timezone.utc).replace(tzinfo=None)
+    skipped, rejected = [], []
+    for i in _items(gh, board):
+        if i.get("stage") == "Skipped":
+            skipped.append(i)
+        elif i.get("stage") == "Rejected":
+            m = re.search(r"job-radar:ref=([0-9a-f]{16})", ((i.get("content") or {}).get("body") or ""))
+            at = _rejected_on(m.group(1)) if m else None
+            if at and now - at >= timedelta(days=rejected_days):
+                rejected.append(i)
+    todo = skipped + rejected
     for i in todo[:max_n]:
         gh("project", "item-archive", board["number"], "--owner", board["owner"], "--id", i["id"])
         sleep(0.5)
     n = min(len(todo), max_n)
-    return f"archived {n} Skipped card(s)" + (f", {len(todo) - n} left for the next run" if len(todo) > n else "")
+    n_rej = max(0, n - len(skipped))
+    msg = f"archived {n - n_rej} Skipped card(s)"
+    if n_rej:
+        msg += f" and {n_rej} Rejected card(s) older than {rejected_days} days"
+    return msg + (f", {len(todo) - n} left for the next run" if len(todo) > n else "")
 
 
 FIT_START, FIT_END = "<!-- job-radar:fit -->", "<!-- /job-radar:fit -->"

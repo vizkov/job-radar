@@ -1,6 +1,6 @@
 ---
 name: application-review
-description: Review a CV, cover letter and STAR stories as a set before the user applies, with four fresh read-only subagents (an ATS, a recruiter, a consistency auditor and a copy editor) plus a deterministic cross-check, and report ranked fixes with evidence. Runs automatically at the end of tailor-application; also use when the user provides, updates or generates their CV, cover letter or STAR drafts, or asks "are these consistent?", "would a recruiter shortlist this?", "review my application".
+description: Review a CV, cover letter and STAR stories as a set before the user applies, with four fresh read-only subagents (an ATS, a recruiter, a consistency auditor and a copy editor) plus a deterministic cross-check, and report ranked fixes with evidence. Offered at the end of tailor-application and run only when the user says so; also use when the user provides, updates or generates their CV, cover letter or STAR drafts, or asks "are these consistent?", "would a recruiter shortlist this?", "review my application".
 ---
 
 # Application review (ATS + recruiter + consistency audit)
@@ -132,7 +132,7 @@ folders built from them. Then offer `track` (Shortlisted) or `apply-assist`.
 
 ## Guardrails
 
-- **Never skip the review** (the user's rule, 2026-09-30): not for a small change, not for a patch or refresh of an existing application after a master change, not because the checker passed. All four readers, on every application.
+- **Never run the review unasked** (the user's rule, 2026-10-05, replacing 2026-09-30's "never skip"): after a tailoring, patch or refresh, offer it in one line and launch the readers only on the user's word. When asked, run all four readers on the application named.
 - Reviewers are read-only and never see secrets; the review stays in private paths (`profile/`).
 - A reviewer's persona is not a real ATS or a real recruiter. Say the verdict is a judgement.
 - Never send, submit or message anyone (rule 3).

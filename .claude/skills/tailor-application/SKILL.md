@@ -7,7 +7,7 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
 
 **Read `writing-rules.md` (next to this file) first**: what the CV, cover letter and stories are each for, what each CV section is for and how it reads, which sections are static, the skills rules, and the register rules. `jd_check.py tailor` runs `tools/cv_lint.py`, which enforces the mechanical ones.
 
-0. **Masters first.** Run `python tools/master_drift.py status`. If it says the masters are not cleared, run the `master-update` check (deterministic pass plus two
+0. **Masters first.** Run `python tools/master_drift.py status`. If it says the masters are not cleared, offer the `master-update` check (deterministic pass plus two
    fresh reviewers), fix what it finds, `python tools/master_drift.py clear`, and only then build or refresh the draft: drafts come from clean masters, once (the
    user's rule, 2026-09-30). `jd_check.py tailor` refuses otherwise.
 1. **Identify the role.** Find its ref in `data/matches.csv` (match company/title) or on the board card.
@@ -32,7 +32,7 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    Note: JSON schema for the file:
    ```json
    {"key": "<ref>",
-    "headline": "one line, e.g. Application Security Engineer — secure code review & threat modeling",
+    "headline": "master P00, verbatim (static, never retitled per role)",
     "sections": [{"heading": "Summary", "bullets": [{"source_id": "P01", "text": "..."}]},
                  {"heading": "Experience — <Employer> (<dates>)", "bullets": [{"source_id": "B03", "text": "..."}]},
                  {"heading": "Certifications", "bullets": [{"source_id": "E01", "text": "..."}]}],
@@ -67,10 +67,12 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
      The CV must fit **two pages** and the cover letter **one**: cut the least relevant bullets (a bullet
      that duplicates a Key achievement goes first) and make `C12` (why in-house) the first paragraph to drop. The letter and the CV must not read alike (`writing-rules.md` section 1).
    **Read the CV and letter as a copy editor before validating**: no meta-commentary, no chat-style clauses, no repeated phrases, one tense per bullet, bullets grouped by context.
-   - Headline: the target role title and 1-2 strengths; no contact details.
+   - Headline: **static (the user, 2026-10-05)**: copy master `P00` verbatim into `headline` and never retitle it per role or per JD; the Profile and Skills carry the convergence.
    - Visa sponsorship: the CV header (from `master_resume.md`'s `location`) does not say "Requires visa sponsorship" by default;
      the user decides per application (often after a referral or a first conversation). Ask before adding it to `location` for that
      copy; the cover letter block `C13` states it either way. An ATS screening filter may reject on the phrase; a recruiter may want it.
+   - **Picking the letter's points (the user, 2026-10-05):** the header of `profile/career/cover_blocks.md` is the procedure. Name the JD's 3-4 requirements in your own words, then choose up to three blocks whose `cv anchor` is in the tailored CV and whose `proves` tags match, preferring the lowest `rank` (what the CV leaves out), draft each in plain language (challenge, what you did, impact last) and shorten to one page. Blocks under "other situations" need the user's word.
+   - Cover letter content rules (the user, 2026-10-05; full text in `writing-rules.md`): reword the ad's requirements in your own words (never its sentences), no sub-bullets, add what the CV does not say, "why this company" is about the company and role, and pressure stories lead with impact.
    - Cover letter: 3-4 paragraphs from cover blocks and condensed STAR stories; mention sponsorship needs
      honestly if the role is abroad (block `C03`-style text if they have one).
    **Self-contained lines and matching documents (read the finished CV and letter top to bottom before validating):**
@@ -95,7 +97,7 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    `tools/render_pdf.py` or ask; changing approved text needs their yes.
 6. **Review gate.** Run the `application-review` skill on this folder (ATS, recruiter and consistency
    subagents plus `tools/consistency_check.py`); its findings go to the user **in the chat, not in a file**. Fix or
-   ask the user about every "fix before applying" finding, then re-validate and re-render. **Never skip it** (the user's rule, 2026-09-30): not for a small change, not when you only patch or refresh an existing application after a master change, not because the checker passed. All four readers (ATS, recruiter, consistency, copy editor), on every application.
+   ask the user about every "fix before applying" finding, then re-validate and re-render. **Never run it unasked** (the user's rule, 2026-10-05, replacing 2026-09-30's "never skip"): offer it in one line when the build is done and launch the readers only on the user's word. When asked, all four readers (ATS, recruiter, consistency, copy editor) on the application named.
    If the user only asked for the CV, still build both files (they need both eventually), but lead
    with the CV.
 7. **Hand over for review.** Print the **Key achievements section in full** in your reply (the checker's diff lists only

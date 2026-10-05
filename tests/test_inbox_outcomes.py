@@ -62,3 +62,9 @@ def test_log_overrides_a_stale_snapshot(tmp_path):
 def test_real_confirmation_emails_are_acknowledgements():
     assert io.classify("Thanks for your interest in Apple.", "We just received your resume for the following role")[0] == "acknowledgement"
     assert io.classify("Thank you for your application to Sonar", "we have received your application")[0] == "acknowledgement"
+
+
+def test_amazon_progress_with_other_candidates_is_a_rejection():
+    # Amazon's rejection says "we have decided to progress with other candidates" (2026-10-05); the classifier had said unknown
+    text = "After careful consideration and review of your application, we have decided to progress with other candidates for this role."
+    assert io.classify("Amazon application: Status update", text)[0] == "rejection"

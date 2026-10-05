@@ -17,8 +17,8 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "what's new?", "how's my search going?", "anything good this week?" | `consultant-brief` |
 | "which of these fit me?", "score the new roles", "is this one worth it?" | `score-roles` |
 | "tailor my CV for …", "prep my application for …", "write a cover letter for …" | `tailor-application` |
-| "review my application", "are these consistent?", "would a recruiter shortlist this?", the user provides or updates their CV / cover letter / STAR drafts, or `tailor-application` finishes | `application-review` (four read-only subagents: ATS, recruiter, consistency audit, copy editor; runs after every tailoring or refresh and is never skipped) |
-| the user edits `profile/career/master_resume.md`, `cover_blocks.md` or `stories.md`, or you change one (a review fix, an "Also true" line) | `master-update` (consistency re-check of the masters with two subagents, then refresh every application built from the old versions; run it after **every** master change, never skipped; the masters are cleared with `python tools/master_drift.py clear` only when the check finds nothing left to fix, and `jd_check.py tailor` refuses to build or refresh any application until then: masters first, drafts once) |
+| "review my application", "are these consistent?", "would a recruiter shortlist this?", the user provides or updates their CV / cover letter / STAR drafts, or `tailor-application` finishes | `application-review` (four read-only subagents: ATS, recruiter, consistency audit, copy editor; offered after every tailoring or refresh, and run only when the user says so: rule 12) |
+| the user edits `profile/career/master_resume.md`, `cover_blocks.md` or `stories.md`, or you change one (a review fix, an "Also true" line) | `master-update` (consistency re-check of the masters with two subagents, then refresh every application built from the old versions; after a master change, offer it and run it only when the user says so (rule 12); the masters are cleared with `python tools/master_drift.py clear` after a check that finds nothing left to fix, or on the user's word if they decline the check, and `jd_check.py tailor` refuses to build or refresh any application until then: masters first, drafts once; **a story or CV change also means reviewing the cover blocks listed by `cover_sync.py status`**) |
 | brief has an **INBOX-CHECK** line, "did anyone reply?", "any rejections?" | `inbox-check` (Gmail connector, read-only; suggests Rejected/Interview/Offer, the user confirms, then `track`) |
 | "will they sponsor?", a role recommended apply/maybe before referrals | `sponsorship-check` (ad + country rules + register + web research; verdict with evidence on the card) |
 | a role is shortlisted or "apply", "who do I know at …", "X referred me", brief lists an unanswered ask | `referrals` (people the user knows: asked before applying; recruiters and other strangers: after applying, with the tailored CV attached; the user sends every message) |
@@ -28,6 +28,7 @@ blocks) and `profile/config.json` (target countries, titles, tiers). If
 | "stop showing …", "add company …", "also look in Germany", "too much noise", "pause/resume the radar" | `tune-radar` |
 | "is anything broken?", "why no new roles?", a source failing in the status issue | `health` |
 | brief says "weekly system review due", "what could be better?" | `system-review` (maintainer's copy only: not shipped in the public template) |
+| a card moves to Rejected, `inbox-check` finds a rejection, "why was it rejected?" | `rejection-review` (read-only: the role's scored must-haves vs the CV, the timing, sponsorship and location, same-company applications; what is likely and what is a guess) |
 | brief shows CV gaps, "how do I strengthen my CV?", "which certs matter?" | `cv-review` |
 | a card reaches Interview, "I have an interview with …" | `interview-prep` |
 | "what can this do?", "man", "help", "what am I missing?" | `manual` (runs `tools/manual.py`) |
@@ -75,10 +76,10 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
   (`profile/applications/<folder>/`).
 - Tools you run (all have `--help`): `radar.py`, `verify_boards.py`,
   `tools/board_sync.py`, `tools/jd_prep.py`, `tools/jd_check.py`, `tools/render_resume.py`,
-  `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/cv_lint.py` (form and section rules: `.claude/skills/tailor-application/writing-rules.md`), `tools/master_drift.py` (which applications no longer match the master documents), `tools/inbox_outcomes.py` (applications awaiting an answer; phrase classifier for outcome emails), `tools/fetch_application_mail.py` + `tools/app_mail.py` (the Action's daily mailbox scan and the application-mail ledger `state/application_mail.jsonl`: the brief's **MAIL** lines), `tools/build_candidates.py`, `tools/public_template.py`,
+  `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/cv_lint.py` (form and section rules: `.claude/skills/tailor-application/writing-rules.md`), `tools/master_drift.py` (which applications no longer match the master documents), `tools/jd_cleanup.py` (trims the bulky JD files of skipped and rejected roles after 14/30 days; `list` shows what, `run` removes it), `tools/cover_sync.py` (the cover blocks follow the stories and CV lines they expand: `status` lists stale blocks, `done` records the sync after you update them; `master_drift.py clear` and `jd_check.py tailor` refuse while a block is stale), `tools/inbox_outcomes.py` (applications awaiting an answer; phrase classifier for outcome emails), `tools/fetch_application_mail.py` + `tools/app_mail.py` (the Action's daily mailbox scan and the application-mail ledger `state/application_mail.jsonl`: the brief's **MAIL** lines), `tools/build_candidates.py`, `tools/public_template.py`,
   `tools/post_leads.py` (query rotation, recruiter list, lead log and add-role for LinkedIn hiring posts),
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
-- Tailoring always starts from `profile/career/` (never from another application's `tailored.json`); the CV header location is always
+- Tailoring always starts from `profile/career/` (never from another application's `tailored.json`); the CV headline is static (the user, 2026-10-05): master `P00` verbatim, never retitled per role; the CV header location is always
   "Open to relocation" (no destination); facts the user adds go into `stories.md` as "Also true" lines.
 - `profile/application_answers.json` (private) holds the user's standing answers to application-form questions (sponsorship, notice period,
   in-office, consent, voluntary demographics). `apply-assist` reads it first and saves every new answer there, so the user is never asked twice.
@@ -177,10 +178,20 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
     it's possible").** When a role's Stage becomes Skipped or Rejected (you set it, `track`, `score-roles`, or the session brief logs a card
     the user dragged there), delete its `profile/applications/<folder>/` if one exists, then commit the deletion. Find the folder by ref:
     `tailored.json` in each folder carries `"key": "<ref>"`. This is a standing word for application folders only: leave the JD packet in
-    `work/jd/`, the score, the issue and the card alone. Skipped/Rejected cards are archived and gone anyway; the folder is the only leftover.
+    `work/jd/`, the score, the issue and the card alone. Skipped cards are archived daily and the folder is the only leftover; Rejected cards stay on the board for 30 days as the record, then the same daily archive (`board_sync.py archive`) archives them (restorable from the Project's Archive).
+    **JD packets are trimmed on a cadence (the user, 2026-10-05: the folder bloats):** `tools/jd_cleanup.py` (run daily by the SessionStart hook, with a CADENCE line) removes `jd.txt` and `packet.md`
+    from `work/jd/<ref>/` 14 days after a role is Skipped (or scored skip with no card), 30 days after Rejected; `score.json`, `meta.json` and `sponsorship.json` are kept, and
+    Applied/Interview/Offer/Shortlisted/New roles are never touched (`profile/config.json` `cleanup.skipped_days` / `rejected_days` change the days).
     Don't delete when the role is Applied/Interview/Offer, and tell the user in one line which folder you removed.
 
 11. **No relevant bullet is dropped from an application (the user, 2026-10-02: B11 was cut from the Amazon CVs although the ad's duties fit it).**
     A tailored CV keeps every master bullet of a role unless it matches nothing in the JD at all; page fit is never the reason (shorten wording,
     or ask). A dropped master bullet needs `"dropped": {"<id>": "no JD match: <why>"}` in `tailored.json`; `tools/cv_lint.py` (run by
     `jd_check.py tailor`) errors without it. Roles whose master has more than 5 bullets may drop down to 5. See `tailor-application`.
+
+12. **No checks unless asked (the user, 2026-10-05, replacing the 2026-09-30 "never skipped" rule).** Never launch review subagents or other
+    check passes on your own: not the four `application-review` readers, not the `master-update` auditors, not an extra consistency or
+    copy-edit pass, not after a small change and not after a refresh. After a change, say in one line that the check is available and
+    wait for the user's word. The deterministic steps a task itself needs still run: `jd_check.py tailor` and `render_resume.py` when the user
+    asks for a PDF, and the master-clear gate (`master_drift.py status`). If the masters are not cleared and the user declines the check,
+    clear them with `python tools/master_drift.py clear` only on their word. Say what was not checked when you hand work back.

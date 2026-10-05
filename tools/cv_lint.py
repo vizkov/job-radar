@@ -182,6 +182,11 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
             e, w = line_issues(str(c["source_id"]), str(c.get("text", "")))
             errs += e
             warns += w
+    # a letter is a fast read: no optional sub-points / sub-bullets (the user, 2026-10-05)
+    for c in data.get("cover_letter", []):
+        sid = c.get("source_id") if isinstance(c, dict) else None
+        if sid and career.has(sid) and "(optional)" in career.items[sid].section:
+            errs.append(f"cover letter uses the optional sub-point [{sid}]: a letter is a fast read, so no sub-bullets; say it inside the parent block")
     # "the bank" must come after the defined term in the same document (the user, 2026-10-02: B05, B06 and B10 say "the bank")
     cv_lines = [str(b.get("text", "")) for sec in data.get("sections", []) if isinstance(sec, dict)
                 for b in sec.get("bullets", []) if isinstance(b, dict)]
@@ -244,6 +249,12 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
             warns.append(f"Key achievement [{a}] is {n} words; keep to 35 or fewer (one or two lines): state the outcome only, drop the secondary clause (a second proof point, a recognition, a follow-on, or how it landed, which the matching experience bullet carries) in this copy")
     # key achievement restates an experience bullet
     ach = [s for s in chosen if s[0] == "P" and career.items.get(s) and career.items[s].section == "Key achievements"]
+    # one list style per section (writing-rules section 3 rule 9; the user, 2026-10-05: "Chained logic flaws: found" beside "AI security: Found"):
+    # after the label every Key achievement starts with a capital, as the master lines do
+    after = {a: m.group(1) for a in ach if (m := re.match(r"^[^:]{1,60}:\s+(\S)", chosen[a]))}
+    if len({c.isupper() for c in after.values()}) > 1:
+        lower = [a for a, c in after.items() if not c.isupper()]
+        errs.append(f"Key achievements mix capital and lower-case starts after the label ({lower} start lower-case): begin every one with a capital after the colon, as the master lines do")
     for a in ach:
         wa = _content_words(re.sub(r"^\w[\w ]*:\s*", "", chosen[a]))
         for b in (s for s in chosen if s[0] == "B"):

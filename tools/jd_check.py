@@ -22,7 +22,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
-from jobradar.career import EMAIL_RE, PHONE_RE, URL_RE, Career, load_career, masters_cleared  # noqa: E402
+from jobradar.career import EMAIL_RE, PHONE_RE, URL_RE, Career, cover_blocks_stale, cover_sync_message, load_career, masters_cleared  # noqa: E402
 
 sys.path.insert(0, str(ROOT / "tools"))
 from cv_lint import tailored_issues  # noqa: E402
@@ -309,6 +309,10 @@ def cmd_tailor(folder: str) -> int:
         print(f"MASTERS NOT CLEARED: {why}.\nApplication drafts are only built or refreshed from clean masters. "
               "Run the master-update check (deterministic pass plus two fresh reviewers), fix what they find, "
               "then  python tools/master_drift.py clear")
+        return 1
+    stale_cover = cover_blocks_stale()
+    if stale_cover:
+        print(cover_sync_message(stale_cover))
         return 1
     if errs:
         print("INVALID tailored.json:\n" + "\n".join(f"  - {e}" for e in errs))

@@ -721,8 +721,14 @@ def main() -> int:
             follow_ups = stale_applications(items, now)
             if _needs_fill(items):
                 fill_note = start_fill(now)
-            if any(i.get("stage") == "Skipped" for i in items):
+            if any(i.get("stage") in ("Skipped", "Rejected") for i in items):
                 start_archive(now)
+        try:   # housekeeping: trim the JD packets of skipped and rejected roles once a day (tools/jd_cleanup.py); never stops the brief
+            if cadence.is_due("jd_cleanup", now, ROOT):
+                import jd_cleanup
+                note = (note + "; " if note else "") + jd_cleanup.run(ROOT, now)
+        except Exception as e:
+            note = (note + "; " if note else "") + f"JD cleanup failed ({type(e).__name__})"
         updates, unpublished = template_status(since, run)
         print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, last_run_health(run),
                     updates, unpublished, board_design_note() if items is not None else None,

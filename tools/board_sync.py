@@ -585,7 +585,7 @@ def refresh_bodies(gh: Gh) -> str:
 # gets the same board. GitHub's API sets name, layout, filter and columns; it can't set sort or
 # board grouping, so those are reported as one-time clicks (`sort`, `group`).
 VIEWS = [
-    {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "-stage:Applied",
+    {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "-stage:Applied -status:Done",
      "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral", "Country"],
      "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},
     # "Act now" = open roles not yet applied to/skipped that are brand new or posted 14+ days ago, so about to expire

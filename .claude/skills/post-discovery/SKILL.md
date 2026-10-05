@@ -36,6 +36,7 @@ it to true and commit. Never run it from the daily Action or in the background.
 
 ## The sweep
 
+0. **`discovery.linkedin_posts.network_only` (the user, 2026-10-05: only search companies where they can get referrals).** When true, company searches skip every employer with no contact in `profile/network.csv`; keyword searches stay as the safety net.
 0. **Which companies get searched (the user's instruction, 2026-10-04: keyword searches were nearly useless; aim at high-fit companies where they
    have contacts who can refer them).** `post_leads.py queries` walks `ranked_companies()`: the user's `company_extra`; then companies that are
    employers where the user knows someone in `profile/network.csv` (a contact makes any employer a fit, the user's word 2026-10-04); then other

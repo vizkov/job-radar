@@ -156,3 +156,11 @@ def test_high_fit_targets_follow_extras_and_scored_employers(monkeypatch):
     assert pl.fit_targets("") == []
     pl.TARGETS.write_text("Company\tEuropean City / Offices\nNCC Group\tManchester\n", encoding="utf-8")   # an older file without Fit
     assert pl.fit_targets("High") == []
+
+
+def test_network_only_skips_employers_with_no_contact(monkeypatch):
+    write_scores([{"company": "Amazon", "recommendation": "apply", "fit_score": 85}])
+    monkeypatch.setattr(pl, "network_companies", lambda: ["Solaris"])
+    monkeypatch.setattr(pl, "_has_contact", lambda c: c == "Solaris")
+    monkeypatch.setattr(pl, "settings", lambda: {**pl.DEFAULTS, "network_only": True})
+    assert pl.ranked_companies() == [(1, "Solaris")]                    # Amazon has no contact: not searched

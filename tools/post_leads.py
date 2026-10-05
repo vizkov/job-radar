@@ -48,7 +48,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 4, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 6, "company_extra": [], "company_fit": "High", "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 6, "company_extra": [], "company_fit": "High", "network_only": False, "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
@@ -151,7 +151,7 @@ def ranked_companies() -> list[tuple[int, str]]:
             if normalize(name) in seen or normalize(name) not in good and tier_of(name) != 0:
                 continue
             t = tier_of(name)
-            if t == 9:
+            if t == 9 or (t in (2, 3) and s.get("network_only")):
                 continue   # no contact: left for the tier 2/3 passes, in their own order
             seen.add(normalize(name))
             out.append((t, name))

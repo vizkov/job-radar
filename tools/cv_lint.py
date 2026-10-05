@@ -187,6 +187,12 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
         sid = c.get("source_id") if isinstance(c, dict) else None
         if sid and career.has(sid) and "(optional)" in career.items[sid].section:
             errs.append(f"cover letter uses the optional sub-point [{sid}]: a letter is a fast read, so no sub-bullets; say it inside the parent block")
+    # no sentence over 40 words in a letter (the user, 2026-10-05: long stacked sentences lose a recruiter)
+    for c in data.get("cover_letter", []):
+        if isinstance(c, dict) and str(c.get("source_id", ""))[:1] in ("C", "S"):
+            for sent in re.split(r"(?<=[.!?])\s+", str(c.get("text", ""))):
+                if len(sent.split()) > 40:
+                    errs.append(f"cover letter [{c['source_id']}] has a sentence of {len(sent.split())} words (limit 40): split it: \"{sent[:60]}...\"")
     # a block covers several angles, so its master title is only a default: each letter labels the angle it uses (the user, 2026-10-05)
     unlabeled = [c.get("source_id") for c in data.get("cover_letter", []) if isinstance(c, dict)
                  and c.get("source_id") not in ("C01", "C02", "C12", "C13", "C14") and not c.get("label")

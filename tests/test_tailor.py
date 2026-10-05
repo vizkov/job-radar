@@ -164,3 +164,9 @@ def test_cover_letter_label_is_optional_but_must_be_plain_words(monkeypatch):
     assert check(d) == ([], [])                       # a story with its own title needs no label
     monkeypatch.setattr(CAREER.items["S01"], "section", "")
     assert any("have no label" in e for e in check(d)[0])
+
+
+def test_letter_sentence_over_40_words_is_an_error():
+    d = json.loads(json.dumps(GOOD))
+    d["cover_letter"][1]["text"] = "word " * 41 + "end."
+    assert any("limit 40" in e for e in check(d)[0])

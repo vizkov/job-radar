@@ -131,7 +131,8 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
             due.append("post_discovery")
             lines.append(f"  - LinkedIn post sweep: {when('post_discovery', now, root, posts_fallback)} · DUE: after "
                          "answering the first message (if they opened with a task, offer it in one line), run "
-                         "`post-discovery`, then `cadence.py done post_discovery`")
+                         "`post-discovery` (LinkedIn posts, plus the careers sites of network companies), "
+                         "then `cadence.py done post_discovery`")
         else:
             lines.append(f"  - LinkedIn post sweep: {when('post_discovery', now, root)} · ok")
     else:

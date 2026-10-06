@@ -45,6 +45,9 @@ it to true and commit. Never run it from the daily Action or in the background.
    knows there** (`python tools/referrals.py contacts "<company>"`): that is a referral route for before applying. The network list is only as good
    as `network.csv`: if it is short, offer to import the user's LinkedIn connections export (Settings > Data privacy > Get a copy of your data >
    Connections; no scraping) so more companies qualify.
+0. **Network companies also get a careers-site check (the user, 2026-10-06, only for companies in `profile/network.csv`).** For each, confirm the radar watches its own
+   careers site (`data/coverage_report.csv`: VERIFIED, or a careers page). If not, add its public ATS board to `profile/overrides.csv` (probe Greenhouse/Lever/Ashby APIs), or read
+   its careers page in Chrome for the user's titles and countries and list what you find. Same cadence as the post sweep: do it in the same pass, stamped by the same `cadence.py done post_discovery` (the user, 2026-10-06). Never do this for employers where the user knows no one.
 0. **Companies the user names.** "Also search <company>": add it to `discovery.linkedin_posts.company_extra` in `profile/config.json` (keep the list
    short; company searches are `company_queries` of the session's searches) and commit.
 1. **Queries.** `python tools/post_leads.py queries --urls` prints the next searches, each with its LinkedIn link (it marks them run). Open the

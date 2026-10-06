@@ -53,6 +53,9 @@ A **REFERRAL-ROUTE** line lists live apply/maybe cards at companies where `profi
 logged yet (the user, 2026-10-04): mention each in one line with the contact's name and offer the `referrals` skill; people the user knows
 are asked before applying. The names in `network.csv` are placeholders, not real people: never search LinkedIn or anywhere else for them;
 the contacts only decide which companies come first (`post-discovery` company searches use LinkedIn's Author-company filter, not names).
+For those same companies, and only those (the user, 2026-10-06: "only for companies where I know people"), `post-discovery` also checks the company's own careers site
+for roles, not just LinkedIn posts: a company with no board in `data/coverage_report.csv` gets one added to `profile/overrides.csv` when it has a public ATS API
+(Greenhouse, Lever, Ashby…), otherwise its careers page is read in Chrome. Same cadence as the LinkedIn post sweep (the user, 2026-10-06): it runs in the same `post-discovery` pass and is stamped by the same `cadence.py done post_discovery`. Never extend this to employers where the user knows no one.
 GitHub's rate limit is real: every board read is costly and a burst trips a throttle. Pass **several refs in one
 call** (`jd_check.py score r1 r2 … --board`, `sponsorship.py record r1 r2 … --board`): they share one board read.
 Never loop over refs with one call each.

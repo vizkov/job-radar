@@ -22,7 +22,7 @@ publish`): a failing test blocks the publish.
    `config.json` at import time. So results don't depend on whatever is in `profile/`.
 3. **Never write real files.** The autouse fixture `_isolate_tool_state` points every
    file path constant in `board_sync.py`, `jd_check.py`, `jd_prep.py`, `render_resume.py`,
-   `session_brief.py`, `calibrate.py`, `referrals.py` and `sponsorship.py` at a temporary folder
+   `session_brief.py`, `calibrate.py`, `referrals.py`, `post_leads.py` and `sponsorship.py` at a temporary folder
    (JD packets, applications, scores, matches, logs, state), and gives `calibrate.py` a copy of
    the sample config. (It exists because earlier tests once wrote
    into the real `scores.jsonl` and `issue_map.json`.) When a tool gains a new file path,

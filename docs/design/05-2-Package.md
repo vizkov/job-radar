@@ -88,7 +88,7 @@ Part of the [5. Code reference](05-Code-reference.md) (the index of every file a
 | `norm_title(title)` | Title without gender markers, lower-case, letters and digits only. |
 | `primary_country(countries)` | First country in priority order (then extras, then REMOTE-EU); anything else: the alphabetically first. |
 | `content_key(p)` | `c:<company>|<title>|<country>`; anonymous employers get a unique key. |
-| `Group` | Postings sharing a key; `best` (lowest source rank) and `also` (the other URLs). |
+| `Group` | Postings sharing a key; `best` (lowest source rank) and `also` (the other `Posting` objects, not URLs). |
 | `group_postings(postings)` | Group by content key. |
 
 **Watch out**

@@ -98,7 +98,7 @@ docs in the same commit.
 | `_TITLE`, `_SENIORITY` | `tiering.py` | Compiled (regex, weight) pairs from `config.json` → `tiering` |
 | `REG_DIR` | `sponsors.py` | `data/registers/` |
 | `_retry_after()` | `sources/_http.py` | Seconds from a `Retry-After` header, capped at 60; 0 for the date form |
-| `BundesagenturSource`, `JobTechSource`, `EuresSource`, `PAGE_SIZE` | `sources/*.py` | The search-source classes; results per page (50, 100, 50) |
+| `BundesagenturSource`, `JobTechSource`, `EuresSource`, `PAGE_SIZE` | `sources/*.py` | The search-source classes; results per page (50, 100, 50; `reed.py` also uses 100) |
 | `_get()` | `sources/jobtech.py` | One JobTech API call (phrase-quoting multi-word queries) |
 | `_PERIODS` | `sources/eures.py` | Allowed look-back windows: 1, 3, 7, 30 days |
 | `_ROLLUP` | `sources/ats.py` | Matches Workday's "N Locations" placeholder |

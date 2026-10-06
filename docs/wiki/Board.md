@@ -70,7 +70,7 @@ job board reports it).
 
 One pinned issue, edited every run: roles found, how many are waiting for the board,
 which sources stopped returning results, and for each source how many listings it found and why
-the rest were dropped (wrong country, title, not permanent, or employer not on your list). It holds counts only, no job titles, so it's
+the rest were dropped (wrong country, title, not permanent, posted too long ago, or employer not on your list). It holds counts only, no job titles, so it's
 safe to screenshot or share when asking for help. Like everything in your repo, only you
 can see it.
 

@@ -107,7 +107,7 @@ For every posting from every source:
    source isn't set to include outsiders, drop it.
 
 It also counts matches per source, and every drop by reason (country, title, not permanent,
-employer not on the list; `DROP_REASONS`), so the status card can say what each source found and why
+posted too long ago, employer not on the list; `DROP_REASONS`), so the status card can say what each source found and why
 listings were dropped.
 
 ### Deduplicate and diff: `group_postings()` then `diff_seen()`
@@ -152,7 +152,7 @@ jobs is therefore not "broken". A whole-source crash is tracked as unit `*`.
   source table. Every third-party string goes through `md()` (escapes Markdown) and every
   link through `md_url()` (only http/https).
 - `select_for_board()` picks new groups for the board: tiers in `config.board.tiers`
-  (only `baseline_tiers` on the first run), and only companies on the list.
+  (only `baseline_tiers` on the first run), and only companies on the list. It returns nothing unless `board.enabled` is true (default false).
 - `payload()` turns each into `{ref, title, body, labels}`. `enqueue()` appends them to
   `state/board_queue.json`, skipping refs already queued.
 - `render_status()` builds the short "Radar status" text: counts and source health, no

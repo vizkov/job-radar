@@ -96,7 +96,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `referral_notes(now)` | Asks unanswered after `referrals.wait_days`, as health notes (at most 5). |
 | `stale_days(root)` | `board.stale_days` from the config, for the brief's "looks closed" line. |
 | `skipped_refs(root)` | Refs whose latest logged Stage is Skipped/Rejected, so an archived skip (gone from the board read) is not auto-scored or counted unscored again. |
-| `start_archive(now)`, `LAST_ARCHIVE` | Once a day (stamp `work/.last_archive`), start `board_sync.py archive` detached (log `work/board_archive.log`) when any card is in Stage = Skipped. |
+| `start_archive(now)`, `LAST_ARCHIVE` | Once a day (stamp `work/.last_archive`), start `board_sync.py archive` detached (log `work/board_archive.log`) when any card is in Stage = Skipped or Rejected. |
 | `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
 | `_CONTROL`, `_REF` | Characters stripped by `safe()`; the ref marker in issue bodies. |
 | Other thresholds (in code) | Top 6 new Tier 1 roles listed; "unscored" = Tier 1 from the last 14 days; "fresh" = posted in the last 3 days; "no run completed for 2+ days" warning; a CV gap needs 3+ scored roles missing it. Follow-ups only apply to cards with a logged stage change. |

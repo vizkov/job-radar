@@ -18,7 +18,7 @@ Source registers, refreshed weekly by `.github/workflows/registers.yml` into
 
 | Register | What it lists | Rows (2026-09-28) |
 |---|---|---|
-| UK Home Office register of licensed sponsors | Employers licensed for Skilled Worker, Senior or Specialist Worker, Scale-up | 123,106 |
+| UK Home Office register of licensed sponsors | Employers licensed for Skilled Worker, Senior or Specialist Worker, Scale-up | 123,149 (2026-10-05) |
 | Dutch IND public register "Work" | Recognised sponsors for work / highly skilled migrants | 12,984 |
 
 How the employer is matched (tried with your `targets.tsv` name first, then the
@@ -70,7 +70,7 @@ Score (rules in `config.json` → `tiering`):
 | Best country | GB, NL, IE +2; CH, DE, SE, remote-Europe +1 |
 | Employer on your list | +1 |
 | Licensed sponsor in the role's country (UK/NL) | +1 |
-| Employer's `Fit` column in `targets.tsv` is High | +`target_fit_high` (1): a generic title such as "Security Engineer" at a company you rate highly (Meta, 2026-10-02) should not rank below a specialist title elsewhere |
+| Employer is on the list and its `Fit` column in `targets.tsv` is High (both are required, `tiering.py`) | +`target_fit_high` (1): a generic title such as "Security Engineer" at a company you rate highly (Meta, 2026-10-02) should not rank below a specialist title elsewhere |
 | Posted within `fresh_days` (3) | +`fresh_bonus` (1): applying early matters |
 
 Tier 1 when the score ≥ `tier1_min_score` (6). Examples:

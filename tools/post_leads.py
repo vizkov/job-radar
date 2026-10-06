@@ -48,7 +48,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 12, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 6, "company_extra": [], "company_fit": "High", "network_only": False, "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 6, "company_extra": [], "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
@@ -143,7 +143,8 @@ def ranked_companies() -> list[tuple[int, str]]:
     scored, targets = fit_companies(), fit_targets(s["company_fit"])
     known = network_companies()
     good = {normalize(c) for c in scored + targets + known}
-    seen, out = set(), []
+    # `careers_site_companies` (the user, 2026-10-06) are read on their own careers sites in Chrome, not through post searches: start them as seen
+    seen, out = {normalize(c) for c in s.get("careers_site_companies") or []}, []
     for tier_of, names in ((lambda c: 0, list(s["company_extra"])),
                            (lambda c: 1 if _has_contact(c) else 9, known + scored + targets),
                            (lambda c: 2, scored), (lambda c: 3, targets)):
@@ -155,7 +156,20 @@ def ranked_companies() -> list[tuple[int, str]]:
                 continue   # no contact: left for the tier 2/3 passes, in their own order
             seen.add(normalize(name))
             out.append((t, name))
-    return out
+    return _merge_variants(out)
+
+
+def _merge_variants(ranked: list[tuple[int, str]]) -> list[tuple[int, str]]:
+    """One search per employer (the user, 2026-10-06: 'Amazon', 'Amazon / AWS' and 'Meta AI (FAIR)' spent three of eight searches on the same posts).
+    A name whose words start with another listed name's words ('amazon aws' after 'amazon', 'meta ai' after 'meta') is a variant: it folds into the
+    shorter name, which keeps the better (lower) tier. Whole words only, so 'Meta' never swallows 'Metaswitch'."""
+    words = {name: normalize_words(name).split() for _, name in ranked}
+    best = {}
+    for tier, name in ranked:
+        w = words[name]
+        base = next((m for _, m in ranked if m != name and words[m] and len(words[m]) < len(w) and w[:len(words[m])] == words[m]), name)
+        best[base] = min(tier, best.get(base, tier))
+    return [(best[name], name) for _, name in ranked if name in best]
 
 
 def search_companies() -> list[str]:

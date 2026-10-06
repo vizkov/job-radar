@@ -164,3 +164,20 @@ def test_network_only_skips_employers_with_no_contact(monkeypatch):
     monkeypatch.setattr(pl, "_has_contact", lambda c: c == "Solaris")
     monkeypatch.setattr(pl, "settings", lambda: {**pl.DEFAULTS, "network_only": True})
     assert pl.ranked_companies() == [(1, "Solaris")]                    # Amazon has no contact: not searched
+
+
+def test_variant_names_of_one_employer_are_one_search():
+    ranked = [(1, "Amazon"), (2, "Amazon / AWS"), (1, "Meta"), (2, "Meta AI (FAIR)"), (3, "Metaswitch"), (2, "Google DeepMind"), (1, "Google")]
+    assert pl._merge_variants(ranked) == [(1, "Amazon"), (1, "Meta"), (3, "Metaswitch"), (1, "Google")]
+    assert pl._merge_variants([(2, "Amazon / AWS"), (1, "Amazon")]) == [(1, "Amazon")]       # the shorter name wins whatever the order
+    assert pl._merge_variants([(2, "Amazon / AWS")]) == [(2, "Amazon / AWS")]                # a lone variant stays
+
+
+def test_careers_site_companies_are_left_out_of_post_searches(monkeypatch):
+    write_scores([{"company": "Amazon", "recommendation": "apply", "fit_score": 85}])
+    monkeypatch.setattr(pl, "network_companies", lambda: ["Cisco", "Solaris"])
+    monkeypatch.setattr(pl, "_has_contact", lambda c: True)
+    monkeypatch.setattr(pl, "settings", lambda: {**pl.DEFAULTS, "company_extra": ["Tesla"], "careers_site_companies": ["Cisco", "tesla"]})
+    names = [c for _, c in pl.ranked_companies()]
+    assert "Cisco" not in names and "Tesla" not in names                # read on their careers sites in Chrome instead
+    assert "Solaris" in names and "Amazon" in names                     # everyone else still searched

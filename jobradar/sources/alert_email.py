@@ -278,19 +278,24 @@ class AlertEmailSource:
             # a quiet week with no alerts is normal (track_empty=False)
             out.units.append(UnitStatus(name, ok=True, raw_count=s["jobs"], label=f"{name} alert emails",
                                         track_empty=False))
-            if s["rejected"]:
-                out.units.append(UnitStatus(f"{name}:rejected", ok=False, track_empty=False,
-                                            label=f"{name} emails failing DKIM",
-                                            error=f"{s['rejected']} of {s['mails']} {name} emails failed DKIM"))
-            if s["empty"]:  # the provider changed its email layout
-                out.units.append(UnitStatus(f"{name}:parse", ok=False, label=f"{name} alert emails with no jobs",
-                                            error=f"{s['empty']} {name} emails yielded no jobs (layout change?): "
-                                                  + "; ".join(s["empty_subjects"][:3])))
+            # Always report these two, ok when clean: a unit that is only written when it fails never
+            # resets its streak after the fix (Indeed ":parse" sat at 21 for days after the parser worked).
+            out.units.append(UnitStatus(f"{name}:rejected", ok=not s["rejected"], track_empty=False,
+                                        label=f"{name} emails failing DKIM",
+                                        error=f"{s['rejected']} of {s['mails']} {name} emails failed DKIM"
+                                        if s["rejected"] else ""))
+            # the provider changed its email layout
+            out.units.append(UnitStatus(f"{name}:parse", ok=not s["empty"], track_empty=False,
+                                        label=f"{name} alert emails with no jobs",
+                                        error=f"{s['empty']} {name} emails yielded no jobs (layout change?): "
+                                              + "; ".join(s["empty_subjects"][:3]) if s["empty"] else ""))
         if foreign:
             note = f"{foreign} of {len(msgs)} emails ignored (unknown sender)"
             out.units.append(UnitStatus("foreign", ok=not lookalike, raw_count=foreign, track_empty=False,
                                         label="emails from unknown senders",
                                         error=note + f", {lookalike} naming a job site" if lookalike else ""))
+        else:
+            out.units.append(UnitStatus("foreign", ok=True, track_empty=False, label="emails from unknown senders"))
         out.units += self._mailbox_units()
         return out
 

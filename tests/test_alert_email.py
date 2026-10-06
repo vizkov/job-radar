@@ -240,4 +240,19 @@ def test_indeed_sign_in_code_mail_is_not_a_layout_change(tmp_path):
         "Authentication-Results: mx.google.com; dkim=pass header.i=@indeed.com\n"
         "Content-Type: text/plain; charset=utf-8\n\nYour code.\n")
     res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["indeed"]}).fetch())
-    assert not [u for u in res.units if u.key.endswith(":parse")]
+    assert not [u for u in res.units if u.key.endswith(":parse") and not u.ok]
+
+
+def test_clean_run_reports_parse_and_foreign_units_ok_so_old_streaks_reset(tmp_path):
+    """A unit written only when it fails never resets: Indeed ':parse' sat at a 21-run streak after the parser was fixed."""
+    from jobradar.health import update_health
+    from jobradar.model import SourceResult
+    (tmp_path / "_status.json").write_text(json.dumps({"ok": True, "fetched": 1, "mailbox": "INBOX", "providers": {}}))
+    (tmp_path / "a.eml").write_bytes((FX / "real/indeed_match_2026_09.eml").read_bytes())
+    res = asyncio.run(AlertEmailSource({"eml_dir": str(tmp_path), "providers": ["indeed"]}).fetch())
+    keys = {u.key: u.ok for u in res.units}
+    assert keys.get("indeed:parse") is True and keys.get("indeed:rejected") is True and keys.get("foreign") is True
+    health = {"alert_email|indeed:parse": {"bad_streak": 21, "last_ok_count": 0},
+              "alert_email|foreign": {"bad_streak": 5, "last_ok_count": 0}}
+    update_health(health, [res])
+    assert health["alert_email|indeed:parse"]["bad_streak"] == 0 and health["alert_email|foreign"]["bad_streak"] == 0

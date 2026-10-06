@@ -8,7 +8,7 @@ Claude's; a few are yours), and how to pause, stop or take access back.
 | You need | Why | Cost |
 |---|---|---|
 | A **GitHub account** | Your copy of job-radar and your board live there | free |
-| A **Claude Pro or Max** plan, with **Claude Code** installed | Claude operates everything. No separate API account or key | your plan |
+| A **Claude Pro or Max** plan, with **Claude Code** installed (the free Claude plan doesn't include Claude Code) | Claude operates everything. No separate API account or key | your plan |
 | **git**, **Python 3.13** and GitHub's **`gh`** tool on your computer | Claude uses them to run job-radar for you | free |
 | *Optional:* **Chrome** with the **Claude in Chrome** extension | Only if you want Claude to pre-fill application forms | free |
 | *Optional:* a **Gmail** account for job-alert emails | Only if you want LinkedIn/Indeed/Glassdoor jobs included | free |
@@ -27,16 +27,16 @@ Stuck on any of these? Once Claude Code runs, say "check my setup" and Claude te
 
 GitHub's free plan includes 2,000 minutes a month of automated runs for private
 projects; job-radar uses roughly 450–750 a month (15–25 minutes a day across its three daily runs).
+If you ever pass the 2,000, GitHub stops the runs until the next month. It only charges you if you have raised your Actions spending limit above its default of $0, so with the default nothing is billed; the radar simply pauses.
 
 ## Setup, in order
 
 1. **Make your private copy.** job-radar's public project holds only code. Your search
-   must live in a **private** copy that only you can see. Open Claude Code in an empty
-   folder and say: *"Make me a private copy of https://github.com/vizkov/job-radar called
+   must live in a **private** copy that only you can see. Make an empty folder (for example `job-radar` in Documents), open a terminal in it (on Windows: right-click inside the folder, then **Open in Terminal**), type `claude` and press Enter. Then say: *"Make me a private copy of https://github.com/vizkov/job-radar called
    my-job-radar."* Claude creates the private repository on your GitHub account and
    copies the code into it; there's nothing for you to type. (`vizkov/job-radar` is the author's public template: it holds only code, never anyone's data.) Claude Code asks your permission before it runs commands or writes files; read what it proposes, and approve the ones for creating your repository and copying the project. Don't use GitHub's "Fork"
    button: a fork of a public project can't be made private.
-2. **Open Claude Code in your copy and say "set this up for me".** Claude does the work
+2. **Open Claude Code in your copy and say "set this up for me".** (Claude tells you which folder your copy is in; in the terminal run `cd` into it, then `claude` again.) Claude does the work
    and pauses when it needs you:
    1. **Your CV and preferences.** Paste or attach your CV; say which countries, job
       titles and companies you want. Claude converts your CV into its own format and

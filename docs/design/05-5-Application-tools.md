@@ -38,7 +38,7 @@ capitalised anyway, so "Led the review" doesn't flag "Led" as a new name.
 Step 4b of `tailor-application` (the user, 2026-10-07). `prep <folder>` renders only the text of the validated tailored draft (`render_resume.py --text-only`, no PDF) as
 draft **A** in `work/apps/<folder>/experiment/` and writes one brief file per agent: two Opus writers (**B** from the job description alone with placeholder facts, **C** from the job
 description plus `profile/career/`) and the four readers of `application-review` (ATS, recruiter, consistency auditor, copy editor; their personas are read from `personas.md`, the
-copy editor also gets `writing-rules.md`). The session spawns every agent with one line, "Read and follow <brief path>", so no long prompt passes through the conversation. The readers
+copy editor also gets `writing-rules.md`). The two Opus writers run as part of tailoring without asking (`prep` only writes files); the four readers start only after the user says yes, once for the three drafts and once for the PDFs (CLAUDE.md rule 12). The session spawns every agent with one line, "Read and follow <brief path>", so no long prompt passes through the conversation. The readers
 see A, B and C under those letters and are not told which is the tailored draft; each writes its report next to the drafts and replies with it. `status <folder>` lists which files exist.
 The session then fixes A (only what the stories and rules back), validates, renders the PDFs, and runs the same checks and the four readers again on the PDFs. Why: a first run on two
 real applications (Anthropic, Cloudflare) showed the tailored draft carried claims the stories did not support and phrases that echoed the ad, and that the Opus drafts mainly added

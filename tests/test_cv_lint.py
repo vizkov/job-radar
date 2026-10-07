@@ -179,3 +179,11 @@ def test_letter_copying_the_ad_is_an_error():
     assert cv_lint.ad_overlaps("I like a clear risk picture, shown to leaders.", jd) == []
     assert cv_lint.ad_overlaps("I do this: into a clear risk picture for leadership, fast.", jd) == ["into a clear risk picture for leadership"]
     assert cv_lint.ad_overlaps("Application security engineer role with threat modelling.", "application security engineer role threat modelling") == []
+
+
+def test_letter_paraphrasing_an_ad_sentence_warns():
+    jd = "You will own security due diligence and secure integration for acquisitions, assessing a target's security posture pre-close and writing the security risk readout for leadership."
+    near = "I would own the due diligence and integration of acquisitions, assessing the posture of a target before close and writing a risk readout for leadership."
+    assert cv_lint.ad_paraphrases(near, jd)
+    assert not cv_lint.ad_paraphrases("I find the few flaws that matter and explain them until executives and engineers both act on them every time.", jd)
+    assert not cv_lint.ad_paraphrases(near, jd, skip={"diligence", "integration", "acquisitions", "posture", "readout"})

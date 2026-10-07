@@ -11,6 +11,7 @@ reviewer's (application-review). Returns (errors, warnings) of plain strings; jd
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import sys
 from pathlib import Path
@@ -179,6 +180,33 @@ def ad_overlaps(text: str, jd: str) -> list[str]:
     return out
 
 
+def _stems(sentence: str, skip: set[str]) -> list[str]:
+    """Content words of a sentence, crudely stemmed, without stop words and without words every letter shares with the ad (skill nouns, the role title)."""
+    out = []
+    for w in re.findall(r"[a-z][a-z'-]{3,}", sentence.lower()):
+        w = re.sub(r"(ing|ed|es|s)$", "", w) if len(w) > 5 else w
+        if w not in STOP and w not in skip:
+            out.append(w)
+    return out
+
+
+def ad_paraphrases(text: str, jd: str, skip: set[str] = frozenset(), min_pairs: int = 4) -> list[tuple[str, str]]:
+    """(letter sentence, ad sentence) pairs where the letter keeps the ad's content words in the ad's order with up to one word between
+    (a swapped synonym or a reordered clause does not hide it). Warns only: shared domain words alone can trip it."""
+    skip = {re.sub(r"(ing|ed|es|s)$", "", w) if len(w) > 5 else w for w in skip}
+    pairs = lambda q: {(q[i], q[j]) for i in range(len(q)) for j in (i + 1, i + 2) if j < len(q)}
+    split = lambda t: [x for x in re.split(r"(?<=[.!?])\s+|\n+", t) if len(x.split()) >= 6]
+    ad = [(a, pairs(_stems(a, skip))) for a in split(jd)]
+    out = []
+    for sent in split(text):
+        mine = pairs(_stems(sent, skip))
+        for a, ap in ad:
+            if len(mine & ap) >= min_pairs:
+                out.append((sent, a))
+                break
+    return out
+
+
 def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
     errs, warns = [], []
     chosen: dict[str, str] = {}
@@ -236,6 +264,17 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
             for run in ad_overlaps(str(c.get("text", "")) if isinstance(c, dict) else "", jd_file.read_text(encoding="utf-8", errors="ignore")):
                 errs.append(f"cover letter [{c.get('source_id')}] copies the ad: \"{run}\" is a run of five or more words from the job description; "
                             "say it in your own words (skill nouns and tool names may stay)")
+    if letter_lines and jd_file.is_file():
+        jd_text = jd_file.read_text(encoding="utf-8", errors="ignore")
+        skill_words = set(re.findall(r"[a-z]{3,}", " ".join(career.items[i].text for i in career.items if i.startswith("K")).lower()))
+        try:
+            skill_words |= set(re.findall(r"[a-z]{3,}", str(json.loads((jd_file.parent / "meta.json").read_text(encoding="utf-8")).get("title", "")).lower()))
+        except (OSError, ValueError):
+            pass
+        for c in data.get("cover_letter", []):
+            for mine, theirs in ad_paraphrases(str(c.get("text", "")) if isinstance(c, dict) else "", jd_text, skill_words):
+                warns.append(f"cover letter [{c.get('source_id')}] follows an ad sentence closely (same content words, same order): \"{mine[:90]}\" ~ \"{theirs[:90]}\"; "
+                             "build the line from your own story instead")
     for doc, lines in (("CV", cv_lines), ("cover letter", letter_lines)):
         for t in lines:
             if re.search(DEFINED_BANK, t, re.I):

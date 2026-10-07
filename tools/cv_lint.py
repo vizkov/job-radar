@@ -83,6 +83,8 @@ def line_issues(sid: str, text: str) -> tuple[list[str], list[str]]:
         warns.append(f"[{sid}] vague category (\"{m.group(0)}\"): name the tool, standard, language or certificate, if the stories back it")
     if len(STACKED_HEDGE.findall(text)) >= 2:
         warns.append(f"[{sid}] two hedges (about/around) in one line: state the figure once")
+    if sid[0] in "PB" and re.search(r"\bcomparable\b", text, re.I) and not re.search(r"\b(usual|typical|normal|than|compared|versus|vs)\b", text, re.I):
+        warns.append(f"[{sid}] \"comparable\" without a baseline: say compared with what (\"an assessment's usual delivery\"), writing-rules.md 3.19")
     if sid[0] in "PB" and LABEL_ONLY.match(re.sub(r"^\w+:\s*", "", text)):
         warns.append(f"[{sid}] \"Briefed ...\" shows attendance, not impact: add what the audience did or decided")
     words = re.findall(r"[a-z']+", re.sub(r"https?://\S+", " ", text.lower()))

@@ -187,3 +187,10 @@ def test_letter_paraphrasing_an_ad_sentence_warns():
     assert cv_lint.ad_paraphrases(near, jd)
     assert not cv_lint.ad_paraphrases("I find the few flaws that matter and explain them until executives and engineers both act on them every time.", jd)
     assert not cv_lint.ad_paraphrases(near, jd, skip={"diligence", "integration", "acquisitions", "posture", "readout"})
+
+
+def test_comparable_without_a_baseline_warns():
+    _, w = cv_lint.line_issues("P09", "Tooling: Built a workflow, cutting a comparable assessment from three weeks to one.")
+    assert any("comparable" in x for x in w)
+    _, w2 = cv_lint.line_issues("P09", "Tooling: Built a workflow, cutting an assessment's usual delivery from three weeks to one.")
+    assert not any("comparable" in x for x in w2)

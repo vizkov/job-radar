@@ -262,7 +262,7 @@ def resume_html(data: dict, career, contact: dict) -> str:
                 label = parts[1] if len(parts) > 1 else parts[0]
             # the year stays in the entry's own text: a right-aligned date column is read as a separate column by text extractors
             # (ATS parsers), which detach it from its entry (found by two ATS readers on 2026-10-07)
-            rows.append(f'<p><b>{esc(label)}</b> ({esc(year)}): {esc(rest)}</p>')
+            rows.append(f'<p><b>{esc(label)}</b>: {esc(rest.rstrip("."))} ({esc(year)})</p>')   # the year ends the entry, as in Education
         out.append('<h2>Volunteering</h2><div class="edu">' + "".join(rows) + "</div>")
 
     edu = [(i, t) for i, t in chosen if i[0] == "E"]

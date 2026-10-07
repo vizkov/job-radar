@@ -115,4 +115,4 @@ def test_posting_title_hyphen_is_tidied_and_volunteering_takes_its_label_from_th
     c = career()
     c.items["B09"] = Item("B09", "Ran sessions for young people.", "Experience", "Volunteering — Helpers Abroad — 2023")
     data = dict(DATA, sections=[{"heading": "x", "bullets": DATA["sections"][0]["bullets"] + [{"source_id": "B09", "text": "Ran sessions for young people."}]}])
-    assert "<b>Helpers Abroad</b> (2023): Ran sessions for young people." in rp.resume_html(data, c, CONTACT)
+    assert "<b>Helpers Abroad</b>: Ran sessions for young people (2023)" in rp.resume_html(data, c, CONTACT)

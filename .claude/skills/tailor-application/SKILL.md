@@ -85,6 +85,20 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    - The masters stay as the user's logs; fix these in the tailored file, not in `master_resume.md`.
 4. **Validate:** `python tools/jd_check.py tailor <folder>`. Fix every error; never work around one.
    Warnings about heavy rewording mean you drifted from what the user actually did — tighten it.
+4b. **Draft experiment, before any PDF (the user, 2026-10-07; the full procedure is `python tools/draft_experiment.py`).** Three drafts of the same application go to the four
+   readers together, so the PDFs are made from the corrected draft, not the first one:
+   - **A** is your validated tailored draft; **B** is a resume and letter an **Opus** agent writes from the job description alone (placeholder facts); **C** is one an **Opus** agent writes
+     from the job description plus `profile/career/` (master CV, stories, cover blocks). Run `python tools/draft_experiment.py prep <folder>`: it writes the A text (no PDF) and one brief
+     per agent into `work/apps/<folder>/experiment/` (private scratch) and prints the spawn lines. Spawn the two writers with `model: "opus"` in the background and the one-line prompt
+     `Read and follow <brief path>`, so the long prompts never pass through the conversation.
+   - When both have written `resume_B/letter_B` and `resume_C/letter_C` (`draft_experiment.py status <folder>`), spawn the four readers (ATS on `sonnet`, the others default) the same way.
+     They see A, B and C under those letters and are never told which is the tailored draft.
+   - **Read the reports as judgement, not fact, and check every finding against `profile/career/` (`stories.md`, the master) before acting.** Compare A with C: take what C does better
+     only where the stories back it (a phrasing, a proof point, a motive the master's block C12 carries); B shows structure and keyword strategy only. Findings that repeat choices recorded in
+     `writing-rules.md` section 7 are counted in one line. A finding that needs a master change goes through masters first (`master-update`), then rebuild once.
+   - Fix **A** in `tailored.json` (claims that exceed a story, copies of the ad, tighter wording, missing terms the stories back), re-run `jd_check.py tailor`, then render. Tell the user
+     in the hand-over how A, B and C compared (the ATS match, the recruiter's call, the consistency verdict, the copy editor's counts) and which fixes you took and why.
+   - The user can say "skip the experiment" for one role: say what was not checked.
 5. **Render:** `python tools/render_resume.py <folder>` → **two files only, the user's rule**: `resume.pdf` (two pages)
    and `cover_letter.pdf` (one page), in the layout of the user's own `cv.pdf` / `cover.pdf`. It uses Chrome or
    Edge, which are already installed; nothing to pip install. The same text as Markdown is written to
@@ -95,9 +109,7 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    After rendering, check the page count (CV 2, letter 1).
    **Once the user has approved the content, never change it to fit the page**: adjust spacing in
    `tools/render_pdf.py` or ask; changing approved text needs their yes.
-6. **Review gate.** Run the `application-review` skill on this folder (ATS, recruiter and consistency
-   subagents plus `tools/consistency_check.py`); its findings go to the user **in the chat, not in a file**. Fix or
-   ask the user about every "fix before applying" finding, then re-validate and re-render. **Never run it unasked** (the user's rule, 2026-10-05, replacing 2026-09-30's "never skip"): offer it in one line when the build is done and launch the readers only on the user's word. When asked, all four readers (ATS, recruiter, consistency, copy editor) on the application named.
+6. **Review gate on the PDFs (the user, 2026-10-07: the PDFs are handled as before and run again through the same checks; this replaces 2026-10-05's "only on the user's word" for a tailoring).** Re-run the deterministic checks (`jd_check.py tailor`, `cv_lint.py`, `consistency_check.py --folder <folder> --final`), then run the `application-review` skill on the finished application: the four readers (ATS, recruiter, consistency auditor, copy editor) on the text of `resume.pdf` and `cover_letter.pdf` (`pdftotext -enc UTF-8`, which is what a parser receives). Its findings go to the user **in the chat, not in a file**. Fix every "fix before applying" finding that the stories and the writing rules back (ask about the rest), re-validate and re-render, and stop after two passes or when none is left. The user can say "skip the review" for one role: say what was not checked. Reader checks on anything else stay on the user's word.
    If the user only asked for the CV, still build both files (they need both eventually), but lead
    with the CV.
 7. **Hand over for review.** Print the **Key achievements section in full** in your reply (the checker's diff lists only

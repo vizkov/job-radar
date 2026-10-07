@@ -2,7 +2,7 @@
 
 **What this is:** The tools behind scoring and tailoring: fetching job descriptions, validating Claude's scores and tailored text, rendering the CV and cover letter, and the consistency, drift and outcome checks.  
 **Read first:** [4. A Claude session](04-Claude-session.md)  
-**Code:** `tools/jd_prep.py`, `jd_check.py`, `render_resume.py`, `render_pdf.py`, `inbox_outcomes.py`, `master_drift.py`, `cv_lint.py`, `consistency_check.py`  
+**Code:** `tools/jd_prep.py`, `jd_check.py`, `render_resume.py`, `render_pdf.py`, `draft_experiment.py`, `inbox_outcomes.py`, `master_drift.py`, `cv_lint.py`, `consistency_check.py`  
 
 Part of the [5. Code reference](05-Code-reference.md) (the index of every file and function).
 
@@ -32,6 +32,17 @@ The `score.json` and `tailored.json` contracts are on page 4, [4.3](04-Claude-se
 
 **Watch out**: `_NAME`'s lookbehinds skip the first word of a sentence, which is
 capitalised anyway, so "Led the review" doesn't flag "Led" as a new name.
+
+## `tools/draft_experiment.py`: three drafts and the four readers, before any PDF
+
+Step 4b of `tailor-application` (the user, 2026-10-07). `prep <folder>` renders only the text of the validated tailored draft (`render_resume.py --text-only`, no PDF) as
+draft **A** in `work/apps/<folder>/experiment/` and writes one brief file per agent: two Opus writers (**B** from the job description alone with placeholder facts, **C** from the job
+description plus `profile/career/`) and the four readers of `application-review` (ATS, recruiter, consistency auditor, copy editor; their personas are read from `personas.md`, the
+copy editor also gets `writing-rules.md`). The session spawns every agent with one line, "Read and follow <brief path>", so no long prompt passes through the conversation. The readers
+see A, B and C under those letters and are not told which is the tailored draft; each writes its report next to the drafts and replies with it. `status <folder>` lists which files exist.
+The session then fixes A (only what the stories and rules back), validates, renders the PDFs, and runs the same checks and the four readers again on the PDFs. Why: a first run on two
+real applications (Anthropic, Cloudflare) showed the tailored draft carried claims the stories did not support and phrases that echoed the ad, and that the Opus drafts mainly added
+packaging ideas; the readers' reports are judgement, so every finding is checked against the stories first.
 
 ## `tools/render_resume.py`: CV and cover letter files
 

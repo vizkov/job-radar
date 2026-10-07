@@ -1,6 +1,7 @@
 """Render a validated tailored résumé + cover letter. No LLM here.
 
     python tools/render_resume.py <folder> [--md] [--docx]    # profile/applications/<folder>/
+    python tools/render_resume.py <folder> --text-only        # only work/apps/<folder>/resume.md + cover_letter.md, no PDFs (the draft experiment)
 
 Refuses to run unless tools/jd_check.py tailor has validated exactly this
 tailored.json (it checks the saved SHA-256). By default it writes the two files the user wants per application,
@@ -73,8 +74,8 @@ def to_docx(data: dict, contact: dict, path: Path) -> None:
 
 def main(argv=None) -> int:
     args = list(argv if argv is not None else sys.argv[1:])
-    want_docx, want_md = "--docx" in args, "--md" in args
-    args = [a for a in args if a not in ("--docx", "--md", "--pdf")]
+    want_docx, want_md, text_only = "--docx" in args, "--md" in args, "--text-only" in args
+    args = [a for a in args if a not in ("--docx", "--md", "--pdf", "--text-only")]
     if len(args) != 1:
         print(__doc__)
         return 2
@@ -96,6 +97,9 @@ def main(argv=None) -> int:
     md, cover = to_markdown(data, contact), cover_letter(data, contact)
     (scratch / "resume.md").write_text(md, encoding="utf-8")
     (scratch / "cover_letter.md").write_text(cover, encoding="utf-8")
+    if text_only:
+        print(f"wrote work/apps/{app.name}/resume.md, cover_letter.md (no PDFs)")
+        return 0
     wrote = []
     try:
         from render_pdf import render_pdfs  # tools/ is on sys.path when run as a script

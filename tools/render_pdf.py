@@ -4,7 +4,7 @@ Called by  python tools/render_resume.py <folder>  (the default output; it first
 tools/jd_check.py tailor saved, so only validated text is rendered). Writes resume.pdf and cover_letter.pdf.
 
 The layout (Arial, A4 CV / US Letter cover letter, teal #005477 headings, a rule under the header, right-aligned
-dates) copies the user's Downloads/cv.pdf and cover.pdf. The text is the tailored text; the structure (company,
+dates on roles; education and volunteering years stay inline so parsers keep them attached) copies the user's Downloads/cv.pdf and cover.pdf. The text is the tailored text; the structure (company,
 role, city and dates for each bullet, skill categories, education years) comes from profile/career/master_resume.md,
 so nothing is invented. HTML is printed to PDF with headless Chrome or Edge (already on the machine, no extra
 packages); the PDF is real text, not an image, so applicant tracking systems can read it.
@@ -260,18 +260,17 @@ def resume_html(data: dict, career, contact: dict) -> str:
             if not label:   # the entry name lives in the master heading, so the line itself need not repeat it
                 parts = career.items[i].context.split(" — ")
                 label = parts[1] if len(parts) > 1 else parts[0]
-            rows.append(f'<div class="row"><p><b>{esc(label)}</b>: {esc(rest)}</p><span class="meta">{esc(year)}</span></div>')
+            # the year stays in the entry's own text: a right-aligned date column is read as a separate column by text extractors
+            # (ATS parsers), which detach it from its entry (found by two ATS readers on 2026-10-07)
+            rows.append(f'<p><b>{esc(label)}</b> ({esc(year)}): {esc(rest)}</p>')
         out.append('<h2>Volunteering</h2><div class="edu">' + "".join(rows) + "</div>")
 
     edu = [(i, t) for i, t in chosen if i[0] == "E"]
     if edu:
         rows = []
-        for _, t in edu:
-            m = re.search(r"\s*\((\d{4}\s*[–-]\s*\d{4})\)\s*$", t)
-            years, body = (m.group(1), t[:m.start()]) if m else ("", t)
-            label, rest = split_label(body)
-            rows.append(f'<div class="row"><p><b>{esc(label)}</b>{": " + esc(rest) if rest else ""}</p>'
-                        f'<span class="meta">{esc(years)}</span></div>')
+        for _, t in edu:   # the master line already carries its years, "(2019 – 2020)": keep them inline (see Volunteering)
+            label, rest = split_label(t)
+            rows.append(f'<p><b>{esc(label)}</b>{": " + esc(rest) if rest else ""}</p>')
         out.append('<h2>Education</h2><div class="edu">' + "".join(rows) + "</div>")
     return page("@page { size: A4; margin: 35.4pt 43pt 30pt 43pt; }", "".join(out))
 

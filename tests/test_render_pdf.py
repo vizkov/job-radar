@@ -68,7 +68,7 @@ def test_resume_layout_follows_the_design():
     assert "OldCo <small>(now NewCo)</small>" in h and "Paris · Jan 2018 – Dec 2020" in h   # a 4-part role is its own company
     assert '<a href="https://github.com/alex/oss">github.com/alex/oss</a>: a code review method.' in h
     assert "<p><b>Application security:</b> pentesting, code review</p>" in h
-    assert 'Example University</b>: B.Sc. Computer Science' in h and ">2010 – 2014<" in h
+    assert 'Example University</b>: B.Sc. Computer Science (2010 – 2014)' in h and ">2010 – 2014<" not in h   # years stay in the entry's text, not a right-hand column
     assert 'mailto:alex@example.com' in h and "linkedin.com/in/alex" in h and "size: A4" in h
 
 
@@ -115,4 +115,4 @@ def test_posting_title_hyphen_is_tidied_and_volunteering_takes_its_label_from_th
     c = career()
     c.items["B09"] = Item("B09", "Ran sessions for young people.", "Experience", "Volunteering — Helpers Abroad — 2023")
     data = dict(DATA, sections=[{"heading": "x", "bullets": DATA["sections"][0]["bullets"] + [{"source_id": "B09", "text": "Ran sessions for young people."}]}])
-    assert "<b>Helpers Abroad</b>: Ran sessions for young people." in rp.resume_html(data, c, CONTACT)
+    assert "<b>Helpers Abroad</b> (2023): Ran sessions for young people." in rp.resume_html(data, c, CONTACT)

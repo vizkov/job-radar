@@ -3,6 +3,8 @@
     python tools/add_role.py <job url>                       # fetch it, run every filter, add it if it passes
     python tools/add_role.py <job url> --dry-run             # show what would happen, write nothing
     python tools/add_role.py <job url> --override old,country   # only on the user's word, per reason, when a filter would drop it
+    python tools/add_role.py <url> --company "Acme" --title "Security Engineer" --location "London, UK" --posted 2026-10-01 [--countries GB]
+                                                             # a link that cannot be fetched (LinkedIn, a company site, a pasted ad): fields given by hand
 
 Runs: the company's board through ats-scrapers (Greenhouse, Lever, Ashby links), then select() (countries, titles, permanent-only,
 max_age_days, employer list), dedupe against everything seen, sponsor-register tags, tier and score, data/matches.csv, and the
@@ -29,13 +31,18 @@ def main(argv=None) -> int:
     ap.add_argument("url")
     ap.add_argument("--override", default="", help="comma list of filters to bypass: country, title, employment, old, company")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--company", default=""); ap.add_argument("--title", default=""); ap.add_argument("--location", default="")
+    ap.add_argument("--posted", default="", help="YYYY-MM-DD; leave out only if the ad shows no date (a role with no date passes the age filter)")
+    ap.add_argument("--countries", default="", help="ISO codes, e.g. GB,NL; default: read from --location")
     a = ap.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
-    p = asyncio.run(intake.fetch_posting(a.url))
+    p = None if (a.company and a.title) else asyncio.run(intake.fetch_posting(a.url))
+    if p is None and a.company and a.title:
+        p = intake.manual_posting(a.url, a.company, a.title, a.location, a.posted, a.countries)
     if p is None:
         print("could not fetch that posting: only Greenhouse, Lever and Ashby job links are supported here, or the job is closed. "
-              "For anything else, tell Claude the title, company, location and posted date.")
+              "For anything else give --company, --title, --location and --posted by hand.")
         return 1
     age = f"{(__import__('datetime').date.today() - p.posted_at.date()).days} days ago" if p.posted_at else "no posted date"
     print(f"{p.company} — {p.title} | {p.location} | countries {','.join(sorted(p.countries)) or '?'} | posted {age}")

@@ -168,7 +168,7 @@ queue. `select()` stops at the first filter that drops a role, so `admit()` re-r
 **every** reason. A role the filters would drop is reported and not added; `--override country,old,…` (only on the user's word) adds it anyway
 and `data/matches.csv` `origin` records it (`manual-override:country,old`; blank for the daily run, `manual` for a role that passed).
 `post_leads.py add-role` uses the same door (`--override` there too). Why: two Anthropic roles added by hand on 2026-10-07 (posted 89 and
-623 days before, `max_age_days` 30) skipped the age filter that the daily run applies. `--dry-run` writes nothing. It writes the same files
+623 days before, `max_age_days` 30) skipped the age filter that the daily run applies. For a link the fetch cannot read (LinkedIn, a company site, a pasted ad) `--company --title --location --posted [--countries]` build the posting by hand (`intake.manual_posting`, source `manual`) and it goes through the same filters. `--dry-run` writes nothing. It writes the same files
 the Action writes (`data/matches.csv`, `state/seen.json`, `state/board_queue.json`), so commit and pull as for any session change.
 
 ## `tools/post_leads.py`: LinkedIn hiring-post discovery (standard library only)

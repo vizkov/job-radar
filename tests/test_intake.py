@@ -46,3 +46,14 @@ def test_job_links_are_parsed_for_the_three_supported_ats():
     assert intake.parse_job_url("https://jobs.lever.co/acme/123e4567-e89b-12d3-a456-426614174000")[:2] == ("lever", "acme")
     assert intake.parse_job_url("https://jobs.ashbyhq.com/acme/123e4567-e89b-12d3-a456-426614174000")[:2] == ("ashby", "acme")
     assert intake.parse_job_url("https://www.linkedin.com/jobs/view/1/") is None
+
+
+def test_manual_fields_build_a_posting_the_same_filters_judge(monkeypatch):
+    p = intake.manual_posting("https://example.com/j", "Globex", "Application Security Engineer", "London, UK", "2026-10-05")
+    assert p.source == "manual" and p.countries == frozenset({"GB"}) and p.posted_at.date().isoformat() == "2026-10-05"
+    assert intake.manual_posting("u", "G", "T", "Berlin", countries="de,nl").countries == frozenset({"DE", "NL"})
+    old = intake.manual_posting("https://example.com/j2", "Globex", "Application Security Engineer", "London, UK", "2020-01-01")
+    import radar
+    monkeypatch.setitem(radar.CONFIG, "max_age_days", 30)
+    r = intake.admit(old, {"company"})
+    assert r["status"] == "dropped" and "old" in r["reasons"]

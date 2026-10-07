@@ -109,3 +109,13 @@ async def fetch_posting(url: str) -> Posting | None:
         if jid in str(job.url) or jid in str(getattr(job, "global_id", "")):
             return job_to_posting(job, board)
     return None
+
+
+def manual_posting(url: str, company: str, title: str, location: str = "", posted: str = "", countries: str = "") -> Posting:
+    """A posting built from fields the user gave (a link the ATS fetch cannot read: LinkedIn, a company site, a pasted ad).
+    Countries default to what the radar would read from the location text."""
+    from datetime import datetime
+    from jobradar.common import countries_for
+    cc = {c.strip().upper() for c in countries.split(",") if c.strip()} or countries_for(None, location)
+    return Posting(source="manual", company=company.strip(), title=title.strip(), location=location.strip(), countries=frozenset(cc),
+                   url=url, external_id=url, posted_at=datetime.fromisoformat(posted) if posted else None)

@@ -116,7 +116,7 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
   "the roles on the board" always means what `gh project item-list` returns, never `state/issue_map.json` or `matches.csv`.
   `max_age_days` in `profile/config.json` drops roles posted longer ago than that (0 = no limit).
 - **Roles the user hands you go through the same door as the daily run (the user, 2026-10-07: two Anthropic roles added by hand, posted 89 and 623 days
-  before while `max_age_days` is 30, skipped every filter).** For a job link: `python tools/add_role.py <url>` (`--dry-run` first); for a LinkedIn hiring
+  before while `max_age_days` is 30, skipped every filter).** For a job link: `python tools/add_role.py <url>` (`--dry-run` first; for a link it cannot fetch, such as LinkedIn or a company site, give `--company --title --location --posted` by hand); for a LinkedIn hiring
   post: `post_leads.py add-role`. Both run `jobradar/intake.py`: country, title, permanent-only, age and employer filters, dedupe, sponsor tags, tier, `matches.csv`,
   board queue. Never write a `matches.csv` row or a board card by hand. If a filter would drop the role, the tool names every reason and adds nothing: tell the user
   the reasons in plain words and ask; `--override <reasons>` only on their word for that role (it is recorded in the `origin` column). A role that passes needs no override.

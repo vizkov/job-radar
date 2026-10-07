@@ -172,3 +172,10 @@ def test_letter_optional_sub_point_is_an_error(monkeypatch):
     e, _ = cv_lint.tailored_issues(d, test_tailor.CAREER)
     assert any("optional sub-point" in x for x in e)
 
+
+
+def test_letter_copying_the_ad_is_an_error():
+    jd = "You will turn an unfamiliar codebase into a clear risk picture for leadership under time pressure."
+    assert cv_lint.ad_overlaps("I like a clear risk picture, shown to leaders.", jd) == []
+    assert cv_lint.ad_overlaps("I do this: into a clear risk picture for leadership, fast.", jd) == ["into a clear risk picture for leadership"]
+    assert cv_lint.ad_overlaps("Application security engineer role with threat modelling.", "application security engineer role threat modelling") == []

@@ -161,6 +161,24 @@ BANK_TERM = "a Fortune 100 global financial and banking institution"
 DEFINED_BANK = r"fortune 100 global financial and banking institution"
 
 
+def ad_overlaps(text: str, jd: str) -> list[str]:
+    """Runs of five or more words the letter shares with the ad, in order (rule: reword the ad, never copy it). Short runs are skill nouns."""
+    wd = lambda t: re.findall(r"[a-z0-9+/']+", t.lower())
+    ad, words = wd(jd), wd(text)
+    grams = {tuple(ad[i:i + 5]) for i in range(len(ad) - 4)}
+    out, i = [], 0
+    while i <= len(words) - 5:
+        if tuple(words[i:i + 5]) in grams:
+            j = i + 5
+            while j < len(words) and tuple(words[j - 4:j + 1]) in grams:
+                j += 1
+            out.append(" ".join(words[i:j]))
+            i = j
+        else:
+            i += 1
+    return out
+
+
 def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
     errs, warns = [], []
     chosen: dict[str, str] = {}
@@ -212,6 +230,12 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
     cv_lines = [str(b.get("text", "")) for sec in data.get("sections", []) if isinstance(sec, dict)
                 for b in sec.get("bullets", []) if isinstance(b, dict)]
     letter_lines = [str(c.get("text", "")) for c in data.get("cover_letter", []) if isinstance(c, dict)]
+    jd_file = ROOT / "work" / "jd" / str(data.get("key", "")) / "jd.txt"
+    if letter_lines and jd_file.is_file():
+        for c in data.get("cover_letter", []):
+            for run in ad_overlaps(str(c.get("text", "")) if isinstance(c, dict) else "", jd_file.read_text(encoding="utf-8", errors="ignore")):
+                errs.append(f"cover letter [{c.get('source_id')}] copies the ad: \"{run}\" is a run of five or more words from the job description; "
+                            "say it in your own words (skill nouns and tool names may stay)")
     for doc, lines in (("CV", cv_lines), ("cover letter", letter_lines)):
         for t in lines:
             if re.search(DEFINED_BANK, t, re.I):

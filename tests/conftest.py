@@ -55,6 +55,12 @@ def _isolate_tool_state(tmp_path, monkeypatch):
     import post_leads
     for attr, name in (('QUERIES', 'queries.json'), ('PEOPLE', 'people.jsonl'), ('LEADS', 'leads.jsonl'), ('MATCHES', 'matches.csv'), ('SCORES', 'scores.jsonl'), ('TARGETS', 'targets.tsv')):
         monkeypatch.setattr(post_leads, attr, tmp_path / f'_iso_post_{name}')
+    import radar  # jobradar/intake.py writes radar's state and data files: keep tests off the real ones
+    (tmp_path / "_iso_radar_state").mkdir(exist_ok=True)
+    (tmp_path / "_iso_radar_data").mkdir(exist_ok=True)
+    monkeypatch.setattr(radar, "STATE", tmp_path / "_iso_radar_state")
+    monkeypatch.setattr(radar, "DATA", tmp_path / "_iso_radar_data")
+    monkeypatch.setattr(radar, "DIGESTS", tmp_path / "_iso_radar_digests")
     import session_brief
     for attr in ("WORK", "LAST", "LAST_REVIEW", "LAST_DOCS_REVIEW", "LAST_CALIBRATION", "FILL_LOCK", "LAST_ARCHIVE", "SNAPSHOT", "PIPELINE_LOG"):
         monkeypatch.setattr(session_brief, attr, tmp_path / f"_iso_sb_{attr.lower()}")

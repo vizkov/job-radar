@@ -102,15 +102,21 @@ def test_similar_title_at_another_company_is_not_known():
     assert pl.known_roles("Acme", "Sales Manager") == []
 
 
-def test_add_role_writes_row_with_poster_and_queues_a_card(monkeypatch):
+def test_add_role_goes_through_the_radars_filters_and_needs_an_override(monkeypatch):
+    import radar
     queued = []
     monkeypatch.setattr(bs, "promote", lambda refs, dry_run=False: queued.append(refs) or "queued")
     _, rec = pl.log_lead("https://x/p/9", "Ana", "Globex", "Application Security Engineer", "Amsterdam", "2026-09-30",
                          author_url="https://www.linkedin.com/in/ana", today=date(2026, 10, 1))
-    out = pl.add_role(rec["id"], "NL")
-    row = list(csv.DictReader(pl.MATCHES.open(encoding="utf-8")))[0]
+    # Globex is not on the user's employer list: the daily run would drop it, so add-role refuses without the user's word
+    refused = pl.add_role(rec["id"], "NL")
+    assert refused.startswith("NOT ADDED") and "employers not on your list" in refused and "--override company" in refused
+    assert not queued and pl.stats()["added"] == 0
+    out = pl.add_role(rec["id"], "NL", override="company")
+    row = list(csv.DictReader((radar.DATA / "matches.csv").open(encoding="utf-8")))[0]
     assert row["source"] == "linkedin_post" and row["poster"] == "Ana" and row["countries"] == "NL"
-    assert queued == [[row["ref"]]] and row["ref"] in out
+    assert row["origin"] == "manual-override:company" and row["ref"] in out
+    assert queued == [[row["ref"]]]
     from jobradar.board import row_payload
     assert "Posted by: [Ana](https://www.linkedin.com/in/ana)" in row_payload(row)["body"]
     assert "not added" in pl.add_role(rec["id"], "NL")    # now status added: cannot be added twice

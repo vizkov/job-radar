@@ -159,6 +159,18 @@ out of date.
 
 **Watch out**: a second ask after someone already referred leaves the field at *Referred* (the ask is still logged and commented).
 
+## `tools/add_role.py` and `jobradar/intake.py`: roles added by hand go through the daily run's pipeline
+
+`add_role.py <job url>` (Greenhouse, Lever, Ashby links) fetches the company's board through ats-scrapers, finds the posting and hands it to
+`intake.admit()`, which runs the same functions as `radar.py`: `select()` (countries, titles, permanent-only, `max_age_days`, employer list),
+`group_postings` + `diff_seen` (dedupe against everything seen), `enrich()` (sponsor tags, tier, score), `append_matches()` and the board
+queue. `select()` stops at the first filter that drops a role, so `admit()` re-runs it with each triggered filter bypassed (`skip=`) to name
+**every** reason. A role the filters would drop is reported and not added; `--override country,old,…` (only on the user's word) adds it anyway
+and `data/matches.csv` `origin` records it (`manual-override:country,old`; blank for the daily run, `manual` for a role that passed).
+`post_leads.py add-role` uses the same door (`--override` there too). Why: two Anthropic roles added by hand on 2026-10-07 (posted 89 and
+623 days before, `max_age_days` 30) skipped the age filter that the daily run applies. `--dry-run` writes nothing. It writes the same files
+the Action writes (`data/matches.csv`, `state/seen.json`, `state/board_queue.json`), so commit and pull as for any session change.
+
 ## `tools/post_leads.py`: LinkedIn hiring-post discovery (standard library only)
 
 | Name | Is |

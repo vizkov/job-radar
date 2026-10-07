@@ -29,6 +29,7 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 | `tools/public_template.py` | keep the public template current and clean | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/manual.py` | the `man` page | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/referrals.py` | referral routes and asks (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
+| `tools/add_role.py` | add a role you found yourself (a job link) through the radar's own filters and bookkeeping | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/post_leads.py` | LinkedIn hiring-post discovery (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/sponsorship.py` | checked sponsorship verdicts (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/calibrate.py` | automatic tier tuning (standard library only) | [5.4](05-4-Board-and-session-tools.md) |

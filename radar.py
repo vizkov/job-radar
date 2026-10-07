@@ -55,10 +55,11 @@ DROP_REASONS = {"country": "outside your countries", "title": "titles not matchi
 
 
 def select(results: list[SourceResult], include_outside, matcher=None,
-           dropped: Counter | None = None) -> tuple[list[Posting], Counter]:
+           dropped: Counter | None = None, skip: frozenset | set = frozenset()) -> tuple[list[Posting], Counter]:
     """Country + title filter, then company matching. Returns kept postings and per-source match counts.
     include_outside: bool for all sources, or {source: bool}. `dropped`, if given, counts why each
-    listing was dropped, keyed (source, reason) with reasons from DROP_REASONS."""
+    listing was dropped, keyed (source, reason) with reasons from DROP_REASONS. `skip`: reasons not to filter on (jobradar/intake.py,
+    for a role added by hand that the user agreed to bring in despite that filter; the daily run never passes it)."""
     dropped = dropped if dropped is not None else Counter()
     matcher = matcher or default_matcher()
     tgt = target_countries() | {"REMOTE-EU"}
@@ -67,6 +68,8 @@ def select(results: list[SourceResult], include_outside, matcher=None,
         outside_ok = include_outside.get(res.source, False) if isinstance(include_outside, dict) else include_outside
         for p in res.postings:
             countries = p.countries & tgt
+            if not countries and "country" in skip:
+                countries = set(p.countries)
             if not countries:
                 dropped[(res.source, "country")] += 1
                 dropped[(res.source, "where:" + (",".join(sorted(p.countries)) or "location not recognised"))] += 1
@@ -78,19 +81,19 @@ def select(results: list[SourceResult], include_outside, matcher=None,
                         UNRECOGNISED[res.source].append(sample)
                 continue
             # a hash-watched careers page has no job titles to filter; its change notice always passes
-            if not (p.raw.get("page_changed") or title_matches(p.title)):
+            if "title" not in skip and not (p.raw.get("page_changed") or title_matches(p.title)):
                 dropped[(res.source, "title")] += 1
                 continue
-            if not_permanent(p.title) or not_permanent(p.raw.get("employment", "")):
+            if "employment" not in skip and (not_permanent(p.title) or not_permanent(p.raw.get("employment", ""))):
                 dropped[(res.source, "employment")] += 1
                 continue  # permanent roles only (config.json: employment_exclude)
             max_age = int(CONFIG.get("max_age_days") or 0)  # 0 = no limit; roles with no posted date always pass
-            if max_age and p.posted_at and (date.today() - p.posted_at.date()).days > max_age:
+            if "old" not in skip and max_age and p.posted_at and (date.today() - p.posted_at.date()).days > max_age:
                 dropped[(res.source, "old")] += 1
                 continue  # posted more than max_age_days ago (config.json: max_age_days)
             p.countries = frozenset(countries)
             p.company_canonical = matcher.resolve(p.company, p.company_hint)
-            if p.company_canonical is None and not outside_ok:
+            if p.company_canonical is None and not outside_ok and "company" not in skip:
                 dropped[(res.source, "company")] += 1
                 continue
             kept.append(p)
@@ -279,7 +282,10 @@ def append_matches(new: list[Group], today: str):
              "also_on": " ".join(a.url for a in g.also),
              # what tools/jd_prep.py needs to fetch the full description via the ATS scraper
              "ats": g.best.raw.get("ats", ""), "ats_slug": g.best.raw.get("slug", ""),
-             "external_id": g.best.external_id} for g in new]
+             "external_id": g.best.external_id,
+             # how the role arrived: blank for the daily run; "manual" or "manual-override:<reasons>" from jobradar/intake.py
+             "origin": g.best.raw.get("origin", ""),
+             **g.best.raw.get("row_extra", {})} for g in new]
     if not rows:
         return
     log = DATA / "matches.csv"

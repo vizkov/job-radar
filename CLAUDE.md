@@ -81,6 +81,7 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
   `tools/board_sync.py`, `tools/jd_prep.py`, `tools/jd_check.py`, `tools/render_resume.py`,
   `tools/refresh_registers.py`, `tools/consistency_check.py` (cross-checks CV, cover letter and STAR stories), `tools/cv_lint.py` (form and section rules: `.claude/skills/tailor-application/writing-rules.md`), `tools/master_drift.py` (which applications no longer match the master documents), `tools/jd_cleanup.py` (trims the bulky JD files of skipped and rejected roles after 14/30 days; `list` shows what, `run` removes it), `tools/cover_sync.py` (the cover blocks follow the stories and CV lines they expand: `status` lists stale blocks, `done` records the sync after you update them; `master_drift.py clear` and `jd_check.py tailor` refuse while a block is stale), `tools/inbox_outcomes.py` (applications awaiting an answer; phrase classifier for outcome emails), `tools/fetch_application_mail.py` + `tools/app_mail.py` (the Action's daily mailbox scan and the application-mail ledger `state/application_mail.jsonl`: the brief's **MAIL** lines), `tools/build_candidates.py`, `tools/public_template.py`,
   `tools/post_leads.py` (query rotation, recruiter list, lead log and add-role for LinkedIn hiring posts),
+  `tools/add_role.py` (a job link the user hands you: runs it through the radar's own filters and bookkeeping, see below),
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
 - Tailoring always starts from `profile/career/` (never from another application's `tailored.json`); the CV headline is static (the user, 2026-10-05): master `P00` verbatim, never retitled per role; the CV header location is always
   "Open to relocation" (no destination); facts the user adds go into `stories.md` as "Also true" lines.
@@ -114,6 +115,11 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
   A role can have an issue and a score but no live card (aged out by `max_age_days`, then archived, even if later scored apply):
   "the roles on the board" always means what `gh project item-list` returns, never `state/issue_map.json` or `matches.csv`.
   `max_age_days` in `profile/config.json` drops roles posted longer ago than that (0 = no limit).
+- **Roles the user hands you go through the same door as the daily run (the user, 2026-10-07: two Anthropic roles added by hand, posted 89 and 623 days
+  before while `max_age_days` is 30, skipped every filter).** For a job link: `python tools/add_role.py <url>` (`--dry-run` first); for a LinkedIn hiring
+  post: `post_leads.py add-role`. Both run `jobradar/intake.py`: country, title, permanent-only, age and employer filters, dedupe, sponsor tags, tier, `matches.csv`,
+  board queue. Never write a `matches.csv` row or a board card by hand. If a filter would drop the role, the tool names every reason and adds nothing: tell the user
+  the reasons in plain words and ask; `--override <reasons>` only on their word for that role (it is recorded in the `origin` column). A role that passes needs no override.
 - User guide: `docs/wiki/`. Design reference (yours): `docs/design/`, starting at its README:
   concepts, architecture, a run and a session step by step, and every file and function.
 

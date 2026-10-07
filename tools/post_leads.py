@@ -9,7 +9,7 @@
     python tools/post_leads.py lead --post-url <url> --author "…" --company "…" --title "…" [--location "…"] \\
         [--posted YYYY-MM-DD] [--kind person|job_board] [--author-url <url>] [--reposter "…"] [--jd-url <url>] \\
         [--open yes|no|unknown] [--note "…"]            # log one post; says if the role is already known or stale
-    python tools/post_leads.py add-role <lead id> --countries GB[,NL] [--location "…"]   # new roles only: row + board card
+    python tools/post_leads.py add-role <lead id> --countries GB[,NL] [--location "…"] [--override old,company]   # new roles only, through the radar's filters (jobradar/intake.py): row + board card
     python tools/post_leads.py stats [--days N]         # what the posts added compared with the other sources
 
 The searches themselves are run by Claude in the user's own logged-in Chrome, read-only (see the skill and
@@ -334,12 +334,13 @@ def log_lead(post_url: str, author: str, company: str, title: str, location: str
     return f"lead {lid}: {msg}", rec
 
 
-def add_role(lid: str, countries: str, location: str = "", gh=None) -> str:
-    """Turn a `new` lead into a matches.csv row and a queued board card (the poster is named on the card)."""
-    from jobradar import tiering
-    from jobradar.board import role_ref
-    from jobradar.dedupe import norm_title, primary_country
+def add_role(lid: str, countries: str, location: str = "", gh=None, override: str = "") -> str:
+    """Turn a `new` lead into a matches.csv row and a queued board card, through the radar's own pipeline
+    (jobradar/intake.py: country, title, permanent-only, age and employer filters, dedupe, sponsor tags, tier). A filter that
+    would drop the role is reported and the role is not added, unless `override` names the reason (the user's word)."""
     import board_sync
+    from jobradar import intake
+    from jobradar.model import Posting
     lead = leads().get(lid)
     if not lead:
         return f"unknown lead {lid}"
@@ -348,18 +349,24 @@ def add_role(lid: str, countries: str, location: str = "", gh=None) -> str:
     cc_list = [c.strip().upper() for c in countries.split(",") if c.strip()]
     if not cc_list:
         return "give --countries (ISO codes, e.g. GB,NL)"
-    ref = role_ref(f"c:{normalize(lead['company'])}|{norm_title(lead['title'])}|{primary_country(cc_list)}")
-    total, reasons = tiering.score(lead["title"], cc_list, False, None, lead.get("age_days"))
-    row = {"ref": ref, "date": date.today().isoformat(), "company": lead["company"], "title": lead["title"],
-           "location": location or lead["location"], "countries": ",".join(cc_list),
-           "url": lead["jd_url"] or lead["post_url"], "source": "linkedin_post", "posted": lead["posted"],
-           "on_list": "", "tier": tiering.tier(total), "score": total, "score_reasons": " ".join(reasons),
-           "poster": lead["author"], "poster_url": lead["author_url"] or lead["post_url"]}
-    _write_row(row)
-    _append(LEADS, {"id": lid, "status": "added", "ref": ref, "at": _now()})
-    board_sync.promote([ref])
-    return (f"added {lead['company']} — {lead['title']} as ref {ref} (tier {row['tier']}); card queued. Next: `board_sync.py roles` "
-            f"opens it, then score-roles and sponsorship-check")
+    try:
+        posted_at = datetime.fromisoformat(lead["posted"]) if lead.get("posted") else None
+    except ValueError:
+        posted_at = None
+    p = Posting(source="linkedin_post", company=lead["company"], title=lead["title"], location=location or lead["location"],
+                countries=frozenset(cc_list), url=lead["jd_url"] or lead["post_url"], external_id=lid, posted_at=posted_at,
+                raw={"row_extra": {"poster": lead["author"], "poster_url": lead["author_url"] or lead["post_url"]}})
+    r = intake.admit(p, {x.strip() for x in override.split(",") if x.strip()})
+    if r["status"] == "dropped":
+        return (f"NOT ADDED: the radar's filters would drop this role: {'; '.join(r['why'])} [{', '.join(r['reasons'])}]. "
+                f"Only on the user's word: add-role {lid} --countries {countries} --override {','.join(r['reasons'])}")
+    if r["status"] == "known":
+        return f"already known to the radar (ref {r['ref']}): not added again"
+    _append(LEADS, {"id": lid, "status": "added", "ref": r["ref"], "at": _now()})
+    board_sync.promote([r["ref"]])          # no-op when intake already queued the card
+    return (f"added {lead['company']} — {lead['title']} as ref {r['ref']} (tier {r['tier']})"
+            + (f", overriding: {','.join(r['overridden'])}" if r["overridden"] else "")
+            + "; card queued. Next: `board_sync.py roles` opens it, then score-roles and sponsorship-check")
 
 
 def _write_row(row: dict) -> None:
@@ -405,7 +412,7 @@ def main(argv=None) -> int:
     ld.add_argument("--posted", default=""); ld.add_argument("--kind", choices=KINDS, default="person")
     ld.add_argument("--author-url", default=""); ld.add_argument("--reposter", default=""); ld.add_argument("--jd-url", default="")
     ld.add_argument("--open", dest="open_", choices=["yes", "no", "unknown"], default="unknown"); ld.add_argument("--note", default="")
-    ar = sub.add_parser("add-role"); ar.add_argument("id"); ar.add_argument("--countries", required=True); ar.add_argument("--location", default="")
+    ar = sub.add_parser("add-role"); ar.add_argument("id"); ar.add_argument("--countries", required=True); ar.add_argument("--location", default=""); ar.add_argument("--override", default="")
     st = sub.add_parser("stats"); st.add_argument("--days", type=int, default=30)
     a = ap.parse_args(argv)
     if a.cmd == "queries":
@@ -429,7 +436,7 @@ def main(argv=None) -> int:
         print(log_lead(a.post_url, a.author, a.company, a.title, a.location, a.posted, a.kind, a.author_url, a.reposter,
                        a.jd_url, a.open_, a.note)[0])
     elif a.cmd == "add-role":
-        print(add_role(a.id, a.countries, a.location))
+        print(add_role(a.id, a.countries, a.location, override=a.override))
     else:
         print(json.dumps(stats(a.days)))
     return 0

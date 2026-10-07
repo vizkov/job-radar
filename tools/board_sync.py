@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 import re
 import subprocess
 import sys
@@ -142,7 +143,8 @@ class Gh:
             return ""
         # encoding: gh speaks UTF-8; Windows' default (cp1252) would garble text read back from GitHub
         return subprocess.run(["gh", *args], check=True, capture_output=True, text=True,
-                              encoding="utf-8", errors="replace").stdout.strip()
+                              encoding="utf-8", errors="replace",
+                              creationflags=0x08000000 if os.name == "nt" else 0).stdout.strip()  # CREATE_NO_WINDOW
 
 
 def _body_file(text: str) -> str:

@@ -57,10 +57,16 @@ def safe(text, limit: int = 80) -> str:
     return t if len(t) <= limit else t[: limit - 1] + "…"
 
 
+# Windows: a hidden console for every child. DETACHED_PROCESS (no console at all) made each gh/git the
+# background jobs started open its own visible console window, which lagged the machine at session start.
+NO_WINDOW = 0x08000000 if os.name == "nt" else 0          # CREATE_NO_WINDOW
+DETACHED_FLAGS = NO_WINDOW | 0x00000200                   # | CREATE_NEW_PROCESS_GROUP
+
+
 def run(cmd: list[str], timeout: int = 25) -> tuple[bool, str]:
     try:
         r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, timeout=timeout,
-                           encoding="utf-8", errors="replace")
+                           encoding="utf-8", errors="replace", creationflags=NO_WINDOW)
         return r.returncode == 0, (r.stdout if r.returncode == 0 else r.stderr or r.stdout).strip()
     except (OSError, subprocess.TimeoutExpired) as e:
         return False, type(e).__name__
@@ -228,7 +234,7 @@ def start_archive(now: datetime) -> str | None:
     log = open(WORK / "board_archive.log", "a", encoding="utf-8")
     kwargs = {"cwd": ROOT, "stdout": log, "stderr": log, "stdin": subprocess.DEVNULL}
     if os.name == "nt":
-        kwargs["creationflags"] = 0x00000008 | 0x00000200  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+        kwargs["creationflags"] = DETACHED_FLAGS
     else:
         kwargs["start_new_session"] = True
     subprocess.Popen([sys.executable, str(ROOT / "tools" / "board_sync.py"), "archive"], **kwargs)
@@ -255,7 +261,7 @@ def start_fill(now: datetime) -> str:
     log = open(WORK / "board_fill.log", "a", encoding="utf-8")
     kwargs = {"cwd": ROOT, "stdout": log, "stderr": log, "stdin": subprocess.DEVNULL}
     if os.name == "nt":
-        kwargs["creationflags"] = 0x00000008 | 0x00000200  # DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+        kwargs["creationflags"] = DETACHED_FLAGS
     else:
         kwargs["start_new_session"] = True
     subprocess.Popen([sys.executable, str(ROOT / "tools" / "board_sync.py"), "fill"], **kwargs)
@@ -364,7 +370,7 @@ def start_prep(refs: list[str]) -> str:
     log = open(WORK / "jd_prep.log", "a", encoding="utf-8")
     kwargs = {"cwd": ROOT, "stdout": log, "stderr": log, "stdin": subprocess.DEVNULL}
     if os.name == "nt":
-        kwargs["creationflags"] = 0x00000008 | 0x00000200
+        kwargs["creationflags"] = DETACHED_FLAGS
     else:
         kwargs["start_new_session"] = True
     args = [str(venv), str(ROOT / "tools" / "jd_prep.py")]

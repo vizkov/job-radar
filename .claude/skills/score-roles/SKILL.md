@@ -63,7 +63,7 @@ description: Score job descriptions against the user's CV (fit score, met/missin
    - Permanent roles only: if the JD says the role is a contract, fixed-term, temporary, interim or
      freelance position, add a blocker (`type: other`, quoting the ad) and recommend `skip`.
    - `blockers`: things that stop this user regardless of skill — security clearance, citizenship /
-     right-to-work without sponsorship, a required language that isn't in `languages` in `profile/config.json` (the user has English only: an ad that requires German, French, Dutch or any other language is a `language` blocker and a `skip`; "a plus" or "nice to have" is not a requirement), on-site location they can't
+     right-to-work without sponsorship, a required language that isn't in `languages` in `profile/config.json` (the user has English only: an ad that requires German, French, Dutch or any other language is a `language` blocker and a `skip`; "a plus" or "nice to have" is not a requirement and not a blocker, but a **preferred** language the user lacks gets its own line in the summary and about 5 points off the fit score (the user, 2026-10-09: Santander listed Spanish as preferred; that one role was made a skip on their word, the general rule is the note and the points)), on-site location they can't
      do. Take the user's location and visa needs from their profile (e.g. a C-block about
      relocation, or the contact location); if they live outside the role's country, assume they
      need sponsorship unless the profile says otherwise.

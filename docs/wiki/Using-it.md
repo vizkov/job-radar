@@ -97,7 +97,7 @@ three rows below). Claude can only reach your Gmail connector and Chrome when yo
 | Job | Who runs it | When |
 |---|---|---|
 | Role search | GitHub, by itself | Three times a day, whether or not your computer is on |
-| Job-alert emails (LinkedIn, Indeed, Glassdoor) | GitHub, by itself, as the first step of every role search | Three times a day, only if you set up the alert mailbox. Roles found only in alert emails reach you this way |
+| Job-alert emails (the providers in `sources.yaml`: LinkedIn and Indeed in your setup; Glassdoor is supported but off) | GitHub, by itself, as the first step of every role search | Three times a day, only if you set up the alert mailbox. Roles found only in alert emails reach you this way |
 | Reply tracking (receipts, rejections, interview invitations) | GitHub reads the mailbox and logs mail about roles you applied to; Claude later suggests board changes in the inbox check | Three times a day, only if the mailbox is your normal inbox |
 | New roles reach your board | GitHub creates the cards; Claude fills in their columns | Fields are filled at the start of your next session |
 | Closed-role and old-card cleanup | Claude's session-start step archives Skipped cards and trims bulky job-description files of skipped and rejected roles | Once a day, when you open a session (job-description files after 14 days for Skipped, 30 for Rejected) |

@@ -187,6 +187,10 @@ docstring holds the four rules for any AI step.
 **Watch out**: `+ ["## [Z999] end"]` appends a fake final heading so the last story is
 flushed by the same code path; `Z999` is then removed.
 
+## `jobradar/bamboohr_json.py`: BambooHR listing fix
+
+BambooHR's careers widget (`/jobs/embed2.php`) now answers with JSON, but `ats-scrapers` 0.3.0 (the newest release, October 2026) parses only the old HTML list, so every BambooHR tenant looked empty (Integrity360 fell from 40 roles to 0; found by the health check, 2026-10-10). `install()` wraps `BambooHRScraper._parse_widget` so a JSON body is read by `parse_json_widget(slug, text)` (departments, then positions: id, name, url, location) and an HTML body still goes to the library. `jobradar/common.py` imports the module so the patch is active everywhere ATS boards are fetched. The detail pages (`/careers/<id>/detail`) were unchanged, so descriptions still arrive. Delete the module when a library release parses the JSON itself. Test: `tests/test_bamboohr_json.py`.
+
 ## `jobradar/alert_providers.py`: email providers (standard library only)
 
 `Provider`: `name`, `senders`, `dkim_domain`, `job_id` regex, canonical `url` template, and optional `redirect` (the only link accepted for Indeed, whose alerts carry no job ID).

@@ -9,6 +9,8 @@ from pathlib import Path
 
 from ats_scrapers.scrapers import get_scraper
 
+from jobradar import bamboohr_json  # noqa: F401  (patches the BambooHR listing parser; see that module)
+
 from jobradar.paths import ROOT, profile_path
 
 CONFIG = json.loads(profile_path("config.json").read_text(encoding="utf-8"))

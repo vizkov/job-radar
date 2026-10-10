@@ -30,7 +30,7 @@ from cv_lint import tailored_issues  # noqa: E402
 WORK = ROOT / "work" / "jd"
 SCORES = ROOT / "data" / "scores.jsonl"
 MET = {"yes", "partial", "no"}
-BLOCKER_TYPES = {"clearance", "right_to_work", "language", "location", "seniority", "other"}
+BLOCKER_TYPES = {"clearance", "right_to_work", "language", "location", "seniority", "knockout", "other"}
 RECOMMENDATIONS = {"apply", "maybe", "skip"}
 LEVELS = {"below", "at", "above"}  # the role's level against the user's record; optional, "below" lowers the ceiling
 # The fit score is a judgement, but it may not float above what the must-have table supports (2026-10-02: a role

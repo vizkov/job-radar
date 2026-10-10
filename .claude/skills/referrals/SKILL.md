@@ -212,3 +212,7 @@ referral went through an internal portal, the user may not need to apply separat
 **After the user says they have applied** (`track` sets the card to Applied), offer the stranger route: find the recruiter or
 team contact (step 1), draft the note with the tailored CV attached (step 2), cold-read it (2b), and log the ask (step 3).
 Never draft or suggest sending it before the application is in.
+**Proof of work in the note:** if `profile/career/` records a public item (write-up, tool, CVE, lab ranking) relevant to the
+team's stack, the note names it in one line with the link, and the ask is small ("what do you think of this?", ten minutes),
+not "can you refer me?". Four lines: who the user is, the one result tied to their stack, why them, the ask. Only items the user
+has published and confirmed; none yet means the note goes without one. Expect single-digit reply rates.

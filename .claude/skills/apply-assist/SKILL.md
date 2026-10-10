@@ -34,6 +34,10 @@ The user is the approver and the one who submits. You prepare and type; you neve
    consent to be contacted, voluntary demographics. Use those values in the page table (the user still approves each page).
    Ask only about what is `null` or missing, and **save every new answer to that file** so it is never asked again. Voluntary
    demographic questions with a `null` value stay blank.
+   **"Years of experience with X" questions:** count all relevant experience (pen-testing, secure code review and cloud work
+   overlap), from the CV dates, never more than they support; show the user the number and the dates behind it, and save the
+   answer per skill in `application_answers.json` so every application gives the same number. A binary question the user
+   fails (years, certification) is a knockout: say so before filling the rest, and let the user decide whether to go on.
 1. **Pick the role and material.** Find the ref in `data/matches.csv`. There must be a validated tailored
    application (`profile/applications/<folder>/validated.sha256` matching `tailored.json`); if not, run
    `tailor-application` first. Use the role's URL from `matches.csv` (the company's own ATS link), never

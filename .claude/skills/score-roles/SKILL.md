@@ -44,7 +44,7 @@ description: Score job descriptions against the user's CV (fit score, met/missin
    ```json
    {"key": "<ref>", "fit_score": 0-100, "level": "below|at|above",
     "must_haves": [{"requirement": "...", "met": "yes|partial|no", "evidence": ["B03", "S01"]}],
-    "blockers": [{"type": "clearance|right_to_work|language|location|seniority|other",
+    "blockers": [{"type": "clearance|right_to_work|language|location|seniority|knockout|other",
                   "quote": "<copied verbatim from the JD>"}],
     "summary": "2-4 plain sentences for the user",
     "recommendation": "apply|maybe|skip",
@@ -68,6 +68,13 @@ description: Score job descriptions against the user's CV (fit score, met/missin
      relocation, or the contact location); if they live outside the role's country, assume they
      need sponsorship unless the profile says otherwise.
      Quotes must be copied exactly from the JD.
+   - **Knockout check (the user's pasted ATS advice, 2026-10-10: instant rejections are usually a screening question, not the CV).**
+     Before scoring, read the ad for hard filters a form will ask as a yes/no or a number: a minimum of years ("5+ years of X"),
+     a required certification, a notice-period or start-date limit, a salary band, a location or work-authorisation condition.
+     Compare each with the CV dates, `profile/application_answers.json` and `profile/config.json`. Count all relevant experience
+     for "years with X" (pen-testing, secure code review and cloud work overlap), but never more than the dates support. A binary
+     requirement the user plainly fails is a blocker with `type: knockout` (quote the ad) and the role is not worth the application;
+     a borderline one is a line in the summary, not a blocker.
    - `fit_score`: how well their evidence covers the must-haves, reduced for blockers and seniority
      mismatch. Be calibrated: 80+ strong, 60-79 worth a look, below 50 poor. **`jd_check` caps it:** coverage is
      (yes + half the partials) / all must-haves; the score may not exceed coverage minus 15 per blocker minus 10 when

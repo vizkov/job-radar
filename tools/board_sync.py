@@ -509,7 +509,7 @@ def archive_skipped(gh: Gh, max_n: int = ARCHIVE_MAX, sleep=time.sleep, now: "da
 FIT_START, FIT_END = "<!-- job-radar:fit -->", "<!-- /job-radar:fit -->"
 TIER_LINE = re.compile(r"^- \*\*Tier \d\*\* \(score [^\n]*\)\n?", re.M)  # older cards carried the tier arithmetic
 BLOCKER_NAMES = {"clearance": "Security clearance", "right_to_work": "Right to work", "language": "Language",
-                 "location": "Location", "seniority": "Seniority", "other": "Other"}
+                 "location": "Location", "seniority": "Seniority", "knockout": "Hard requirement", "other": "Other"}
 WORK_JD = ROOT / "work" / "jd"
 
 

@@ -23,6 +23,10 @@ Evidence first: every recommendation must point at real job descriptions the use
      consultancies accept an alternative). No advice on paying for anything without the user asking.
    - **Hard blocker** (clearance, citizenship, right to work): not fixable by CV; suggest filtering or
      de-prioritising those roles instead (`tune-radar`).
+   - **Proof-of-work gap:** the CV has no public evidence a reader can open (write-ups, CVEs, CTF or lab rankings, GitHub
+     tooling, certs). Recommend the cheapest one or two that fit the target roles (a threat-model write-up of a generic flow,
+     a small tool, a lab ranking), as a long game next to applications. Never use client data or anything under NDA; nothing
+     goes into the career docs until the user has it and confirms it. Link the best three items at most, from one hub page.
 4. **Check freshness of docs:** roles or dates that look out of date, a summary that no longer matches the
    roles being targeted, missing STAR stories / cover blocks.
 5. **Report** the top 5 items: gap, how many target roles it affects, type, proposed action. Never add

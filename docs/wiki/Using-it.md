@@ -91,13 +91,16 @@ sit down, or just look at the board.
 
 At the start of every session Claude gets a list of the recurring jobs, with when each last ran and which are due. Claude runs
 what is due without being asked, or, if you opened with a task of your own, offers it in one line. If it skips one it tells you which
-and why. Nothing runs while no session is open except the GitHub search: Claude can only reach your Gmail and Chrome when you
-have it open, so those checks happen then.
+and why. While no session is open, only GitHub works: the role search, reading the alert mailbox and the reply scan (the first
+three rows below). Claude can only reach your Gmail connector and Chrome when you have it open, so the other checks happen then.
 
 | Job | Who runs it | When |
 |---|---|---|
 | Role search | GitHub, by itself | Three times a day, whether or not your computer is on |
+| Job-alert emails (LinkedIn, Indeed, Glassdoor) | GitHub, by itself, as the first step of every role search | Three times a day, only if you set up the alert mailbox. Roles found only in alert emails reach you this way |
+| Reply tracking (receipts, rejections, interview invitations) | GitHub reads the mailbox and logs mail about roles you applied to; Claude later suggests board changes in the inbox check | Three times a day, only if the mailbox is your normal inbox |
 | New roles reach your board | GitHub creates the cards; Claude fills in their columns | Fields are filled at the start of your next session |
+| Closed-role and old-card cleanup | Claude's session-start step archives Skipped cards and trims bulky job-description files of skipped and rejected roles | Once a day, when you open a session (job-description files after 14 days for Skipped, 30 for Rejected) |
 | Scoring | Claude | A few of the freshest unscored roles at the start of a session (see above) |
 | Inbox check | Claude, through the Gmail connector (read-only) | About once a day, when you have applications waiting for an answer |
 | LinkedIn post sweep | Claude, in your Chrome | About once a day, only if you switched it on |

@@ -36,7 +36,7 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
 |---|---|---|
 | The private repo's contents get pushed to the public template | Only files on an **allowlist** (`PUBLIC`) and not on the `PRIVATE` list are ever copied; `check` fails if the template tracks a private file; every publish runs it | `tools/public_template.py` |
 | A workflow runs in a public repo (the template, or a copy made public by mistake), publishing issues and logs | Every workflow's first job (`guard`) checks the repo is private and skips otherwise (override: repo variable `JOB_RADAR_ALLOW_PUBLIC=true`) | `.github/workflows/*.yml` |
-| Actions logs show job titles or target companies | Workflows run with `--quiet`: counts only | `radar.py`, `verify_boards.py` |
+| Actions logs show job titles or target companies | The radar and verify workflows run with `--quiet`: counts only (the registers workflow prints only register row counts) | `radar.py`, `verify_boards.py` |
 | The "Radar status" issue, visible to anyone with repo access, lists roles | It contains counts and source health only, no titles | `radar.py: render_status()` |
 
 ### 1b. Other people's details
@@ -50,7 +50,7 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
 
 | How it could happen | Defence | Where |
 |---|---|---|
-| A compromised Python package reads it from the environment | The secret exists only in the one step that fetches mail, which runs **before** `pip install` and with `python -I -S`: no third-party code is on the machine or in the process. A test proves the fetcher imports only the standard library | `radar.yml` step 3, `tools/fetch_alert_emails.py`, `jobradar/alert_providers.py` |
+| A compromised Python package reads it from the environment | The secret exists only in the two steps that fetch mail (alert emails, then application mail), which run **before** `pip install` and with `python -I -S`: no third-party code is on the machine or in the process. A test proves the fetcher imports only the standard library | `radar.yml` step 3, `tools/fetch_alert_emails.py`, `jobradar/alert_providers.py` |
 | It's written to a file, a commit or the chat | It lives only in GitHub Actions secrets; the fetcher never prints it (a test checks) | `fetch_alert_emails.py`, `CLAUDE.md` rule 5 |
 | It's used to change the mailbox | Read-only IMAP (`EXAMINE`, `BODY.PEEK[]`): nothing is marked read, moved or deleted | `fetch_alert_emails.py: fetch()` |
 | The application-mail scan reads more of the mailbox than alerts do | `fetch_application_mail.py` lists headers only, reads the body of messages from recruiting systems or naming a watched company, skips sign-in codes, password resets and bulk mail, and the ledger stores no message text | `application_mail.py: candidate()`, `app_mail.py: ingest()` |

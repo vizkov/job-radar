@@ -401,7 +401,7 @@ When the user agrees to a change, Claude commits to the private repo (`origin`).
    deleted from the template.
 3. `publish()`: copy those files into the template clone, **run the whole test suite
    there**, run `check` (no private file tracked), commit, push.
-4. Merge the template back into the private copy, so drift is empty again.
+4. Merge the template back into the private copy, so drift is empty again. The template deliberately lacks the maintainer-only files (`MAINTAINER_ONLY`), so the merge deletes them here; `restore_maintainer_only()` then checks them back out from the commit before the merge and commits that (CLAUDE.md rule 9).
 5. `mirror_wiki()`: copy `docs/wiki/*.md` into the template's GitHub Wiki, rewriting links
    (`wiki_text()`).
 

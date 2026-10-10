@@ -123,4 +123,4 @@ template's history is never rewritten. Other copies pick changes up with `git pu
 
 The three scheduled workflows (radar 3x a day, verify monthly, registers weekly) are
 described in [3. A scheduled run](03-Scheduled-run.md). All three run behind the privacy
-guard, share one concurrency group so their commits never race, and run with `--quiet`.
+guard, share one concurrency group so their commits never race. The radar and verify workflows run with `--quiet`; the registers workflow prints only register row counts.

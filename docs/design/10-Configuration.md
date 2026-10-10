@@ -161,6 +161,8 @@ The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 |---|---|---|
 | `auto_per_session` | 8 | Roles Claude scores automatically at the start of each session, before answering the user's first message: the freshest unscored Tier 1 roles on the list, skipping cards already closed or skipped. 0 = only when asked. 0.25–0.5% of a session per role (measured) |
 
+`scoring.linkedin_job_pages` (default false) lets `score-roles` read one LinkedIn job page at a time in the user's logged-in Chrome to get a description; LinkedIn's terms ban automated access, so this is the user's risk to accept. `cleanup.skipped_days` and `cleanup.rejected_days` (14 and 30) set when `tools/jd_cleanup.py` trims `jd.txt` and `packet.md` from `work/jd/<ref>/` for Skipped and Rejected roles.
+
 ## Referrals (`config.json` → `referrals`)
 
 | Key | Default | Meaning |

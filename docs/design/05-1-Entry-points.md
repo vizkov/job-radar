@@ -21,7 +21,7 @@ only), `--include-outside` (keep employers not on the list).
 | `load(path, default)` | Reads a JSON file, or returns `default` if it doesn't exist. |
 | `UNRECOGNISED`, `UNRECOGNISED_N` | Per source, up to 30 distinct sample locations of listings whose **title matched** but where no country was found, and how many such listings there were: possible real losses, listed in the digest so missing places can be added to `_CITY_NAMES`. Module-level and never reset: they add up across `select()` calls in one process (one per run in practice; tests reset them). |
 | `DROP_REASONS`, `drop_lines(results, matched, dropped)` | Why a listing was dropped (country, title, employment, company), and one status line per source: found → dropped by reason → kept. |
-| `select(results, include_outside, matcher, dropped)` | Country filter, title filter, company matching; returns kept postings and per-source match counts. `include_outside` is a bool or a per-source dict. |
+| `select(results, include_outside, matcher, dropped, skip)` | Country filter, title filter, company matching; returns kept postings and per-source match counts. `include_outside` is a bool or a per-source dict. `skip` is a set of drop reasons not to filter on; only `jobradar/intake.py` passes it, for a role the user hand-added and agreed to bring in despite that filter (the daily run never does). |
 | `diff_seen(groups, seen, today)` | Returns groups none of whose keys are in `seen`; stamps all their keys with today. |
 | `enrich(new, sponsors)` | Adds sponsor tags, score, tier and reasons to each new group's `tags`. |
 | `_sponsor_note(g)` / `_line(g)` | One digest line for a group: escaped title link, location, posted date, sponsor note, "also on" links. |

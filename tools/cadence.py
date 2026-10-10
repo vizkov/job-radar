@@ -14,6 +14,9 @@ stamp themselves when they finish:
     python tools/cadence.py done views_check      # after updating VIEWS to match the live board views
     python tools/cadence.py done jd_cleanup       # stamped by tools/jd_cleanup.py itself (the hook runs it daily)
     python tools/cadence.py show                  # the ledger
+    python tools/cadence.py reminder add <id> <YYYY-MM-DD> <text...>   # a ONE-OFF job: shows in the brief from that date
+    python tools/cadence.py reminder done <id>    # finish it: the reminder is removed, it never shows again
+    python tools/cadence.py reminder list
 
 Stamps live in work/.cadence.json (private, local). The radar search and the new-role additions are
 read from what the GitHub Action already writes (digests/status.md, matches.csv, the issue map, the board).
@@ -76,6 +79,61 @@ def when(name: str, now: datetime, root: Path = ROOT, fallback: datetime | None 
     hours = int((now - at).total_seconds() // 3600)
     ago = f"{hours}h ago" if hours < 48 else f"{hours // 24}d ago"
     return f"last ran {at:%Y-%m-%d %H:%M} UTC ({ago})"
+
+
+def _reminders_file(root: Path) -> Path:
+    return root / "work" / ".reminders.json"
+
+
+def reminders(root: Path = ROOT) -> list[dict]:
+    """One-off reminders ({"id", "due": "YYYY-MM-DD", "text"}), for work that happens once on or after a date and then goes
+    away (unlike JOBS, which recur). Private, local: work/.reminders.json."""
+    try:
+        data = json.loads(_reminders_file(root).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return [r for r in data if isinstance(r, dict) and r.get("id") and r.get("due")] if isinstance(data, list) else []
+
+
+def _save_reminders(items: list[dict], root: Path) -> None:
+    f = _reminders_file(root)
+    if not items:
+        f.unlink(missing_ok=True)   # nothing left: no stale file
+        return
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(json.dumps(items, indent=1), encoding="utf-8")
+
+
+def reminder_add(rid: str, due: str, text: str, root: Path = ROOT) -> str:
+    datetime.fromisoformat(due)   # ValueError on a bad date
+    items = [r for r in reminders(root) if r["id"] != rid] + [{"id": rid, "due": due, "text": text}]
+    _save_reminders(items, root)
+    return f"reminder {rid}: due {due}"
+
+
+def reminder_done(rid: str, root: Path = ROOT) -> str:
+    items = reminders(root)
+    if not any(r["id"] == rid for r in items):
+        raise ValueError(f"no reminder {rid!r}; have {[r['id'] for r in items]}")
+    _save_reminders([r for r in items if r["id"] != rid], root)
+    return f"reminder {rid}: done and removed"
+
+
+def reminder_lines(now: datetime, root: Path) -> tuple[list[str], list[str]]:
+    """(brief lines, due names) for the one-off reminders; empty when there are none."""
+    lines, due = [], []
+    for r in reminders(root):
+        try:
+            when_due = datetime.fromisoformat(r["due"])
+        except ValueError:
+            continue
+        if now >= when_due:
+            due.append(f"reminder:{r['id']}")
+            lines.append(f"  - One-off ({r['id']}): {r['text']} · DUE since {r['due']}: run it after answering the first message "
+                         f"(or offer it in one line), then `python tools/cadence.py reminder done {r['id']}`, which removes it for good")
+        else:
+            lines.append(f"  - One-off ({r['id']}): {r['text']} · due {r['due']} · ok")
+    return lines, due
 
 
 def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_board: int, new_skip: int,
@@ -184,6 +242,9 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
                      "offer it in one line), run `docs-review`; it stamps itself (`work/.last_docs_review`)")
     else:
         lines.append("  - Docs review: not due (few code files changed since the last one) · ok")
+    extra_lines, extra_due = reminder_lines(now, root)
+    lines += extra_lines
+    due += extra_due
     return lines, due
 
 
@@ -192,6 +253,22 @@ def main(argv=None) -> int:
     if args[:1] == ["done"] and len(args) == 2:
         try:
             print(done(args[1]))
+        except ValueError as e:
+            print(e)
+            return 2
+        return 0
+    if args[:1] == ["reminder"] and len(args) >= 2:
+        try:
+            if args[1] == "add" and len(args) >= 5:
+                print(reminder_add(args[2], args[3], " ".join(args[4:])))
+            elif args[1] == "done" and len(args) == 3:
+                print(reminder_done(args[2]))
+            elif args[1] == "list":
+                for r in reminders():
+                    print(f"{r['id']}: due {r['due']} · {r['text']}")
+            else:
+                print(__doc__)
+                return 2
         except ValueError as e:
             print(e)
             return 2

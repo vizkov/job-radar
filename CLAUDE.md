@@ -67,6 +67,7 @@ review after answering the first message unless the user opened with a task: the
 they are closing the session), and each of those jobs stamps itself when finished with
 `python tools/cadence.py done <inbox_check|post_discovery|auto_score|views_check|health|cv_review>` (the docs review stamps `work/.last_docs_review` itself). If you skip a DUE job, say which one and why in one line;
 never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the guarantee that an overdue job is visible, not that it ran.
+**One-off work** (not recurring: for example a one-week check after a change) is a reminder, not a note in memory: `python tools/cadence.py reminder add <id> <YYYY-MM-DD> <text>`. The block lists it from that date as a **One-off** line, and `reminder done <id>` removes it for good once it is done.
 
 ## How the machinery fits together
 

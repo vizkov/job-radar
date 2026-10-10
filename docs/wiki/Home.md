@@ -58,6 +58,7 @@ developers and for Claude.
 
 ```
  3x a day on GitHub's servers (02:47, 08:47, 14:47 UTC), no one involved
+   (new cards appear on their own; some columns, such as Tier and Fit, fill in at your next session)
    → check your target companies' job boards, public job portals, your job-alert emails
    → keep matching roles → rate them → one card per new role on your board
                                                         ▲            ◀── you look, drag cards

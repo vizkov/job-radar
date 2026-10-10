@@ -90,13 +90,29 @@ def fetch(host: str, user: str, password: str, mailbox: str, since: date, sender
     return out, diag
 
 
+def configured_providers(path: Path | None = None) -> list[str]:
+    """The `providers: [...]` list under `alert_email:` in profile/sources.yaml, so the workflow fetches exactly what
+    the radar parses. Standard library only (this step holds the mailbox password), so no YAML parser: one regex.
+    Falls back to every known provider when the file or the key is missing."""
+    path = path or ROOT / "profile" / "sources.yaml"
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return list(PROVIDERS)
+    block = re.search(r"^\s*alert_email:\s*$(.*?)(?=^\S|^\s{0,2}[A-Za-z_]+:\s*$|\Z)", text, re.M | re.S)
+    m = re.search(r"^\s*providers:\s*\[([^\]]*)\]", block.group(1) if block else "", re.M)
+    names = [n.strip().strip("'\"") for n in m.group(1).split(",") if n.strip()] if m else []
+    return names or list(PROVIDERS)
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--out", default=".alert_mail")
     ap.add_argument("--days", type=int, default=3)
     ap.add_argument("--mailbox", default="auto", help='"auto" = Gmail All Mail if present, else INBOX')
     ap.add_argument("--host", default="imap.gmail.com")
-    ap.add_argument("--providers", default=",".join(PROVIDERS))
+    ap.add_argument("--providers", default="config",
+                    help='comma list, or "config" (default) = the `providers` list of alert_email in profile/sources.yaml')
     args = ap.parse_args(argv)
 
     out = Path(args.out) if Path(args.out).is_absolute() else ROOT / args.out
@@ -108,7 +124,7 @@ def main(argv=None) -> int:
         user, pw = os.environ.get("JOBALERT_IMAP_USER"), os.environ.get("JOBALERT_IMAP_PASSWORD")
         if not user or not pw:
             raise RuntimeError("JOBALERT_IMAP_USER / JOBALERT_IMAP_PASSWORD not set")
-        names = [n.strip() for n in args.providers.split(",") if n.strip()]
+        names = configured_providers() if args.providers == "config" else             [n.strip() for n in args.providers.split(",") if n.strip()]
         unknown = [n for n in names if n not in PROVIDERS]
         if unknown:
             raise RuntimeError(f"unknown providers: {', '.join(unknown)}")

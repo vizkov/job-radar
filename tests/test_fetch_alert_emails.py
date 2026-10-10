@@ -128,3 +128,14 @@ def test_all_mail_and_sender_diagnostics(tmp_path, monkeypatch, capsys):
     assert headers and all("PEEK" in c[-1] for c in headers)          # addresses only, never marks read
     out = capsys.readouterr().out
     assert "messages-noreply@linkedin.com (1)" in out and "app-password-123" not in out
+
+
+def test_configured_providers_follow_sources_yaml(tmp_path):
+    import fetch_alert_emails as f  # tools/ is on the path in this module's other tests
+    y = tmp_path / "sources.yaml"
+    y.write_text("sources:\n  other:\n    providers: [nope]\n  alert_email:\n    enabled: true\n"
+                 "    providers: [linkedin, 'indeed']   # note\n    eml_dir: x\n  next:\n    providers: [glassdoor]\n")
+    assert f.configured_providers(y) == ["linkedin", "indeed"]
+    assert f.configured_providers(tmp_path / "missing.yaml") == list(f.PROVIDERS)
+    y.write_text("sources:\n  alert_email:\n    enabled: true\n")
+    assert f.configured_providers(y) == list(f.PROVIDERS)

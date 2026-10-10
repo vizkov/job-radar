@@ -101,8 +101,10 @@ The user-facing version is in [Your part](../wiki/Your-part.md). The details:
 6. **Turn it on:** set `alert_email: enabled: true` in `profile/sources.yaml` (the
    sample in `examples/` ships with it off). The workflow already
    passes both secrets to the two fetch steps only (alert mail, application mail).
-   To use fewer providers, trim `--providers` in that step and `providers` in
-   `sources.yaml`.
+   The fetch step takes its providers from the `providers` list of `alert_email` in
+   `sources.yaml` (`configured_providers()` in `tools/fetch_alert_emails.py`, a one-regex read because
+   that step may not import a YAML parser), so trimming that one list is all it takes. `--providers a,b`
+   overrides it.
 
 ## Test it locally
 

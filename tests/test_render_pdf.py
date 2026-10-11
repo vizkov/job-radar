@@ -75,7 +75,7 @@ def test_resume_layout_follows_the_design():
 def test_cover_letter_layout_follows_the_design():
     h = rp.cover_html(DATA, career(), CONTACT, "Security Engineer", "ExampleCo", date(2026, 9, 30))
     assert "30 September 2026" in h and "ExampleCo" in h and "Dear Hiring Manager," in h
-    assert "<b>Re: Security Engineer</b>" in h and "size: Letter" in h
+    assert "Re:" not in h and "size: Letter" in h        # no "Re:" line (the user, 2026-10-12)
     assert "I am applying for the role. It matches my work." in h     # C01 + C02 are one paragraph
     assert h.index("What I would bring to the team:") < h.index("<b>Seeing across systems.</b>") < h.index("Explaining risk.")
     assert "<li>One example of it.</li>" in h                          # an optional block is a sub-point of the one before
@@ -110,8 +110,6 @@ def test_prints_a_real_pdf(tmp_path):
 
 
 def test_posting_title_hyphen_is_tidied_and_volunteering_takes_its_label_from_the_heading():
-    h = rp.cover_html(DATA, career(), CONTACT, "Penetration Testing Engineer- VP", "ExampleCo", date(2026, 9, 30))
-    assert "<b>Re: Penetration Testing Engineer – VP</b>" in h
     c = career()
     c.items["B09"] = Item("B09", "Ran sessions for young people.", "Experience", "Volunteering — Helpers Abroad — 2023")
     data = dict(DATA, sections=[{"heading": "x", "bullets": DATA["sections"][0]["bullets"] + [{"source_id": "B09", "text": "Ran sessions for young people."}]}])

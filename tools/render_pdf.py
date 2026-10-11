@@ -298,10 +298,7 @@ def cover_html(data: dict, career, contact: dict, role_title: str = "", company:
     body = [header_html(contact, pretty_headline(data["headline"]))]
     body.append(f'<p class="addr">{esc(when)}</p>' + (f'<p class="addr">{esc(company)}</p>' if company else ""))
     body.append('<p class="salute">Dear Hiring Manager,</p>')
-    if role_title:
-        role_title = re.sub(r"(\w)- ", r"\1 – ", role_title)   # posting titles often read "Engineer- VP"
-        body.append(f'<p class="re"><b>Re: {esc(role_title)}</b></p>')
-    body.append(f"<p>{esc(opening)}</p>")
+    body.append(f"<p>{esc(opening)}</p>")   # no "Re:" line (the user, 2026-10-12: not wanted in their letters)
     blocks = [(i, t) for i, t in paras if i not in OPENING + CLOSING]
     if blocks:
         body.append("<p class=\"lead\">What I would bring to the team:</p><ul class=\"blocks\">")

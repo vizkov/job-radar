@@ -141,12 +141,26 @@ don't spend a referral on a role that can't sponsor the user.
     and offers the CV ("could I send you my CV?"), and the CV goes in the first message after they accept. An attachment in LinkedIn InMail is
     unverified, so tell the user to check, and say it plainly if not: then the note names the role and ID and offers the CV, and it goes by email or in a
     message to a connection.
-  - **One small ask, matched to who is asked (the user's decision, 2026-09-30).** A **recruiter** gets the attached CV and the line "if you're not the
-    right person, could you pass it to them?" (their reply can then be as small as a forward; it beats "a call?"). An **engineer or hiring-team
+  - **One small ask, matched to who is asked (the user's decision, 2026-09-30).** A **recruiter** gets the attached CV and one conditional chat ask,
+    "If you think my background fits the role, could we briefly discuss it and the team?" (the user's final wording, 2026-10-12: it replaced the
+    earlier "if you're not the right person, could you pass it to them?", which is now only an optional second sentence when the user wants a safety net;
+    never both asks as separate requests). An **engineer or hiring-team
     member** gets "Could we chat briefly about the team?" and **no CV attached** (an unsolicited CV to someone who can't act on it reads as pressure):
     a small slice of time about their own work. **Never ask for a referral in a first message** (it asks a stranger to
     vouch for you; it follows after a conversation) and never put two asks in one message. Never offer "or apply through the site" as a choice:
     if she says apply, that overrides the referral-before-apply rule only if the user agrees.
+  - **Final form of a recruiter's note after applying (the user's own edits to the Vinted Pay note, 2026-10-12; draft toward this, not toward a longer one).**
+    Five short paragraphs, about 120-140 words, no subject-line cleverness. (1) "Hi <first name>," then one sentence on what prompted it (their post,
+    quoted only for what it says) and what the user applied for: **when the same role has several postings (cities), name every one the user applied
+    to, each with its own job ID, at equal weight** ("both Amsterdam (LinkedIn job 4469182726) and London (ID 4980907101)"); an ID the user does not
+    have is asked for or replaced by the LinkedIn job ID, never left out; then "my CV is attached". (2) "As I read the ad, the core is …" with the ad's
+    core asks the user's record covers, **including a compliance or assurance ask when a skills row backs it** (the user added the PCI DSS assurance
+    ask to the reading himself), then one sentence "That is the ground I work on:" with years, domain and the three or four methods (for
+    payments: threat modelling, design and code review, penetration testing). **Leave out** result figures, tool and methodology achievements, the
+    senior audience and any scope-limiting aside ("not an assessor role"): the attached CV carries them and the note stays a reading plus ground (the
+    user cut all of these from the first draft; the cold reader's call for evidence in the note was overruled). (3) The visa line in the middle, in the user's
+    form: "I'm in India and would need visa sponsorship, and I'm willing to relocate to <each city>." (4) One conditional ask (above), nothing after it
+    but "Thank you," and the name. Proofread acronyms and names before showing the draft (a "PIC DSS" typo slipped past a draft and was caught only by the user).
   - **Refer to a recipient's post only for what it says.** If the note mentions her hiring post, match it exactly: the title, the locations it lists, and
     roughly when. A post for the same title in other cities is *not* a post for the user's posting: say "I saw your post on <title> in <her cities>;
     there is also a <user's city> posting (ID …)". Never write "your post on this role" unless the post links the same job. Check before drafting: read

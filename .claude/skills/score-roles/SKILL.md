@@ -75,6 +75,14 @@ description: Score job descriptions against the user's CV (fit score, met/missin
      for "years with X" (pen-testing, secure code review and cloud work overlap), but never more than the dates support. A binary
      requirement the user plainly fails is a blocker with `type: knockout` (quote the ad) and the role is not worth the application;
      a borderline one is a line in the summary, not a blocker.
+   - **Scope check (the user, 2026-10-12: Vinted Pay Staff roles rejected; the recruiter said the role is embedded ownership inside a product
+     engineering org, building and running production cloud security architecture and multi-quarter roadmaps, not advisory or assessment work).**
+     When a Staff/Principal/lead ad asks for in-house ownership (running a control or cloud security architecture in production, a multi-quarter
+     roadmap, on-call or detection and response) add it as its own must-have. The user's record is assessment-side (threat models, reviews,
+     methodology and tooling adopted by teams, B22/P12), with no production ownership of that kind; mark it `partial` only for tooling or
+     methodology the user built and others used, otherwise `no`. A `no` here means `recommendation` is at most `maybe`, the summary starts with
+     "scope risk: advisory record vs embedded ownership", and Staff roles of this kind are not shortlisted without the user's word. A judgement
+     rule, not enforced by `jd_check`; Senior-level AppSec, product-security and payments-security roles are the better fit.
    - `fit_score`: how well their evidence covers the must-haves, reduced for blockers and seniority
      mismatch. Be calibrated: 80+ strong, 60-79 worth a look, below 50 poor. **`jd_check` caps it:** coverage is
      (yes + half the partials) / all must-haves; the score may not exceed coverage minus 15 per blocker minus 10 when

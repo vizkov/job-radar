@@ -2,7 +2,9 @@
 
     python tools/post_leads.py queries [--n N] [--urls] # the next searches to run (least recently run first); marks nothing;
                                                         # --urls also prints the LinkedIn link (author-company filter when the id is known)
-    python tools/post_leads.py searched <key> [<key> …] # mark searches finished (the key printed under each query): only these leave the queue
+    python tools/post_leads.py searched <key> [<key> …] [--ceiling] [--hits N]   # mark searches finished (the key printed under each query): only these leave the queue;
+                                                        # --ceiling: scrolling stopped before the results passed the age window; --hits: real hiring posts found
+    python tools/post_leads.py followup "<dream company>" [--urls]   # a second, title-words search for it, if its finished search hit the ceiling or found hiring posts
     python tools/post_leads.py company-id "<company>" <digits>   # record a company's LinkedIn id (from the Author company filter)
     python tools/post_leads.py person add --name "…" --url <profile> --company "…" [--headline "…"] [--function "…"]
     python tools/post_leads.py person next [--n N]      # known recruiters/managers whose posts were read longest ago
@@ -49,7 +51,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 12, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 6, "company_extra": [], "dream_companies": [], "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 6, "company_extra": [], "dream_companies": [], "followup_max": 3, "followup_words": '("application security" OR "product security" OR "threat modelling" OR pentest OR "penetration testing")', "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
@@ -199,6 +201,12 @@ def search_url(line: str, path: Path | None = None) -> tuple[str, str]:
     `authorCompany` filter: only posts written by people who work there (the user's idea, 2026-10-04; tested on Meta: 3 of 6 posts were
     by Meta staff, 2 real hiring posts, against none from a company-name keyword search). Without an id the hint says how to get one."""
     base = "https://www.linkedin.com/search/results/content/?keywords={}&sortBy=%22date_posted%22"
+    f = re.fullmatch(r"(.+?) (\(.*\))", line)
+    if f and f.group(2) == settings()["followup_words"]:
+        cid = company_id(f.group(1), path)
+        if cid:
+            return base.format(quote(f.group(2))) + f"&authorCompany=%5B%22{cid}%22%5D", ""
+        return base.format(quote(line)), f"no LinkedIn id for {f.group(1)}: record it first (see the company-search note), then `post_leads.py company-id \"{f.group(1)}\" <digits>`"
     m = re.fullmatch(r"""(.+?) "we're hiring" security""", line)
     if m:
         cid = company_id(m.group(1), path)
@@ -236,15 +244,38 @@ def plan_queries(n: int | None = None) -> list[tuple[str, str]]:
     return out
 
 
-def mark_searched(keys: list[str], now: str | None = None) -> list[str]:
-    """Record that these searches (keys from `plan_queries`) finished. Returns the keys it marked."""
+def mark_searched(keys: list[str], now: str | None = None, ceiling: bool = False, hits: int = 0) -> list[str]:
+    """Record that these searches (keys from `plan_queries`) finished. Returns the keys it marked. `ceiling`: the results had not passed the
+    post-age window when scrolling stopped; `hits`: real hiring posts found. Both feed `followup_query` (the user, 2026-10-13)."""
     log = _load(QUERIES, {})
     stamp = now or _now()
     for key in keys:
-        log[key] = {"last": stamp, "runs": (log.get(key) or {}).get("runs", 0) + 1}
+        log[key] = {"last": stamp, "runs": (log.get(key) or {}).get("runs", 0) + 1, "ceiling": bool(ceiling), "hits": int(hits)}
     QUERIES.parent.mkdir(parents=True, exist_ok=True)
     QUERIES.write_text(json.dumps(log, indent=1, sort_keys=True), encoding="utf-8")
     return list(keys)
+
+
+def followup_query(company: str, now: str | None = None) -> tuple[str, str] | None:
+    """A second search for a dream company whose finished search either hit the scroll ceiling before the post-age window ended or found at least
+    one real hiring post: the title words (`followup_words`) instead of "hiring security", on the same author-company filter, so posts that say
+    "join my AppSec team" are caught. (line, key), or None when not due: not a dream company, nothing to follow up, already followed up since
+    that search, or `followup_max` follow-ups already ran today. Marks nothing: `mark_searched([key])` when it finishes."""
+    s = settings()
+    dream = {normalize(c) for c in list(s["dream_companies"])[:10]}
+    if normalize(company) not in dream:
+        return None
+    log = _load(QUERIES, {})
+    base = log.get(f"company|{normalize(company)}") or {}
+    if not (base.get("ceiling") or base.get("hits", 0) >= 1):
+        return None
+    fkey = f"followup|{normalize(company)}"
+    if (log.get(fkey) or {}).get("last", "") >= base.get("last", ""):
+        return None
+    today = (now or _now())[:10]
+    if sum(1 for k, v in log.items() if k.startswith("followup|") and v.get("last", "").startswith(today)) >= s["followup_max"]:
+        return None
+    return f'{company} {s["followup_words"]}', fkey
 
 
 def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
@@ -416,7 +447,8 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     q = sub.add_parser("queries"); q.add_argument("--n", type=int); q.add_argument("--urls", action="store_true")
-    sd = sub.add_parser("searched"); sd.add_argument("keys", nargs="+")
+    sd = sub.add_parser("searched"); sd.add_argument("keys", nargs="+"); sd.add_argument("--ceiling", action="store_true"); sd.add_argument("--hits", type=int, default=0)
+    fu = sub.add_parser("followup"); fu.add_argument("company"); fu.add_argument("--urls", action="store_true")
     ci = sub.add_parser("company-id"); ci.add_argument("company"); ci.add_argument("id")
     p = sub.add_parser("person"); ps = p.add_subparsers(dest="what", required=True)
     pa = ps.add_parser("add"); pa.add_argument("--name", required=True); pa.add_argument("--url", required=True)
@@ -439,7 +471,14 @@ def main(argv=None) -> int:
             else:
                 print(f"{line}\t{key}")
     elif a.cmd == "searched":
-        print("marked searched: " + ", ".join(mark_searched(a.keys)))
+        print("marked searched: " + ", ".join(mark_searched(a.keys, ceiling=a.ceiling, hits=a.hits)))
+    elif a.cmd == "followup":
+        fq = followup_query(a.company)
+        if not fq:
+            print("no follow-up due")
+        else:
+            url, hint = search_url(fq[0])
+            print(f"{fq[0]}\n  key: {fq[1]}" + (f"\n  {url}" if a.urls else "") + (f"\n  NOTE: {hint}" if hint else ""))
     elif a.cmd == "company-id":
         print(set_company_id(a.company, a.id))
     elif a.cmd == "person":

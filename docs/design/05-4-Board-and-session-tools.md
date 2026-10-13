@@ -182,6 +182,7 @@ the Action writes (`data/matches.csv`, `state/seen.json`, `state/board_queue.jso
 | `company_id`, `set_company_id`, `search_url(line)` | LinkedIn's id per company; the post-search link for a query line, with the `authorCompany` filter (posts written by employees) when the id is known, else a note on how to read the id |
 | `plan_queries(n)` | The next post searches as (line, key), tier then least recently run first (dream companies first), spread over a title x place diagonal; the phrase rotates when a pair comes round again; marks nothing |
 | `mark_searched(keys, now)` | Records that these searches finished (CLI: `post_leads.py searched <key> …`); only finished searches leave the queue, so one cut short by a rate limit stays first in line |
+| `followup_query(company, now)` | A second, title-words search for a dream company whose finished search hit the scroll ceiling or found a real hiring post (outcomes recorded by `mark_searched(keys, now, ceiling, hits)`); `None` when not due, already followed up since that search, or `followup_max` (3) already ran today; marks nothing. CLI: `post_leads.py followup "<company>"` |
 | `next_queries(n, now)` | `plan_queries` and `mark_searched` in one step, for tests and one-shot callers |
 | `people()`, `add_person`, `next_people`, `mark_read` | The recruiters and managers worth re-reading: latest record per profile URL, longest unread first |
 | `leads()`, `lead_id(url)`, `_clean_url` | Every lead by id (later records overwrite fields); id = hash of the post URL without tracking parameters |

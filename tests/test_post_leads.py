@@ -211,3 +211,32 @@ def test_plan_marks_nothing_and_only_finished_searches_leave_the_queue(monkeypat
     assert pl.plan_queries() == first                         # planning twice marks nothing
     pl.mark_searched(["company|aaa"], now="2026-10-01T00:00:00+00:00")   # only Aaa finished: Bbb was cut off
     assert [k for _, k in pl.plan_queries()] == ["company|bbb", "company|ccc"]   # Bbb stays at the front, Ccc next
+
+
+def test_followup_only_for_dream_companies_with_a_reason_once_and_capped(monkeypatch):
+    real = pl.settings()
+    monkeypatch.setattr(pl, "settings", lambda: {**real, "dream_companies": ["Aaa", "Bbb", "Ccc", "Ddd"], "company_extra": [], "followup_max": 2})
+    day = "2026-10-14T09:00:00+00:00"
+    pl.mark_searched(["company|aaa"], now=day, hits=2)
+    pl.mark_searched(["company|bbb"], now=day, ceiling=True)
+    pl.mark_searched(["company|ccc"], now=day)                      # nothing found, scroll reached the window: no follow-up
+    pl.mark_searched(["company|ddd"], now=day, hits=1)
+    assert pl.followup_query("Ccc", now=day) is None
+    assert pl.followup_query("NotDream", now=day) is None
+    line, key = pl.followup_query("Aaa", now=day)
+    assert key == "followup|aaa" and line.startswith("Aaa (") and "application security" in line
+    assert pl.followup_query("Aaa", now=day) == (line, key)          # planning twice marks nothing
+    pl.mark_searched([key], now=day)
+    assert pl.followup_query("Aaa", now=day) is None                 # already followed up since that search
+    pl.mark_searched(["followup|bbb"], now=day)
+    assert pl.followup_query("Ddd", now=day) is None                 # the day's cap of 2 is used
+    assert pl.followup_query("Ddd", now="2026-10-15T09:00:00+00:00") is not None
+
+
+def test_followup_search_url_uses_the_title_words_and_the_author_company_filter(tmp_path):
+    ids = tmp_path / "ids.json"
+    pl.set_company_id("Aaa", "123", ids)
+    url, hint = pl.search_url(f'Aaa {pl.DEFAULTS["followup_words"]}', ids)
+    assert hint == "" and "authorCompany=%5B%22123%22%5D" in url and "application%20security" in url and "Aaa" not in url
+    url2, hint2 = pl.search_url(f'Bbb {pl.DEFAULTS["followup_words"]}', ids)   # no id yet: a keyword search plus a note
+    assert "authorCompany" not in url2 and "company-id" in hint2

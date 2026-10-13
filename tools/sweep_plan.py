@@ -89,17 +89,32 @@ def plan(s: dict | None = None, rows: list[dict] | None = None, post_log: dict |
             if not ln:
                 continue
             lane = min(ln, key=lambda x: (_last(name, x, post_log, careers_log), x != "post"))   # the lane done longer ago; ties: the post search
-            items.append((_last(name, lane, post_log, careers_log), name, lane))
+            # rank by the company's MOST RECENT action over all its lanes, so a company with two lanes does not outrank a one-lane company just
+            # because its older lane is stale (the independent review, 2026-10-13: Google covered 30 of 30 passes, Anthropic 18)
+            items.append((max(_last(name, x, post_log, careers_log) for x in ln), name, lane))
         ranked[cat] = [(n, ln) for _, n, ln in sorted(items)]
     chosen = {cat: ranked[cat][:quotas[cat]] for cat in CATEGORIES}
     spare = total - sum(len(v) for v in chosen.values())
-    for cat in CATEGORIES:                                   # spare slots flow down the categories, in order
+    # spare slots flow DOWN from the first category that left slots unused (consulting empty: its slots go to network, then chrome-only), and
+    # only then wrap round to the categories above it
+    first_short = next((i for i, c in enumerate(CATEGORIES) if len(ranked[c]) < quotas[c]), 0)
+    for cat in CATEGORIES[first_short + 1:] + CATEGORIES[:first_short + 1]:
         if spare <= 0:
             break
         more = ranked[cat][len(chosen[cat]):len(chosen[cat]) + spare]
         chosen[cat] += more
         spare -= len(more)
     return [(n, cat, ln) for cat in CATEGORIES for n, ln in chosen[cat]][:total]
+
+
+def skipped(s: dict | None = None, rows: list[dict] | None = None) -> list[str]:
+    """Listed companies with no action at all because the radar already reads them and the post search is switched off for them
+    (`careers_site_companies`): the plan names them so they are not dropped silently."""
+    import careers_queue as cq
+    import post_leads as pl
+    s = pl.settings() if s is None else s
+    rows = cq._coverage_rows() if rows is None else rows
+    return [n for cat, names in categories(s, rows).items() for n in names if not lanes(n, cat, s, rows)]
 
 
 def main(argv=None) -> int:
@@ -109,6 +124,9 @@ def main(argv=None) -> int:
     import careers_queue as cq
     import post_leads as pl
     log = cq._load(cq.STATE)
+    covered = skipped()
+    if covered:
+        print("Not planned (the radar reads their jobs and their post search is off): " + ", ".join(covered))
     for name, cat, lane in plan():
         if lane == "post":
             line = f'{name} "we\'re hiring" security'

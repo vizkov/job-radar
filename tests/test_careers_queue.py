@@ -39,16 +39,8 @@ def test_a_read_counts_only_when_it_is_recorded_and_moves_the_company_to_the_bac
     assert [n for _, n in cq.queue(ROWS)][:3] == ["Gamma", "Delta", "Beta"]        # Beta finished: back of the dream tier; a tier-1 company never jumps it
 
 
-def test_url_is_remembered_and_listed(monkeypatch, tmp_path, capsys):
+def test_url_is_remembered(monkeypatch, tmp_path):
     setup(monkeypatch, tmp_path)
-    monkeypatch.setattr(cq, "_coverage_rows", lambda path=None: ROWS)
     cq.set_url("Beta", "https://example.test/jobs?q=security")
-    cq.main(["next", "--n", "1"])
-    assert "Beta\tdream\thttps://example.test/jobs?q=security" in capsys.readouterr().out
-
-
-def test_the_dream_lists_never_take_every_slot(monkeypatch, tmp_path):
-    q = [(0, f"D{i}") for i in range(9)] + [(1, "N1"), (1, "N2"), (2, "T1")]
-    assert [n for _, n in cq.pick(q, 6, 2)] == ["D0", "D1", "D2", "D3", "N1", "N2"]       # four dream, two reserved for the rest
-    assert [n for _, n in cq.pick(q[:3] + [(2, "T1")], 6, 2)] == ["D0", "D1", "D2", "T1"]  # a short dream list: nothing is wasted
-    assert [n for _, n in cq.pick(q[9:], 6, 2)] == ["N1", "N2", "T1"]                      # no dream companies: all slots go to the rest
+    import json
+    assert json.loads((tmp_path / "chrome.json").read_text(encoding="utf-8"))["beta"]["url"] == "https://example.test/jobs?q=security"

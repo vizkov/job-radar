@@ -1,16 +1,10 @@
 """The Chrome careers-site log and queue (the pass itself is planned by `tools/sweep_plan.py`, which shares the cap with the LinkedIn searches): companies whose jobs the radar cannot read itself, so Claude reads their careers pages in Chrome.
 
-    python tools/careers_queue.py next [--n N]          # the companies to read this pass (marks nothing)
     python tools/careers_queue.py done "<company>" [--roles N] [--note "…"]   # a read finished: only this moves it to the back
     python tools/careers_queue.py url "<company>" <careers search url>        # remember the page that worked
     python tools/careers_queue.py status                # every queued company with its tier, last read and url
 
-Why a queue of its own (the user, 2026-10-13: "the current design starves most companies where the only way is using Chrome"): the LinkedIn post
-sweep has a tight cap (`max_searches`, a rate-limit risk) and was the only thing that ever reached a company without a board. A careers page is
-the employer's own site, read-only and low risk, so it gets its own cap (`careers_reads_per_session`) and its own rotation: least recently read
-first inside a tier, and a read counts only when it finishes, so a cut-off pass keeps its place.
-
-Each pass takes `careers_reads_per_session` (6) companies, at least `careers_reserve` (2) of them from tiers 1-2 so the dream lists cannot starve the rest.
+The pass itself (which companies, how many, which means) is planned by `tools/sweep_plan.py`, which shares ONE cap with the LinkedIn post searches (the user, 2026-10-13: a separate cap would double it). This module keeps the log of finished reads, the remembered search urls and the test for which companies the radar cannot read.
 
 Tiers: 0 the user's dream companies (product list and the parallel consulting list, `discovery.linkedin_posts.dream_companies` and
 `dream_consulting`); 1 companies the user knows someone at, and `chrome_always` (no readable feed whatever the coverage report says);
@@ -51,8 +45,8 @@ def settings() -> dict:
     import post_leads
     s = post_leads.settings()
     return {"dream": list(s.get("dream_companies") or [])[:10] + list(s.get("dream_consulting") or [])[:5],
-            "always": list(s.get("chrome_always") or []), "per_session": int(s.get("careers_reads_per_session", 6)),
-            "reserve": int(s.get("careers_reserve", 2)), "fit": s.get("company_fit", "High"), "skip": {normalize(c) for c in s.get("careers_site_companies") or []}}
+            "always": list(s.get("chrome_always") or []),
+            "fit": s.get("company_fit", "High"), "skip": {normalize(c) for c in s.get("careers_site_companies") or []}}
 
 
 def _coverage_rows(path: Path | None = None) -> list[dict]:
@@ -108,18 +102,6 @@ def queue(rows: list[dict] | None = None, log: dict | None = None) -> list[tuple
     return sorted(out, key=lambda tn: (tn[0], (log.get(normalize(tn[1])) or {}).get("last", "")))
 
 
-def pick(q: list[tuple[int, str]], n: int, reserve: int) -> list[tuple[int, str]]:
-    """The first `n` of the queue, but never all dream companies: at least `reserve` slots go to the lower tiers (least recently read first),
-    so a long dream list cannot starve the network and target companies (the user, 2026-10-13: the old design starved them). Unused slots flow back."""
-    dream = [x for x in q if x[0] == 0]
-    rest = [x for x in q if x[0] != 0]
-    low = rest[:min(reserve, max(n - 1, 0))] if dream else rest[:n]   # one slot is always the top of the queue
-    top = dream[:n - len(low)]
-    extra = [x for x in rest[len(low):]][:max(0, n - len(low) - len(top))]
-    chosen = set(top + low + extra)
-    return [x for x in q if x in chosen]
-
-
 def done(company: str, roles: int | None = None, note: str = "", now: str | None = None) -> str:
     log = _load(STATE) or {}
     k = normalize(company)
@@ -148,18 +130,12 @@ def set_url(company: str, url: str) -> str:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    n = sub.add_parser("next"); n.add_argument("--n", type=int)
     d = sub.add_parser("done"); d.add_argument("company"); d.add_argument("--roles", type=int); d.add_argument("--note", default="")
     u = sub.add_parser("url"); u.add_argument("company"); u.add_argument("url")
     sub.add_parser("status")
     a = ap.parse_args(argv)
     log = _load(STATE) or {}
-    if a.cmd == "next":
-        take = a.n or settings()["per_session"]
-        for tier, name in pick(queue(log=log), take, settings()["reserve"]):
-            rec = log.get(normalize(name)) or {}
-            print(f"{name}\t{TIER_NAMES[tier]}\t{rec.get('url', '')}")
-    elif a.cmd == "done":
+    if a.cmd == "done":
         print(done(a.company, a.roles, a.note))
     elif a.cmd == "url":
         print(set_url(a.company, a.url))

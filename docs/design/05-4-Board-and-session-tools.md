@@ -220,7 +220,7 @@ countries and everything else remain the user's decision.
 
 ## `tools/sweep_plan.py`: one plan for the pass
 
-`plan()` returns `(company, category, lane)` for every action of a post-discovery pass within `max_searches`: quotas per category (`sweep_quotas`: 4 product dream, 3 consulting dream, 2 network, 1 chrome-only), spare slots flowing down the categories, one lane per company (the LinkedIn post search or the Chrome careers read, whichever was done longer ago; a company the radar already reads gets the post search only). It marks nothing. `categories()` and `lanes()` build the lists; `post_leads.py searched` and `careers_queue.py done` mark an action when it finishes.
+`plan()` returns `(company, category, lane)` for every action of a post-discovery pass within `max_searches`: quotas per category (`sweep_quotas`: 4 product dream, 3 consulting dream, 2 network, 1 chrome-only), spare slots flowing down the categories, one lane per company (the LinkedIn post search or the Chrome careers read, whichever was done longer ago; a company the radar already reads gets the post search only). It marks nothing. Ranking is by a company's most recent action over all its lanes (so a company with two lanes does not outrank one with a single lane), and spare slots flow down from the first short category before wrapping to the top. `skipped()` names companies with no action because the radar reads them and their post search is off. `categories()` and `lanes()` build the lists; `post_leads.py searched` and `careers_queue.py done` mark an action when it finishes.
 
 ## `tools/careers_queue.py`: the Chrome careers-site log and queue
 
@@ -228,9 +228,8 @@ Companies the radar cannot read (not VERIFIED in `data/coverage_report.csv`, or 
 
 | Name | What it does |
 |---|---|
-| `queue(rows, log)` | `(tier, company)` for every company to read, tier 0 dream (`dream_companies`, `dream_consulting`), tier 1 `chrome_always` and network companies, tier 2 `company_fit` targets; least recently read first inside a tier |
-| `pick(q, n, reserve)` | The first `n`, with at least `reserve` slots kept for tiers 1 and 2; slots a short dream list does not use flow to them |
+| `queue(rows, log)` | `(tier, company)` for every company the radar cannot read, tier 0 dream, 1 `chrome_always` and network, 2 `company_fit` targets; least recently read first inside a tier (used by `status`; the pass itself is planned by `sweep_plan.py`) |
 | `done(company, roles, note)` | Records a finished read; only this moves the company to the back |
 | `set_url(company, url)` | Remembers the search page that worked |
 | `needs_chrome(company, rows, always)` | True when the coverage row is missing, not VERIFIED, or has zero jobs in the user's countries |
-CLI: `next`, `done`, `url`, `status`. Planning marks nothing, like `post_leads.py queries`.
+CLI: `done`, `url`, `status`. The pass is planned by `tools/sweep_plan.py`; this module only records.

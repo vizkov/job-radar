@@ -33,7 +33,7 @@ also why the public template never runs anything.
 |---|---|---|---|
 | 1 | `actions/checkout@<sha>` | Downloads the repo | run fails |
 | 2 | `actions/setup-python@<sha>` | Installs Python 3.13 | run fails |
-| 3 | Fetch job-alert emails | `python -I -S tools/fetch_alert_emails.py --out .alert_mail --days 3 --providers linkedin,indeed,glassdoor` with the two mail secrets in its environment | ignored (`continue-on-error`); the failure shows in the Radar status card |
+| 3 | Fetch job-alert emails | `python -I -S tools/fetch_alert_emails.py --out .alert_mail --days 3` with the two mail secrets in its environment | ignored (`continue-on-error`); the failure shows in the Radar status card |
 | 3b | Fetch application mail | `python -I -S tools/fetch_application_mail.py --out .app_mail --days 4`, same two secrets | ignored; the failure shows in the brief's CADENCE line |
 | 4 | `pip install --require-hashes -r requirements.txt` | Installs dependencies; refuses any file whose hash doesn't match the lock file | run fails |
 | 5 | `python radar.py --quiet` | The pipeline (3.2 below) | run fails |
@@ -172,7 +172,7 @@ append_matches(new, today)                              # data/matches.csv
 ```
 
 **Stale check.** A role on the board that no source has listed for more than `stale_days` (5) days is
-probably closed. `stale_refs()` compares each board ref's last-seen date
+probably closed. `stale_refs()` compares the last-seen date of each ref in `issue_map` (every issue the radar ever opened, not only live board cards)
 (`ref_last_seen()` hashes every content key in `seen.json` back to its ref) with the
 cutoff. It runs **only on healthy runs**: every source OK, and no more than
 `max(3, 10% of units)` units erroring (so up to 3 errors are always tolerated). Otherwise

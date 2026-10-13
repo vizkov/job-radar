@@ -76,7 +76,7 @@ errors become one-line notes, and it always exits 0.
    `board_sync.py fill` as a **detached background process**, so the brief doesn't wait for
    dozens of API calls. A timestamp file stops it starting twice within 10 minutes. A field added later, such as Country, is
    therefore back-filled onto cards that already have a Stage ([page 11](11-Board-internals.md#where-each-card-value-comes-from)).
-8. **`start_archive()`**: when any card is in Stage=Skipped or Rejected, and at most once a day (stamp `work/.last_archive`), starts `board_sync.py archive` detached, which archives cards in Stage=Skipped and Rejected cards older than 30 days (`REJECTED_ARCHIVE_DAYS`) (the Action's token can't reach the user's Project).
+8. **`start_archive()`**: when any card is in Stage=Skipped or Rejected, and at most once a day (stamp `work/.last_archive`), starts `board_sync.py archive` detached, which archives cards in Stage=Skipped and Rejected cards older than 30 days (`REJECTED_ARCHIVE_DAYS`) (the Action's token can't reach the user's Project). After it, `main()` runs `jd_cleanup` (`tools/jd_cleanup.py`, which trims the JD files of skipped and rejected roles) once every 48 hours (`cadence.is_due("jd_cleanup")`); a failure never stops the brief.
 9. **`template_status()`**: commits the public template gained since the last session
    ("system updated": Claude should re-read the relevant skill), and any code here not yet
    published (`public_template.drift()`).
@@ -106,7 +106,7 @@ the brief with an undo line).
    CADENCE block (every recurring job, when it last ran, and which are DUE: `tools/cadence.py`). Its jobs: the radar search, new roles to
    the board, scoring, the Gmail inbox check, the LinkedIn post sweep, board views vs code (DUE when the live views differ from `VIEWS`) 
    the health check (DUE once a day while `status.md` lists source problems), the CV review (DUE at most weekly while the brief shows
-   recurring CV gaps) and the docs review (DUE when `docs_review_note()` fires, so it does not wait for the user to say they are
+   recurring CV gaps) the JD packet cleanup (`tools/jd_cleanup.py`, DUE every 48 hours), the application-mail scan (a line of its own, not in `JOBS`) and the docs review (DUE when `docs_review_note()` fires, so it does not wait for the user to say they are
    closing the session).
 
 1. **Header and run state:** the generated-at line, a warning if the `git pull` failed, and the
@@ -195,7 +195,7 @@ contract (anything else is rejected):
  "must_haves": [{"requirement": "1-300 chars",
                  "met": "yes | partial | no",
                  "evidence": ["B03", "S01"]}],          // 1-30 items; the skill asks for 3-10
- "blockers": [{"type": "clearance | right_to_work | language | location | seniority | other",
+ "blockers": [{"type": "clearance | right_to_work | language | location | seniority | knockout | other",
                "quote": "copied verbatim from the JD, 8+ chars"}],
  "summary": "1-1500 chars",
  "recommendation": "apply | maybe | skip",

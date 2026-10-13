@@ -48,7 +48,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 12, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 6, "company_extra": [], "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 6, "company_extra": [], "dream_companies": [], "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
@@ -136,7 +136,7 @@ def network_companies() -> list[str]:
 
 
 def ranked_companies() -> list[tuple[int, str]]:
-    """(tier, company) for every employer the company searches walk, each once. Tier 0: named in chat (`company_extra`).
+    """(tier, company) for every employer the company searches walk, each once. Tier 0: the user's dream companies (`dream_companies`, at most 10: the first ten count) and employers named in chat (`company_extra`).
     Tier 1: the user knows someone there (any employer in `network.csv`: knowing someone makes it a fit; the user's word, 2026-10-04): a hiring post
     there leads to a referral before applying. Tier 2: scored apply/maybe, no contact. Tier 3: `company_fit` targets, no contact."""
     s = settings()
@@ -145,7 +145,7 @@ def ranked_companies() -> list[tuple[int, str]]:
     good = {normalize(c) for c in scored + targets + known}
     # `careers_site_companies` (the user, 2026-10-06) are read on their own careers sites in Chrome, not through post searches: start them as seen
     seen, out = {normalize(c) for c in s.get("careers_site_companies") or []}, []
-    for tier_of, names in ((lambda c: 0, list(s["company_extra"])),
+    for tier_of, names in ((lambda c: 0, list(s["dream_companies"])[:10] + list(s["company_extra"])),
                            (lambda c: 1 if _has_contact(c) else 9, known + scored + targets),
                            (lambda c: 2, scored), (lambda c: 3, targets)):
         for name in names:

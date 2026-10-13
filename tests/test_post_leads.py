@@ -187,3 +187,17 @@ def test_careers_site_companies_are_left_out_of_post_searches(monkeypatch):
     names = [c for _, c in pl.ranked_companies()]
     assert "Cisco" not in names and "Tesla" not in names                # read on their careers sites in Chrome instead
     assert "Solaris" in names and "Amazon" in names                     # everyone else still searched
+
+
+def test_dream_companies_are_searched_first_even_with_no_contact_and_network_only(monkeypatch):
+    write_scores([{"company": "Amazon", "recommendation": "apply", "fit_score": 85}])
+    real = pl.settings()
+    monkeypatch.setattr(pl, "settings", lambda: {**real, "network_only": True, "dream_companies": ["Netflix", "Amazon UK"], "company_extra": ["Monzo"]})
+    assert pl.search_companies()[:3] == ["Netflix", "Amazon UK", "Monzo"]   # no contact at Netflix: still tier 0; Amazon once
+
+
+def test_only_the_first_ten_dream_companies_count(monkeypatch):
+    real = pl.settings()
+    names = [f"Dream{i}" for i in range(12)]
+    monkeypatch.setattr(pl, "settings", lambda: {**real, "dream_companies": names, "company_extra": []})
+    assert pl.search_companies()[:10] == names[:10] and "Dream10" not in pl.search_companies()[:10]

@@ -201,3 +201,13 @@ def test_only_the_first_ten_dream_companies_count(monkeypatch):
     names = [f"Dream{i}" for i in range(12)]
     monkeypatch.setattr(pl, "settings", lambda: {**real, "dream_companies": names, "company_extra": []})
     assert pl.search_companies()[:10] == names[:10] and "Dream10" not in pl.search_companies()[:10]
+
+
+def test_plan_marks_nothing_and_only_finished_searches_leave_the_queue(monkeypatch):
+    real = pl.settings()
+    monkeypatch.setattr(pl, "settings", lambda: {**real, "dream_companies": ["Aaa", "Bbb", "Ccc"], "company_extra": [], "company_queries": 2, "max_searches": 2})
+    first = pl.plan_queries()
+    assert [k for _, k in first] == ["company|aaa", "company|bbb"]
+    assert pl.plan_queries() == first                         # planning twice marks nothing
+    pl.mark_searched(["company|aaa"], now="2026-10-01T00:00:00+00:00")   # only Aaa finished: Bbb was cut off
+    assert [k for _, k in pl.plan_queries()] == ["company|bbb", "company|ccc"]   # Bbb stays at the front, Ccc next

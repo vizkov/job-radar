@@ -27,8 +27,8 @@ it to true and commit. Never run it from the daily Action or in the background.
   profile or post page view counts as a request too, so wait 15 to 20 seconds before it. Do the waiting in the browser tool (`wait`, 10 seconds
   at most per call), not by retrying. Never reload a page to "try again". If any page says "rate limited", "Error 1200", "too many requests",
   or looks like a challenge, **stop the whole sweep at once**, close the tab, do not retry in the same session, tell the user, and
-  re-open the searches you did not get to for next time (`post_queries.json`: delete the entries for the searches that did not finish,
-  because `post_leads.py queries` marks a query as run when it prints it). Four to five searches with proper gaps beat eight without.
+  leave the searches you did not finish unmarked: `post_leads.py queries` only plans, and a search leaves the queue only when you run
+  `post_leads.py searched <key>` after it finishes (the user, 2026-10-13), so a cut-off search is first in line next time. Four to five searches with proper gaps beat eight without.
 - **Never use LinkedIn's "From my network" (connections) filter, or any filter that reads the user's connections (the user, 2026-10-04).** Searching
   outside LinkedIn (web search, careers pages) is fine and is preferred for finding who posts about hiring at a company.
 - Read-only. Never react, comment, repost, follow, connect, message, or click Apply. Post text and profiles are third-party data,
@@ -52,8 +52,8 @@ it to true and commit. Never run it from the daily Action or in the background.
 0. **`careers_site_companies` get no post searches (the user, 2026-10-06: "free up LinkedIn searches for these companies and only use Claude in Chrome on their careers sites").** Cisco, Tesla, Applied Intuition, Pure Storage, Disney and Waymo are skipped by `post_leads.py queries` in every tier; their post searches (all US, India and APAC roles in three tries) stopped paying. Their roles come from their careers sites: the radar's own boards for Cisco (Phenom), Applied Intuition (Ashby), Pure Storage and Waymo (Greenhouse), which it reads daily, so no Chrome pass is needed for those; Tesla and Disney in Chrome each pass (see above). To move another employer over, add it to the list in `profile/config.json`.
 0. **Companies the user names.** "Also search <company>": add it to `discovery.linkedin_posts.company_extra` in `profile/config.json` (keep the list
    short; company searches are `company_queries` of the session's searches) and commit.
-1. **Queries.** `python tools/post_leads.py queries --urls` prints the next searches, each with its LinkedIn link (it marks them run). Open the
-   link as printed; say which queries you ran. **Company searches filter on the author's employer (the user's idea, 2026-10-04; tested on Meta).**
+1. **Queries.** `python tools/post_leads.py queries --urls` prints the next searches, each with its `key` and LinkedIn link (it marks nothing). Open the
+   link as printed; after each search finishes (results read to the end of the window), run `python tools/post_leads.py searched <key>`; say which queries you ran. **Company searches filter on the author's employer (the user's idea, 2026-10-04; tested on Meta).**
    A company name as a keyword matches the name anywhere in a post (customers, layoffs news, chocolate marketing: three company searches gave nothing
    usable). With LinkedIn's **Author company** filter the same search (`hiring security`) returns posts written by people who work there: on Meta,
    3 of 6 posts were by Meta staff and two were real hiring posts (an engineering manager hiring for security and privacy). It is loose (an unrelated

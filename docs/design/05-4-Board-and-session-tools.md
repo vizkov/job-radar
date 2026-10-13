@@ -180,7 +180,9 @@ the Action writes (`data/matches.csv`, `state/seen.json`, `state/board_queue.jso
 | `fit_companies()`, `fit_targets(fit)`, `search_companies()` | Employers scored apply/maybe, best first; `targets.tsv` companies with a given Fit; the company-search list: `company_extra`, then the scored employers, then the High-fit targets, each employer once |
 | `network_companies()`, `ranked_companies()`, `_has_contact` | Employers in `profile/network.csv`; `(tier, company)` for the company searches: 0 named in chat, 1 a contact there, 2 scored apply/maybe, 3 `company_fit` targets; `search_companies()` is the names only |
 | `company_id`, `set_company_id`, `search_url(line)` | LinkedIn's id per company; the post-search link for a query line, with the `authorCompany` filter (posts written by employees) when the id is known, else a note on how to read the id |
-| `next_queries(n, now)` | The next post searches, least recently run first, spread over a title x place diagonal; the phrase rotates when a pair comes round again; marks them run |
+| `plan_queries(n)` | The next post searches as (line, key), tier then least recently run first (dream companies first), spread over a title x place diagonal; the phrase rotates when a pair comes round again; marks nothing |
+| `mark_searched(keys, now)` | Records that these searches finished (CLI: `post_leads.py searched <key> …`); only finished searches leave the queue, so one cut short by a rate limit stays first in line |
+| `next_queries(n, now)` | `plan_queries` and `mark_searched` in one step, for tests and one-shot callers |
 | `people()`, `add_person`, `next_people`, `mark_read` | The recruiters and managers worth re-reading: latest record per profile URL, longest unread first |
 | `leads()`, `lead_id(url)`, `_clean_url` | Every lead by id (later records overwrite fields); id = hash of the post URL without tracking parameters |
 | `known_roles(company, title)` | Rows of `matches.csv` for the same employer (loose name match) with a similar title (60% of the shorter title's words shared) |

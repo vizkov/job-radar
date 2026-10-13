@@ -1,7 +1,8 @@
 """LinkedIn hiring-post discovery: the bookkeeping behind the `post-discovery` skill. Standard library only.
 
-    python tools/post_leads.py queries [--n N] [--urls] # the next searches to run (least recently run first); marks them run;
+    python tools/post_leads.py queries [--n N] [--urls] # the next searches to run (least recently run first); marks nothing;
                                                         # --urls also prints the LinkedIn link (author-company filter when the id is known)
+    python tools/post_leads.py searched <key> [<key> …] # mark searches finished (the key printed under each query): only these leave the queue
     python tools/post_leads.py company-id "<company>" <digits>   # record a company's LinkedIn id (from the Author company filter)
     python tools/post_leads.py person add --name "…" --url <profile> --company "…" [--headline "…"] [--function "…"]
     python tools/post_leads.py person next [--n N]      # known recruiters/managers whose posts were read longest ago
@@ -208,23 +209,22 @@ def search_url(line: str, path: Path | None = None) -> tuple[str, str]:
     return base.format(quote(line)), ""
 
 
-def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
-    """The next `n` post searches, least recently run first; marks them run. `company_queries` of them are
-    "<company> hiring security", employers with a contact of the user's first (`ranked_companies`); the rest walk the title x place grid
-    on a diagonal, so one session does not spend every search on one city. The phrase rotates each time a
-    (title, place) pair comes round again. `not_words` are appended as NOT (...) to the grid searches."""
+def plan_queries(n: int | None = None) -> list[tuple[str, str]]:
+    """The next `n` post searches as (query line, key), least recently run first; marks nothing (the user, 2026-10-13: a search cut short by a
+    rate limit or a closed session must stay at the front of the queue, so a search counts as run only when `mark_searched` is told it finished).
+    `company_queries` of them are "<company> hiring security", employers by `ranked_companies` tier and then least recently run (dream
+    companies first); the rest walk the title x place grid on a diagonal, so one session does not spend every search on one city. The phrase
+    rotates each time a (title, place) pair comes round again. `not_words` are appended as NOT (...) to the grid searches."""
     s = settings()
     n = s["max_searches"] if n is None else n
     log = _load(QUERIES, {})
-    stamp = now or _now()
     out = []
     # keyed by the normalised name, so "Amazon" and "Amazon Web Services" are one employer however the best-scored role names it;
     # the list itself is rebuilt from the scores each time, so new employers join (never run: first) and dropped ones leave
     ckey = lambda c: f"company|{normalize(c)}"  # noqa: E731
     firms = [c for _, c in sorted(ranked_companies(), key=lambda tc: (tc[0], (log.get(ckey(tc[1])) or {}).get("last", "")))]
     for c in firms[:min(s["company_queries"], n)]:
-        out.append(f'{c} "we\'re hiring" security')
-        log[ckey(c)] = {"last": stamp, "runs": (log.get(ckey(c)) or {}).get("runs", 0) + 1}
+        out.append((f'{c} "we\'re hiring" security', ckey(c)))
     titles, places, phrases = s["titles"], s["places"], s["phrases"]
     tail = f" NOT ({' OR '.join(s['not_words'])})" if s["not_words"] else ""
     pairs = list(itertools.product(range(len(titles)), range(len(places))))
@@ -232,11 +232,26 @@ def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
     for ti, pi in pairs[:n - len(out)]:
         key = f"{titles[ti]}|{places[pi]}"
         rec = log.get(key) or {"runs": 0}
-        out.append(f"{phrases[rec['runs'] % len(phrases)]} {titles[ti]} {places[pi]}{tail}")
-        log[key] = {"last": stamp, "runs": rec["runs"] + 1}
+        out.append((f"{phrases[rec['runs'] % len(phrases)]} {titles[ti]} {places[pi]}{tail}", key))
+    return out
+
+
+def mark_searched(keys: list[str], now: str | None = None) -> list[str]:
+    """Record that these searches (keys from `plan_queries`) finished. Returns the keys it marked."""
+    log = _load(QUERIES, {})
+    stamp = now or _now()
+    for key in keys:
+        log[key] = {"last": stamp, "runs": (log.get(key) or {}).get("runs", 0) + 1}
     QUERIES.parent.mkdir(parents=True, exist_ok=True)
     QUERIES.write_text(json.dumps(log, indent=1, sort_keys=True), encoding="utf-8")
-    return out
+    return list(keys)
+
+
+def next_queries(n: int | None = None, now: str | None = None) -> list[str]:
+    """The next `n` post searches, planned and marked run in one step (tests and one-shot callers). The CLI plans first and marks per finished search."""
+    plan = plan_queries(n)
+    mark_searched([k for _, k in plan], now)
+    return [line for line, _ in plan]
 
 
 def people() -> list[dict]:
@@ -401,6 +416,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     q = sub.add_parser("queries"); q.add_argument("--n", type=int); q.add_argument("--urls", action="store_true")
+    sd = sub.add_parser("searched"); sd.add_argument("keys", nargs="+")
     ci = sub.add_parser("company-id"); ci.add_argument("company"); ci.add_argument("id")
     p = sub.add_parser("person"); ps = p.add_subparsers(dest="what", required=True)
     pa = ps.add_parser("add"); pa.add_argument("--name", required=True); pa.add_argument("--url", required=True)
@@ -416,12 +432,14 @@ def main(argv=None) -> int:
     st = sub.add_parser("stats"); st.add_argument("--days", type=int, default=30)
     a = ap.parse_args(argv)
     if a.cmd == "queries":
-        for line in next_queries(a.n):
+        for line, key in plan_queries(a.n):
             if a.urls:
                 url, hint = search_url(line)
-                print(f"{line}\n  {url}" + (f"\n  NOTE: {hint}" if hint else ""))
+                print(f"{line}\n  key: {key}\n  {url}" + (f"\n  NOTE: {hint}" if hint else ""))
             else:
-                print(line)
+                print(f"{line}\t{key}")
+    elif a.cmd == "searched":
+        print("marked searched: " + ", ".join(mark_searched(a.keys)))
     elif a.cmd == "company-id":
         print(set_company_id(a.company, a.id))
     elif a.cmd == "person":

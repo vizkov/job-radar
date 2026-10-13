@@ -181,6 +181,9 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | `max_scrolls` | 12 | The ceiling on scrolls per search. A search scrolls until the newest-first results pass `max_post_age_days` (30), so the whole window is read; the ceiling only stops a runaway |
 | `max_people_per_session` | 8 | Profiles opened (known people's posts, original authors) per session |
 | `company_queries` | 6 | How many of the session's searches are `<company> "we're hiring" security`, walked in this order: companies in `profile/network.csv` that are also good fits first, then other scored apply/maybe employers, then `company_fit` targets; the rest are keyword searches (a small safety net; the user found keyword-only sweeps nearly useless) |
+| `dream_consulting` | [] | A parallel list of at most 5 dream consulting employers (the first five count), same treatment as `dream_companies` |
+| `chrome_always` | [] | Companies read in Chrome whatever the coverage report says (no readable feed): Deloitte, Tesla, Disney |
+| `careers_reads_per_session` / `careers_reserve` | 6 / 2 | Companies `tools/careers_queue.py next` hands out per pass, and how many of those slots are kept for the network and target tiers |
 | `dream_companies` | [] | The user's dream employers, at most 10 (the first ten count). Tier 0: searched first, with or without a contact and even when `network_only` is true; they also get the network companies' careers-site check and referral route. The user's own list, never auto-edited |
 | `followup_max` | 3 | Follow-up (title-words) searches allowed per day for dream companies whose first search hit the scroll ceiling or found a real hiring post; they come out of `max_searches` |
 | `followup_words` | (application security OR product security OR threat modelling OR pentest OR penetration testing) | The title words of a follow-up search, used with the author-company filter |

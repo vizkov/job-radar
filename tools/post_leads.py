@@ -51,7 +51,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 12, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 6, "company_extra": [], "dream_companies": [], "followup_max": 3, "followup_words": '("application security" OR "product security" OR "threat modelling" OR pentest OR "penetration testing")', "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 6, "company_extra": [], "dream_companies": [], "dream_consulting": [], "chrome_always": [], "careers_reads_per_session": 6, "careers_reserve": 2, "followup_max": 3, "followup_words": '("application security" OR "product security" OR "threat modelling" OR pentest OR "penetration testing")', "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
@@ -148,7 +148,7 @@ def ranked_companies() -> list[tuple[int, str]]:
     good = {normalize(c) for c in scored + targets + known}
     # `careers_site_companies` (the user, 2026-10-06) are read on their own careers sites in Chrome, not through post searches: start them as seen
     seen, out = {normalize(c) for c in s.get("careers_site_companies") or []}, []
-    for tier_of, names in ((lambda c: 0, list(s["dream_companies"])[:10] + list(s["company_extra"])),
+    for tier_of, names in ((lambda c: 0, list(s["dream_companies"])[:10] + list(s["dream_consulting"])[:5] + list(s["company_extra"])),
                            (lambda c: 1 if _has_contact(c) else 9, known + scored + targets),
                            (lambda c: 2, scored), (lambda c: 3, targets)):
         for name in names:

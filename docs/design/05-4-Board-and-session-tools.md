@@ -217,3 +217,16 @@ the Action writes (`data/matches.csv`, `state/seen.json`, `state/board_queue.jso
 
 **Watch out**: only `tiering.title_keywords` weights ever change automatically; include/exclude lists,
 countries and everything else remain the user's decision.
+
+## `tools/careers_queue.py`: the Chrome careers-site queue
+
+Companies the radar cannot read (not VERIFIED in `data/coverage_report.csv`, or zero jobs in the user's countries, plus `chrome_always`) are read by Claude on their own careers pages in Chrome. The queue is separate from the LinkedIn post sweep so the post sweep's small cap cannot starve them. State: `state/chrome_careers.json` (per company: last read, runs, url, note).
+
+| Name | What it does |
+|---|---|
+| `queue(rows, log)` | `(tier, company)` for every company to read, tier 0 dream (`dream_companies`, `dream_consulting`), tier 1 `chrome_always` and network companies, tier 2 `company_fit` targets; least recently read first inside a tier |
+| `pick(q, n, reserve)` | The first `n`, with at least `reserve` slots kept for tiers 1 and 2; slots a short dream list does not use flow to them |
+| `done(company, roles, note)` | Records a finished read; only this moves the company to the back |
+| `set_url(company, url)` | Remembers the search page that worked |
+| `needs_chrome(company, rows, always)` | True when the coverage row is missing, not VERIFIED, or has zero jobs in the user's countries |
+CLI: `next`, `done`, `url`, `status`. Planning marks nothing, like `post_leads.py queries`.

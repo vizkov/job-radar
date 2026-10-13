@@ -69,11 +69,16 @@ do?" or type `/manual` (it's generated from the system itself).
 
 - Submit an application, or email or message anyone for you. It prepares; you send.
 - Add experience, skills, numbers or links you don't have. The checker rejects it.
-- Open Indeed or Glassdoor pages. It asks you to paste those job descriptions. LinkedIn has two narrow
-  exceptions, both read-only in your own logged-in Chrome: it reads the job description of a role it is
-  scoring, one page at a time (no searching or browsing LinkedIn), and, if you switch it on, it looks for a
-  recruiter or hiring manager for one role you're about to apply to (see "Who should I contact" above).
-  LinkedIn's terms ban automated access, so both carry a small risk to your LinkedIn account.
+- Open Indeed or Glassdoor pages. It asks you to paste those job descriptions.
+- Use LinkedIn beyond three narrow, read-only uses in your own logged-in Chrome. LinkedIn's terms ban automated
+  access, so each carries a small risk to your LinkedIn account. Claude never reacts, comments, connects, messages or follows.
+
+  | LinkedIn use | What it does | Default |
+  |---|---|---|
+  | Job descriptions | Reads the description of one role it is scoring, one page at a time (no searching or browsing) | Asked at setup; off in a fresh copy |
+  | Contact lookup | Looks for a recruiter or hiring manager for one role you're about to apply to (see "Who should I contact" above) | Off until you say yes |
+  | Hiring-post search | Reads post-search results and known recruiters' posts at the start of a session, capped, to find roles announced in posts | Off until you say yes |
+
 - Ask for passwords in chat. Secrets go in GitHub's settings page, which you fill in yourself.
 
 ## What happens without you
@@ -91,14 +96,17 @@ sit down, or just look at the board.
 
 At the start of every session Claude gets a list of the recurring jobs, with when each last ran and which are due. Claude runs
 what is due without being asked, or, if you opened with a task of your own, offers it in one line. If it skips one it tells you which
-and why. While no session is open, only GitHub works: the role search, reading the alert mailbox and the reply scan (the first
-three rows below). Claude can only reach your Gmail connector and Chrome when you have it open, so the other checks happen then.
+and why. While no session is open, only GitHub works: the role search, reading the alert mailbox, the reply scan, the status card and the two
+maintenance runs (the GitHub rows below). Claude can only reach your Gmail connector and Chrome when you have it open, so the other checks happen then.
 
 | Job | Who runs it | When |
 |---|---|---|
 | Role search | GitHub, by itself | Three times a day, whether or not your computer is on |
 | Job-alert emails (the providers in `sources.yaml`: LinkedIn and Indeed in your setup; Glassdoor is supported but off) | GitHub, by itself, as the first step of every role search | Three times a day, only if you set up the alert mailbox. Roles found only in alert emails reach you this way |
 | Reply tracking (receipts, rejections, interview invitations) | GitHub reads the mailbox and logs mail about roles you applied to; Claude later suggests board changes in the inbox check | Three times a day, only if the mailbox is your normal inbox |
+| Radar status card | GitHub, by itself | Updated by every role search: what ran, which sources failed |
+| Sponsor registers refresh | GitHub, by itself | Weekly, Mondays 04:23 UTC |
+| Company-board check (which of your companies' job boards still work) | GitHub, by itself | Monthly, on the 1st at 03:13 UTC; it updates the coverage report, which Claude reads when you ask "is anything broken?" |
 | New roles reach your board | GitHub creates the cards; Claude fills in their columns | Fields are filled at the start of your next session |
 | Closed-role and old-card cleanup | Claude's session-start step archives Skipped cards and trims bulky job-description files of skipped and rejected roles | Once a day, when you open a session (job-description files after 14 days for Skipped, 30 for Rejected) |
 | Scoring | Claude | A few of the freshest unscored roles at the start of a session (see above) |
@@ -106,6 +114,7 @@ three rows below). Claude can only reach your Gmail connector and Chrome when yo
 | LinkedIn post sweep | Claude, in your Chrome | About once a day, only if you switched it on |
 | Board views check | Claude | When you've changed a view in GitHub: Claude copies your layout into the saved design (your column order is never touched) |
 | CV review | Claude offers it in one line | At most once a week, while your scored roles keep showing the same CV gaps |
+| Scoring-weight tuning | Claude, automatically | About once a week, one small step on one title keyword when your own scores justify it; Claude says so with a one-line undo |
 | Health check | Claude runs or offers it | Once a day, while the last run reports a source that stopped returning results |
 
 ## Costs

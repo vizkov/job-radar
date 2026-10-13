@@ -32,7 +32,7 @@ If you ever pass the 2,000, GitHub stops the runs until the next month. It only 
 ## Setup, in order
 
 1. **Make your private copy.** job-radar's public project holds only code. Your search
-   must live in a **private** copy that only you can see. Make an empty folder (for example `job-radar` in Documents), open a terminal in it (on Windows: right-click inside the folder, then **Open in Terminal**), type `claude` and press Enter. Then say: *"Make me a private copy of https://github.com/vizkov/job-radar called
+   must live in a **private** copy that only you can see. Make an empty folder (for example `job-radar` in Documents), open a terminal in it (on Windows: right-click inside the folder, then **Open in Terminal**), type `claude` and press Enter (the first time, Claude Code asks you to sign in with your Claude account: do that, then carry on). Then say: *"Make me a private copy of https://github.com/vizkov/job-radar called
    my-job-radar."* Claude creates the private repository on your GitHub account and
    copies the code into it; there's nothing for you to type. (`vizkov/job-radar` is the author's public template: it holds only code, never anyone's data.) Claude Code asks your permission before it runs commands or writes files; read what it proposes, and approve the ones for creating your repository and copying the project. Don't use GitHub's "Fork"
    button: a fork of a public project can't be made private.

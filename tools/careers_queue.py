@@ -1,4 +1,4 @@
-"""The Chrome careers-site queue: companies whose jobs the radar cannot read itself, so Claude reads their careers pages in Chrome.
+"""The Chrome careers-site log and queue (the pass itself is planned by `tools/sweep_plan.py`, which shares the cap with the LinkedIn searches): companies whose jobs the radar cannot read itself, so Claude reads their careers pages in Chrome.
 
     python tools/careers_queue.py next [--n N]          # the companies to read this pass (marks nothing)
     python tools/careers_queue.py done "<company>" [--roles N] [--note "…"]   # a read finished: only this moves it to the back

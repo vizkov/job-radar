@@ -218,7 +218,11 @@ the Action writes (`data/matches.csv`, `state/seen.json`, `state/board_queue.jso
 **Watch out**: only `tiering.title_keywords` weights ever change automatically; include/exclude lists,
 countries and everything else remain the user's decision.
 
-## `tools/careers_queue.py`: the Chrome careers-site queue
+## `tools/sweep_plan.py`: one plan for the pass
+
+`plan()` returns `(company, category, lane)` for every action of a post-discovery pass within `max_searches`: quotas per category (`sweep_quotas`: 4 product dream, 3 consulting dream, 2 network, 1 chrome-only), spare slots flowing down the categories, one lane per company (the LinkedIn post search or the Chrome careers read, whichever was done longer ago; a company the radar already reads gets the post search only). It marks nothing. `categories()` and `lanes()` build the lists; `post_leads.py searched` and `careers_queue.py done` mark an action when it finishes.
+
+## `tools/careers_queue.py`: the Chrome careers-site log and queue
 
 Companies the radar cannot read (not VERIFIED in `data/coverage_report.csv`, or zero jobs in the user's countries, plus `chrome_always`) are read by Claude on their own careers pages in Chrome. The queue is separate from the LinkedIn post sweep so the post sweep's small cap cannot starve them. State: `state/chrome_careers.json` (per company: last read, runs, url, note).
 

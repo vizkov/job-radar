@@ -32,7 +32,8 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 | `tools/draft_experiment.py` | tailoring step 4b: three drafts (tailored, Opus from the ad, Opus from the ad + record) and the briefs for the four readers | [5.5](05-5-Application-tools.md) |
 | `tools/add_role.py` | add a role you found yourself (a job link) through the radar's own filters and bookkeeping | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/post_leads.py` | LinkedIn hiring-post discovery (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
-| `tools/careers_queue.py` | the Chrome careers-site queue: companies the radar cannot read, rotated and capped | [5.4](05-4-Board-and-session-tools.md) |
+| `tools/careers_queue.py` | the Chrome careers-site log: which companies the radar cannot read and when each was last read | [5.4](05-4-Board-and-session-tools.md) |
+| `tools/sweep_plan.py` | plans one post-discovery pass: one cap, split by kind of company, one action per company | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/sponsorship.py` | checked sponsorship verdicts (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/calibrate.py` | automatic tier tuning (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/jd_prep.py` | fetch job descriptions | [5.5](05-5-Application-tools.md) |

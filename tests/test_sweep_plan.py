@@ -23,12 +23,12 @@ def setup(monkeypatch):
     monkeypatch.setattr(pl, "fit_targets", lambda fit: ["O1", "O2"])
 
 
-def test_the_pass_is_split_4_3_2_1_and_each_company_appears_once(monkeypatch):
+def test_the_pass_is_split_3_3_2_2_and_each_company_appears_once(monkeypatch):
     setup(monkeypatch)
     out = sp.plan(s(), ROWS, {}, {})
     assert len(out) == 10
-    assert [c for _, c, _ in out].count("dream_product") == 4 and [c for _, c, _ in out].count("dream_consulting") == 3
-    assert [c for _, c, _ in out].count("network") == 2 and [c for _, c, _ in out].count("other") == 1
+    assert [c for _, c, _ in out].count("dream_product") == 3 and [c for _, c, _ in out].count("dream_consulting") == 3
+    assert [c for _, c, _ in out].count("network") == 2 and [c for _, c, _ in out].count("other") == 2
     assert len({n for n, _, _ in out}) == 10
     assert {ln for n, c, ln in out if c == "other"} == {"careers"}          # chrome-only companies are read, not post-searched
 

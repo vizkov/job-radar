@@ -3,7 +3,7 @@
     python tools/sweep_plan.py [--urls]     # the companies for this pass (marks nothing)
 
 The user's rule (2026-10-13): the cap was there for a reason, so LinkedIn post searches and Chrome careers reads share it (`max_searches`, 10),
-split by kind of company: 4 product dream companies, 3 consulting dream companies, 2 other companies the user knows someone at, 1 other company
+split by kind of company: 3 product dream companies, 3 consulting dream companies, 2 other companies the user knows someone at, 2 other companies
 whose jobs only a Chrome read can reach (`sweep_quotas`). Slots a category cannot fill (a short list, a company the radar already reads) flow
 to the next category in that order.
 
@@ -79,7 +79,7 @@ def plan(s: dict | None = None, rows: list[dict] | None = None, post_log: dict |
     post_log = pl._load(pl.QUERIES, {}) if post_log is None else post_log
     careers_log = cq._load(cq.STATE) if careers_log is None else careers_log
     total = int(s.get("max_searches", 10)) if total is None else total
-    quotas = {**{"dream_product": 4, "dream_consulting": 3, "network": 2, "other": 1}, **(s.get("sweep_quotas") or {})}
+    quotas = {**{"dream_product": 3, "dream_consulting": 3, "network": 2, "other": 2}, **(s.get("sweep_quotas") or {})}
     cats = categories(s, rows)
     ranked: dict[str, list[tuple[str, str]]] = {}
     for cat in CATEGORIES:

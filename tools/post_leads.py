@@ -51,7 +51,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 12, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 6, "company_extra": [], "dream_companies": [], "dream_consulting": [], "chrome_always": [], "sweep_quotas": {"dream_product": 4, "dream_consulting": 3, "network": 2, "other": 1}, "followup_max": 3, "followup_words": '("application security" OR "product security" OR "threat modelling" OR pentest OR "penetration testing")', "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 6, "company_extra": [], "dream_companies": [], "dream_consulting": [], "chrome_always": [], "sweep_quotas": {"dream_product": 3, "dream_consulting": 3, "network": 2, "other": 2}, "followup_max": 3, "followup_words": '("application security" OR "product security" OR "threat modelling" OR pentest OR "penetration testing")', "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',

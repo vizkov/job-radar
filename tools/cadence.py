@@ -13,6 +13,7 @@ stamp themselves when they finish:
     python tools/cadence.py done cv_review        # after the cv-review skill
     python tools/cadence.py done views_check      # after updating VIEWS to match the live board views
     python tools/cadence.py done jd_cleanup       # stamped by tools/jd_cleanup.py itself (the hook runs it daily)
+    python tools/cadence.py done system_review    # after the system-review skill (maintainer's copy only)
     python tools/cadence.py show                  # the ledger
     python tools/cadence.py reminder add <id> <YYYY-MM-DD> <text...>   # a ONE-OFF job: shows in the brief from that date
     python tools/cadence.py reminder done <id>    # finish it: the reminder is removed, it never shows again
@@ -30,7 +31,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 JOBS = {"inbox_check": 20, "post_discovery": 20, "auto_score": 4, "views_check": 24,
-        "health": 24, "cv_review": 168, "jd_cleanup": 48}   # name -> hours before it is due again
+        "health": 24, "cv_review": 168, "jd_cleanup": 48, "system_review": 168}   # name -> hours before it is due again
 
 
 def _file(root: Path) -> Path:
@@ -140,7 +141,7 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
           new_waiting: int, queued: int, unscored_cards: int, auto_picks: int, awaiting: int,
           posts_enabled: bool, posts_fallback: datetime | None = None, views_drift: str | None = None,
           docs_review: str | None = None, cv_gaps: str | None = None, source_problems: int = 0,
-          docs_review_job: bool = True,
+          docs_review_job: bool = True, system_review_job: bool = False,
           mail_scan: tuple[str, bool] | None = None) -> tuple[list[str], list[str]]:
     """(lines for the brief, names of the jobs that are due). Every job gets a line, due or not."""
     lines = ["- CADENCE (each recurring job and when it last ran). Run every one marked DUE, or tell the user in one "
@@ -242,6 +243,14 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
                      "offer it in one line), run `docs-review`; it stamps itself (`work/.last_docs_review`)")
     else:
         lines.append("  - Docs review: not due (few code files changed since the last one) · ok")
+    # weekly system review (the user, 2026-10-13: it was only a Health line, not a cadence job); the skill is maintainer-only like docs-review
+    if system_review_job:
+        if is_due("system_review", now, root):
+            due.append("system_review")
+            lines.append(f"  - System review: {when('system_review', now, root)} · DUE: offer the `system-review` skill in one line after the "
+                         "first message (run it on the user's yes), then `cadence.py done system_review`")
+        else:
+            lines.append(f"  - System review: {when('system_review', now, root)} · ok")
     extra_lines, extra_due = reminder_lines(now, root)
     lines += extra_lines
     due += extra_due

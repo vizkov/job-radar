@@ -526,10 +526,7 @@ def health_checks(root: Path, now: datetime, rows: list[dict], scores: dict, las
             if not any(r.get("source", "").endswith("_email") and r.get("date", "") >= week for r in rows):
                 notes.append("no roles from alert emails in the last 7 days (normal right after setup; "
                              "if alerts have been arriving, the email layout may have changed: check health)")
-    review = _read_stamp(LAST_REVIEW)
-    if (root / ".claude" / "skills" / "system-review").exists() and (
-            review is None or now - review >= timedelta(days=REVIEW_EVERY_DAYS)):
-        notes.append("weekly system review due: offer the system-review skill")
+    # the weekly system review is a cadence job now (tools/cadence.py `system_review`), no longer a Health line
     missing_counts = Counter(m for s in scores.values() for m in s.get("missing", []))
     common = [f"{safe(m, 60)} ({n})" for m, n in missing_counts.most_common(3) if n >= 3]
     if common:
@@ -583,6 +580,7 @@ def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, ite
                                 posts_enabled=posts_on, posts_fallback=fallback, views_drift=views_drift,
                                 docs_review=docs_review, cv_gaps=cv_gaps, source_problems=source_problems,
                                 docs_review_job=(root / ".claude" / "skills" / "docs-review").exists(),
+                                system_review_job=(root / ".claude" / "skills" / "system-review").exists(),
                                 mail_scan=app_mail.scan_line(root, now))
     return lines
 

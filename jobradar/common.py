@@ -42,11 +42,15 @@ _CITY_NAMES = {
            "watford", "luton", "stevenage", "hatfield", "hemel hempstead", "uxbridge", "wembley", "croydon",
            "osterley", "chelmsford", "colchester", "oxford", "coventry", "warwick", "leicester", "nottingham",
            "derby", "sheffield", "liverpool", "newcastle", "sunderland", "knutsford", "exeter", "plymouth",
-           "cardiff", "newport", "swansea", "neath", "aberdeen", "dundee", "stirling", "livingston"],
+           "cardiff", "newport", "swansea", "neath", "aberdeen", "dundee", "stirling", "livingston",
+           # seen dropped as "location not recognised" (2026-10-13): counties and towns the alert emails name
+           "worcestershire", "worcester", "east lothian", "west lothian", "midlothian"],
     "NL": ["amsterdam", "the hague", "den haag", "rotterdam", "utrecht", "eindhoven", "delft", "amstelveen",
            "amersfoort", "leusden", "veldhoven", "zoetermeer", "maastricht", "haarlem", "leiden", "groningen",
            "arnhem", "nijmegen", "breda", "tilburg", "hilversum", "hoofddorp", "schiphol", "almere", "enschede",
-           "hertogenbosch", "den bosch", "zwolle", "apeldoorn", "deventer", "dordrecht", "gouda", "alkmaar"],
+           "hertogenbosch", "den bosch", "zwolle", "apeldoorn", "deventer", "dordrecht", "gouda", "alkmaar",
+           # seen dropped as "location not recognised" (2026-10-13)
+           "barendrecht", "driebergen", "driebergen-rijsenburg", "zeist", "nieuwegein", "houten", "rijswijk", "capelle aan den ijssel"],
     "IE": ["dublin", "cork", "galway", "limerick", "waterford", "dundalk"],
     "CH": ["zurich", "zürich", "geneva", "genève", "geneve", "bern", "lausanne", "basel", "baar", "aarau",
            "rapperswil"],

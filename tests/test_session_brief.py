@@ -66,7 +66,7 @@ def test_health_checks(tmp_path):
     text = brief(root, run_note="the last scheduled job-radar run ended 'failure'")
     assert "career docs missing: STAR stories, cover-letter blocks" in text
     assert "no scheduled run has completed for 4 days" in text and "ended 'failure'" in text
-    assert "alert emails not working" in text and "weekly system review due" in text
+    assert "alert emails not working" in text and "System review" in text and "weekly system review due" not in text   # a cadence job now, not a Health line
     assert "CV gaps across scored roles: CREST CCT (3)" in text
 
 
@@ -332,3 +332,18 @@ def test_a_copy_without_the_maintainer_skills_never_mentions_them(tmp_path):
     root = make_root(tmp_path, [row("a" * 16, "2026-10-02", company="Apple")])
     out = brief(root, docs_note="docs review due: 10 code files changed")
     assert "Docs review" not in out and "system-review" not in out
+
+
+def test_system_review_is_a_cadence_job_that_clears_once_stamped(tmp_path):
+    import cadence
+    kw = dict(radar_last="ok", new_total=0, new_on_board=0, new_skip=0, new_waiting=0, queued=0, unscored_cards=0, auto_picks=0,
+              awaiting=0, posts_enabled=False, system_review_job=True)
+    lines, due = cadence.block(NOW, tmp_path, **kw)
+    assert "system_review" in due and any("System review" in l and "DUE" in l for l in lines)
+    cadence.done("system_review", tmp_path, NOW - timedelta(hours=1))
+    lines, due = cadence.block(NOW, tmp_path, **kw)
+    assert "system_review" not in due and any("System review" in l and "ok" in l for l in lines)
+    _, due = cadence.block(NOW + timedelta(days=8), tmp_path, **kw)
+    assert "system_review" in due                               # weekly again
+    lines, due = cadence.block(NOW, tmp_path, **{**kw, "system_review_job": False})   # a copy without the skill has no such job
+    assert "system_review" not in due and not any("System review" in l for l in lines)

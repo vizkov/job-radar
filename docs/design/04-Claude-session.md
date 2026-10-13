@@ -106,7 +106,7 @@ the brief with an undo line).
    CADENCE block (every recurring job, when it last ran, and which are DUE: `tools/cadence.py`). Its jobs: the radar search, new roles to
    the board, scoring, the Gmail inbox check, the LinkedIn post sweep, board views vs code (DUE when the live views differ from `VIEWS`) 
    the health check (DUE once a day while `status.md` lists source problems), the CV review (DUE at most weekly while the brief shows
-   recurring CV gaps) the JD packet cleanup (`tools/jd_cleanup.py`, DUE every 48 hours), the application-mail scan (a line of its own, not in `JOBS`) and the docs review (DUE when `docs_review_note()` fires, so it does not wait for the user to say they are
+   recurring CV gaps) the JD packet cleanup (`tools/jd_cleanup.py`, DUE every 48 hours), the application-mail scan (a line of its own, not in `JOBS`) and the weekly system review (a cadence job since 2026-10-13, where the maintainer-only skill exists) and the docs review (DUE when `docs_review_note()` fires, so it does not wait for the user to say they are
    closing the session).
 
 1. **Header and run state:** the generated-at line, a warning if the `git pull` failed, and the

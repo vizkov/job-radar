@@ -347,3 +347,32 @@ def test_system_review_is_a_cadence_job_that_clears_once_stamped(tmp_path):
     assert "system_review" in due                               # weekly again
     lines, due = cadence.block(NOW, tmp_path, **{**kw, "system_review_job": False})   # a copy without the skill has no such job
     assert "system_review" not in due and not any("System review" in l for l in lines)
+
+
+def test_workflows_health_flags_failures_thin_schedules_and_stale_maintenance_runs():
+    from datetime import datetime, timezone
+    now = datetime(2026, 10, 14, 12, 0, tzinfo=timezone.utc)
+
+    def run_json(items):
+        import json
+        return True, json.dumps(items)
+
+    def good(created, event="schedule"):
+        return {"conclusion": "success", "status": "completed", "createdAt": created, "event": event}
+
+    def runner(radar, registers, verify):
+        def f(cmd, timeout):
+            wf = cmd[cmd.index("--workflow") + 1]
+            return run_json({"job-radar": radar, "registers.yml": registers, "verify.yml": verify}[wf])
+        return f
+    healthy = runner([good("2026-10-14T09:44:00Z"), good("2026-10-13T22:14:00Z"), good("2026-10-13T13:00:00Z")],
+                     [good("2026-10-12T12:14:00Z")], [good("2026-10-01T10:07:00Z")])
+    assert sb.workflows_health(healthy, now) is None
+    thin = runner([good("2026-10-14T09:44:00Z"), good("2026-10-13T09:44:00Z")], [good("2026-10-12T12:14:00Z")], [good("2026-10-01T10:07:00Z")])
+    assert "only 1 scheduled search run(s)" in sb.workflows_health(thin, now)
+    bad = runner([good("2026-10-14T09:44:00Z"), good("2026-10-14T01:00:00Z"), {**good("2026-10-13T22:00:00Z"), "conclusion": "failure"}],
+                 [good("2026-09-20T12:14:00Z")], [good("2026-08-01T10:07:00Z")])
+    note = sb.workflows_health(bad, now)
+    assert "1 of the last 3 search runs failed" in note and "weekly sponsor-register refresh has not succeeded in 9+ days" in note
+    assert "monthly company-board check has not succeeded in 35+ days" in note
+    assert sb.workflows_health(lambda cmd, t: (False, ""), now) is None            # gh unreachable: say nothing

@@ -114,6 +114,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `board_design_note()` | Views drift note. |
 | `last_due_slot(now, workflow)` | Latest cron slot (from `radar.yml`) that should have run, minus grace. |
 | `last_run_health(runner, now, workflow)` | Report a failed run; restart a skipped one. |
+| `workflows_health(runner, now)` | The trend and the other workflows: any of the last 5 search runs failed, fewer than 2 scheduled search runs in 24 h (3 are due), the weekly `registers.yml` not succeeded in 9 days, the monthly `verify.yml` not in 35; joined into the same run note. |
 | `health_checks(...)` | Career docs, run age, alert emails, review due, recurring CV gaps. |
 | `_age`, `brief(...)` | Format the brief. |
 | `main()` | The sequence; always exits 0. |

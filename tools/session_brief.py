@@ -497,6 +497,44 @@ def last_run_health(runner=run, now: datetime | None = None, workflow: Path | No
     return None
 
 
+def workflows_health(runner=run, now: datetime | None = None) -> str | None:
+    """The other scheduled workflows and the daily search's trend (the user, 2026-10-14: "are the flows working? can we add it to the system check?").
+    `last_run_health` only looks at the newest search run; this adds: any of the last 5 search runs failed, fewer than 2 scheduled search runs in the
+    last 24 hours (GitHub delays or drops schedules; 3 are due), and the weekly sponsor-register refresh (`registers.yml`) and the monthly company-board
+    check (`verify.yml`) not having succeeded within 9 and 35 days. One note per problem, joined; None when all is well or `gh` is unreachable."""
+    now = now or datetime.now(timezone.utc)
+    notes = []
+
+    def runs(workflow: str, limit: int):
+        ok, out = runner(["gh", "run", "list", "--workflow", workflow, "--limit", str(limit), "--json", "conclusion,status,createdAt,event"], 20)
+        try:
+            return json.loads(out) if ok and out else None
+        except ValueError:
+            return None
+
+    def when(r):
+        return datetime.fromisoformat(r["createdAt"].replace("Z", "+00:00"))
+
+    radar = runs("job-radar", 12)
+    if radar:
+        failed = [r for r in radar[:5] if r.get("conclusion") not in (None, "", "success")]
+        if failed:
+            notes.append(f"{len(failed)} of the last {min(len(radar), 5)} search runs failed (latest {when(failed[0]):%d %b %H:%M} UTC)")
+        recent = [r for r in radar if r.get("event") == "schedule" and now - when(r) <= timedelta(hours=24)]
+        if len(recent) < 2:
+            notes.append(f"only {len(recent)} scheduled search run(s) in the last 24 h (3 are due; GitHub delays or drops schedules)")
+    for workflow, label, days in (("registers.yml", "weekly sponsor-register refresh", 9), ("verify.yml", "monthly company-board check", 35)):
+        rs = runs(workflow, 5)
+        if rs is None:
+            continue
+        good = [r for r in rs if r.get("conclusion") == "success"]
+        if not good or now - when(good[0]) > timedelta(days=days):
+            notes.append(f"the {label} has not succeeded in {days}+ days ({workflow})")
+        elif rs and rs[0].get("conclusion") not in (None, "", "success"):
+            notes.append(f"the last {label} run ended '{rs[0]['conclusion']}' ({workflow})")
+    return "; ".join(notes) or None
+
+
 # ---------------------------------------------------------------- checks
 
 def health_checks(root: Path, now: datetime, rows: list[dict], scores: dict, last_run: str,
@@ -734,7 +772,7 @@ def main() -> int:
         except Exception as e:
             note = (note + "; " if note else "") + f"JD cleanup failed ({type(e).__name__})"
         updates, unpublished = template_status(since, run)
-        print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, last_run_health(run),
+        print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, "; ".join(n for n in (last_run_health(run), workflows_health(run)) if n) or None,
                     updates, unpublished, board_design_note() if items is not None else None,
                     docs_review_note(now, run), (closed_skipped, closed_ask), start_background=True))
         WORK.mkdir(exist_ok=True)

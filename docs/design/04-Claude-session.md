@@ -82,6 +82,7 @@ errors become one-line notes, and it always exits 0.
    published (`public_template.drift()`).
 10. **Three values worked out as arguments to the `brief()` call** (still in `main()`, before any
     text is printed):
+    - **`workflows_health()`** (joined into the same note): failed or thin recent search runs, and the weekly register refresh and monthly board check not having succeeded lately.
     - **`last_run_health()`**: the latest `job-radar` Actions run. If it failed, say so. If
       the last scheduled slot (read from `radar.yml`'s cron, plus 1 hour grace) passed with no
       run, GitHub skipped it: start one with `gh workflow run job-radar`.

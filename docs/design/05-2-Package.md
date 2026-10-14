@@ -4,7 +4,7 @@
 **Read first:** pages [2](02-Architecture.md) and [3](03-Scheduled-run.md)  
 **Code:** `jobradar/*.py`  
 
-Part of the [5. Code reference](05-Code-reference.md) (the index of every file and function).
+Part of the [5. Code reference](05-Code-reference.md) (the index of every file and function). `jobradar/application_mail.py` is described in [5.5](05-5-Application-tools.md) and `jobradar/sources/` in [5.3](05-3-Sources.md).
 
 ---
 
@@ -68,7 +68,10 @@ Part of the [5. Code reference](05-Code-reference.md) (the index of every file a
 | `CompanyMatcher` | Index of `normalized spelling → display name` from targets (each ` / ` part too) and aliases. |
 | `.match(name)` | Exact lookup of the normalized name. |
 | `.resolve(company, hints)` | Match the posting's company; if that fails, the first matching hint. |
-| `load_targets()`, `load_aliases()` | Read `targets.tsv` / `aliases.csv` (lines starting `#` skipped). |
+| `load_targets()` | The `Company` column of `targets.tsv` (a tab-separated file with a header; rows with an empty Company are skipped; it does **not** skip `#` lines). |
+| `load_aliases()` | `aliases.csv` rows (`alias,canonical`); lines starting `#` are skipped; a missing file gives an empty list. |
+| `load_high_fit()` | Normalised names of the targets whose `Fit` column is `High` (empty when there is no Fit column); `radar.high_fit_targets()` caches it. |
+| `load_sectors()` | Normalised company name to a frozenset of lower-case tags from the optional `Sector` column (comma-separated); only companies with a non-empty Sector appear. `radar.sector_targets()` caches it and `tiering.score` uses the tags for `sector_bonus`. |
 | `default_matcher()` | Cached matcher built from the profile. |
 
 **Watch out**
@@ -115,7 +118,7 @@ Part of the [5. Code reference](05-Code-reference.md) (the index of every file a
 
 | Name | Is |
 |---|---|
-| `score(title, countries, on_list, sponsor, age_days, high_fit)` | Best title keyword + all seniority words + best country + on-list bonus + `target_fit_high` bonus (employer's Fit column in targets.tsv is High) + sponsor bonus + freshness bonus; returns `(total, reasons)`. `matching.load_high_fit()` reads the Fit = High names; `radar.high_fit_targets()` caches them. |
+| `score(title, countries, on_list, sponsor, age_days, high_fit, sectors)` | Best title keyword + all seniority words + best country + on-list bonus + `target_fit_high` bonus (employer's Fit column in targets.tsv is High) + sponsor bonus + freshness bonus; returns `(total, reasons)`. `matching.load_high_fit()` reads the Fit = High names; `radar.high_fit_targets()` caches them. |
 | `tier(total)` | 1 if total ≥ `tier1_min_score`, else 2. |
 
 Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
@@ -156,6 +159,19 @@ Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
 
 **Watch out**: the tier is **not** in the title. It's a board field only (no label; `fill` copies it from `matches.csv`, see [page 11](11-Board-internals.md#where-each-card-value-comes-from)); repeating it in the title would be a second copy.
 
+## `jobradar/intake.py`: roles that arrive by hand
+
+One door for a role the user hands over (a job link, a LinkedIn hiring post, a pasted ad): the same filters and bookkeeping as the daily run. Used by `tools/add_role.py` and `tools/post_leads.py add-role` ([5.4](05-4-Board-and-session-tools.md)).
+
+| Name | Is |
+|---|---|
+| `admit(p, override, dry_run, baseline)` | Runs one `Posting` through `radar.select()` (countries, titles, permanent-only, `max_age_days`, employer list). `select()` stops at the first filter that drops a role, so `admit()` repeats it with each triggered filter bypassed (`skip=`) to name **every** reason. Reasons not in `override` give `{"status": "dropped", "reasons": [...]}` and nothing is written. Otherwise it resolves the canonical company, sets `raw["origin"]` (`manual`, or `manual-override:<reasons>`), dedupes with `diff_seen()` (`known` if seen before), runs `enrich()`, and unless `dry_run` writes `state/seen.json`, `data/matches.csv` (`append_matches()`) and, when the board rules select it, the board queue. Returns `status` `added`, `dropped` or `known`, plus `ref`, `tier`, `score`, `carded`. |
+| `parse_job_url(url)` | `(ats, board slug, job id)` for a Greenhouse, Lever or Ashby link; `None` for anything else. |
+| `fetch_posting(url)` | The role as the daily run would see it: the company's board through ats-scrapers (the entry in `boards.json`, else a board built from the slug), then the one posting by job id. `None` if the link is not one of the three or the posting is not found. |
+| `manual_posting(url, company, title, location, posted, countries)` | A `Posting` from fields the user gave (source `manual`), for links the fetch cannot read; countries default to what `countries_for()` reads from the location text. |
+
+**Watch out**: a filter that would drop the role is reported, never silently skipped; it is bypassed only when the caller names the reason (the user's word).
+
 ## `jobradar/mdsafe.py`: escaping for GitHub Markdown
 
 `md(text)` escapes Markdown special characters, so a job titled `Pentester](https://evil)`
@@ -189,7 +205,7 @@ flushed by the same code path; `Z999` is then removed.
 
 ## `jobradar/bamboohr_json.py`: BambooHR listing fix
 
-BambooHR's careers widget (`/jobs/embed2.php`) now answers with JSON, but `ats-scrapers` 0.3.0 (the newest release, October 2026) parses only the old HTML list, so every BambooHR tenant looked empty (Integrity360 fell from 40 roles to 0; found by the health check, 2026-10-10). `install()` wraps `BambooHRScraper._parse_widget` so a JSON body is read by `parse_json_widget(slug, text)` (departments, then positions: id, name, url, location) and an HTML body still goes to the library. `jobradar/common.py` imports the module so the patch is active everywhere ATS boards are fetched. The detail pages (`/careers/<id>/detail`) were unchanged, so descriptions still arrive. Delete the module when a library release parses the JSON itself. Test: `tests/test_bamboohr_json.py`.
+BambooHR's careers widget (`/jobs/embed2.php`) now answers with JSON, but `ats-scrapers` 0.3.0 (the newest release, October 2026) parses only the old HTML list, so every BambooHR tenant looked empty (Integrity360 fell from 40 roles to 0; found by the health check). `install()` wraps `BambooHRScraper._parse_widget` so a JSON body is read by `parse_json_widget(slug, text)` (departments, then positions: id, name, url, location) and an HTML body still goes to the library. `jobradar/common.py` imports the module so the patch is active everywhere ATS boards are fetched. The detail pages (`/careers/<id>/detail`) were unchanged, so descriptions still arrive. Delete the module when a library release parses the JSON itself. Test: `tests/test_bamboohr_json.py`.
 
 ## `jobradar/alert_providers.py`: email providers (standard library only)
 

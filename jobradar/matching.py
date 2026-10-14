@@ -91,6 +91,14 @@ def load_high_fit(path: Path | None = None) -> set[str]:
                 if r.get("Company") and (r.get("Fit") or "").strip().lower() == "high"}
 
 
+def load_sectors(path: Path | None = None) -> dict[str, frozenset[str]]:
+    """Normalised company name -> sector tags from the optional Sector column of targets.tsv (comma-separated, lowercase)."""
+    path = path or profile_path("targets.tsv")
+    with open(path, encoding="utf-8") as fh:
+        return {normalize(r["Company"]): frozenset(t.strip().lower() for t in (r.get("Sector") or "").split(",") if t.strip())
+                for r in csv.DictReader(fh, delimiter="	") if r.get("Company") and (r.get("Sector") or "").strip()}
+
+
 def load_aliases(path: Path | None = None) -> list[tuple[str, str]]:
     path = path or profile_path("aliases.csv")
     if not path.exists():

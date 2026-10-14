@@ -23,6 +23,7 @@ only), `--include-outside` (keep employers not on the list).
 | `DROP_REASONS`, `drop_lines(results, matched, dropped)` | Why a listing was dropped (country, title, employment, company), and one status line per source: found → dropped by reason → kept. |
 | `select(results, include_outside, matcher, dropped, skip)` | Country filter, title filter, company matching; returns kept postings and per-source match counts. `include_outside` is a bool or a per-source dict. `skip` is a set of drop reasons not to filter on; only `jobradar/intake.py` passes it, for a role the user hand-added and agreed to bring in despite that filter (the daily run never does). |
 | `diff_seen(groups, seen, today)` | Returns groups none of whose keys are in `seen`; stamps all their keys with today. |
+| `high_fit_targets()`, `sector_targets()` | Read once per run (`lru_cache`) for `enrich()`: the normalised names of `targets.tsv` companies whose Fit is High (`matching.load_high_fit()`), and each company's Sector tags (`matching.load_sectors()`). Both return empty when `targets.tsv` cannot be read. |
 | `enrich(new, sponsors)` | Adds sponsor tags, score, tier and reasons to each new group's `tags`. |
 | `_sponsor_note(g)` / `_line(g)` | One digest line for a group: escaped title link, location, posted date, sponsor note, "also on" links. |
 | `_by_score(groups)` | Sort by score descending, then title. |

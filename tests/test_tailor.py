@@ -110,9 +110,19 @@ def test_invalid_file_removes_old_stamp(app):
 
 
 @pytest.mark.skipif(render_pdf.find_browser() is None, reason="no Chrome or Edge installed")
+@pytest.mark.skipif(render_pdf.find_browser() is None, reason="no Chrome or Edge installed")
+def test_pdf_render_refuses_until_the_opus_draft_exists(app):
+    assert jd_check.cmd_tailor(app.name) == 0
+    assert render_resume.main([app.name]) == 1                         # step 4b (draft_experiment) not done yet
+    exp = render_resume.SCRATCH / app.name / "experiment"
+    exp.mkdir(parents=True, exist_ok=True)
+    (exp / "draft_B.json").write_text("draft", encoding="utf-8")
+    assert render_resume.main([app.name]) == 0
+
+
 def test_render_writes_only_the_two_pdfs_by_default(app):
     assert jd_check.cmd_tailor(app.name) == 0
-    assert render_resume.main([app.name]) == 0
+    assert render_resume.main([app.name, "--skip-experiment"]) == 0
     assert sorted(p.name for p in app.iterdir()) == ["cover_letter.pdf", "resume.pdf", "tailored.json", "validated.sha256"]
     assert (app / "resume.pdf").read_bytes()[:5] == b"%PDF-"
     scratch = render_resume.SCRATCH / app.name                              # the Markdown is scratch text for the reviewers
@@ -122,14 +132,14 @@ def test_render_writes_only_the_two_pdfs_by_default(app):
 def test_without_a_browser_the_markdown_goes_into_the_folder(app, monkeypatch):
     monkeypatch.setattr(render_pdf, "find_browser", lambda: None)
     assert jd_check.cmd_tailor(app.name) == 0
-    assert render_resume.main([app.name]) == 0
+    assert render_resume.main([app.name, "--skip-experiment"]) == 0
     assert sorted(p.name for p in app.iterdir()) == ["cover_letter.md", "resume.md", "tailored.json", "validated.sha256"]
 
 
 def test_render_outputs(app):
     docx = pytest.importorskip("docx")
     assert jd_check.cmd_tailor(app.name) == 0
-    assert render_resume.main([app.name, "--md", "--docx"]) == 0         # Markdown and Word are opt-in
+    assert render_resume.main([app.name, "--md", "--docx", "--skip-experiment"]) == 0         # Markdown and Word are opt-in
     md = (app / "resume.md").read_text(encoding="utf-8")
     assert md.startswith("# Alex Example") and "alex.example@example.com" in md and "IDOR" in md
     doc = docx.Document(str(app / "resume.docx"))

@@ -52,7 +52,7 @@ DATE = "DATE"
 FIELDS = {  # name -> single-select options, None for a number field, or DATE
     "Stage": ["New", "Shortlisted", "Applied", "Interview", "Offer", "Rejected", "Skipped"],
     "Tier": ["T1", "T2"],
-    "Country": ["CH", "DE", "GB", "IE", "NL", "SE", "REMOTE-EU"],  # the role's first country in matches.csv; add one here to track a new country
+    "Country": ["AE", "CH", "DE", "GB", "IE", "NL", "SE", "REMOTE-EU"],  # the role's first country in matches.csv; add one here to track a new country
     "Fit": None,
     "Recommendation": ["Apply", "Maybe", "Skip"],
     # Register match gives Licensed / Unclear / Unlikely automatically; Confirmed / Likely / No need the
@@ -86,7 +86,7 @@ FIELD_DOCS = {  # field -> option -> description (GitHub shows these in the drop
         "Skipped": "Not pursuing: poor fit, blocker, closed ad or not interested",
     },
     "Country": {"CH": "Switzerland", "DE": "Germany", "GB": "United Kingdom", "IE": "Ireland", "NL": "Netherlands",
-                "SE": "Sweden", "REMOTE-EU": "Remote, anywhere in Europe"},
+                "SE": "Sweden", "AE": "United Arab Emirates", "REMOTE-EU": "Remote, anywhere in Europe"},
     "Tier": {"T1": "Apply early. Rule-based guess until scored; then a scored Apply", "T2": "Lower priority. Rule-based guess until scored; then a scored Skip"},
     "Recommendation": {
         "Apply": "Strong fit, no blockers: worth applying now",
@@ -194,6 +194,17 @@ def describe(gh: Gh) -> str:
 def sync_roles(gh: Gh, max_per_run: int, sleep=time.sleep) -> tuple[int, int]:
     """Open issues for queued roles, oldest first. Returns (created, still queued)."""
     queue = json.loads(QUEUE.read_text(encoding="utf-8")) if QUEUE.exists() else []
+    # A ref is a hash of company + title + country, so a queued role whose ref already has an issue is the same role found
+    # again (a LinkedIn alert for a role added by hand, a re-post): never open a second card for it (the user, 2026-10-20: Meta
+    # got #176 beside #109). Different refs for one job (n8n per country) cannot be told apart here: see tools/jd_dupes.py.
+    known = _load(ISSUE_MAP, {})
+    dupes = [p for p in queue if p["ref"] in known]
+    if dupes:
+        queue = [p for p in queue if p["ref"] not in known]
+        for p in dupes:
+            print(f"board: not opening a second card for {p['ref']} ({p['title']}): issue #{known[p['ref']]} already exists")
+        if not gh.dry_run:
+            QUEUE.write_text(json.dumps(queue, indent=1, ensure_ascii=False), encoding="utf-8")
     batch = queue[:max_per_run]
     if not batch:
         return 0, 0
@@ -398,6 +409,26 @@ def find_item(gh: Gh, board: dict, ref: str) -> dict | None:
     return next((i for i in _items(gh, board) if marker in ((i.get("content") or {}).get("body") or "")), None)
 
 
+def no_card_reason(gh: Gh, ref: str) -> str:
+    """Why `find_item` found nothing: the card is archived (the issue exists and its project item is archived)
+    or it was never created. An archived apply/maybe card is the user's call to restore, so say so."""
+    num = _load(ISSUE_MAP, {}).get(ref)
+    if num:
+        try:
+            repo = gh("repo", "view", "--json", "nameWithOwner", "--jq", ".nameWithOwner").strip()
+            owner, name = repo.split("/", 1)
+            out = gh("api", "graphql", "-f", "query=query($o:String!,$n:String!,$i:Int!){repository(owner:$o,name:$n)"
+                     "{issue(number:$i){projectItems(first:5){nodes{isArchived}}}}}",
+                     "-f", f"o={owner}", "-f", f"n={name}", "-F", f"i={num}",
+                     "--jq", "[.data.repository.issue.projectItems.nodes[].isArchived]|any")
+            if out.strip() == "true":
+                return (f"the card (issue #{num}) is archived, not missing; leave it archived (the user, 2026-10-20: archived "
+                        f"cards are not scored onto the board) and do not restore it unasked")
+        except Exception:   # best effort: fall back to the generic wording
+            pass
+    return "no board card yet (it's created by the daily run; see state/board_queue.json)"
+
+
 def _edit(gh: Gh, board: dict, item_id: str, name: str, value) -> None:
     field = board["fields"].get(name)
     if field is None:
@@ -428,7 +459,7 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: s
         return "board not set up yet (python tools/board_sync.py setup-project --repo OWNER/REPO)"
     item = find_item(gh, board, ref)
     if item is None:
-        return f"no board card for {ref} yet (it's created by the daily run; see state/board_queue.json)"
+        return f"{ref}: {no_card_reason(gh, ref)}"
     if (str(values.get("Recommendation", "")).lower() == "skip" and "Stage" not in values
             and item.get("stage") in (None, "", "New")):
         # a Skip recommendation takes a card nobody has acted on off the board (Skipped is archived daily);
@@ -554,7 +585,7 @@ def set_fit_section(gh: Gh, ref: str, score: dict, scored_on: str = "") -> str:
     item = find_item(gh, board, ref) if board else None
     url = ((item or {}).get("content") or {}).get("url")
     if not url:
-        return f"{ref}: no board card yet; fit breakdown not added"
+        return f"{ref}: fit breakdown not added; {no_card_reason(gh, ref)}"
     body = gh("issue", "view", url, "--json", "body", "--jq", ".body")
     _set_body(gh, url, with_fit(body, fit_section(score, scored_on)))
     return f"{ref}: fit breakdown on the card"
@@ -589,7 +620,7 @@ def refresh_bodies(gh: Gh) -> str:
 VIEWS = [
     {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "-stage:Applied -status:Done",
      "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral", "Country"],
-     "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},
+     "sort": [("Stage", "ASC"), ("Fit", "DESC")], "group": []},
     # "Act now" = open roles not yet applied to/skipped that are brand new or posted 14+ days ago, so about to expire
     # (the user changed it in GitHub, 2026-10-02; All Roles hides Applied cards).
     {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "(is:open -stage:Applied,Skipped -label:possibly-closed -recommendation:Skip) AND (posted:<=@today-14d OR stage:New)",

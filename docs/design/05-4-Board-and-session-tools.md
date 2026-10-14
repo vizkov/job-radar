@@ -28,7 +28,7 @@ item-archive`, idempotent because `item-list` omits archived items; `session_bri
 | `Gh` | Runs `gh` with an argument list (no shell), reading its output as UTF-8 (Windows' default code page would garble text written back to GitHub); `dry_run` prints instead. Tests replace it. |
 | `_body_file(text)` | Writes issue text to a temp file for `--body-file`. |
 | `ensure_labels(gh, labels)` | `gh label create --force` for each. |
-| `sync_roles(gh, max, sleep)` | Queue → issues, saving the queue after each (crash-safe). |
+| `sync_roles(gh, max, sleep)` | Queue → issues, saving the queue after each (crash-safe). First a **duplicate-ref guard**: a queued role whose ref is already in `issue_map.json` is the same role found again (a LinkedIn alert for a hand-added role, a re-post), so it is dropped from the queue with a printed line instead of getting a second card. Different refs for one job (one posting per country) cannot be told apart here; see `tools/jd_dupes.py`. |
 | `_load`, `_remember_issue` | JSON read helper; record `ref → issue number`. |
 | `backfill_map(gh)` | Rebuild `issue_map.json` from every role issue's hidden marker. |
 | `sync_stale(gh)` | Add/remove `possibly-closed`. It also labels issues already closed (the issue map holds every ref); harmless, since closed cards are out of the working views. |
@@ -37,6 +37,7 @@ item-archive`, idempotent because `item-list` omits archived items; `session_bri
 | `gh_json`, `load_board`, `_read_fields`, `_save_board` | JSON output of gh; read `profile/board.json`; field and option IDs; save board.json. |
 | `setup_project(gh, repo)` | Create or adopt the "Job search" Project, create missing fields, link the repo, save IDs. |
 | `_items(gh, board, refresh=False)`, `find_item(gh, board, ref)` | All cards, read **once per `gh` object** (cached as `gh._items_cache`; `_edit` updates the cached cards after each write; `refresh=True` re-reads; dry runs never cache); the card whose body has this ref's marker. `jd_check.py score` and `sponsorship.py record` take several refs and share one `Gh`, so a batch costs one board read. |
+| `no_card_reason(gh, ref)` | Why `find_item` found nothing: if the issue exists and its project item is archived (checked with one GraphQL query), says the card is archived and must not be restored unasked; otherwise says it was never created (queue not yet turned into issues). |
 | `_edit(gh, board, item, field, value)` | Set one field (single-select by option ID, date, or number). |
 | `FIT_START`, `FIT_END`, `fit_section(score, scored_on)`, `with_fit(body, section)`, `set_fit_section(gh, ref, score, scored_on)` | The card's fit breakdown from a validated `score.json` (third-party-derived text escaped with `md()`), inserted before the Role ID line or replacing the previous block between the markers. |
 | `promote(refs)` | CLI `promote`: queue cards for recorded roles not on the board (skips ones already carded or queued); `roles` opens them. |
@@ -68,18 +69,18 @@ what it would queue),
 
 ## `tools/jd_cleanup.py`: trim the JD packets of roles you are done with
 
-`candidates(root, now)` lists `work/jd/<ref>/` folders whose `jd.txt` and `packet.md` are past their retention: Stage Skipped 14 days after it was skipped, Rejected 30 days after, scored skip with no stage change 14 days after the score (days overridable in `profile/config.json` `cleanup`). `run(root, now, dry)` removes those two files (never `score.json`, `meta.json` or `sponsorship.json`) and stamps the `jd_cleanup` cadence job; the SessionStart hook calls it daily (the cadence marks it due after 48 hours) and the CADENCE block has a line for it. Roles in New, Shortlisted, Applied, Interview or Offer are never touched.
+`candidates(root, now)` lists `work/jd/<ref>/` folders whose `jd.txt` and `packet.md` are past their retention: Stage Skipped 14 days after it was skipped, Rejected 30 days after, scored skip with no stage change 14 days after the score (days overridable in `profile/config.json` `cleanup`). `run(root, now, dry)` removes those two files (never `score.json`, `meta.json` or `sponsorship.json`) and stamps the `jd_cleanup` cadence job; the SessionStart hook calls it whenever the cadence marks it due (48 hours since the last run) and the CADENCE block has a line for it. Roles in New, Shortlisted, Applied, Interview or Offer are never touched.
 
 ## `tools/cadence.py`: the cadence ledger (standard library only)
 
-The session brief's CADENCE block lists every recurring job and whether it is due, so none runs silently. Jobs Claude runs (they need Gmail or Chrome, which a hook cannot drive) stamp themselves in `work/.cadence.json` when finished.
+The session brief's CADENCE block lists every recurring job and whether it is due, so none runs silently ([page 4](04-Claude-session.md#cadence-the-recurring-jobs) has the full table). Jobs Claude runs (they need Gmail or Chrome, which a hook cannot drive) stamp themselves in `work/.cadence.json` when finished.
 
 | Name | Is |
 |---|---|
-| `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 20, `auto_score` 4, `views_check` 24, `health` 24, `cv_review` 168, `jd_cleanup` 48, `system_review` 168 (eight jobs; the system review only where the maintainer-only `system-review` skill exists, shown through `block(..., system_review_job=True)`). |
+| `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 20, `auto_score` 4, `views_check` 24, `health` 24, `cv_review` 168, `jd_cleanup` 48, `system_review` 168 (eight jobs; the system review only where the maintainer-only `system-review` skill exists, shown through `block(..., system_review_job=True)`). The same table with who runs each: [page 4](04-Claude-session.md#cadence-the-recurring-jobs). |
 | `done(name, root, now)`, `last(name, root)`, `load(root)` | Stamp a job as just finished; read a stamp; read the ledger. CLI: `python tools/cadence.py done <name>` and `show`. |
 | `is_due(name, now, root)`, `when(name, now, root, fallback)` | True when never run or older than its interval; the "last ran … (Nh ago)" text. |
-| `block(now, root, …)` | Returns the brief's CADENCE lines (radar search, new roles to the board, scoring, inbox check, LinkedIn post sweep, board views vs code, health, CV review, JD packet cleanup (due after 48 hours without a stamp; the SessionStart hook runs `tools/jd_cleanup.py` daily, and the line makes a silent failure visible), the application-mail scan (the `mail_scan` argument: due when the Action's mail ledger is more than 36 hours old), docs review) and the names of the due jobs, then one line per **one-off reminder** (`work/.reminders.json`, managed by `cadence.py reminder add|done|list`: it shows from its due date until `reminder done` removes it, for work that happens once, unlike the recurring jobs). These arguments make a line DUE: `views_drift` (the brief's design-diff note: update `VIEWS` to the user's live layout, then `cadence.py done views_check`) and `docs_review` (the reason from `docs_review_note()`: run `docs-review`, which stamps `work/.last_docs_review` itself), `source_problems` (a count from `status_info()`; DUE when above 0 and the `health` job is older than a day: run `health`, then `cadence.py done health`) and `cv_gaps` (the "CV gaps" note from `health_checks()`; DUE when set and `cv_review` is older than a week: offer `cv-review`, then `cadence.py done cv_review`). `session_brief.cadence_block()` gathers its inputs from `matches.csv`, the issue map, the queue and the board, and passes both through. |
+| `block(now, root, …)` | Returns the brief's CADENCE lines and the names of the due jobs, then one line per **one-off reminder** (`work/.reminders.json`, managed by `cadence.py reminder add|done|list`: it shows from its due date until `reminder done` removes it). Which line exists, when each is DUE and how it is stamped: the table on [page 4](04-Claude-session.md#cadence-the-recurring-jobs). Arguments that make a line DUE: `views_drift`, `docs_review` (the reason from `docs_review_note()`), `source_problems` (a count from `status_info()`), `cv_gaps` (the note from `health_checks()`), `mail_scan` (from `app_mail.scan_line()`). `session_brief.cadence_block()` gathers the inputs from `matches.csv`, the issue map, the queue and the board. |
 
 ## `tools/session_brief.py`: the SessionStart hook (standard library only)
 
@@ -92,7 +93,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `calibration_notes(now)`, `LAST_CALIBRATION` | Run `calibrate.apply` at most weekly; report each change with its undo command and a reminder to commit the config. |
 | `referral_route_pick(root, scores, items, by_ref, n)` | The brief's REFERRAL-ROUTE line: live (New/Shortlisted, not Done) cards scored apply/maybe at an employer with a contact in `profile/network.csv` (`referrals.contacts`) and no record in `data/referrals.jsonl`, at most 8. Any error returns no lines (a missing network file must not stop the brief). |
 | `sponsor_check_pick(scores, checked, items, n)`, `read_sponsor_keys(root)` | The brief's SPONSOR-CHECK line: live (New/Shortlisted, not Done) board cards scored apply/maybe with no record in `data/sponsorship.jsonl`, at most 10; Claude runs `sponsorship-check` on them (standing rule: every role on the board gets a verdict). |
-| `auto_score_count(root)`, `auto_score_pick(rows, scored, items, n)`, `start_prep(refs)` | How many roles to score automatically; which (freshest unscored Tier 1, not closed/skipped); fetch their JDs in the background. |
+| `auto_score_count(root)`, `auto_score_pick(rows, scored, items, n)`, `start_prep(refs)` | How many roles to score automatically; which (every unscored live board card of any tier, then the freshest unscored Tier 1 roles; not closed/skipped); fetch their JDs in the background. |
 | `referral_notes(now)` | Asks unanswered after `referrals.wait_days`, as health notes (at most 5). |
 | `stale_days(root)` | `board.stale_days` from the config, for the brief's "looks closed" line. |
 | `skipped_refs(root)` | Refs whose latest logged Stage is Skipped/Rejected, so an archived skip (gone from the board read) is not auto-scored or counted unscored again. |
@@ -125,6 +126,8 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 |---|---|
 | `PRIVATE`, `NEVER_COPY`, `PUBLIC` | What may never be published; what's never copied (venv, caches, clones); what may be published (allowlist). |
 | `is_private(rel)`, `is_public(rel)` | Path tests. Public = on `PUBLIC`, not on `PRIVATE`, not `NEVER_COPY`. |
+| `MAINTAINER_ONLY`, `MAINTAINER_SKILLS` | Path patterns only the maintainer of the public template uses (`.claude/skills/docs-review/*`, `.claude/skills/system-review/*`, `.githooks/*`), added to `PRIVATE`, so never published and removed from the template by `publish()`; and the two skill names (`docs-review`, `system-review`), which the session brief mentions only when they exist in a copy. |
+| `maintainer_only_files(root)`, `restore_maintainer_only(before, tracked, root)` | The tracked files here that match `MAINTAINER_ONLY`; after `autopublish` merges the template back (the template lacks them, so the merge deletes them), check the missing ones out from the commit before the merge and commit that. |
 | `export(dest)` | Build a clean template tree in an empty folder. |
 | `drift(fetch)` | Public files changed in **commits** here since the last template merge. Uncommitted edits are not included. |
 | `dirty_public()`, `committed_bytes(rel)` | Public files with uncommitted changes (reported, not published); a file as committed in `HEAD` (what `publish` copies, never the working-tree version) |
@@ -160,17 +163,16 @@ out of date.
 
 **Watch out**: a second ask after someone already referred leaves the field at *Referred* (the ask is still logged and commented).
 
-## `tools/add_role.py` and `jobradar/intake.py`: roles added by hand go through the daily run's pipeline
+## `tools/add_role.py`: roles added by hand go through the daily run's pipeline
 
 `add_role.py <job url>` (Greenhouse, Lever, Ashby links) fetches the company's board through ats-scrapers, finds the posting and hands it to
-`intake.admit()`, which runs the same functions as `radar.py`: `select()` (countries, titles, permanent-only, `max_age_days`, employer list),
-`group_postings` + `diff_seen` (dedupe against everything seen), `enrich()` (sponsor tags, tier, score), `append_matches()` and the board
-queue. `select()` stops at the first filter that drops a role, so `admit()` re-runs it with each triggered filter bypassed (`skip=`) to name
-**every** reason. A role the filters would drop is reported and not added; `--override country,old,…` (only on the user's word) adds it anyway
-and `data/matches.csv` `origin` records it (`manual-override:country,old`; blank for the daily run, `manual` for a role that passed).
-`post_leads.py add-role` uses the same door (`--override` there too). Why: two Anthropic roles added by hand on 2026-10-07 (posted 89 and
-623 days before, `max_age_days` 30) skipped the age filter that the daily run applies. For a link the fetch cannot read (LinkedIn, a company site, a pasted ad) `--company --title --location --posted [--countries]` build the posting by hand (`intake.manual_posting`, source `manual`) and it goes through the same filters. `--dry-run` writes nothing. It writes the same files
-the Action writes (`data/matches.csv`, `state/seen.json`, `state/board_queue.json`), so commit and pull as for any session change.
+`intake.admit()` (module reference: [5.2 `jobradar/intake.py`](05-2-Package.md#jobradarintakepy-roles-that-arrive-by-hand)). A role the filters would drop
+is reported and not added; `--override country,old,…` (only on the user's word) adds it anyway and `data/matches.csv` `origin` records it
+(`manual-override:country,old`; blank for the daily run, `manual` for a role that passed). `post_leads.py add-role` uses the same door
+(`--override` there too). For a link the fetch cannot read (LinkedIn, a company site, a pasted ad) `--company --title --location --posted [--countries]`
+build the posting by hand (`intake.manual_posting`, source `manual`) and it goes through the same filters. `--dry-run` writes nothing. It writes the same files
+the Action writes (`data/matches.csv`, `state/seen.json`, `state/board_queue.json`), so commit and pull as for any session change. Why it exists: a role added
+by hand once skipped the age filter (posted 89 and 623 days before, `max_age_days` 30) that the daily run applies.
 
 ## `tools/post_leads.py`: LinkedIn hiring-post discovery (standard library only)
 
@@ -225,7 +227,7 @@ countries and everything else remain the user's decision.
 
 ## `tools/careers_queue.py`: the Chrome careers-site log and queue
 
-Companies the radar cannot read (not VERIFIED in `data/coverage_report.csv`, or zero jobs in the user's countries, plus `chrome_always`) are read by Claude on their own careers pages in Chrome. The queue is separate from the LinkedIn post sweep so the post sweep's small cap cannot starve them. State: `state/chrome_careers.json` (per company: last read, runs, url, note).
+Companies the radar cannot read (not VERIFIED in `data/coverage_report.csv`, or zero jobs in the user's countries, plus `chrome_always`) are read by Claude on their own careers pages in Chrome. They share ONE cap with the LinkedIn post searches (`max_searches`, planned by `tools/sweep_plan.py`; why: a separate cap would double it). State: `state/chrome_careers.json` (per company: last read, runs, url, note).
 
 | Name | What it does |
 |---|---|
@@ -234,3 +236,10 @@ Companies the radar cannot read (not VERIFIED in `data/coverage_report.csv`, or 
 | `set_url(company, url)` | Remembers the search page that worked |
 | `needs_chrome(company, rows, always)` | True when the coverage row is missing, not VERIFIED, or has zero jobs in the user's countries |
 CLI: `done`, `url`, `status`. The pass is planned by `tools/sweep_plan.py`; this module only records.
+
+
+### `tools/jd_dupes.py`
+
+Read-only. Compares the full saved ad texts (`work/jd/<ref>/jd.txt`) of cards from the same company, never titles alone. A pair is `SAME` when at least 90% of the shorter ad's 8-word runs are in the longer one and the shorter ad is not tiny; the tool also prints the sentences only one ad has, so the verdict is checked against the differing text. It writes nothing and moves no card: one job is posted once per country and each gets its own ref, and the user decides what is skipped. Run by `score-roles` step 2b.
+
+`session_brief.score_pick_now()` (CLI `session_brief.py --score-pick`) recomputes the auto-score pick from the live board and `matches.csv`, so roles added by the session's sweeps are included; it is read-only and starts no background job.

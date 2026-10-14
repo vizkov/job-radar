@@ -199,6 +199,9 @@ def parse_match(body: str) -> list[dict]:
     return jobs
 
 
+# Digest mails open with "Your job alert for <search> in <place>"; single-job mails carry no search name.
+_ALERT_NAME = re.compile(r"^Your job alert for (.+?)(?: in .+)?$", re.I | re.M)
+
 _SUBJECT_PLACE = re.compile(r"\bjobs? in (.+?)(?: is now active)?$", re.I)
 
 
@@ -211,6 +214,8 @@ def to_postings(msg: Message, p: Provider) -> list[Posting]:
     # locations the country lookup doesn't know (small towns).
     hit = _SUBJECT_PLACE.search(" ".join((msg.get("Subject") or "").split()))
     place = hit.group(1) if hit else ""
+    named = _ALERT_NAME.search(_part(msg, "text/plain"))
+    alert = " ".join(named.group(1).split()) if named else ""
     out = []
     try:
         when = parsedate_to_datetime(msg.get("Date")) if msg.get("Date") else None
@@ -221,7 +226,7 @@ def to_postings(msg: Message, p: Provider) -> list[Posting]:
         out.append(Posting(source=f"{p.name}_email", company=j["company"], title=j["title"],
                            location=j["location"], countries=frozenset(countries),
                            url=j.get("link") or p.url.format(id=j["id"]), external_id=j["id"], posted_at=when,
-                           raw={"message_id": msg.get("Message-ID", "")}))
+                           raw={"message_id": msg.get("Message-ID", ""), "alert": alert}))
     return out
 
 

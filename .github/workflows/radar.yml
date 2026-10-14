@@ -106,4 +106,20 @@ jobs:
           git config user.email "job-radar@users.noreply.github.com"
           git add state digests data/matches.csv 2>/dev/null || true
           git diff --cached --quiet || git commit -m "radar: $(date -u +%F)"
-          for i in 1 2 3; do git pull -q --rebase origin main && git push && break; [ "$i" = 3 ] && exit 1; sleep 10; done  # a local push may land mid-run
+          # A local push may land mid-run. If the rebase then conflicts, take this run's fresh copy of the
+          # regenerated snapshot files only; any other conflict (a ledger, a user file) aborts and fails as before.
+          sync() {
+            git pull -q --rebase origin main && return 0
+            bad=0
+            for f in $(git diff --name-only --diff-filter=U); do
+              case "$f" in
+                digests/latest.md|digests/status.md|state/health.json|state/application_mail_status.json)
+                  git checkout --theirs -- "$f" && git add "$f" ;;
+                *) bad=1 ;;
+              esac
+            done
+            if [ "$bad" = 0 ] && GIT_EDITOR=true git rebase --continue; then return 0; fi
+            git rebase --abort || true
+            return 1
+          }
+          for i in 1 2 3; do sync && git push && break; [ "$i" = 3 ] && exit 1; sleep 10; done

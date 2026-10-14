@@ -7,7 +7,7 @@ security, pentest and security-consulting roles in Europe; the job titles, count
 companies are your settings, and Claude changes them for you. Three times a day it checks
 the job boards of the companies you want to work for, plus public job services (EURES for the EU, the German
 and Swedish employment agencies, and optionally Reed for the UK) and, optionally, your job-alert emails.
-LinkedIn, Indeed and Glassdoor jobs come in only through those alert emails; job-radar never scrapes those sites (the only exceptions are three opt-in, read-only uses in your own Chrome, listed in "What Claude will not do" on page 2). It puts every new matching role on a board for you. You
+LinkedIn, Indeed and Glassdoor jobs come in only through those alert emails; job-radar's automatic runs never scrape those sites. The only exceptions are a few narrow, read-only uses in your own Chrome, off until you say yes, all listed in one place: [LinkedIn consent](Your-part.md#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup). It puts every new matching role on a board for you. You
 use it through **two things only**:
 
 1. **Claude.** You talk to it in Claude Code, in your private copy of this project. It
@@ -17,7 +17,7 @@ use it through **two things only**:
 2. **Your board.** A GitHub Project where every new role is a card. You (or Claude) move
    each card along: New → Shortlisted → Applied → Interview → Offer.
 
-You don't write code or edit settings files. At most, you type one command Claude gives you
+You don't write code or edit settings files (Claude keeps your preferences in settings files and changes them when you ask in plain words). At most, you type one command Claude gives you
 and click a few settings on GitHub; [Your part](Your-part.md) lists every one.
 
 ## Read these, in order
@@ -43,13 +43,15 @@ developers and for Claude.
 | **Sponsor** | Will the employer sponsor your work visa for this job? It starts as a register check (**Licensed** = on the UK/Dutch list of employers allowed to sponsor, which means *can*, not *will*). When Claude researches a role it becomes **Confirmed**, **Likely**, **Unlikely** or **No**, with the evidence on the card. **Unclear** means the register check couldn't tie the employer to a licence, or the country has no public register (Ireland, Germany, Sweden, Switzerland). |
 | **Referral** | Whether someone has referred you for the job: Finding contact, Asked, Referred, No route, or Not needed. You ask the people you know; Claude drafts only notes to recruiters or hiring managers, and keeps track. |
 | **Posted** | When the employer posted the job. Some sources don't say; then it's the day job-radar first found it, which is usually within hours. Newer is better: early applications do better. |
+| **Master documents** | Your three source documents: your CV, your STAR stories and your cover-letter paragraphs, kept in your private copy. Every tailored CV and letter is built only from lines in them, so nothing is invented. When you change one, Claude re-checks them against each other and rebuilds the applications that used the old version. |
+| **Settings** | Your preferences (countries, job titles, companies, how old a role may be, which sources to read). Claude changes them when you ask; you never open the files. |
 | **Role ID** | A 16-character code on each card. Mention it (or just the company and role) and Claude finds everything about that job. |
 | **Target companies** | The list of employers you want. Roles at other employers are left off your board, wherever they were found, unless you ask otherwise. |
 | **Repository (repo)** | Your project's folder on GitHub. Yours is **private**: only you (and anyone you invite) can see it, its issues and its board. |
 | **Issue** / **label** | GitHub's name for a discussion item, and a coloured tag on it. Each card on your board is an issue; labels like `role` or `possibly-closed` are how the automatic runs pass information to it. |
 | **GitHub Actions** | GitHub's service that runs job-radar's automatic search on its servers, on a schedule, without your computer being on. |
 | **Secret** | A password stored encrypted in your repo's settings, readable only by the automatic runs. |
-| **Session** | One conversation with Claude in Claude Code. Each one starts with a short briefing. Separately, Claude plans limit how much you can use Claude in each few-hour window; costs below are given as a share of that allowance, and typing `/usage` in Claude Code shows how much is left. |
+| **Session** | One conversation with Claude in Claude Code (a terminal window where you talk to Claude). Each one starts with a short briefing. Separately, Claude plans limit how much you can use Claude in each few-hour window; costs below are given as a share of that allowance, and typing `/usage` in Claude Code shows how much is left. |
 | **STAR story** | A short account of something you did: Situation, Task, Action, Result. Used for cover letters and interview answers. |
 | **ATS** (applicant tracking system) | The software employers use to post jobs and receive applications (Greenhouse, Workday…). "ATS-safe" CVs are plain enough for it to read. |
 | **The checker** | Code that inspects everything Claude writes for you (scores, tailored CVs) and rejects anything invented. |

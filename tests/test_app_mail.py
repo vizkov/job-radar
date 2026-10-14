@@ -281,3 +281,10 @@ def test_sender_domain_is_matched_by_label_not_substring():
     assert am.is_ats("x <a@hire.acme.com>")
     assert not am.is_ats("x <a@yorkshire.gov.uk>")                  # contains "hire." as a substring
     assert not am.is_ats("x <a@notamazon.jobs>") and not am.is_ats("x <a@evil-lever.co>")
+
+
+def test_n8n_style_rejection_without_the_word_unfortunately_is_a_rejection():
+    text = ("after carefully considering all the applications, we've decided to move on to the next stages of the hiring "
+            "process with some other talents. It wasn't an easy decision")
+    assert app_mail.classify_mail("n8n | Follow-up on your application", text)[0] == "rejection"
+    assert app_mail.classify_mail("Next steps", "We would like to move on to the next stage with you")[0] != "rejection"

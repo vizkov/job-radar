@@ -29,11 +29,19 @@ def test_pending_lists_only_applied_and_interview(tmp_path):
     matches.write_text("ref,company,title\nr1,Apple,Vulnerability Engineer\nr3,Sonar,AppSec\nr2,Other,X\n")
     log = tmp_path / "log.jsonl"
     log.write_text(json.dumps({"ref": "r1", "field": "Stage", "value": "Applied", "at": "2026-09-30T13:51:35+00:00"}) + "\n")
-    got = io.pending(snap, matches, log)
+    chk = tmp_path / "checked.json"
+    got = io.pending(snap, matches, log, chk)
     assert [r["ref"] for r in got] == ["r3", "r1"] or [r["ref"] for r in got] == ["r1", "r3"]
     apple = next(r for r in got if r["ref"] == "r1")
     assert apple["gmail_query"] == '"Apple" after:2026/09/30'
     assert apple["title"] == "Vulnerability Engineer"
+    # once a role's mail has been read, the next search starts at that day, never at the application date
+    assert io.mark_checked(["r1"], "2026-11-07", chk) == "2026-11-07"
+    apple = next(r for r in io.pending(snap, matches, log, chk) if r["ref"] == "r1")
+    assert apple["gmail_query"] == '"Apple" after:2026/11/07'
+    assert apple["last_checked"] == "2026-11-07"
+    io.mark_checked(["r1"], "2026-11-01", chk)  # an older stamp never moves the mark back
+    assert io.checked_dates(chk)["r1"] == "2026-11-07"
 
 
 def test_seen_roundtrip(tmp_path):
@@ -56,7 +64,7 @@ def test_log_overrides_a_stale_snapshot(tmp_path):
         {"ref": "r2", "field": "Stage", "value": "Applied", "at": "2026-09-29T10:00:00+00:00"},
         {"ref": "r2", "field": "Stage", "value": "Rejected", "at": "2026-10-02T10:00:00+00:00"},
     ]) + nl)
-    assert [r["ref"] for r in io.pending(snap, matches, log)] == ["r1"]
+    assert [r["ref"] for r in io.pending(snap, matches, log, tmp_path / "checked.json")] == ["r1"]
 
 
 def test_real_confirmation_emails_are_acknowledgements():
@@ -68,3 +76,27 @@ def test_amazon_progress_with_other_candidates_is_a_rejection():
     # Amazon's rejection says "we have decided to progress with other candidates" (2026-10-05); the classifier had said unknown
     text = "After careful consideration and review of your application, we have decided to progress with other candidates for this role."
     assert io.classify("Amazon application: Status update", text)[0] == "rejection"
+
+
+def test_gmail_hook_records_opened_ids_and_per_role_checks(tmp_path):
+    import inbox_hook as hook
+    seen, chk = tmp_path / "seen.json", tmp_path / "checked.json"
+    snap = tmp_path / "snap.json"
+    snap.write_text(json.dumps({"r1": "Applied"}))
+    matches = tmp_path / "m.csv"
+    matches.write_text("ref,company,title\nr1,Apple,Vulnerability Engineer\n")
+    log = tmp_path / "log.jsonl"
+    log.write_text(json.dumps({"ref": "r1", "field": "Stage", "value": "Applied", "at": "2026-09-30T13:51:35+00:00"}) + "\n")
+    kw = dict(snapshot=snap, matches=matches, log=log)
+    # an opened thread: ids found in a JSON-in-text result, as MCP content blocks come back
+    resp = {"content": [{"type": "text", "text": json.dumps({"id": "1a1b320a21675a32", "messages": [{"id": "1a1ad8c6c2ea0c82"}]})}]}
+    assert hook.handle({"tool_name": "mcp__claude_ai_Gmail__get_thread", "tool_response": resp}, seen, chk, **kw) == "seen 2"
+    assert io.seen_ids(seen) == {"1a1b320a21675a32", "1a1ad8c6c2ea0c82"}
+    # a per-role search stamps the role; a broad or multi-company search stamps nothing
+    q = {"tool_name": "mcp__claude_ai_Gmail__search_threads", "tool_response": {}, "tool_input": {"query": '"Apple" after:2026/09/30'}}
+    assert hook.handle(q, seen, chk, **kw) == "checked 1" and "r1" in io.checked_dates(chk)
+    q["tool_input"]["query"] = 'newer_than:10d ("Apple" OR "Sonar")'
+    assert hook.handle(q, tmp_path / "s2.json", tmp_path / "c2.json", **kw).startswith("broad")
+    # errors and other tools are ignored
+    assert hook.handle({"tool_name": "mcp__claude_ai_Gmail__get_thread", "tool_response": {"is_error": True}}, seen, chk, **kw) == "ignored"
+    assert hook.handle({"tool_name": "Bash", "tool_response": "x"}, seen, chk, **kw) == "ignored"

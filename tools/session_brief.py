@@ -294,13 +294,20 @@ def skipped_refs(root: Path) -> set:
 
 def auto_score_pick(rows: list[dict], scored: dict, items: list[dict] | None, n: int,
                     skipped: set = frozenset()) -> list[dict]:
-    """The freshest unscored Tier 1 roles on the list, skipping cards the user already closed or skipped."""
+    """The freshest unscored roles: Tier 1 roles on the list plus every live board card, skipping cards the user already closed or skipped."""
     done = set(skipped)
     for i in items or []:
         hit = _REF.search((i.get("content") or {}).get("body") or "")
         if hit and (i.get("stage") in ("Skipped", "Rejected", "Offer") or i.get("status") == "Done"):
             done.add(hit.group(1))
-    todo = [r for r in rows if str(r.get("tier")) == "1" and r.get("on_list") == "yes"
+    # Every live, unacted card needs a score, whatever its tier (the user, 2026-10-20: the pick saw only Tier 1
+    # rows from matches.csv, so Tier 2 cards that reached the board stayed unscored and the board never filled).
+    on_board = set()
+    for i in items or []:
+        hit = _REF.search((i.get("content") or {}).get("body") or "")
+        if hit and i.get("stage") in (None, "", "New", "Shortlisted") and i.get("status") != "Done":
+            on_board.add(hit.group(1))
+    todo = [r for r in rows if ((str(r.get("tier")) == "1" and r.get("on_list") == "yes") or r.get("ref") in on_board)
             and r.get("ref") not in scored and r.get("ref") not in done]
     seen, out = set(), []
     for r in sorted(todo, key=lambda r: (r.get("posted") or r.get("date") or ""), reverse=True):
@@ -661,9 +668,11 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
     pick = auto_score_pick(rows, scores, items, auto_n, skipped) if auto_n else []
     if pick:
         prep = start_prep([r["ref"] for r in pick]) if start_background else ""
-        lines.append(f"- AUTO-SCORE (config scoring.auto_per_session={auto_n}): before answering the user's first "
-                     "message, run score-roles on these refs, freshest first, then answer them; say so in one line, "
-                     "and skip it only if they ask for something urgent: " + ", ".join(r["ref"] for r in pick)
+        lines.append(f"- AUTO-SCORE (config scoring.auto_per_session={auto_n}): the LAST job of the session, after the post sweep, "
+                     "inbox check, health and the other DUE jobs (the user, 2026-10-22: those add roles, which then went unscored). "
+                     "Answer the user's first message first; when the other jobs are done, run `python tools/session_brief.py "
+                     "--score-pick` for the current list (it includes roles the sweeps added) and score-roles on it, freshest "
+                     "first. At session start these were pending: " + ", ".join(r["ref"] for r in pick)
                      + (f" ({prep})" if prep else ""))
     unchecked = sponsor_check_pick(scores, read_sponsor_keys(root), items)
     if unchecked:
@@ -742,7 +751,24 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
     return "\n".join(lines) + "\n"
 
 
+def score_pick_now() -> str:
+    """The roles to score right now (`--score-pick`): the AUTO-SCORE pick recomputed from the live board and matches.csv,
+    so roles the session's sweeps added are included. Read-only; no pull, no background jobs."""
+    root = ROOT
+    n = auto_score_count(root)
+    if not n:
+        return "automatic scoring is off (scoring.auto_per_session is 0)"
+    items, note = board_items(root, run)
+    pick = auto_score_pick(read_matches(root), read_scores(root), items, n, skipped_refs(root))
+    if note:
+        return f"board unreadable ({note}); try again in a minute"
+    return (f"{len(pick)} to score: " + ", ".join(r["ref"] for r in pick)) if pick else "nothing to score: every live card and recent Tier 1 role has a score"
+
+
 def main() -> int:
+    if "--score-pick" in sys.argv[1:]:
+        print(score_pick_now())
+        return 0
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     try:
         if not (ROOT / "profile").exists():

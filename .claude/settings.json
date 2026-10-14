@@ -12,6 +12,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__claude_ai_Gmail__(search_threads|get_thread|get_message)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"$CLAUDE_PROJECT_DIR/tools/inbox_hook.py\" 2>/dev/null || python3 \"$CLAUDE_PROJECT_DIR/tools/inbox_hook.py\" 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }

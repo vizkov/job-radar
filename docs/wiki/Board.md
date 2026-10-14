@@ -6,9 +6,11 @@ Your GitHub Project is the dashboard: one card per role, plus a "Radar status" c
 New cards arrive three times a day. (How they get there, for the curious:
 [Board internals](../design/11-Board-internals.md).)
 
-**If a view looks empty:** cards that arrived since your last Claude session may have blank Stage, Tier, Country or
-Posted fields until Claude next opens (it fills them at the start of every session), and views filter on those.
-The **All Roles** view shows every card except the ones you've already applied to, so it still shows the blank ones.
+**Columns stay blank until a Claude session fills them.** GitHub doesn't let the automatic runs write to your board's columns, so a card
+that arrived since your last session may have blank Stage, Tier, Country or Posted fields until you next open Claude Code (it fills
+them in the background at the start of every session, in a minute or two). Views filter on those columns, so "Act now" won't show a blank card yet; the
+**All Roles** view shows every card except the ones you've already applied to, so it still shows them. Nothing is lost in the meantime. If
+you add a column later and it is empty on older cards, Claude notices at the start of the next session and fills it in wherever it can work the value out.
 
 ## Fields
 
@@ -22,13 +24,6 @@ The **All Roles** view shows every card except the ones you've already applied t
 | Sponsor | Confirmed, Likely, Licensed, Unclear, Unlikely, No | Starts as a **register match only** (Licensed, Unclear or Unlikely): the employer holds a UK/NL sponsor licence, which says it *can* sponsor, not that it will. When Claude checks a role (the ad, the country's rules, the company's own pages), it sets **Confirmed**, **Likely**, **Unlikely** or **No** and adds the evidence, with links, to the card |
 | Referral | Finding contact, Asked, Referred, No route, Not needed | Claude, as you tell it about referral asks (each step is also a comment on the card) |
 | Posted | date | When the employer posted it; if the source doesn't say, the day job-radar first found it. Sort by it to apply early |
-
-Cards that arrived since your last Claude session may have empty fields: GitHub doesn't
-let the automatic runs write to your board's columns, so Claude fills them when you next
-open a session (it takes a minute or two, in the background). Until then, "Act now" and
-other views that filter on those columns won't show those cards yet; the "All Roles" view
-does. Nothing is lost in the meantime. If a column you add later is empty on older cards, Claude
-notices at the start of the next session and fills it in by itself, wherever it can work the value out.
 
 Moving a role to Offer, Rejected or Skipped closes its issue. It works the other way too: if you
 **close a card** (or mark it Done) that you hadn't acted on, Claude sets its Stage to Skipped at your
@@ -78,7 +73,7 @@ can see it.
 
 | View | What it's for |
 |---|---|
-| **Act now** | Open roles you haven't applied to or skipped that are either brand new or posted 14 or more days ago (the ones about to expire: apply before they close), best fit first |
+| **Act now** | The roles that need a decision today: ones you haven't applied to or skipped (and that Claude hasn't scored Skip or flagged as probably closed) which are either brand new or have been listed for 14 days or more and may close soon, best fit first |
 | **All Roles** | Every role you haven't applied to yet, best fit first |
 | **Pipeline** | A board with one column per Stage; drag cards as things happen |
 

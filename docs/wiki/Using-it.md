@@ -25,7 +25,7 @@ do?" or type `/manual` (it's generated from the system itself).
 | You say | Claude does |
 |---|---|
 | "What's new?" / "How's my search going?" | Tells you the few roles most worth your time (freshest first), what's not yet scored, what's waiting on a reply, anything broken |
-| "Score this one" + a pasted job description | LinkedIn roles: Claude reads the description itself in your Chrome, one page at a time. Indeed and Glassdoor roles, which Claude never opens: paste the description and it scores it like any other |
+| "Score this one" + a pasted job description | LinkedIn roles: if you switched it on ([LinkedIn consent](Your-part.md#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup)), Claude reads the description itself in your Chrome; otherwise paste it. Indeed and Glassdoor roles, which Claude never opens: paste the description and it scores it like any other |
 | "Which of these fit me?" / "Is the Bridewell role worth it?" | Reads each job description and compares it with your CV: a Fit score, which requirements you meet (and the CV line that proves it), blockers such as security clearance or right to work, and Apply / Maybe / Skip. Puts Fit and Recommendation on the card |
 
 ### Applying
@@ -33,7 +33,8 @@ do?" or type `/manual` (it's generated from the system itself).
 | You say | Claude does |
 |---|---|
 | "Will Amazon sponsor my visa for this role?" | Checks what the ad says (and quotes it), applies that country's visa rules, checks the UK/Dutch registers, and looks at the company's own careers pages. Sets the card's Sponsor column to Confirmed, Likely, Unlikely or No, with the evidence and links on the card. Done automatically for roles recommended Apply or Maybe, before any referral ask |
-| "Who should I contact at N26?" (when you're applying) | If you know nobody there, Claude looks for the likely hiring manager and a recruiter: first on public pages, then on LinkedIn. By default it gives you the LinkedIn search links to open. If you've switched on the LinkedIn lookup, it reads the search results in your logged-in Chrome instead: for that one role, only when you ask, read-only (it never connects or messages). LinkedIn's terms ban any automated access, so that setting puts your account at some risk; it's off unless you turn it on. It suggests one person of each kind and drafts the notes for you to send |
+| "Which domains can I show?" / "Target fintech" | Asks you short plain-words questions about work your CV never mentions (for example whether you saw card numbers swapped for tokens), then records which industry domains your record backs, with the CV lines and stories that prove each. It only writes what you say, and it keeps a list of what you must not claim. Tailoring and scoring use it. Setup runs it too, while your CV is being written |
+| "Who should I contact at N26?" (when you're applying) | If you know nobody there, Claude looks for the likely hiring manager and a recruiter: first on public pages, then on LinkedIn. By default it gives you the LinkedIn search links to open. If you've switched on the LinkedIn lookup ([LinkedIn consent](Your-part.md#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup)), it reads the search results in your logged-in Chrome instead. It suggests one person of each kind and drafts the notes for you to send |
 | "Check LinkedIn posts" / "Has anyone posted hiring?" | If you've switched it on, Claude reads LinkedIn hiring posts and reposts by recruiters and hiring managers in your Chrome (a few searches, read-only), follows reposts to the person who wrote the original, and adds roles the job boards don't have as cards with the poster named. Paste a post you've seen and it does the same |
 | "Who do I know at Amazon?" / "I asked Priya" / "Priya referred me" | Before you apply, Claude checks who you've said can help at that company and suggests one person per role. You message people you know yourself; Claude gives you the role links and job IDs to pass on. Only for strangers (recruiters, HR, hiring managers) does it draft the message, from your own CV lines, for you to send: after you have applied, with that role's tailored CV attached for you to add (a connection request can't carry a file, so the CV follows once they accept). Every ask is tracked on the card's **Referral** column. If nobody answers within 4 days (you can change that), it suggests one follow-up or applying directly |
 | "Tailor my CV for the MDSec role" | Builds a CV and cover letter from **your own** CV lines, picked and reordered for that job; a checker makes sure nothing was invented. You get two PDFs, a two-page CV and a one-page cover letter, laid out like your own documents and built so applicant tracking systems read them reliably |
@@ -57,11 +58,11 @@ do?" or type `/manual` (it's generated from the system itself).
 | "Add a view with only Tier 2 roles" | Adds it to your board and keeps it in your copy's design, so it comes back if the board is rebuilt |
 | "Undo that tuning change" | Puts a title rating back to what it was before Claude's automatic weekly adjustment |
 | "Stop showing DevSecOps roles" / "Add Checkmarx" / "Also look in Germany" | Changes your settings, shows you before/after numbers, saves when you agree |
-| "Only roles in English" | Your working languages are `languages` in your config (English by default). Every job description gets a language check: an ad written in, or requiring, another language (German, Dutch, French…) is flagged and scored as a skip. Add a language there if you learn one |
-| "Skip anything posted over a month ago" | Sets the maximum age of a role (`max_age_days`, 30 by default when you ask for a month). Roles with no posted date are kept. Older roles already on your board can be moved to Skipped |
+| "Only roles in English" | Your working languages are part of your settings (English by default). Every job description gets a language check: an ad written in, or requiring, another language (German, Dutch, French…) is flagged and scored as a skip. Add a language there if you learn one |
+| "Skip anything posted over a month ago" | Sets the maximum age of a role (the "max age" setting, which is how old a posting may be before it is left off your board; 30 days when you ask for a month). Roles with no posted date are kept. Older roles already on your board can be moved to Skipped |
 | "Why was it rejected?" | Reads the role's scored requirements, the timing of the email, your sponsorship and location answers and any other applications to the same company, and says what is likely and what is only a guess; it changes nothing |
 | "How do I strengthen my CV?" / "Which certs matter?" | Looks across your scored roles for requirements you keep missing and suggests what to add or evidence better |
-| (automatic) | At the start of each session, when you send your first message, Claude first scores up to 8 of the freshest unscored Tier 1 roles (2–4% of a session), then answers you. Say "don't auto-score" or ask Claude to change the number |
+| (automatic) | Claude scores the new roles that have no score yet (up to 8 by default) as the last job of each session, after your question and the other housekeeping, so roles found during the session are included (2–4% of a session). Say "don't auto-score" or ask Claude to change the number |
 | (automatic) | Once a week, when enough roles are scored, Claude adjusts how job titles are rated (the Tier) using how those roles actually scored, one small step at a time. It tells you what changed at the start of your next session, and one sentence undoes it. Your title filters, countries and companies only change when you say so |
 | "Is anything broken?" | Checks the runs and every source; fixes or explains |
 
@@ -70,15 +71,7 @@ do?" or type `/manual` (it's generated from the system itself).
 - Submit an application, or email or message anyone for you. It prepares; you send.
 - Add experience, skills, numbers or links you don't have. The checker rejects it.
 - Open Indeed or Glassdoor pages. It asks you to paste those job descriptions.
-- Use LinkedIn beyond three narrow, read-only uses in your own logged-in Chrome. LinkedIn's terms ban automated
-  access, so each carries a small risk to your LinkedIn account. Claude never reacts, comments, connects, messages or follows.
-
-  | LinkedIn use | What it does | Default |
-  |---|---|---|
-  | Job descriptions | Reads the description of one role it is scoring, one page at a time (no searching or browsing) | Asked at setup; off in a fresh copy |
-  | Contact lookup | Looks for a recruiter or hiring manager for one role you're about to apply to (see "Who should I contact" above) | Off until you say yes |
-  | Hiring-post search | Reads post-search results and known recruiters' posts at the start of a session, capped, to find roles announced in posts | Off until you say yes |
-
+- Use LinkedIn beyond the narrow, read-only uses in your own logged-in Chrome that you switched on. What they are, the account risk and how to turn each off are in one place: [LinkedIn consent](Your-part.md#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup). Claude never reacts, comments, connects, messages or follows.
 - Ask for passwords in chat. Secrets go in GitHub's settings page, which you fill in yourself.
 
 ## What happens without you
@@ -87,8 +80,8 @@ Three times a day (02:47, 08:47 and 14:47 UTC; ask Claude for your local times) 
 checks for new roles and adds them
 to your board as **New** cards: Tier 1 and 2, at companies on your list. When you next
 open Claude Code, a briefing is ready: new roles, cards you moved, follow-ups due,
-anything broken. When you send your first message, Claude first scores up to 8 of the freshest new Tier 1
-roles (on by default; say "don't auto-score" to turn it off). Anything else, including tailoring, happens
+anything broken. Claude answers your first message first, runs any other housekeeping that is due, and scores
+new unscored roles last (up to 8 by default; on by default; say "don't auto-score" to turn it off). Anything else, including tailoring, happens
 when you ask. Say "what's new?" when you
 sit down, or just look at the board.
 
@@ -102,14 +95,14 @@ maintenance runs (the GitHub rows below). Claude can only reach your Gmail conne
 | Job | Who runs it | When |
 |---|---|---|
 | Role search | GitHub, by itself | Three times a day, whether or not your computer is on |
-| Job-alert emails (the providers in `sources.yaml`: LinkedIn and Indeed in your setup; Glassdoor is supported but off) | GitHub, by itself, as the first step of every role search | Three times a day, only if you set up the alert mailbox. Roles found only in alert emails reach you this way |
-| Reply tracking (receipts, rejections, interview invitations) | GitHub reads the mailbox and logs mail about roles you applied to; Claude later suggests board changes in the inbox check | Three times a day, only if the mailbox is your normal inbox |
+| Job-alert emails (the alert providers switched on in your settings: LinkedIn and Indeed in your setup; Glassdoor is supported but off) | GitHub, by itself, as the first step of every role search | Three times a day, only if you set up the alert mailbox. Roles found only in alert emails reach you this way |
+| Reply tracking (receipts, rejections, interview invitations) | GitHub reads the mailbox and logs mail about roles you applied to; Claude later suggests board changes in the inbox check | Three times a day, only if the mailbox behind the secret is your normal inbox ([Which mailbox](Your-part.md#optional-job-alert-emails-linkedin-indeed-glassdoor)) |
 | Radar status card | GitHub, by itself | Updated by every role search: what ran, which sources failed |
 | Sponsor registers refresh | GitHub, by itself | Weekly, Mondays 04:23 UTC |
 | Company-board check (which of your companies' job boards still work) | GitHub, by itself | Monthly, on the 1st at 03:13 UTC; it updates the coverage report, which Claude reads when you ask "is anything broken?" |
 | New roles reach your board | GitHub creates the cards; Claude fills in their columns | Fields are filled at the start of your next session |
 | Closed-role and old-card cleanup | Claude's session-start step archives Skipped cards and trims bulky job-description files of skipped and rejected roles | Once a day, when you open a session (job-description files after 14 days for Skipped, 30 for Rejected) |
-| Scoring | Claude | A few of the freshest unscored roles at the start of a session (see above) |
+| Scoring | Claude | The unscored roles, as the last job of a session (see above) |
 | Inbox check | Claude, through the Gmail connector (read-only) | About once a day, when you have applications waiting for an answer |
 | LinkedIn post sweep | Claude, in your Chrome | About once a day, only if you switched it on |
 | Board views check | Claude | When you've changed a view in GitHub: Claude copies your layout into the saved design (your column order is never touched) |

@@ -44,10 +44,11 @@
       "security lead": 1, "devsecops": 1, "vulnerabilit*": 0
     },
     "seniority_keywords": {"senior": 1, "sr": 1, "lead": 1, "staff": 0,
-                           "junior": -2, "associate": -1, "graduate": -3, "entry level": -3},
+                           "junior": -2, "associate": -1, "graduate": -3, "entry level": -3, "new grad": -3},
     "country": {"GB": 2, "NL": 2, "IE": 2, "CH": 1, "DE": 1, "SE": 1, "REMOTE-EU": 1},
     "on_target_list": 1,
     "target_fit_high": 1,
+    "sector_bonus": {},
     "sponsor_yes": 1,
     "fresh_days": 3,
     "fresh_bonus": 1

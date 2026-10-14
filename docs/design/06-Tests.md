@@ -56,6 +56,7 @@ exposed insight lines being read as job titles. Indeed and Glassdoor still have 
 | `test_board.py` | `board` | Payload title/labels/marker, hostile text neutralised, title cap, same ref across sources, baseline vs daily selection, queue dedupe, status has no titles, stale refs |
 | `test_radar.py` | `radar` | One broken source doesn't stop others, filtering, seen by ID and content key, digest sections, per-source outside flag, Markdown injection, CSV header migration |
 | `test_ats_adapter.py` | `sources/ats` | Greenhouse conversion, Workday detail URL and roll-up resolution |
+| `test_hn_hiring.py` | `hn_hiring` | Top-level comments only, header parsing (company, role, location), prose and non-security posts dropped, no thread is a failed source |
 | `test_eu_sources.py` | `bundesagentur`, `jobtech`, `eures`, `reed` | Parsing, JobTech phrase quoting, EURES title search, one failing query keeps the rest |
 | `test_careers_page.py` | `sources/careers_page` | Each real page, hash stability, missing anchor is an error, JSON/RSS feeds, XML entity-expansion rejected, robots.txt |
 | `test_cv_lint.py` | `tools/cv_lint` | Form and section rules from `writing-rules.md` |
@@ -82,6 +83,19 @@ exposed insight lines being read as job titles. Indeed and Glassdoor still have 
 | `test_referrals.py` | `tools/referrals` | Contacts found loosely and in the user's order; ask/result logged and put on the card; unanswered asks after the wait |
 | `test_docs_cover_code.py` | the overview docs | Every board field is in Concepts and the user guide's Board page; every skill in CLAUDE.md, page 4 and a "Things you can say" row (`USER_PHRASES`); every tool in the code reference; every config key in Configuration |
 | `test_check_doc_links.py` | `tools/check_doc_links` | The repo's docs have no broken links; a link with a space or a missing target is caught |
+| `test_bamboohr_json.py` | `jobradar/bamboohr_json` | The JSON widget is parsed (departments, positions, duplicates dropped, missing URL built from the id) and the patched scraper still accepts the old HTML form |
+| `test_cadence_reminders.py` | `tools/cadence` | One-off reminders: due on a date, listed until `reminder done`, then gone; adding the same id replaces it, bad input is rejected; the Scoring line is the last cadence line |
+| `test_careers_queue.py` | `tools/careers_queue` | Only companies the radar cannot read are queued, in tier order; a read counts only once recorded and moves the company to the back of its tier; the search URL is remembered |
+| `test_common.py` | `common.countries_for` | Places once dropped as unrecognised (Prague, Brno, Dutch and British towns) now resolve to their country; Poland still resolves to none |
+| `test_cover_sync.py` | `jobradar/career`, `tools/cover_sync` | A cover block goes stale when a story or CV line it cites changes and is clean after `record_cover_sync`; blocks without metadata are ignored |
+| `test_domain_profile.py` | `tools/domain_profile` | A valid `domains.json` has no problems; unknown IDs, a `strong` domain with under two pieces of evidence, leads that are not evidence, a missing `not_claimed` and bad quiz answers are rejected; lead IDs by sector come strongest first with no repeats |
+| `test_draft_experiment.py` | `tools/draft_experiment` | The default compares two drafts and the ad-only draft is optional; briefs never say which draft is the tailored one and name every report file; `prep` refuses an unvalidated application |
+| `test_intake.py` | `jobradar/intake` | Every filter that would drop a hand-added role is named and nothing is written; an override adds it, records why in `origin`, and a second add is `known`; `--dry-run` writes nothing; Greenhouse, Lever and Ashby links parse; manual fields build a posting the same filters judge |
+| `test_jd_check.py` | `jd_check.recommendation_cap` | The recommendation band: apply at 70+, maybe at 50-69, skip below 50 or with a blocker; sponsorship `unlikely` caps at maybe and `no` at skip |
+| `test_jd_cleanup.py` | `tools/jd_cleanup` | Skipped and rejected roles are trimmed after their retention while `score.json`, `meta.json` and `sponsorship.json` stay; a scored-skip role with no stage is trimmed but any stage protects it; `--dry-run` changes nothing |
+| `test_jd_dupes.py` | `tools/jd_dupes` | The same ad under a different title is `SAME`; a different role sharing boilerplate is not; a short snippet is never `SAME`; the sentences only one ad has are reported |
+| `test_sector_tier.py` | `matching.load_sectors`, `tiering.score` | The optional Sector column is read (empty without it); the sector bonus applies once, only to listed employers, never as a sum; no configured bonus changes nothing |
+| `test_sweep_plan.py` | `tools/sweep_plan` | The pass is split 3/3/2/2 with each company once; a company the radar reads gets the post search only and an unreadable one alternates lanes; spare slots flow down from the short category and the total never exceeds the cap; a company with two lanes does not outrank single-lane ones |
 
 ## Faking `gh`
 

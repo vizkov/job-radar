@@ -163,14 +163,16 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
         due.append("board_roles")
     else:
         lines.append(f"  - New roles to the board: {detail} · ok")
-    # scoring
+    # scoring is the LAST job (the user, 2026-10-22: sweeps that ran after it added roles that stayed unscored); its line goes last
     if auto_picks or unscored_cards:
-        lines.append(f"  - Scoring: {unscored_cards} board card(s) with no score, {auto_picks} picked for automatic scoring; "
-                     f"{when('auto_score', now, root)} · DUE: score-roles on the AUTO-SCORE refs, then "
-                     "`cadence.py done auto_score`")
+        scoring_line = (f"  - Scoring (run LAST, after every other job above, because sweeps add roles): {unscored_cards} board card(s) "
+                        f"with no score, {auto_picks} picked at session start; {when('auto_score', now, root)} · DUE: when the other "
+                        "jobs are done, run `python tools/session_brief.py --score-pick` for the current list, `score-roles` on it, "
+                        "then `cadence.py done auto_score`")
         due.append("auto_score")
     else:
-        lines.append(f"  - Scoring: every board card is scored; {when('auto_score', now, root)} · ok")
+        scoring_line = (f"  - Scoring: every board card is scored at session start; {when('auto_score', now, root)} · run "
+                        "`python tools/session_brief.py --score-pick` after the other jobs, in case they added roles")
     # inbox
     if awaiting:
         state = "DUE: run `inbox-check`, then `cadence.py done inbox_check`" if is_due("inbox_check", now, root) else "ok"
@@ -254,6 +256,7 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
     extra_lines, extra_due = reminder_lines(now, root)
     lines += extra_lines
     due += extra_due
+    lines.append(scoring_line)
     return lines, due
 
 

@@ -18,6 +18,15 @@ plain language; do the typing yourself.
    - their CV → `profile/career/master_resume.md` in the ID format (see `examples/career/`). If they paste
      or attach a CV, convert it yourself: one ID per bullet, contact details in the front matter, and show
      them the result to confirm nothing was changed. Same for STAR stories and cover-letter paragraphs.
+2b. **Domains (before the masters are final, and again right after).** Ask which sectors they want to target (fintech, healthcare,
+   aviation, cloud platform… or none). If none, skip this step; `domains.json` is optional and tiering/scoring work without it.
+   For each sector run the `domain-profile` quiz (`.claude/skills/domain-profile/quiz.md`; if the sector has no bank yet, write one
+   there in the same plain-words style) **while you are still building the masters**: every "yes" goes straight into the story or
+   CV bullet as ordinary text, not as an "Also true" patch after the fact. Nobody writes down work they do not know counts, so this
+   is the cheapest moment to find it. Then, once the masters exist and have IDs, run `domain-profile` steps 6-7 to write
+   `profile/domains.json` (evidence IDs, `lead_ids`, `not_claimed`) and `python tools/domain_profile.py validate`. The file cannot be
+   written earlier: `validate` checks every ID against the masters. Same rules as the skill: nothing the user did not say, show the
+   draft lines and get a yes first.
 3. **Data.** `python tools/refresh_registers.py`; clone `atss/` and `agg/` (docs/design/14-Setup-and-publishing.md) and run
    `python tools/build_candidates.py` then `python verify_boards.py --quiet`. Report coverage from
    `data/coverage_report.csv`: which targets have no board, and offer careers pages / alerts for those.

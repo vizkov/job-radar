@@ -256,3 +256,15 @@ def test_clean_run_reports_parse_and_foreign_units_ok_so_old_streaks_reset(tmp_p
               "alert_email|foreign": {"bad_streak": 5, "last_ok_count": 0}}
     update_health(health, [res])
     assert health["alert_email|indeed:parse"]["bad_streak"] == 0 and health["alert_email|foreign"]["bad_streak"] == 0
+
+
+def test_digest_mail_records_the_alert_search_name():
+    from email.message import EmailMessage
+    from jobradar.alert_providers import PROVIDERS
+    from jobradar.sources.alert_email import to_postings
+    m = EmailMessage()
+    m["From"] = "jobalerts-noreply@linkedin.com"
+    m["Subject"] = "Meta Application Security Engineer and 34 other jobs"
+    m.set_content("Your job alert for fintech security in United Kingdom\n30+ new jobs.\n\n"
+                  "Security Engineer\nExample Ltd\nLondon\n\nView job: https://www.linkedin.com/comm/jobs/view/4480099898/?x=1\n")
+    assert [p.raw["alert"] for p in to_postings(m, PROVIDERS["linkedin"])] == ["fintech security"]

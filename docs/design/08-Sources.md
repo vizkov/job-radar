@@ -1,6 +1,6 @@
 # 8. Sources
 
-**What this is:** Where roles come from: the seven adapters (ats, careers_page, alert_email, bundesagentur, jobtech, eures, reed), what each costs to run, what breaks, and how to add a company or a careers page.  
+**What this is:** Where roles come from: the eight adapters (ats, careers_page, alert_email, bundesagentur, jobtech, eures, reed, hn_hiring), what each costs to run, what breaks, and how to add a company or a careers page.  
 **Read first:** [3. A scheduled run](03-Scheduled-run.md)  
 **Code:** `jobradar/sources/`, `verify_boards.py`, `boards.json`, `profile/sources.yaml`, `profile/careers_pages.yaml`, `profile/overrides.csv`
 
@@ -22,6 +22,7 @@ python radar.py --dry-run --source <name> [--include-outside]
 | `jobtech` | on | ~10 s | none | Sweden's public employment service |
 | `eures` | on | ~1–2 min | none | EU portal: NL, IE, CH, SE (no UK; DE via bundesagentur) |
 | `reed` | off until the key exists | not measured yet | free API key (GitHub secret `REED_API_KEY`) | reed.co.uk, UK job board, official API, permanent roles only; many listings are agency-posted |
+| `hn_hiring` | on | ~10 s | none | Hacker News "Ask HN: Who is hiring?" (this and last month's thread, public HN Search API). Free-text posts, mostly US and remote startups; security posts only; employers are outside your list by nature (`include_outside_list: true`) |
 | `careers_page` | on | ~10 s for 5 pages | none | Company careers pages without an ATS (`profile/careers_pages.yaml`) |
 | `alert_email` | off in `examples/`; on once the secrets exist | not measured yet | Gmail app password (dedicated mailbox safer) | LinkedIn / Indeed / Glassdoor alert emails; see [Job-alert emails](12-Job-alert-emails.md) |
 

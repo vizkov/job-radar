@@ -45,6 +45,8 @@ Look for explicit statements, and quote them verbatim:
 - **CH**: non-EU hiring is quota-limited and the employer must show no suitable Swiss/EU candidate: rare
   for these roles, *unlikely* unless explicit.
 - **SE**: employer-sponsored work permit; the question is willingness (look for evidence).
+- **AE** (Dubai, a target since 2026-11-10): employer-sponsored residence visa, no register and no salary route to check; the question is
+  willingness and whether the ad or the company's own pages mention relocation or visa support. Usually `likely` for a real local employer, `unclear` for an agency.
 
 ## 4. Research the company (WebSearch / WebFetch)
 Two or three searches at most, e.g. `"<company>" visa sponsorship software engineer <country>`,

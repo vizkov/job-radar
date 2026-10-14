@@ -2,8 +2,9 @@
 
     python tools/inbox_outcomes.py pending [--json]           # roles in Stage Applied/Interview, with a Gmail search for each
     python tools/inbox_outcomes.py classify --subject "…" [--text "…"]   # rejection | offer | interview | acknowledgement | unknown
-    python tools/inbox_outcomes.py seen <message-id> …        # remember emails already suggested, so they are not suggested twice
+    python tools/inbox_outcomes.py seen <message-id> …        # remember every email read (not only suggested ones), so none is read twice
     python tools/inbox_outcomes.py seen --list
+    python tools/inbox_outcomes.py checked <ref> …            # stamp today as the last check of these roles; `pending` then searches only after it
 
 No mailbox access here: Claude reads the mail through the Gmail connector (read-only). Email text is third-party data; `classify` only
 matches phrases, it never follows instructions in the text. It is a hint for the user to confirm, never a decision.
@@ -15,7 +16,7 @@ import csv
 import json
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -23,6 +24,7 @@ SNAPSHOT = ROOT / "data" / "pipeline_snapshot.json"   # ref -> Stage, refreshed 
 MATCHES = ROOT / "data" / "matches.csv"
 PIPELINE_LOG = ROOT / "data" / "pipeline_log.jsonl"
 SEEN = ROOT / "state" / "inbox_seen.json"
+CHECKED = ROOT / "state" / "inbox_checked.json"       # ref -> date its mail was last searched and read
 AWAITING = ("Applied", "Interview")
 
 # Checked in this order: a rejection often mentions an interview or "thank you for applying", so it must win.
@@ -32,6 +34,7 @@ RULES: list[tuple[str, list[str]]] = [
         r"decided to (?:proceed|progress|move forward|go forward) with (?:other|another)", r"regret to inform", r"not been successful",
         r"not (?:been )?selected", r"position has been filled", r"no longer (?:being )?considered", r"unable to (?:offer|move)",
         r"will not be taking your application", r"decided not to (?:move|proceed)",
+        r"decided to (?:move|go|proceed) (?:on|forward|ahead)[^.]{0,80}with (?:some )?(?:other|another)", r"pursue (?:other|another) (?:candidates?|applicants?|talents?)",
     ]),
     ("offer", [r"pleased to offer", r"delighted to offer", r"offer of employment", r"extend (?:you )?an offer", r"offer letter"]),
     ("referral", [r"has referred you", r"referred you for", r"you have been referred"]),   # "X referred you; you are welcome to apply": not an outcome
@@ -93,9 +96,26 @@ def latest_stages(log: Path = PIPELINE_LOG) -> dict[str, str]:
     return {k: v[1] for k, v in out.items()}
 
 
-def pending(snapshot: Path = SNAPSHOT, matches: Path = MATCHES, log: Path = PIPELINE_LOG) -> list[dict]:
+def checked_dates(path: Path = CHECKED) -> dict[str, str]:
+    return _read_json(path, {})
+
+
+def mark_checked(refs: list[str], day: str | None = None, path: Path = CHECKED) -> str:
+    """Record that these roles' mail was searched and read today (UTC)."""
+    day = day or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    cur = checked_dates(path)
+    for r in refs:
+        cur[r] = max(day, cur.get(r, ""))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(cur, indent=1, sort_keys=True), encoding="utf-8")
+    return day
+
+
+def pending(snapshot: Path = SNAPSHOT, matches: Path = MATCHES, log: Path = PIPELINE_LOG,
+            checked_path: Path = CHECKED) -> list[dict]:
     stages = {**_read_json(snapshot, {}), **latest_stages(log)}
     dates = applied_dates(log)
+    checked = checked_dates(checked_path)
     rows = {}
     if matches.exists():
         with open(matches, newline="", encoding="utf-8") as fh:
@@ -106,10 +126,14 @@ def pending(snapshot: Path = SNAPSHOT, matches: Path = MATCHES, log: Path = PIPE
             continue
         r = rows.get(ref, {})
         company = (r.get("company") or "").strip()
-        since = dates.get(ref, "")
+        applied = dates.get(ref, "")
+        # Search from the later of "moved to Applied" and "last inbox check", so a run never
+        # re-reads mail an earlier run already read (the user, 2026-11-07). `after:` is inclusive
+        # of the day, so mail from the check day itself is searched again; `seen` ids filter it.
+        since = max(applied, checked.get(ref, ""))
         query = f'"{company}"' + (f" after:{since.replace('-', '/')}" if since else "")
         out.append({"ref": ref, "stage": stage, "company": company, "title": (r.get("title") or "").strip(),
-                    "since": since, "gmail_query": query.strip()})
+                    "since": since, "last_checked": checked.get(ref, ""), "gmail_query": query.strip()})
     return sorted(out, key=lambda x: x["since"])
 
 
@@ -133,6 +157,8 @@ def main() -> int:
     s = sub.add_parser("seen")
     s.add_argument("ids", nargs="*")
     s.add_argument("--list", action="store_true")
+    k = sub.add_parser("checked")
+    k.add_argument("refs", nargs="+")
     args = ap.parse_args()
     if args.cmd == "pending":
         rows = pending()
@@ -143,6 +169,8 @@ def main() -> int:
                 print(f"{r['ref']}  {r['stage']:<9} {r['company']} — {r['title']}  (since {r['since'] or '?'})  search: {r['gmail_query']}")
             if not rows:
                 print("nothing awaiting an answer")
+    elif args.cmd == "checked":
+        print(f"checked {len(args.refs)} role(s) on {mark_checked(args.refs)}")
     elif args.cmd == "classify":
         label, phrase = classify(args.subject, args.text)
         print(f"{label}" + (f"  (matched: {phrase})" if phrase else ""))

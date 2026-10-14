@@ -14,12 +14,12 @@ Every new role gets a **fit tier** and, for UK and Dutch roles, a
 ```
 
 Source registers, refreshed weekly by `.github/workflows/registers.yml` into
-`data/registers/`:
+`data/registers/` (row counts change with every refresh; `data/registers/meta.json` has the current ones):
 
-| Register | What it lists | Rows (2026-09-28) |
+| Register | What it lists | Rows (roughly) |
 |---|---|---|
-| UK Home Office register of licensed sponsors | Employers licensed for Skilled Worker, Senior or Specialist Worker, Scale-up | 123,149 (2026-10-05) |
-| Dutch IND public register "Work" | Recognised sponsors for work / highly skilled migrants | 12,984 |
+| UK Home Office register of licensed sponsors | Employers licensed for Skilled Worker, Senior or Specialist Worker, Scale-up | about 123,000 |
+| Dutch IND public register "Work" | Recognised sponsors for work / highly skilled migrants | about 13,000 |
 
 How the employer is matched (tried with your `targets.tsv` name first, then the
 name the source reported):
@@ -70,7 +70,8 @@ Score (rules in `config.json` → `tiering`):
 | Best country | GB, NL, IE +2; CH, DE, SE, remote-Europe +1 |
 | Employer on your list | +1 |
 | Licensed sponsor in the role's country (UK/NL) | +1 |
-| Employer is on the list and its `Fit` column in `targets.tsv` is High (both are required, `tiering.py`) | +`target_fit_high` (1): a generic title such as "Security Engineer" at a company you rate highly (Meta, 2026-10-02) should not rank below a specialist title elsewhere |
+| Employer is on the list and its `Fit` column in `targets.tsv` is High (both are required, `tiering.py`) | +`target_fit_high` (1): a generic title such as "Security Engineer" at a company you rate highly should not rank below a specialist title elsewhere |
+| Employer is on the list and carries a tag in the optional `Sector` column of `targets.tsv` that `tiering.sector_bonus` lists (the user's copy: `fintech` 1, `banking` 1; the template ships `{}`) | +the best single tag's bonus, never a sum; reason `sector:<tag>` in `matches.csv`. Affects only new roles: existing cards keep their tier. Without a Sector column or an empty `sector_bonus` nothing changes |
 | Posted within `fresh_days` (3) | +`fresh_bonus` (1): applying early matters |
 
 Tier 1 when the score ≥ `tier1_min_score` (6). Examples:

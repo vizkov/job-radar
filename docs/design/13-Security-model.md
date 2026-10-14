@@ -10,8 +10,7 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
 
 - Log in to LinkedIn or any job portal with the user's credentials.
 - Scrape LinkedIn, Indeed or Glassdoor (their terms forbid it; their alert emails are
-  read instead). A third opt-in exception (`discovery.linkedin_posts.enabled`, the user's instruction of
-  2026-10-01): at the start of a session Claude in Chrome may read LinkedIn post-search results and known
+  read instead). A third opt-in exception (`discovery.linkedin_posts.enabled`): at the start of a session Claude in Chrome may read LinkedIn post-search results and known
   recruiters' posts in the user's own logged-in browser, capped by `max_searches`, `max_scrolls` and
   `max_people_per_session`, read-only, never from the daily Action. Same breach of LinkedIn's terms, same
   user-accepted risk (CLAUDE.md rule 4c). `jd_prep.py` refuses those domains in code (`NEVER_FETCH`). One opt-in
@@ -19,10 +18,9 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
   role and asks, Claude in Chrome may read LinkedIn people-search results in the user's own
   logged-in browser to find a recruiter or hiring manager. Read-only, a few searches, never
   connects or messages. It still breaches LinkedIn's terms (any automated access); the user
-  accepted that risk for their own account. A second exception, standing (the user's instruction of
-  2026-10-01, `CLAUDE.md` rule 4a): `score-roles` has Claude in Chrome read **one** LinkedIn job page at a time
+  accepted that risk for their own account. A second exception, standing (`scoring.linkedin_job_pages`, `CLAUDE.md` rule 4a): `score-roles` has Claude in Chrome read **one** LinkedIn job page at a time
   for a role already on the list, saving only the description text; no search pages, no loops, no clicking.
-  `jd_prep.py` itself still never fetches LinkedIn.
+  `jd_prep.py` itself still never fetches LinkedIn. A fourth, narrow one (`CLAUDE.md` rule 4d): when a role has no posted date, Claude may open one LinkedIn job search for that company and title (at most 3 a session) and read only the matching listing's date and location. The user-facing list of all these uses, with how to turn each off, is [LinkedIn consent](../wiki/Your-part.md#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup) in the user guide.
 - Submit an application. `apply-assist` may pre-fill a form in the user's Chrome, page
   by page after they approve the values; the final Submit is always the user's click.
 - Email or message anyone on the user's behalf.

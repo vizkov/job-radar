@@ -41,7 +41,9 @@ STRONG_INTERVIEW = re.compile(r"schedul|invite you|phone screen|would like to (?
 NEEDS_ACTION = re.compile(r"please (?:complete|reply|respond|confirm|submit|upload|book|select|provide)|action required|"
                           r"within \d+ (?:hours?|days?|business days)|assessment|calendly|availability|deadline", re.I)
 DEFINITE_REJECTION = re.compile(r"unfortunately|regret to inform|decided (?:to (?:proceed|move forward|go forward) with|not to)|"
-                                r"position has been filled|will not be (?:moving|proceeding)", re.I)
+                                r"position has been filled|will not be (?:moving|proceeding)|"
+                                r"decided to (?:move|go|proceed) (?:on|forward|ahead)[^.]{0,80}with (?:some )?(?:other|another)|"
+                                r"pursue (?:other|another) (?:candidates?|applicants?|talents?)", re.I)
 _CONTROL = re.compile(r"[\x00-\x1f\x7f]")
 
 

@@ -56,6 +56,14 @@ default queries and paging. Specifics:
   in EURES and DE is skipped because it mirrors Bundesagentur; region lists can contain
   `null`, which `parse()` filters.
 
+## `sources/hn_hiring.py`: Hacker News "Who is hiring?"
+
+`to_text(html)` (comment HTML to lines), `parse(hit, queries)` (one top-level comment to a `Posting`: header
+`Company | Role | Location | ...`, role = the header segment that mentions a query, else the first body line that
+does; prose posts without a header are dropped), `HNHiringSource` (`_threads` finds the latest `whoishiring`
+"Who is hiring?" threads, `_top_level` pages through a thread's comments and keeps those whose parent is the thread).
+One health unit per thread; no thread found = failed source. Uses the public HN Search API (no key).
+
 ## `sources/reed.py`: reed.co.uk (UK)
 
 `parse(job)` (one API result → `Posting`; `dd/mm/yyyy` dates; a bare town is read as GB), `ReedSource`

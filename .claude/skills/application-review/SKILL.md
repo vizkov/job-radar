@@ -51,7 +51,7 @@ it. Do not tell them what you already found. Word limit 500 each; blunt; no prai
 > anything a parser may drop. (3) Give a match percentage and the top 5 missing terms. Do not
 > suggest adding anything the resume does not already support; say "missing" instead.
 
-**2. Recruiter** (default model):
+**2. Recruiter** (`model: "opus"`; the user, 2026-10-22: the recruiter's judgement of a CV is the one that decides, so it gets the strongest model):
 > You are an experienced technical recruiter with 60 applications on your desk and 6 seconds per
 > CV. Files: <resume>, <cover letter>, <JD>. (1) After skimming only the top third of the CV:
 > would you advance, maybe, or reject, and why? (2) What is the strongest evidence for this job,
@@ -60,7 +60,7 @@ it. Do not tell them what you already found. Word limit 500 each; blunt; no prai
 > claims that sound inflated)? (4) Does the cover letter add something the CV does not, or repeat
 > it? Is it tailored to this company or generic? Give a verdict, 3 strengths, 3 concerns.
 
-**3. Consistency auditor** (default model; it has to compare claims closely):
+**3. Consistency auditor** (`model: "sonnet"`, the user's choice 2026-10-22; it has to compare claims closely, so read its quotes against the files before acting):
 > You are a hiring-panel member who has all three documents on the table and will interview this
 > candidate: <CV>, <cover letter>, <STAR stories>, plus this checklist from an automated
 > pre-check: <paste consistency_check output>. Find where the documents contradict each other or
@@ -75,7 +75,7 @@ it. Do not tell them what you already found. Word limit 500 each; blunt; no prai
 > (f) leftover template text. Report each as: severity (fix first / should fix / nice to have),
 > the exact quotes with file, why it is a problem, and the smallest fix.
 
-**4. Copy editor** (default model; the only reviewer that gets `.claude/skills/tailor-application/writing-rules.md`, including its section 7 "Decided by the user": do not re-propose those choices, but report one that causes a factual contradiction or a new problem; cite the rule section for each finding; a real problem no rule covers goes under "No rule yet" with the rule you would add, never dropped):
+**4. Copy editor** (`model: "sonnet"`, the user's choice 2026-10-22; the only reviewer that gets `.claude/skills/tailor-application/writing-rules.md`, including its section 7 "Decided by the user": do not re-propose those choices, but report one that causes a factual contradiction or a new problem; cite the rule section for each finding; a real problem no rule covers goes under "No rule yet" with the rule you would add, never dropped):
 > You are a senior resume editor and proofreader. Files: <resume>, <cover letter>, the rules file. Read the CV line by line as a
 > recruiter would and judge *form*, not facts: (a) grammar, tense (one per bullet; finished roles in past tense), punctuation, dangling
 > hyphens, British spelling; (b) register: anything that reads like a chat message, meta-commentary, a hedge, an aside, a clause that

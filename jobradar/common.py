@@ -44,16 +44,24 @@ _CITY_NAMES = {
            "derby", "sheffield", "liverpool", "newcastle", "sunderland", "knutsford", "exeter", "plymouth",
            "cardiff", "newport", "swansea", "neath", "aberdeen", "dundee", "stirling", "livingston",
            # seen dropped as "location not recognised" (2026-10-13): counties and towns the alert emails name
-           "worcestershire", "worcester", "east lothian", "west lothian", "midlothian"],
+           "worcestershire", "worcester", "east lothian", "west lothian", "midlothian",
+           # system review 2026-10-22: dropped as "location not recognised"
+           "canary wharf"],
     "NL": ["amsterdam", "the hague", "den haag", "rotterdam", "utrecht", "eindhoven", "delft", "amstelveen",
            "amersfoort", "leusden", "veldhoven", "zoetermeer", "maastricht", "haarlem", "leiden", "groningen",
            "arnhem", "nijmegen", "breda", "tilburg", "hilversum", "hoofddorp", "schiphol", "almere", "enschede",
            "hertogenbosch", "den bosch", "zwolle", "apeldoorn", "deventer", "dordrecht", "gouda", "alkmaar",
            # seen dropped as "location not recognised" (2026-10-13)
-           "barendrecht", "driebergen", "driebergen-rijsenburg", "zeist", "nieuwegein", "houten", "rijswijk", "capelle aan den ijssel"],
-    "IE": ["dublin", "cork", "galway", "limerick", "waterford", "dundalk"],
+           "barendrecht", "driebergen", "driebergen-rijsenburg", "zeist", "nieuwegein", "houten", "rijswijk", "capelle aan den ijssel",
+           # system review 2026-10-22
+           "venlo", "brunssum", "heerlen", "sittard", "geleen", "roermond"],
+    "IE": ["dublin", "cork", "galway", "limerick", "waterford", "dundalk",
+           # system review 2026-10-22
+           "kilkenny", "letterkenny", "sligo", "athlone", "drogheda", "navan", "carlow", "tralee"],
     "CH": ["zurich", "zürich", "geneva", "genève", "geneve", "bern", "lausanne", "basel", "baar", "aarau",
-           "rapperswil"],
+           "rapperswil",
+           # system review 2026-10-22
+           "olten", "zug", "lugano", "winterthur", "lucerne", "luzern"],
     "DE": ["berlin", "munich", "münchen", "muenchen", "frankfurt", "hamburg", "stuttgart", "cologne", "köln",
            "koeln", "heidelberg", "düsseldorf", "dusseldorf", "bonn", "walldorf", "ulm", "bochum", "freiburg",
            "tübingen", "tuebingen", "lüneburg", "hannover", "hanover", "nuremberg", "nürnberg", "leipzig",
@@ -75,6 +83,23 @@ def _words_re(words):
 
 
 _COUNTRY_RE = {c: _words_re(w) for c, w in _COUNTRY_NAMES.items()}
+# system review 2026-10-29: alert roles in these towns were dropped on location alone (Lloyds, CoreTech, Hetzner, SSC Prime, ALTEN). "york" and
+# "wellington" are left out on purpose: "New York" and Wellington NZ would match.
+for _c, _w in {
+    "GB": ["salisbury", "lydbury north", "melbourn", "shropshire", "wiltshire", "somerset", "chester", "fareham"],
+    "NL": ["noordwijk", "noordwijk-binnen", "hoorn"],
+    "DE": ["bad vilbel", "gunzenhausen", "neckarsulm"],
+    "CH": ["givisiez"],
+}.items():
+    _CITY_NAMES.setdefault(_c, []).extend(_w)
+# dropped-alert review 2026-11-10 (eTeam, Eclectic, Hansen, Computacenter, JENOPTIK, SSC Prime, LeoVegas, Zeeman, FinDock); "The Home" (Kainos) and bare postcodes ("1012 NE", Team EIFFEL) are too vague to map.
+for _c, _w in {
+    "GB": ["telford", "royston", "hammersmith"],
+    "DE": ["ludwigshafen", "monheim", "oberaula"],
+    "SE": ["växjö", "vaxjo"],
+    "NL": ["alphen aan den rijn", "woerden"],
+}.items():
+    _CITY_NAMES.setdefault(_c, []).extend(_w)
 _CITY_RE = {c: _words_re(w) for c, w in _CITY_NAMES.items()}
 # A bare country code closing the location, any case ("…, NDS, de"). Target countries only: other
 # two-letter tails are too often US/Canadian state codes.

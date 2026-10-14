@@ -36,6 +36,20 @@ LEVELS = {"below", "at", "above"}  # the role's level against the user's record;
 # The fit score is a judgement, but it may not float above what the must-have table supports (2026-10-02: a role
 # whose table listed only the met requirements scored 85 while an ATS-style count gave 65-75%).
 BLOCKER_PENALTY, LEVEL_PENALTY, FIT_SLACK = 15, 10, 8
+# Recommendation bands (the user, 2026-10-20: same-looking scores were apply on one role and maybe on another). The fit score sets the
+# most a role can be recommended; judgement (scope risk, Staff level, sponsorship) may only lower it, never raise it.
+APPLY_MIN, MAYBE_MIN = 70, 50
+RANK = {"skip": 0, "maybe": 1, "apply": 2}
+
+
+def recommendation_cap(fit: int, blockers: int, sponsor: str = "") -> str:
+    """apply at 70+; maybe at 50-69; skip below 50 or with any blocker. A sponsorship verdict of unlikely caps at maybe, no at skip."""
+    cap = "skip" if blockers or fit < MAYBE_MIN else "maybe" if fit < APPLY_MIN else "apply"
+    if sponsor == "no":
+        return "skip"
+    if sponsor == "unlikely" and cap == "apply":
+        return "maybe"
+    return cap
 
 
 def _norm(s: str) -> str:
@@ -97,6 +111,17 @@ def check_score(data: dict, ref: str, jd_text: str, career: Career) -> list[str]
             errs.append(f"fit_score {data['fit_score']} is above what the must-haves support (coverage {coverage:.0f}%, "
                         f"ceiling {max(ceiling, 0):.0f} + {FIT_SLACK}): list every Basic Qualification (unmet ones as "
                         "'no'), or lower the score")
+    if (data["recommendation"] in RANK and isinstance(data["fit_score"], int) and not isinstance(data["fit_score"], bool)):
+        sp = WORK / ref / "sponsorship.json"
+        try:
+            verdict = json.loads(sp.read_text(encoding="utf-8")).get("verdict", "") if sp.exists() else ""
+        except (OSError, ValueError):
+            verdict = ""
+        cap = recommendation_cap(data["fit_score"], len(bl), verdict)
+        if RANK[data["recommendation"]] > RANK[cap]:
+            errs.append(f"recommendation {data['recommendation']!r} is above what fit {data['fit_score']}, {len(bl)} blocker(s)"
+                        f"{' and sponsorship ' + verdict if verdict in ('no', 'unlikely') else ''} allow (at most {cap!r}: apply 70+, "
+                        f"maybe 50-69, skip below 50 or with a blocker); lower it, or change the score if it is wrong")
     jd_norm = _norm(jd_text)
     for i, b in enumerate(bl):
         if not isinstance(b, dict) or set(b) != {"type", "quote"}:
@@ -334,7 +359,7 @@ def cmd_tailor(folder: str) -> int:
     for w in warns:
         print(f"WARNING: {w}")
     (app / "validated.sha256").write_text(_digest(src), encoding="utf-8")
-    print(f"\nok: validated; render with  python tools/render_resume.py {app.name}")
+    print(f"\nok: validated. Step 4b first: python tools/draft_experiment.py prep {app.name} (Opus draft); then render with  python tools/render_resume.py {app.name}")
     return 0
 
 

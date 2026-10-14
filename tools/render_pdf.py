@@ -330,5 +330,7 @@ def render_pdfs(app: Path, data: dict, career, ref: str) -> list[str]:
         contact = {**contact, "location": data["location"]}
     role_title, company = role_and_company(ref)
     print_pdf(resume_html(data, career, contact), app / "resume.pdf")
+    if not data.get("cover_letter"):   # CV-only application (the user, 2026-11-02): no letter PDF, not an empty one
+        return ["resume.pdf"]
     print_pdf(cover_html(data, career, contact, role_title, company), app / "cover_letter.pdf")
     return ["resume.pdf", "cover_letter.pdf"]

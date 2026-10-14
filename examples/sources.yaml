@@ -71,6 +71,17 @@ sources:
     queries: [application security, appsec, product security, penetration tester, security consultant,
               security engineer, devsecops, threat modelling]
 
+  hn_hiring:
+    # Hacker News "Ask HN: Who is hiring?" (monthly thread; public HN Search API, no key). Free-text posts by
+    # companies, mostly US/remote and startups; only posts that mention a query word and name a role are kept.
+    # Employers are rarely on your list, so they go to matches.csv and "Outside your list", never the board.
+    enabled: true
+    timeout_seconds: 120
+    threads: 2            # this month's thread and last month's
+    max_pages: 4          # 1000 comments per page
+    queries: [security, appsec, pentest, penetration, devsecops, threat model]
+    include_outside_list: true
+
   # --- Company careers pages without an ATS ---------------------------------
   careers_page:
     # Pages and selectors live in careers_pages.yaml (one request per page per run,

@@ -2,6 +2,7 @@
 
     python tools/render_resume.py <folder> [--md] [--docx]    # profile/applications/<folder>/
     python tools/render_resume.py <folder> --text-only        # only work/apps/<folder>/resume.md + cover_letter.md, no PDFs (the draft experiment)
+    (a PDF render refuses until work/apps/<folder>/experiment/draft_B.json exists; --skip-experiment only on the user's word)
 
 Refuses to run unless tools/jd_check.py tailor has validated exactly this
 tailored.json (it checks the saved SHA-256). By default it writes the two files the user wants per application,
@@ -75,7 +76,8 @@ def to_docx(data: dict, contact: dict, path: Path) -> None:
 def main(argv=None) -> int:
     args = list(argv if argv is not None else sys.argv[1:])
     want_docx, want_md, text_only = "--docx" in args, "--md" in args, "--text-only" in args
-    args = [a for a in args if a not in ("--docx", "--md", "--pdf", "--text-only")]
+    skip_experiment = "--skip-experiment" in args
+    args = [a for a in args if a not in ("--docx", "--md", "--pdf", "--text-only", "--skip-experiment")]
     if len(args) != 1:
         print(__doc__)
         return 2
@@ -88,6 +90,11 @@ def main(argv=None) -> int:
         print("tailored.json has not been validated in its current form: run  python tools/jd_check.py tailor "
               f"{app.name}")
         return 1
+    if not text_only and not skip_experiment and not any((SCRATCH / app.name / "experiment" / n).exists() for n in ("draft_B.json", "resume_B.md")):
+        # tailor-application step 4b was skipped on 2026-10-31 (Citi); the Opus draft comes before any PDF
+        print("no Opus draft yet (tailor-application step 4b): run  python tools/draft_experiment.py prep "
+              f"{app.name}  and spawn the writer, then render. --skip-experiment only on the user's word.")
+        return 1
     data = json.loads(src.read_text(encoding="utf-8"))
     contact = load_career().contact
     if data.get("location"):
@@ -96,9 +103,13 @@ def main(argv=None) -> int:
     scratch.mkdir(parents=True, exist_ok=True)
     md, cover = to_markdown(data, contact), cover_letter(data, contact)
     (scratch / "resume.md").write_text(md, encoding="utf-8")
-    (scratch / "cover_letter.md").write_text(cover, encoding="utf-8")
+    has_letter = bool(data.get("cover_letter"))   # CV-only application: no letter files at all
+    if has_letter:
+        (scratch / "cover_letter.md").write_text(cover, encoding="utf-8")
+    elif (scratch / "cover_letter.md").exists():
+        (scratch / "cover_letter.md").unlink()
     if text_only:
-        print(f"wrote work/apps/{app.name}/resume.md, cover_letter.md (no PDFs)")
+        print(f"wrote work/apps/{app.name}/resume.md" + (", cover_letter.md" if has_letter else "") + " (no PDFs)")
         return 0
     wrote = []
     try:
@@ -109,8 +120,10 @@ def main(argv=None) -> int:
         want_md = True
     if want_md:
         (app / "resume.md").write_text(md, encoding="utf-8")
-        (app / "cover_letter.md").write_text(cover, encoding="utf-8")
-        wrote += ["resume.md", "cover_letter.md"]
+        wrote.append("resume.md")
+        if has_letter:
+            (app / "cover_letter.md").write_text(cover, encoding="utf-8")
+            wrote.append("cover_letter.md")
     if want_docx:
         to_docx(data, contact, app / "resume.docx")
         wrote.append("resume.docx")

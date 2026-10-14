@@ -34,7 +34,7 @@ from jobradar.dedupe import Group, group_postings
 from jobradar.health import BROKEN_AFTER_RUNS, update_health
 from functools import lru_cache
 
-from jobradar.matching import default_matcher, load_high_fit, normalize
+from jobradar.matching import default_matcher, load_high_fit, load_sectors, normalize
 from jobradar.mdsafe import md, md_url  # noqa: F401 (tests use radar.md)
 from jobradar.model import Posting, SourceResult
 from jobradar.sources import build_sources, load_sources_config, run_sources
@@ -52,6 +52,25 @@ UNRECOGNISED_N: Counter = Counter()  # source -> how many title-matching listing
 DROP_REASONS = {"country": "outside your countries", "title": "titles not matching",
                 "employment": "not permanent", "old": "posted too long ago",
                 "company": "employers not on your list"}
+# Dropped listings of these sources are kept in state/dropped_alerts.csv, so the filters can be audited (main() turns it on;
+# jobradar/intake.py and tests never do). Alert emails only: the ATS sources drop 100k+ listings a run.
+LOG_DROPS_SOURCES = {"alert_email"}
+LOG_DROPS = False
+DROPPED_ROWS: list[dict] = []
+DROPPED_FIELDS = ["first_seen", "last_seen", "company", "title", "location", "reasons", "source", "url"]
+
+
+def _log_drop(res, p, matcher, tgt, first: str) -> None:
+    """Record a dropped listing with every filter it fails, not only the first (select() stops at the first)."""
+    reasons = [first]
+    if first != "country" and not (p.countries & tgt):
+        reasons.append("country")
+    if first != "title" and not (p.raw.get("page_changed") or title_matches(p.title)):
+        reasons.append("title")
+    if first != "company" and matcher.resolve(p.company, p.company_hint) is None:
+        reasons.append("company")
+    DROPPED_ROWS.append({"company": p.company or "", "title": p.title or "", "location": p.location or "",
+                         "reasons": ",".join(reasons), "source": res.source, "url": p.url or ""})
 
 
 def select(results: list[SourceResult], include_outside, matcher=None,
@@ -72,6 +91,8 @@ def select(results: list[SourceResult], include_outside, matcher=None,
                 countries = set(p.countries)
             if not countries:
                 dropped[(res.source, "country")] += 1
+                if LOG_DROPS and res.source in LOG_DROPS_SOURCES:
+                    _log_drop(res, p, matcher, tgt, "country")
                 dropped[(res.source, "where:" + (",".join(sorted(p.countries)) or "location not recognised"))] += 1
                 # only roles you'd want can be real losses: count and sample those, for the digest
                 if not p.countries and title_matches(p.title):
@@ -83,18 +104,26 @@ def select(results: list[SourceResult], include_outside, matcher=None,
             # a hash-watched careers page has no job titles to filter; its change notice always passes
             if "title" not in skip and not (p.raw.get("page_changed") or title_matches(p.title)):
                 dropped[(res.source, "title")] += 1
+                if LOG_DROPS and res.source in LOG_DROPS_SOURCES:
+                    _log_drop(res, p, matcher, tgt, "title")
                 continue
             if "employment" not in skip and (not_permanent(p.title) or not_permanent(p.raw.get("employment", ""))):
                 dropped[(res.source, "employment")] += 1
+                if LOG_DROPS and res.source in LOG_DROPS_SOURCES:
+                    _log_drop(res, p, matcher, tgt, "employment")
                 continue  # permanent roles only (config.json: employment_exclude)
             max_age = int(CONFIG.get("max_age_days") or 0)  # 0 = no limit; roles with no posted date always pass
             if "old" not in skip and max_age and p.posted_at and (date.today() - p.posted_at.date()).days > max_age:
                 dropped[(res.source, "old")] += 1
+                if LOG_DROPS and res.source in LOG_DROPS_SOURCES:
+                    _log_drop(res, p, matcher, tgt, "old")
                 continue  # posted more than max_age_days ago (config.json: max_age_days)
             p.countries = frozenset(countries)
             p.company_canonical = matcher.resolve(p.company, p.company_hint)
             if p.company_canonical is None and not outside_ok and "company" not in skip:
                 dropped[(res.source, "company")] += 1
+                if LOG_DROPS and res.source in LOG_DROPS_SOURCES:
+                    _log_drop(res, p, matcher, tgt, "company")
                 continue
             kept.append(p)
             matched[res.source] += 1
@@ -122,6 +151,15 @@ def high_fit_targets() -> frozenset:
         return frozenset()
 
 
+@lru_cache(maxsize=1)
+def sector_targets() -> dict:
+    """Sector tags per company from targets.tsv (read once per run; empty without a Sector column)."""
+    try:
+        return load_sectors()
+    except OSError:
+        return {}
+
+
 def enrich(new: list[Group], sponsors=None) -> None:
     """Sponsor-register tags and fit tier for each new group (after dedupe, so only a few lookups)."""
     if not new:
@@ -134,7 +172,8 @@ def enrich(new: list[Group], sponsors=None) -> None:
         sp = sponsors.tag(p.company, p.company_canonical)
         age = (date.today() - p.posted_at.date()).days if p.posted_at else None
         high = bool(p.company_canonical) and normalize(p.company_canonical) in high_fit_targets()
-        total, reasons = fit_score(p.title, p.countries, bool(p.company_canonical), sp, age_days=age, high_fit=high)
+        total, reasons = fit_score(p.title, p.countries, bool(p.company_canonical), sp, age_days=age, high_fit=high,
+                                   sectors=sector_targets().get(normalize(p.company_canonical or ""), frozenset()))
         g.tags = {"sponsor": sp, "score": total, "tier": fit_tier(total), "reasons": reasons}
 
 
@@ -308,6 +347,63 @@ def append_matches(new: list[Group], today: str):
         csv.DictWriter(fh, fieldnames=fields, restval="").writerows(rows)
 
 
+def write_dropped_log(today: str, keep_days: int = 45) -> int:
+    """Merge this run's dropped alert listings into state/dropped_alerts.csv (first/last seen; old rows expire). Returns rows kept."""
+    path = STATE / "dropped_alerts.csv"
+    old: dict[tuple, dict] = {}
+    if path.exists():
+        with open(path, newline="", encoding="utf-8") as fh:
+            for r in csv.DictReader(fh):
+                old[(r["company"].lower(), r["title"].lower(), r["location"].lower())] = r
+    for r in DROPPED_ROWS:
+        k = (r["company"].lower(), r["title"].lower(), r["location"].lower())
+        if k in old:
+            old[k].update(last_seen=today, reasons=r["reasons"], url=r["url"] or old[k]["url"])
+        else:
+            old[k] = {"first_seen": today, "last_seen": today, **r}
+    cutoff = (date.fromisoformat(today) - timedelta(days=keep_days)).isoformat()
+    rows = sorted((r for r in old.values() if r["last_seen"] >= cutoff), key=lambda r: (r["last_seen"], r["company"]), reverse=True)
+    with open(path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=DROPPED_FIELDS, restval="", extrasaction="ignore")
+        w.writeheader()
+        w.writerows(rows)
+    return len(rows)
+
+
+ALERT_HIT_FIELDS = ["first_seen", "last_seen", "alert", "company", "title", "location"]
+
+
+def write_alert_hits(results, today: str, keep_days: int = 45) -> int:
+    """Log which LinkedIn alert (search name) listed each role, kept or dropped, in state/alert_hits.csv, so a
+    search (for example a fintech one) can be judged by the roles only it surfaces. Mails without a search name
+    (single-job alerts) are logged as '(single-job mail)'. Returns rows kept."""
+    path = STATE / "alert_hits.csv"
+    old: dict[tuple, dict] = {}
+    if path.exists():
+        with open(path, newline="", encoding="utf-8") as fh:
+            for r in csv.DictReader(fh):
+                old[(r["alert"], r["company"].lower(), r["title"].lower(), r["location"].lower())] = r
+    for res in results:
+        for p in res.postings:
+            if p.source != "linkedin_email":
+                continue
+            alert = (p.raw or {}).get("alert") or "(single-job mail)"
+            k = (alert, p.company.lower(), p.title.lower(), p.location.lower())
+            if k in old:
+                old[k]["last_seen"] = today
+            else:
+                old[k] = {"first_seen": today, "last_seen": today, "alert": alert, "company": p.company,
+                          "title": p.title, "location": p.location}
+    cutoff = (date.fromisoformat(today) - timedelta(days=keep_days)).isoformat()
+    rows = sorted((r for r in old.values() if r["last_seen"] >= cutoff),
+                  key=lambda r: (r["last_seen"], r["alert"]), reverse=True)
+    with open(path, "w", newline="", encoding="utf-8") as fh:
+        w = csv.DictWriter(fh, fieldnames=ALERT_HIT_FIELDS, restval="", extrasaction="ignore")
+        w.writeheader()
+        w.writerows(rows)
+    return len(rows)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dry-run", action="store_true", help="fetch and print the digest; write nothing")
@@ -332,7 +428,10 @@ def main(argv=None):
     outside = {name: args.include_outside or bool((c or {}).get("include_outside_list", default_outside))
                for name, c in (scfg.get("sources") or {}).items()}
     dropped: Counter = Counter()
+    global LOG_DROPS
+    LOG_DROPS = True
     kept, matched = select(results, outside, dropped=dropped)
+    LOG_DROPS = False
     new = diff_seen(group_postings(kept), seen, today)
     enrich(new)
     broken = update_health(health, results)
@@ -345,7 +444,7 @@ def main(argv=None):
                + ", ".join(f"{r.source}={'ok' if r.ok else 'FAILED'}" for r in results))
     if args.dry_run:
         print(summary if args.quiet else digest)
-        print(f"[dry-run] {len(new)} new, nothing written.")
+        print(f"[dry-run] {len(new)} new, nothing written; {len(DROPPED_ROWS)} dropped alert listings would be logged.")
         return
 
     cutoff = (date.today() - timedelta(days=120)).isoformat()
@@ -366,6 +465,8 @@ def main(argv=None):
     (STATE / "seen.json").write_text(json.dumps(seen, indent=0, sort_keys=True))
     (STATE / "health.json").write_text(json.dumps(health, indent=0, sort_keys=True))
     append_matches(new, today)
+    write_dropped_log(today)
+    write_alert_hits(results, today)
 
     print(summary if args.quiet else digest)
     if gh := os.environ.get("GITHUB_OUTPUT"):

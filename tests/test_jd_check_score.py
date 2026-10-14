@@ -18,7 +18,7 @@ CAREER = load_career(EXAMPLES / "career")
 
 
 def good():
-    return {"key": REF, "fit_score": 50, "recommendation": "maybe", "injection_suspected": True,
+    return {"key": REF, "fit_score": 50, "recommendation": "skip", "injection_suspected": True,
             "summary": "Strong code-review and threat-modeling match; SC clearance is a blocker for a non-UK national.",
             "must_haves": [{"requirement": "Threat modeling", "met": "yes", "evidence": ["B02", "K04"]},
                            {"requirement": "Java code review", "met": "yes", "evidence": ["B03"]},

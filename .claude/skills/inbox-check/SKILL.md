@@ -20,12 +20,18 @@ mailbox for them, **read-only**, and **suggests** board changes. It never moves 
 ## Steps
 0. **Start from the ledger.** The daily scan (`tools/app_mail.py`) already logged emails about your roles; the brief's **MAIL** lines are its plan. Handle those first (`python tools/app_mail.py plan`): `auto` items are moved with `track` and reported in one line each, `ask` items wait for the user's yes, `action needed` items are told to the user first; after each, `python tools/app_mail.py ack <id>`. The steps below add what the scan cannot see (it only sees the Action's mailbox, and only mail it could match to a role): use them to verify and to read a whole thread.
 1. **What is waiting for an answer:** `python tools/inbox_outcomes.py pending` lists roles in Stage Applied or Interview with the date
-   they moved there and a Gmail search for each (`"Company" after:YYYY/MM/DD`). Nothing pending: say so and stop.
+   they moved there and a Gmail search for each (`"Company" after:YYYY/MM/DD`). The date is the later of "moved to Applied" and the role's
+   last check (`state/inbox_checked.json`), so a session never re-reads mail an earlier one read (the user, 2026-11-07). Nothing pending: say so and stop.
+   **Always use the printed `gmail_query` per role; never replace it with one broad search.**
 2. **Connect Gmail.** Load the Gmail tools with ToolSearch (`+gmail`). If only `authenticate` shows, the user has not connected it: call it,
    give the user the link to approve (read-only), then `complete_authentication`. If they'd rather not connect it, stop; don't ask again this session.
 3. **Search each pending role** with its `gmail_query` (widen to the company's ATS sender if the company name alone finds nothing, e.g.
    `from:greenhouse.io "Company"`). Read subject, sender and date, and the snippet or first lines. Skip a message whose id is in
-   `python tools/inbox_outcomes.py seen --list`.
+   `python tools/inbox_outcomes.py seen --list`. Search with `THREAD_VIEW_METADATA_ONLY`/`MINIMAL` and open a thread only when its id is new.
+   **The bookkeeping is automatic** (a PostToolUse hook, `tools/inbox_hook.py`, wired in `.claude/settings.json`; the user, 2026-11-07): every thread you open
+   with `get_thread`/`get_message` goes into the seen list, and a per-role search (`"Company" after:…`, one company, no OR) stamps that role as checked today.
+   Nothing to run. Only if the hook is missing (check `seen --list` after a thread you opened) fall back to `python tools/inbox_outcomes.py seen <id> …`
+   and `checked <ref> …` by hand. Searches that list threads without opening them record nothing but the date, so open only ids not in the seen list.
 4. **Classify:** `python tools/inbox_outcomes.py classify --subject "<subject>" --text "<first lines>"` returns rejection, offer,
    interview, acknowledgement or unknown. Check the label yourself against the text (a rejection often says "thank you for applying"
    and mentions an interview it won't hold). Check the sender is plausibly the company or its recruiting system, not a look-alike, and say

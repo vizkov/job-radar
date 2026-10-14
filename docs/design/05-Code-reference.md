@@ -11,7 +11,7 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 | Page | Covers |
 |---|---|
 | [5.1 Entry points](05-1-Entry-points.md) | `radar.py` (the scheduled pipeline) and `verify_boards.py` |
-| [5.2 The `jobradar` package](05-2-Package.md) | the shared data shapes, settings, matching, dedupe, health, tiering, sponsors, board payloads, trust boundary, career docs |
+| [5.2 The `jobradar` package](05-2-Package.md) | the shared data shapes, settings, matching, dedupe, health, tiering, sponsors, board payloads, trust boundary, career docs, hand-added roles (`intake.py`) |
 | [5.3 `jobradar/sources/`](05-3-Sources.md) | the adapters: ATS boards, search APIs, careers pages, alert emails |
 | [5.4 Board and session tools](05-4-Board-and-session-tools.md) | `board_sync.py`, `cadence.py`, `session_brief.py`, `public_template.py`, referrals, post leads, sponsorship, calibration |
 | [5.5 Application tools](05-5-Application-tools.md) | job descriptions, `jd_check.py`, the renderers, `cv_lint.py`, the consistency, drift and outcome checks |
@@ -24,12 +24,14 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 | `tools/board_sync.py` | GitHub issues and the Project (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/cadence.py` | the cadence ledger (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/cover_sync.py` | the cover blocks follow the stories and CV lines they expand (`status`, `done`) | [5.5](05-5-Application-tools.md) |
+| `tools/jd_dupes.py` | compare the saved ad texts of one company's cards to tell a duplicate listing from a different job | [5.4](05-4-Board-and-session-tools.md) |
+| `tools/domain_profile.py` | validate `profile/domains.json` against the masters; list the IDs to lead with for a sector | [5.5](05-5-Application-tools.md) |
 | `tools/jd_cleanup.py` | trims `jd.txt` and `packet.md` of skipped and rejected roles after 14 and 30 days | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/session_brief.py` | the SessionStart hook (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/public_template.py` | keep the public template current and clean | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/manual.py` | the `man` page | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/referrals.py` | referral routes and asks (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
-| `tools/draft_experiment.py` | tailoring step 4b: three drafts (tailored, Opus from the ad, Opus from the ad + record) and the briefs for the four readers | [5.5](05-5-Application-tools.md) |
+| `tools/draft_experiment.py` | tailoring step 4b: two drafts (A tailored, B Opus from the ad + record; C, Opus from the ad alone, only with `--with-ad-only`) and the briefs for the four readers | [5.5](05-5-Application-tools.md) |
 | `tools/add_role.py` | add a role you found yourself (a job link) through the radar's own filters and bookkeeping | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/post_leads.py` | LinkedIn hiring-post discovery (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/careers_queue.py` | the Chrome careers-site log: which companies the radar cannot read and when each was last read | [5.4](05-4-Board-and-session-tools.md) |
@@ -41,6 +43,7 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 | `tools/render_resume.py` | CV and cover letter files | [5.5](05-5-Application-tools.md) |
 | `tools/render_pdf.py` | the CV and cover letter as PDFs in the user's Claude Design layout | [5.5](05-5-Application-tools.md) |
 | `tools/inbox_outcomes.py` | applications awaiting an answer, and an outcome-email classifier | [5.5](05-5-Application-tools.md) |
+| `tools/inbox_hook.py` | PostToolUse hook: records Gmail ids read and per-role check dates during an inbox check | [5.5](05-5-Application-tools.md) |
 | `tools/fetch_application_mail.py` | the scheduled run's mailbox scan for replies about applied roles (standard library only) | [5.5](05-5-Application-tools.md) |
 | `tools/app_mail.py` | application-mail ledger, plan and brief lines (standard library only) | [5.5](05-5-Application-tools.md) |
 | `tools/master_drift.py` | which applications no longer match the master documents | [5.5](05-5-Application-tools.md) |

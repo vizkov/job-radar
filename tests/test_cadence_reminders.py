@@ -31,3 +31,14 @@ def test_reminder_add_replaces_same_id_and_rejects_bad_input(tmp_path):
         except ValueError:
             continue
         raise AssertionError("expected ValueError")
+
+
+def test_scoring_is_the_last_cadence_line(tmp_path):
+    """The user, 2026-10-22: sweeps ran after scoring and left new roles unscored, so Scoring is listed after every other job."""
+    cadence.reminder_add("r", "2026-10-01", "a reminder", tmp_path)
+    for picks in (2, 0):
+        lines, due = cadence.block(datetime(2026, 10, 22), tmp_path, radar_last="2026-10-22", new_total=0, new_on_board=0,
+                                   new_skip=0, new_waiting=0, queued=0, unscored_cards=picks, auto_picks=picks, awaiting=0,
+                                   posts_enabled=True)
+        assert lines[-1].startswith("  - Scoring") and "--score-pick" in lines[-1]
+        assert ("auto_score" in due) == bool(picks)

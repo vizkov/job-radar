@@ -163,3 +163,15 @@ def test_promote_dry_run_writes_nothing():
                           encoding="utf-8")
     assert bs.promote(["aaaaaaaaaaaaaaaa"], dry_run=True).startswith("would queue 1")
     assert not bs.QUEUE.exists()
+
+
+def test_a_role_that_already_has_an_issue_is_not_opened_again(paths, monkeypatch):
+    monkeypatch.setattr(bs, "ISSUE_MAP", paths / "issue_map.json")
+    items = queue(paths, 3)
+    bs.ISSUE_MAP.write_text(json.dumps({items[1]["ref"]: 109}))
+    gh = FakeGh()
+    created, left = bs.sync_roles(gh, 10, sleep=lambda s: None)
+    titles = [c[c.index("--title") + 1] for c in gh.calls if c[:2] == ("issue", "create")]
+    assert (created, left) == (2, 0) and len(titles) == 2 and items[1]["title"] not in titles
+    assert bs.QUEUE.read_text() == "[]"
+    assert json.loads(bs.ISSUE_MAP.read_text())[items[1]["ref"]] == 109   # the original card's number is kept

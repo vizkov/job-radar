@@ -98,7 +98,7 @@ doesn't match `PRIVATE`.
 |---|---|---|---|
 | `config.json` | Countries, title include/exclude, tier weights, sponsor thresholds, board options, timeouts | Claude (`tune-radar`) | almost everything via `common.py: CONFIG` |
 | `sources.yaml` | Which sources run and their options | Claude | `sources/__init__.py: load_sources_config()` |
-| `targets.tsv` | Target companies (`Company<TAB>Offices`) | Claude (`setup`, `tune-radar`) | `matching.py`, `build_candidates.py` |
+| `targets.tsv` | Target companies (`Company<TAB>Offices`, plus optional `Fit` and `Sector` columns: page 9) | Claude (`setup`, `tune-radar`) | `matching.py`, `build_candidates.py` |
 | `aliases.csv` | `alias,canonical` spellings | Claude | `matching.py` |
 | `overrides.csv` | Extra ATS boards: `company,careers_url,ats,slug` | Claude, `discover_boards.py --apply` | `verify_boards.py` |
 | `board_blocklist.csv` | Boards never to poll: `ats,slug,board_url,reason` | Claude | `verify_boards.py` (`load_blocklist`) |
@@ -106,6 +106,8 @@ doesn't match `PRIVATE`.
 | `sponsor_overrides.csv` | Pinned sponsor-register matches | Claude | `sponsors.py` |
 | `career/master_resume.md`, `stories.md`, `cover_blocks.md` | The user's CV lines, STAR stories and cover paragraphs, each with an ID | Claude (converted from the user's CV, confirmed by them) | `career.py` → `jd_check.py`, `render_resume.py`, skills |
 | `applications/<folder>/` | Per-application `tailored.json`, `validated.sha256`, `resume.pdf`, `cover_letter.pdf` (Markdown copies for the reviewers in `work/apps/<folder>/`; `resume.docx` only when asked), `submitted.md` | Claude, `jd_check.py`, `render_resume.py` | the user, `apply-assist` |
+| `domains.json` | Optional. Which industry domains the user's record backs: domains with strength and evidence IDs, `lead_ids`, `not_claimed`; stamped with the masters' digest when valid | Claude (`domain-profile` skill, after a quiz); `tools/domain_profile.py validate` checks and stamps it | `tools/domain_profile.py` (`status`, `lead`), `tailor-application` |
+| `application_answers.json` | The user's standing answers to application-form questions (sponsorship, notice period, in-office, consent, voluntary demographics) | Claude (`apply-assist` saves each new answer) | `apply-assist`, `score-roles`, `rejection-review` (skills read it directly; no Python tool does) |
 | `network.csv` | Who can help where: `name,company,added`, one row per person per company. Nothing about how people are related or what they do (the user's choice) | Claude (`referrals` skill), from what the user says | `tools/referrals.py` |
 | `board.json` | The Project's owner, number, node ID, URL, field IDs and option IDs | `board_sync.py setup-project` | `board_sync.py`, `session_brief.py` |
 
@@ -119,14 +121,19 @@ doesn't match `PRIVATE`.
 | `issue_map.json` | `{ref: issue number}` | `board_sync.py roles`, `backfill-map` | `radar.py` (stale check), `board_sync.py stale` |
 | `stale_roles.json` | `{stale: [refs], alive: [refs]}` from the latest healthy run | `radar.py` | `board_sync.py stale` |
 | `stale_flagged.json` | Refs currently labelled `possibly-closed` | `board_sync.py stale` | `board_sync.py stale` |
+| `inbox_checked.json` | Per role, the day its mail was last searched and read: the next `inbox-check` search starts there, so no run re-reads old mail | `inbox_outcomes.py mark_checked` (CLI `checked`) | `inbox_outcomes.py pending` |
+| `inbox_seen.json` | IDs of every email the Gmail inbox check has already read (suggested or not), so none is read twice | `inbox_outcomes.py add_seen` (CLI `seen`) | `inbox_outcomes.py seen_ids` |
+| `chrome_careers.json` | Per company the radar cannot read: when Claude last read its careers page in Chrome, how many runs, the search URL that worked, a note | `tools/careers_queue.py` (`done`, `url`) | `careers_queue.py`, `tools/sweep_plan.py` |
+| `linkedin_company_ids.json` | LinkedIn's numeric company id per normalised company name, for the post-search "posts written by employees" filter | `post_leads.py company-id` (`set_company_id`) | `post_leads.py` (`search_url`) |
 
 ### Output (`data/`, `digests/`)
 
 | File | Holds | Written by | Read by |
 |---|---|---|---|
-| `data/matches.csv` | One row per new role ever found: ref, date, company, title, location, countries, url, source, posted, on_list, tier, score, score_reasons, uk/nl sponsor, also_on, ats, ats_slug, external_id | `radar.py: append_matches()` | `jd_prep.py`, `session_brief.py`, `board_sync.py` (Posted fallback), Claude |
+| `data/matches.csv` | One row per new role ever found: ref, date, company, title, location, countries, url, source, posted, on_list, tier, score, score_reasons, uk/nl sponsor, also_on, ats, ats_slug, external_id, and three columns that are blank for the daily run: `poster` and `poster_url` (the LinkedIn author of the hiring post the role came from, set by `post_leads.py add-role`; `board.row_payload` prints them as a "Posted by" line) and `origin` (how the role arrived: `manual` for a hand-added role that passed the filters, `manual-override:<reasons>` when the user overrode a filter; set by `jobradar/intake.py`, only recorded, nothing reads it back) | `radar.py: append_matches()` (the extra columns come from `raw["row_extra"]` and `raw["origin"]`) | `jd_prep.py`, `session_brief.py`, `board_sync.py` (Posted fallback), Claude |
 | `data/scores.jsonl` | One JSON line per scored role: fit_score, recommendation, blockers, missing requirements, summary, injection flag | `jd_check.py score` | `session_brief.py`, `jd_prep.py` (skip scored), `cv-review` |
 | `data/pipeline_log.jsonl` | Every stage change: `{ref, field, value, by: claude|board, at, from?, note?}` | `board_sync.py set`, `session_brief.py` | `session_brief.py` (follow-ups) |
+| `state/dropped_alerts.csv`, `state/alert_hits.csv` | Alert listings the filters dropped (first/last seen, company, title, location, every failing filter) and every LinkedIn alert listing with the alert that found it; rows expire after 45 days | `radar.py` (`write_dropped_log`, `write_alert_hits`) | read by Claude when auditing the filters |
 | `state/application_mail.jsonl`, `state/application_mail_status.json` | Emails about roles applied to (sender, subject, date, thread id, type, matched role; acknowledgements as `{ack, at, how}` rows) and when the scan last ran and whether it worked | `tools/app_mail.py ingest` (in the Action) | `tools/app_mail.py`, `session_brief.py` |
 | `data/post_leads.jsonl`, `data/post_people.jsonl`, `state/post_queries.json` | LinkedIn hiring posts logged (`{id, post_url, author, author_url, reposter, company, title, location, posted, status: new|known|stale|job_board|added, ref, …}`), recruiters and managers worth re-reading, and when each post search last ran | `tools/post_leads.py` | `tools/post_leads.py` |
 | `data/referrals.jsonl` | Every referral ask and answer: `{ref, person, relation?, channel?, status: asked|referred|declined|no_reply|finding|none|not_needed, note, at}` | `tools/referrals.py` | `tools/referrals.py`, `session_brief.py` (reminders) |
@@ -152,6 +159,8 @@ starts them from scratch (so both review timers reset).
 | `work/jd/<ref>/jd.txt`, `meta.json`, `packet.md` | A role's JD text, facts, and the packet Claude reads | `jd_prep.py` (or the user pastes `jd.txt`) |
 | `work/jd/<ref>/score.json` | Claude's fit assessment, before validation | Claude |
 | `work/jd/<ref>/sponsorship.json` | Claude's sponsorship verdict and evidence, before validation | Claude |
+| `work/.cadence.json` | When each recurring cadence job last finished (UTC), for the brief's CADENCE block ([page 4](04-Claude-session.md#cadence-the-recurring-jobs)) | `tools/cadence.py done <job>` (Claude, or `jd_cleanup.py` itself) |
+| `.app_mail/messages.json`, `_status.json` | The daily application-mail scan's candidate messages (headers and the first 2,500 characters of text) and whether the scan worked; deleted with the runner, `.gitignore`d | `tools/fetch_application_mail.py` (read by `app_mail.py ingest` in the same run) |
 | `work/.last_calibration` | When calibration last ran | `session_brief.py` |
 | `work/discovered_boards.csv` | Proposed boards for uncovered targets | `discover_boards.py` |
 | `work/.last_session`, `.fill_started`, `board_fill.log` | Timestamps and logs for the session brief | `session_brief.py` |

@@ -6,6 +6,28 @@
 
 Skim it now; come back when a word is unclear.
 
+## Words you meet first
+
+These are used from page 2 on, before their full entries further down. One line each; the fuller definition is in the tables below or on the page named.
+
+| Word | Meaning |
+|---|---|
+| **Posting** | The code object for one job as one source reported it (`jobradar/model.py`). Full shape under "Data shapes". |
+| **Unit** | One thing a source polls: one ATS board, one search query, one careers page, one email provider. Health is tracked per unit. |
+| **Group** | All postings that are the same role (same content key), merged; one link is the best, the rest are "also on". |
+| **ref** | The 16-character ID of a role. It links the role's issue, `matches.csv` row, JD folder, score and application. |
+| **Session** | One conversation with Claude Code in the user's private copy. Scoring, tailoring and board edits happen in sessions; finding roles does not. |
+| **Brief** | The text the SessionStart hook prints at the start of a session ([page 4](04-Claude-session.md#42-session-start-toolssession_briefpy)). |
+| **CADENCE** | The brief's block listing every recurring job, when it last ran and which are DUE ([table](04-Claude-session.md#cadence-the-recurring-jobs)). |
+| **AUTO-SCORE** | A brief line naming roles Claude should score as the last job of the session; how many comes from `scoring.auto_per_session` in `config.json`. |
+| **Masters** | The three career documents `profile/career/master_resume.md`, `stories.md` and `cover_blocks.md`. Every tailored CV and letter is built only from their lines. |
+| **Cleared** | The masters are "cleared" when they passed the `master-update` consistency check exactly as they are now (a SHA-256 stamp in `profile/career/.master_cleared`). `jd_check.py tailor` refuses to build an application until they are. |
+| **Network company** | A company where `profile/network.csv` lists someone the user knows. Such companies are asked for referrals first and get extra attention in sweeps. |
+| **Dream company** | An employer the user alone names in `discovery.linkedin_posts.dream_companies` (at most 10; consulting ones in `dream_consulting`, at most 5). Searched first in every sweep, with or without a contact. |
+| **Sweep** | One `post-discovery` pass: a capped set of LinkedIn post searches and careers-page reads in the user's Chrome, planned by `tools/sweep_plan.py`. |
+| **Intake** | The one code path (`jobradar/intake.py`) that a role added by hand goes through, applying the same filters as the daily run ([5.2](05-2-Package.md#jobradarintakepy-roles-that-arrive-by-hand)). |
+| **origin** | A `matches.csv` column: blank for roles the daily run found, `manual` for a hand-added role that passed the filters, `manual-override:<reasons>` when the user overrode a filter. |
+
 ## The job-search world
 
 | Term | Meaning |
@@ -27,7 +49,7 @@ Skim it now; come back when a word is unclear.
 | **Template repo** / **private copy** | job-radar's code lives in a public repo (the *template*, `vizkov/job-radar`). Each user runs their own *private copy*, which has the same code plus their personal settings and data. The private copy knows the public one as the git remote `template`. |
 | **Commit** / **push** / **pull** | Save a set of changes into history / send commits to GitHub / fetch commits from GitHub. |
 | **Issue** | A GitHub discussion item (title, body, labels). job-radar creates one issue per role. |
-| **Label** | A coloured tag on an issue: `role`, `possibly-closed`, `radar-status`. Tier, Sponsor and Country are board fields, not labels ([where each card value comes from](11-Board-internals.md#where-each-card-value-comes-from)). `matches.csv` is the private log of every role the radar has found ([page 2](02-Architecture.md)). |
+| **Label** | A coloured tag on an issue: `role`, `possibly-closed`, `radar-status`. Tier, Sponsor and Country are board fields, not labels ([where each card value comes from](11-Board-internals.md#where-each-card-value-comes-from)). |
 | **Project** / **board** | GitHub Projects: a spreadsheet- or kanban-like view over issues. Each issue on it is a **card** (an *item* in the API). |
 | **Field** | A column on a Project, with a value per card. job-radar's: *Stage*, *Tier*, *Country*, *Recommendation*, *Sponsor*, *Referral* (single-selects), *Fit* (a number), *Posted* (a date). Fields belong to the Project; labels belong to the issue. |
 | **View** | A saved way of looking at a Project: which columns show, which filter applies, sort order, and table or board layout. job-radar has *All Roles*, *Act now* and *Pipeline*. |
@@ -70,6 +92,7 @@ Skim it now; come back when a word is unclear.
 | **Content key** | `c:<company>|<title>|<country>`, all normalized. Two postings with the same content key are the same role. | `dedupe.py: content_key()` |
 | **Group** | All postings sharing a content key. The best one (by source rank) supplies the link; the others become "also on". | `dedupe.py: Group` |
 | **ref** (Role ID) | The first 16 hex characters of the SHA-1 of the content key, e.g. `3140f52f7d4f47fc`. It links a role's issue, its `matches.csv` row, its JD folder, its score and its application. | `board.py: role_ref()` |
+| **`matches.csv`** | `data/matches.csv`: the private log of every role the radar has found, one row per role, keyed by its ref ([page 2](02-Architecture.md)). | `radar.py: append_matches()` |
 | **Seen** | `state/seen.json` remembers every posting ID and content key already reported, with the last date seen. A role is "new" only if none of its keys were seen. | `radar.py: diff_seen()` |
 | **Baseline** | The very first run (empty `seen.json`). Everything open is recorded, but only Tier 1 goes to the board so the user doesn't start with hundreds of cards. | `board.py: select_for_board()` |
 | **Score** / **tier** | A rule-based number from title keywords, seniority, country, list membership, sponsor status and freshness. Tier 1 if score ≥ 6, else Tier 2. No AI involved, and not the same as **Fit** (below), the AI-judged score. This is the provisional tier on the card; once a role is scored against the CV, Apply makes it T1 and Skip makes it T2 (`jd_check.TIER_FROM_SCORE`). | `tiering.py` |

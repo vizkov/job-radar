@@ -30,6 +30,7 @@ The skills, and the tools each one runs:
 | `inbox-check` | brief has an `INBOX-CHECK` line, or the user asks whether anyone replied | `inbox_outcomes.py pending`, the Gmail connector (search and read only), `inbox_outcomes.py classify`; suggests, the user confirms, then `track` (see [4.10](#410-reading-replies-inbox-check)) |
 | `master-update` | a master document (`master_resume.md`, `cover_blocks.md`, `stories.md`) changed, by the user or by Claude | `consistency_check.py` on the masters and `master_drift.py`, then (only on the user's word, rule 12) two read-only subagents (master consistency auditor, cold reader); `cover_sync.py` and the masters-clear gate (`master_drift.py status`) are the only automatic steps; stale applications are rebuilt from the current masters once the masters are cleared (see [4.5](#45-when-the-master-documents-change-master-update)) |
 | `application-review` | "review my application", the user provides or updates CV/cover/STAR drafts; offered after `tailor-application`, run only on the user's word (CLAUDE.md rule 12) | `consistency_check.py`, then four read-only subagents (ATS, recruiter, consistency auditor, copy editor); Claude verifies their findings and reports ranked fixes in chat (no `review.md` is written) |
+| `domain-profile` | "target fintech", "which domains can I show?", masters changed, `setup` step 2b | quizzes the user in plain words about work the CV never mentions (`quiz.md` banks), writes the private `profile/domains.json` (domains, strength, evidence IDs, lead IDs, `not_claimed`); `tools/domain_profile.py validate` checks every ID against the masters and stamps their digest, `status` reports stale, `lead <sector>` gives tailoring the IDs to put first |
 | `sponsorship-check` | "will they sponsor?", roles recommended apply/maybe | reads the ad, applies country rules, checks registers, WebSearch/WebFetch on company pages (never LinkedIn/Indeed/Glassdoor); `tools/sponsorship.py record --board` |
 | `referrals` | "who do I know at …", a role recommended apply, an unanswered ask in the brief | `tools/referrals.py contacts/ask/result/route/pending`; messages to strangers are drafted in chat only, never saved to a file |
 | `post-discovery` | `discovery.linkedin_posts.enabled` at session start, "check LinkedIn posts", the user pastes a hiring post | `tools/post_leads.py queries/person/lead/add-role/stats`; Claude in Chrome reads post searches read-only; new roles become cards with the poster named |
@@ -80,9 +81,9 @@ errors become one-line notes, and it always exits 0.
 9. **`template_status()`**: commits the public template gained since the last session
    ("system updated": Claude should re-read the relevant skill), and any code here not yet
    published (`public_template.drift()`).
-10. **Three values worked out as arguments to the `brief()` call** (still in `main()`, before any
+10. **Four values worked out as arguments to the `brief()` call** (still in `main()`, before any
     text is printed):
-    - **`workflows_health()`** (joined into the same note): failed or thin recent search runs, and the weekly register refresh and monthly board check not having succeeded lately.
+    - **`workflows_health()`** (joined with `last_run_health()` into one run note): failed or thin recent search runs, and the weekly register refresh and monthly board check not having succeeded lately.
     - **`last_run_health()`**: the latest `job-radar` Actions run. If it failed, say so. If
       the last scheduled slot (read from `radar.yml`'s cron, plus 1 hour grace) passed with no
       run, GitHub skipped it: start one with `gh workflow run job-radar`.
@@ -102,13 +103,15 @@ background JD fetch for the auto-score roles, and `calibration_notes()` may run
 `calibrate.py apply`, which **rewrites the tier weights in `profile/config.json`** (reported in
 the brief with an undo line).
 
-   **Lines in the brief that Claude must act on** (all built in `brief()`): AUTO-SCORE (score these refs before answering),
-   SPONSOR-CHECK (live apply/maybe cards with no sponsorship verdict), INBOX-CHECK (applications awaiting an answer), and the
-   CADENCE block (every recurring job, when it last ran, and which are DUE: `tools/cadence.py`). Its jobs: the radar search, new roles to
-   the board, scoring, the Gmail inbox check, the LinkedIn post sweep, board views vs code (DUE when the live views differ from `VIEWS`) 
-   the health check (DUE once a day while `status.md` lists source problems), the CV review (DUE at most weekly while the brief shows
-   recurring CV gaps) the JD packet cleanup (`tools/jd_cleanup.py`, DUE every 48 hours), the application-mail scan (a line of its own, not in `JOBS`) and the weekly system review (a cadence job since 2026-10-13, where the maintainer-only skill exists) and the docs review (DUE when `docs_review_note()` fires, so it does not wait for the user to say they are
-   closing the session).
+**Lines in the brief that Claude must act on** (all built in `brief()` unless noted):
+
+- **AUTO-SCORE:** score these refs as the last job of the session, starting from `python tools/session_brief.py --score-pick`.
+- **SPONSOR-CHECK:** live apply/maybe cards with no sponsorship verdict; run `sponsorship-check` on them.
+- **REFERRAL-ROUTE:** live apply/maybe cards at a company where the user knows someone and nothing is asked yet; name the contact and offer `referrals`.
+- **INBOX-CHECK:** applications await an answer and the inbox check is due; run `inbox-check`.
+- **MAIL lines** (from `app_mail.brief_lines()`): replies the daily mail scan found, most urgent first ([4.10](#410-reading-replies-inbox-check)).
+- **Follow-up due:** a card that has been Applied for 14+ days with no change.
+- **CADENCE block:** every recurring job, when it last ran, and which are DUE. The jobs, intervals and stamps are in one table: [CADENCE: the recurring jobs](#cadence-the-recurring-jobs).
 
 1. **Header and run state:** the generated-at line, a warning if the `git pull` failed, and the
    last scheduled run.
@@ -116,13 +119,13 @@ the brief with an undo line).
    freshest first.
 3. **AUTO-SCORE:** `auto_score_pick()` (skipping roles the board shows closed and, via
    `skipped_refs()`, roles whose latest logged Stage is Skipped/Rejected, since an archived card
-   vanishes from the board read) chooses up to `scoring.auto_per_session` freshest unscored Tier 1
-   roles; `start_prep()` fetches their job descriptions in the background (the virtualenv's Python,
-   no Claude usage), and the **AUTO-SCORE** line tells Claude to score them before answering the
-   user's first message (`CLAUDE.md`, Session start). Claude can't act before the user types.
+   vanishes from the board read) chooses up to `scoring.auto_per_session` roles: every unscored live board card (Stage none, New or Shortlisted, any tier), then
+   the freshest unscored Tier 1 roles; `start_prep()` fetches their job descriptions in the background (the virtualenv's Python,
+   no Claude usage), and the **AUTO-SCORE** line tells Claude to score as the last job of the session (why: sweeps add roles after the brief is written), starting from `python tools/session_brief.py --score-pick`, which recomputes the
+   pick from the live board (`score_pick_now()`); the CADENCE block lists Scoring last. Claude can't act before the user types.
 4. **SPONSOR-CHECK:** live apply/maybe cards with no sponsorship verdict.
    **REFERRAL-ROUTE:** live apply/maybe cards at a company where `profile/network.csv` lists someone the user knows and no referral ask or route is logged (`referral_route_pick`); Claude names the contact and offers `referrals`.
-5. **CADENCE block:** one line per recurring job (the paragraph above).
+5. **CADENCE block:** one line per recurring job (the [table below](#cadence-the-recurring-jobs)).
 6. **Counts:** unscored Tier 1 roles (and how many were posted in the last 3 days), then scored
    totals by recommendation.
 7. **Board:** stage counts, how many cards had no fields yet (and the fill started in step 7 of
@@ -134,10 +137,10 @@ the brief with an undo line).
 11. **Health:** `health_checks()` (missing career docs, alert emails failing or silent, runs not
     completing, weekly review due, recurring CV gaps), `referral_notes()`, `calibration_notes()`
     (weekly automatic tier tuning, `tools/calibrate.py apply`, reported with an undo line) and
-    `docs_review_note()`, which no longer appears in the health list: it feeds the CADENCE block's
-    "Docs review:" line (due once 10+ code files changed since the last review); then the
-    views-drift note, code not yet published, and any source problems. The CV-gaps note from `health_checks()` also moves to the
-    CADENCE block ("CV review:" line) instead of repeating under Health; `status_info()` counts as source problems only the
+    `docs_review_note()`, which feeds the CADENCE block's "Docs review:" line rather than the health list
+    (due once 10+ code files changed since the last review); then the
+    views-drift note, code not yet published, and any source problems. The CV-gaps note from `health_checks()` goes to the
+    CADENCE block ("CV review:" line), not under Health; `status_info()` counts as source problems only the
     FAILED rows and the bullets under the status page's warning heading, never the per-source funnel statistics.
 12. **A closing instruction** to start from the brief and not redo its steps.
 
@@ -145,6 +148,45 @@ Every job title and company name in the brief passes through `safe()`: control
 characters, angle brackets and backticks are replaced by spaces, and the length is
 capped. The brief states that those strings are
 third-party data, not instructions.
+
+### CADENCE: the recurring jobs
+
+The CADENCE block lists every recurring job on its own line with "last ran" and `ok` or `DUE`, so no job runs silently
+(`tools/cadence.py`: `JOBS`, `block()`; [5.4](05-4-Board-and-session-tools.md)). A hook cannot drive Gmail or Chrome, so the block makes an
+overdue job visible; it does not run it. Stamps are written to `work/.cadence.json` (local only).
+
+Jobs with an interval in `JOBS` (DUE when never run or older than the interval; some also need a trigger):
+
+| Job | Interval (hours) | Who runs it | DUE only when | Stamp |
+|---|---|---|---|---|
+| `inbox_check` | 20 | Claude, `inbox-check` (Gmail connector) | an application is Applied or Interview | `cadence.py done inbox_check` |
+| `post_discovery` | 20 | Claude, `post-discovery` (Chrome) | `discovery.linkedin_posts.enabled` is true | `cadence.py done post_discovery` |
+| `auto_score` | 4 | Claude, `score-roles`, run last | a board card is unscored or the AUTO-SCORE pick is not empty | `cadence.py done auto_score` |
+| `views_check` | 24 | Claude, edits `VIEWS` to match the live views | the board's views differ from `VIEWS` | `cadence.py done views_check` |
+| `health` | 24 | Claude, `health` | the last run listed source problems | `cadence.py done health` |
+| `cv_review` | 168 | Claude offers `cv-review` | the brief shows recurring CV gaps | `cadence.py done cv_review` |
+| `jd_cleanup` | 48 | the SessionStart hook runs `tools/jd_cleanup.py` | always | `jd_cleanup.py` stamps itself |
+| `system_review` | 168 | Claude offers `system-review` | the maintainer-only skill exists in this copy | `cadence.py done system_review` |
+
+Lines with their own rule, not in `JOBS`:
+
+| Line | Rule | Stamp |
+|---|---|---|
+| Radar search | the GitHub Action; OVERDUE when the last run is more than a day old | none (read from `digests/status.md`) |
+| New roles to the board | DUE when new roles have no card yet or the queue is not empty; run `board_sync.py roles` | none |
+| Application mail scan | the Action's daily scan; DUE when it failed or the last good scan is more than 36 hours old (`SCAN_STALE_HOURS`) | none (`state/application_mail_status.json`) |
+| Docs review | DUE once 10 distinct code files changed since the last review (maintainer-only skill) | `docs-review` writes `work/.last_docs_review` |
+| One-off reminders | listed from their date until removed | `cadence.py reminder done <id>` |
+
+Scoring is printed last in the block on purpose: the other jobs (sweeps, inbox) add roles, and scoring runs after them.
+
+The scheduled GitHub workflows (they run without the user; `workflows_health()` in the brief reports when they lag):
+
+| Workflow | Schedule (UTC) | Timeout | Does |
+|---|---|---|---|
+| `radar.yml` | cron `47 2,8,14 * * *` (three times a day) | 60 min | finds roles, scans the mailbox, opens issues, updates the status issue |
+| `registers.yml` | cron `23 4 * * 1` (Mondays 04:23) | 15 min | refreshes the UK and NL sponsor registers; reported when not succeeded in 9 days |
+| `verify.yml` | cron `13 3 1 * *` (1st of the month 03:13) | 120 min | re-verifies ATS boards into `boards.json`; reported when not succeeded in 35 days |
 
 ### Filling the board: `board_sync.py fill`
 
@@ -212,7 +254,7 @@ the career docs; a requirement is marked met with no evidence; a blocker quote i
 **literally in the JD** (after collapsing whitespace and case); there's no JD text at
 all; or `fit_score` is above what the must-have table supports (coverage = yes plus half
 the partials over all must-haves, minus `BLOCKER_PENALTY` 15 per blocker and `LEVEL_PENALTY`
-10 for `level: below`, plus `FIT_SLACK` 8). `score_warnings()` adds hints, never errors: a long
+10 for `level: below`, plus `FIT_SLACK` 8); or `recommendation` is above the band `recommendation_cap()` allows (apply at fit 70+ (`APPLY_MIN`), maybe at 50-69 (`MAYBE_MIN`), skip below 50 or with a blocker; sponsorship `unlikely` caps at maybe, `no` at skip; judgement may only lower it). `score_warnings()` adds hints, never errors: a long
 "Basic Qualifications" list with no partial or no row, fewer rows than half the bullets, a
 missing `level`. If valid, `upsert_score()` replaces that ref's line in `data/scores.jsonl`, and with
 `--board` it calls `board_sync.set_role_fields()` to set Fit and Recommendation, and
@@ -362,7 +404,9 @@ Gmail search per company; the stage log overrides the snapshot, which is only re
 Gmail connector (search and read only; the connector is tied to the user's Claude login, so this runs only in a session, unlike the daily
 IMAP alert fetch), and labels each candidate with `inbox_outcomes.py classify` (phrase rules; rejection is tested first because rejections often
 mention interviews and thanks). Email text is untrusted (rule 1). Claude checks the label and the sender, reports one line per role, and the
-user confirms before `track` moves the card. `inbox_outcomes.py seen` (`state/inbox_seen.json`, private) stops an email being suggested twice.
+user confirms before `track` moves the card. No mail is read twice (the user, 2026-11-07): `state/inbox_seen.json` holds every opened message id and `state/inbox_checked.json` the day each role's mail was last
+searched, so `pending` searches only `after:` that day. Both are written by a PostToolUse hook on the Gmail read tools (`tools/inbox_hook.py`, wired in
+.claude/settings.json), not by the model: `get_thread`/`get_message` record ids, a single-company search stamps the role. Only ids and dates are stored.
 Nothing is sent, labelled or deleted.
 
 **The daily scan.** A session-only check is not enough for a user who misses emails, so the scheduled run also scans the mailbox
@@ -378,7 +422,7 @@ itself, which is DUE when it failed or is more than 36 hours old. The Gmail conn
 **`board_sync.py set <ref> Stage=Applied`** (`set_role_fields()`): finds the card whose
 issue body contains `job-radar:ref=<ref>` (`find_item()`), sets each field, logs Stage and
 Recommendation changes to `data/pipeline_log.jsonl` (`by: "claude"`), and closes the issue
-for final stages (Offer, Rejected, Skipped). With `--note "…"` the user's reason is stored with the change and
+for final stages (Offer, Rejected, Skipped). When no card is found, `no_card_reason()` says whether the card is archived (leave it archived; restoring is the user's call) or was never created. With `--note "…"` the user's reason is stored with the change and
 posted as a comment on the issue. That is how feedback reaches the card: nothing reads comments
 the user writes on issues themselves.
 

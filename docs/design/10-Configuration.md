@@ -114,6 +114,7 @@ Every source takes `enabled` and `timeout_seconds` (a cap on the whole source). 
 | Source | Keys |
 |---|---|
 | `ats` | `boards_file` (default `boards.json`) |
+| `hn_hiring` | `threads` (monthly threads read, default 2), `max_pages`, `queries` (a post must mention one), `include_outside_list` |
 | `bundesagentur`, `jobtech`, `eures` | `queries`, `health_query` (the canary), `days` (look-back), `max_pages`; `eures` also `countries` |
 | `reed` | `queries`, `health_query`, `max_pages`, `location` (default "United Kingdom"); key from the `REED_API_KEY` environment variable |
 | `careers_page` | `pages_file` (default `careers_pages.yaml` via the profile), `respect_robots` (default true) |
@@ -159,7 +160,7 @@ The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 
 | Key | Default | Meaning |
 |---|---|---|
-| `auto_per_session` | 8 | Roles Claude scores automatically at the start of each session, before answering the user's first message: the freshest unscored Tier 1 roles on the list, skipping cards already closed or skipped. 0 = only when asked. 0.25–0.5% of a session per role (measured) |
+| `auto_per_session` | 8 | Roles Claude scores automatically in each session, as the last job (after the sweeps, which add roles; `session_brief.py --score-pick` lists the current set): every unscored live board card of any tier first, then the freshest unscored Tier 1 roles; closed or skipped cards are not picked (see 4.2). 0 = only when asked. 0.25–0.5% of a session per role (measured) |
 
 `scoring.linkedin_job_pages` (default false) lets `score-roles` read one LinkedIn job page at a time in the user's logged-in Chrome to get a description; LinkedIn's terms ban automated access, so this is the user's risk to accept. `cleanup.skipped_days` and `cleanup.rejected_days` (14 and 30) set when `tools/jd_cleanup.py` trims `jd.txt` and `packet.md` from `work/jd/<ref>/` for Skipped and Rejected roles.
 
@@ -177,19 +178,20 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | Key | Default | Meaning |
 |---|---|---|
 | `enabled` | false | true lets the `post-discovery` skill use Claude in Chrome, in the user's logged-in browser, to read LinkedIn **post** searches and known recruiters' posts at the start of a session. Read-only; never reacts, comments, connects or messages. LinkedIn's terms ban automated access, so this is the user's risk to accept |
-| `max_searches` | 8 | Post searches per session |
+| `max_searches` | 8 | Searches and careers reads per session pass; a hard cap. `sweep_quotas` are per-category ceilings (they sum to 10), so with the default 8 the last slots are never used; `tools/sweep_plan.py` assumes 10 only when the key is absent |
 | `max_scrolls` | 12 | The ceiling on scrolls per search. A search scrolls until the newest-first results pass `max_post_age_days` (30), so the whole window is read; the ceiling only stops a runaway |
 | `max_people_per_session` | 8 | Profiles opened (known people's posts, original authors) per session |
 | `company_queries` | 6 | How many of the session's searches are `<company> "we're hiring" security`, walked in this order: companies in `profile/network.csv` that are also good fits first, then other scored apply/maybe employers, then `company_fit` targets; the rest are keyword searches (a small safety net; the user found keyword-only sweeps nearly useless) |
 | `dream_consulting` | [] | A parallel list of at most 5 dream consulting employers (the first five count), same treatment as `dream_companies` |
 | `chrome_always` | [] | Companies read in Chrome whatever the coverage report says (no readable feed): Deloitte, Tesla, Disney |
+| `network_post_search` | true | false: companies the user only knows someone at (the `network` category) get no LinkedIn post search, only their careers-site check; dream companies are always searched. Why: the post source had added no role the other sources lacked for network-only companies |
 | `sweep_quotas` | 3 / 3 / 2 / 2 | How the `max_searches` slots of one pass are split by `tools/sweep_plan.py`: `dream_product`, `dream_consulting`, `network` (other companies the user knows someone at), `other` (companies only a Chrome read can reach); unfilled slots flow to the next category |
 | `dream_companies` | [] | The user's dream employers, at most 10 (the first ten count). Tier 0: searched first, with or without a contact and even when `network_only` is true; they also get the network companies' careers-site check and referral route. The user's own list, never auto-edited |
 | `followup_max` | 3 | Follow-up (title-words) searches allowed per day for dream companies whose first search hit the scroll ceiling or found a real hiring post; they come out of `max_searches` |
 | `followup_words` | (application security OR product security OR threat modelling OR pentest OR penetration testing) | The title words of a follow-up search, used with the author-company filter |
 | `company_extra` | [] | Companies the user wants searched even before any of their roles is scored (named in chat; Claude edits the list). Searched in the same company slots, ahead of the scored apply/maybe employers; each employer once |
-| `network_only` | false | true: the company searches walk only the user's own `company_extra` and employers where `profile/network.csv` has someone they know (a referral route); scored apply/maybe and `company_fit` employers with no contact are skipped. The sweep exists to find referrals, so the user's copy has it on (2026-10-05) |
-| `careers_site_companies` | [] | Employers left out of the post searches (every tier) because their roles are read on their own careers sites instead: the radar's board where one is VERIFIED, Claude in Chrome where none can be used (Tesla, Disney). The user's copy lists Cisco, Tesla, Applied Intuition, Pure Storage, Disney and Waymo (2026-10-06): their staff's posts were all outside the user's countries, so those search slots go to other employers |
+| `network_only` | false | true: the company searches walk only the user's own `company_extra` and employers where `profile/network.csv` has someone they know (a referral route); scored apply/maybe and `company_fit` employers with no contact are skipped. The sweep exists to find referrals, so the user's copy has it on |
+| `careers_site_companies` | [] | Employers left out of the post searches (every tier) because their roles are read on their own careers sites instead: the radar's board where one is VERIFIED, Claude in Chrome where none can be used (Tesla, Disney). The user's copy lists Cisco, Tesla, Applied Intuition, Pure Storage, Disney and Waymo: their staff's posts were all outside the user's countries, so those search slots go to other employers |
 | `company_fit` | High | Also search the `targets.tsv` companies whose Fit column has this value (after the user's `company_extra` and the scored apply/maybe employers). Blank: none. `targets.tsv` may have a `Fit` column (High / Medium / Watch); older files without it simply add nothing |
 | `not_words` | contract, contractor, freelance | Appended to keyword searches as `NOT (...)`; filters on post text only |
 | `max_post_age_days` | 30 | A post whose original is older than this is stale unless the role is confirmed open |

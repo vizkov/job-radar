@@ -34,7 +34,7 @@ def categories(s: dict, rows: list[dict]) -> dict[str, list[str]]:
     import careers_queue as cq
     import post_leads as pl
     always = {normalize(c) for c in s.get("chrome_always") or []}
-    seen: set[str] = set()
+    seen: set[str] = {normalize(c) for c in s.get("chrome_skip") or []}   # companies the user dropped from the sweep (2026-10-29)
     out: dict[str, list[str]] = {c: [] for c in CATEGORIES}
 
     def add(cat: str, names) -> None:
@@ -56,7 +56,9 @@ def lanes(company: str, cat: str, s: dict, rows: list[dict]) -> list[str]:
     skip_posts = {normalize(c) for c in s.get("careers_site_companies") or []}
     always = {normalize(c) for c in s.get("chrome_always") or []}
     found = []
-    if cat != "other" and normalize(company) not in skip_posts:
+    # network companies get no LinkedIn post search when `network_post_search` is false (the user, 2026-10-22: 0 new roles from them); dream ones always do
+    no_net_posts = cat == "network" and s.get("network_post_search") is False
+    if cat != "other" and normalize(company) not in skip_posts and not no_net_posts:
         found.append("post")
     if cq.needs_chrome(company, rows, always) or cat == "other":
         found.append("careers")

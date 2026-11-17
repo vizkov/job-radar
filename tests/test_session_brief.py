@@ -377,8 +377,10 @@ def test_workflows_health_flags_failures_thin_schedules_and_stale_maintenance_ru
     healthy = runner([good("2026-10-14T09:44:00Z"), good("2026-10-13T22:14:00Z"), good("2026-10-13T13:00:00Z")],
                      [good("2026-10-12T12:14:00Z")], [good("2026-10-01T10:07:00Z")])
     assert sb.workflows_health(healthy, now) is None
-    thin = runner([good("2026-10-14T09:44:00Z"), good("2026-10-13T09:44:00Z")], [good("2026-10-12T12:14:00Z")], [good("2026-10-01T10:07:00Z")])
-    assert "only 1 scheduled search run(s)" in sb.workflows_health(thin, now)
+    two_a_day = runner([good("2026-10-14T09:44:00Z"), good("2026-10-13T13:00:00Z")], [good("2026-10-12T12:14:00Z")], [good("2026-10-01T10:07:00Z")])
+    assert sb.workflows_health(two_a_day, now) is None                              # about 2 a day is normal: no note
+    thin = runner([good("2026-10-13T09:44:00Z"), good("2026-10-12T22:14:00Z")], [good("2026-10-12T12:14:00Z")], [good("2026-10-01T10:07:00Z")])
+    assert "no scheduled search run in the last 24 h" in sb.workflows_health(thin, now)
     bad = runner([good("2026-10-14T09:44:00Z"), good("2026-10-14T01:00:00Z"), {**good("2026-10-13T22:00:00Z"), "conclusion": "failure"}],
                  [good("2026-09-20T12:14:00Z")], [good("2026-08-01T10:07:00Z")])
     note = sb.workflows_health(bad, now)

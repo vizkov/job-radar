@@ -48,6 +48,14 @@ don't spend a referral on a role that can't sponsor the user.
     Security", "AppSec Manager"; the recruiter: "Technical Recruiter" or "Talent Acquisition" with
     "Security"/"Engineering"), first results page only. Read names and headlines from the results;
     open profiles to confirm the current employer and function: 5 by default, up to 8 when the user asks to dig deeper (see the checklist below).
+  - **Search results alone never settle a lookup (the user, 2026-10-14: a Delivery Hero lookup stopped after 7 searches with no profile opened and reported
+    "unverified" for everyone).** The search-result text is headline-only, and company keywords in a people search are noisy (it returns the user's own
+    network and other companies). So, in every lookup, after the searches **open the best candidates' profiles (and their `/recent-activity/all/`) before you
+    report**: up to 5 by default, 8 when asked to dig deeper. Pick them by evidence in the results: current employer shown as the company, a function match
+    (security, "cyber", the role's team), the city of the role; for the recruiter slot, the tech or engineering recruiters first, since their recent posts
+    show which functions they hire for. Report "no route found" only after the profiles are read. Avoid boolean `OR` in people searches (it drops the company
+    from the ranking); use quoted phrases. A company-page URL guessed from the name may not exist (`/company/<slug>/` returned "page isn't available"):
+    reach the company page from a search result instead of guessing.
   - **Dig-deeper checklist (read each opened profile; read-only, stop at any LinkedIn challenge):** (1) the **current employer and role** in the
     header (a hiring post or repost can be a year old and its author may have moved on: check where the poster works *now*; one hiring lead
     seen in a repost had left the company); (2) the **function and team** (About, headline, recent posts, talks, conferences, open-source work), not just the

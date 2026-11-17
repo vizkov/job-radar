@@ -506,8 +506,8 @@ def last_run_health(runner=run, now: datetime | None = None, workflow: Path | No
 
 def workflows_health(runner=run, now: datetime | None = None) -> str | None:
     """The other scheduled workflows and the daily search's trend (the user, 2026-10-14: "are the flows working? can we add it to the system check?").
-    `last_run_health` only looks at the newest search run; this adds: any of the last 5 search runs failed, fewer than 2 scheduled search runs in the
-    last 24 hours (GitHub delays or drops schedules; 3 are due), and the weekly sponsor-register refresh (`registers.yml`) and the monthly company-board
+    `last_run_health` only looks at the newest search run; this adds: any of the last 5 search runs failed, no scheduled search run in the
+    last 24 hours (3 are due and GitHub typically delivers about 2: the user, 2026-10-14, accepts 2 a day), and the weekly sponsor-register refresh (`registers.yml`) and the monthly company-board
     check (`verify.yml`) not having succeeded within 9 and 35 days. One note per problem, joined; None when all is well or `gh` is unreachable."""
     now = now or datetime.now(timezone.utc)
     notes = []
@@ -528,8 +528,8 @@ def workflows_health(runner=run, now: datetime | None = None) -> str | None:
         if failed:
             notes.append(f"{len(failed)} of the last {min(len(radar), 5)} search runs failed (latest {when(failed[0]):%d %b %H:%M} UTC)")
         recent = [r for r in radar if r.get("event") == "schedule" and now - when(r) <= timedelta(hours=24)]
-        if len(recent) < 2:
-            notes.append(f"only {len(recent)} scheduled search run(s) in the last 24 h (3 are due; GitHub delays or drops schedules)")
+        if not recent:
+            notes.append("no scheduled search run in the last 24 h (GitHub delays or drops schedules; about 2 a day is normal)")
     for workflow, label, days in (("registers.yml", "weekly sponsor-register refresh", 9), ("verify.yml", "monthly company-board check", 35)):
         rs = runs(workflow, 5)
         if rs is None:

@@ -46,7 +46,9 @@ _CITY_NAMES = {
            # seen dropped as "location not recognised" (2026-10-13): counties and towns the alert emails name
            "worcestershire", "worcester", "east lothian", "west lothian", "midlothian",
            # system review 2026-10-22: dropped as "location not recognised"
-           "canary wharf"],
+           "canary wharf",
+           # system review 2026-11-18: dropped as "location not recognised" (alert emails)
+           "warwickshire", "gloucestershire", "kidlington", "hastings", "barwick in elmet"],
     "NL": ["amsterdam", "the hague", "den haag", "rotterdam", "utrecht", "eindhoven", "delft", "amstelveen",
            "amersfoort", "leusden", "veldhoven", "zoetermeer", "maastricht", "haarlem", "leiden", "groningen",
            "arnhem", "nijmegen", "breda", "tilburg", "hilversum", "hoofddorp", "schiphol", "almere", "enschede",
@@ -54,7 +56,9 @@ _CITY_NAMES = {
            # seen dropped as "location not recognised" (2026-10-13)
            "barendrecht", "driebergen", "driebergen-rijsenburg", "zeist", "nieuwegein", "houten", "rijswijk", "capelle aan den ijssel",
            # system review 2026-10-22
-           "venlo", "brunssum", "heerlen", "sittard", "geleen", "roermond"],
+           "venlo", "brunssum", "heerlen", "sittard", "geleen", "roermond",
+           # system review 2026-11-18
+           "weert", "harderwijk", "de lier", "geldermalsen", "vught", "breukelen"],
     "IE": ["dublin", "cork", "galway", "limerick", "waterford", "dundalk",
            # system review 2026-10-22
            "kilkenny", "letterkenny", "sligo", "athlone", "drogheda", "navan", "carlow", "tralee"],

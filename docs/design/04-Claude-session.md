@@ -188,6 +188,21 @@ The scheduled GitHub workflows (they run without the user; `workflows_health()` 
 | `registers.yml` | cron `23 4 * * 1` (Mondays 04:23) | 15 min | refreshes the UK and NL sponsor registers; reported when not succeeded in 9 days |
 | `verify.yml` | cron `13 3 1 * *` (1st of the month 03:13) | 120 min | re-verifies ATS boards into `boards.json`; reported when not succeeded in 35 days |
 
+### Other recurring or automatic work (not CADENCE jobs)
+
+Session-start work that runs on its own timer or trigger and has no line in the CADENCE block (all in `tools/session_brief.py` unless noted):
+
+| What | When | Stamp or trigger |
+|---|---|---|
+| Tier-weight calibration (`calibrate.apply`; rewrites `profile/config.json` and prints an undo line) | At most weekly | `work/.last_calibration` |
+| Board archive (`board_sync.py archive`: moves Skipped and old Rejected cards out of the live board) | At most daily | `work/.last_archive` |
+| Board fill (`board_sync.py fill`: Tier, Sponsor, Country fields on new cards) | When new cards lack fields, at most every 10 minutes | the fill lock (`FILL_LOCK`) |
+| Starting the GitHub run again | When `last_run_health` sees a skipped slot | `gh workflow run job-radar` |
+| Referral follow-up notes (`referral_notes()`) | Asks with no answer after `referrals.wait_days` | the referral log |
+| Background JD fetch (`start_prep`) | Every session, for new roles | `work/jd_prep.log` |
+| Inbox bookkeeping (`tools/inbox_hook.py`) | After every Gmail read, by the PostToolUse hook in `.claude/settings.json`, not by the model | `state/inbox_seen.json`, `state/inbox_checked.json` |
+| Board auto-add | GitHub Projects' own workflow, set up once by the user (see the wiki's manual clicks); adds each new `role` issue to the board | none |
+
 ### Filling the board: `board_sync.py fill`
 
 `fill_new()` walks the cards and, for each one with a gap (`fill_gaps()`), sets the values listed in [where each card value comes from](11-Board-internals.md#where-each-card-value-comes-from): Posted, Country, and, on cards with no Stage, Stage, Tier and Sponsor.

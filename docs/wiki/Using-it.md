@@ -62,7 +62,7 @@ do?" or type `/manual` (it's generated from the system itself).
 | "Skip anything posted over a month ago" | Sets the maximum age of a role (the "max age" setting, which is how old a posting may be before it is left off your board; 30 days when you ask for a month). Roles with no posted date are kept. Older roles already on your board can be moved to Skipped |
 | "Why was it rejected?" | Reads the role's scored requirements, the timing of the email, your sponsorship and location answers and any other applications to the same company, and says what is likely and what is only a guess; it changes nothing |
 | "How do I strengthen my CV?" / "Which certs matter?" | Looks across your scored roles for requirements you keep missing and suggests what to add or evidence better |
-| (automatic) | Claude scores the new roles that have no score yet (up to 8 by default) as the last job of each session, after your question and the other housekeeping, so roles found during the session are included (2–4% of a session). Say "don't auto-score" or ask Claude to change the number |
+| (automatic) | Claude scores the new roles that have no score yet (up to 8 by default) as the last job of each session, after your question and the other housekeeping, so roles found during the session are included. This spends part of your Claude allowance by default (about 2–4% of a session for 8 roles). Say "don't auto-score" or ask Claude to change the number |
 | (automatic) | Once a week, when enough roles are scored, Claude adjusts how job titles are rated (the Tier) using how those roles actually scored, one small step at a time. It tells you what changed at the start of your next session, and one sentence undoes it. Your title filters, countries and companies only change when you say so |
 | "Is anything broken?" | Checks the runs and every source; fixes or explains |
 
@@ -76,7 +76,7 @@ do?" or type `/manual` (it's generated from the system itself).
 
 ## What happens without you
 
-Three times a day (02:47, 08:47 and 14:47 UTC; ask Claude for your local times) job-radar
+Three times a day (02:47, 08:47 and 14:47 UTC, i.e. Coordinated Universal Time; ask Claude for your local times; GitHub sometimes skips a slot, so two runs a day is normal) job-radar
 checks for new roles and adds them
 to your board as **New** cards: Tier 1 and 2, at companies on your list. When you next
 open Claude Code, a briefing is ready: new roles, cards you moved, follow-ups due,
@@ -114,7 +114,7 @@ Two more recurring jobs, the docs review and the weekly system review, exist onl
 
 ## Costs
 
-Nothing beyond your Claude subscription (Claude Pro or Max; there's no separate API bill).
+Nothing beyond your paid Claude subscription (Claude Pro or Max, billed by Anthropic at its current prices; there's no separate API bill).
 Claude's work counts toward your plan's normal usage limits. Briefings and tracking are
 light; scoring means reading each job description in full, and tailoring is heavier still.
 Measured on Claude Pro (three scoring batches, 45 roles): scoring costs **0.25–0.5% of a

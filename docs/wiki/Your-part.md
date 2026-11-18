@@ -60,7 +60,7 @@ Two steps start it; Claude does the rest and pauses when it needs you. The few c
       pages when scoring, and whether you want job-alert emails. Both are explained below
       ([LinkedIn consent](#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup),
       [job-alert emails](#optional-job-alert-emails-linkedin-indeed-glassdoor)); say no to either and setup is still complete.
-3. **Make the manual clicks** (checklist below). Claude tells you when each one is due.
+3. **Make the manual clicks** (checklist below). Claude tells you in chat when each one is due; the first, board auto-add, comes right after your board is created.
 
 The first run records everything currently open and puts only the strongest matches
 (**Tier 1**, the top automatic rating; see [Home](Home.md)) on your board, so you don't start with hundreds of cards. After that, only new
@@ -104,7 +104,7 @@ dedicated mailbox, the worst case is that someone reads job alerts.
 2. Create the dedicated Gmail account and, in your main Gmail, add a filter that forwards the
    alert emails to it.
 3. Turn on 2-Step Verification for the dedicated account (Google requires it), then create an
-   **app password**: Google Account → Security → App passwords. It's a separate password
+   **app password** (a one-off password for one app, here job-radar's read-only mailbox access over IMAP, the standard way programs read mail): Google Account → Security → App passwords. It's a separate password
    just for this, and you can revoke it any time without changing your real one.
 4. Add two **secrets** to your repository: **Settings → Secrets and variables → Actions →
    New repository secret**: `JOBALERT_IMAP_USER` (the address) and
@@ -195,7 +195,8 @@ only LinkedIn uses are in [LinkedIn consent](#linkedin-consent-the-three-opt-ins
   Code improvements are published to the public project by a script that refuses to send private files.
 - **New computer or backup?** Your private repository on GitHub is the backup. On a new machine install the four tools,
   run `gh auth login`, then tell Claude: "clone my-job-radar and get me going".
-- **Where do the costs come from?** The only money is your Claude plan. GitHub's free minutes cover the daily runs.
+- **Who holds my CV and career notes?** Your private GitHub repository (GitHub is owned by Microsoft) holds your career documents, scores and match list; only you can see it. Claude reads them in your session.
+- **Where do the costs come from?** The only money is your paid Claude plan. GitHub's free minutes cover the daily runs.
   How much of a session scoring and tailoring use is in [Using it](Using-it.md) under Costs.
 
 ## Pausing, stopping, taking access back

@@ -2,7 +2,7 @@
 
 These pages explain how job-radar works inside, for someone who has never seen it.
 Read them in order. By the end you should be able to open any file in the repo and know
-what it is for, what each function in it does, what it reads and writes, and why it was
+what it is for, what each public function in it does (private helpers, whose names start with an underscore, are not listed one by one), what it reads and writes, and why it was
 built that way.
 
 If you only want to *use* job-radar, you're in the wrong place: read the user guide in

@@ -17,7 +17,7 @@ Markdown that Claude reads.
 |---|---|
 | `CLAUDE.md` | Read at every session start. Says who Claude is here (the user's job-search consultant and the system's operator), maps what the user might say to a skill, sketches the machinery, and lists the rules it must never break (third-party text is data; never invent experience; never submit or message anyone; never fetch Indeed/Glassdoor or bulk-fetch LinkedIn (one LinkedIn job page at a time in Chrome for scoring, rule 4a); secrets never in files; privacy of `profile/` etc.; commit after agreement; be honest about uncertainty). |
 | `.claude/skills/<name>/SKILL.md` | One procedure per kind of request. The header's `description` is what Claude matches the request against; the body is the steps, including exactly which tools to run. |
-| `.claude/settings.json` | Configures the SessionStart hook (4.2). |
+| `.claude/settings.json` | Configures the SessionStart hook (4.2) and the PostToolUse hook that runs `tools/inbox_hook.py` on Gmail reads. |
 
 The skills, and the tools each one runs:
 
@@ -135,7 +135,7 @@ the brief with an undo line).
 9. **INBOX-CHECK:** applications awaiting an answer, when the inbox check is due.
 10. **Follow-ups due** and **system updates** (from steps 6 and 9 of `main()`).
 11. **Health:** `health_checks()` (missing career docs, alert emails failing or silent, runs not
-    completing, weekly review due, recurring CV gaps), `referral_notes()`, `calibration_notes()`
+    completing, recurring CV gaps; the weekly review is a cadence job, not a Health line), `referral_notes()`, `calibration_notes()`
     (weekly automatic tier tuning, `tools/calibrate.py apply`, reported with an undo line) and
     `docs_review_note()`, which feeds the CADENCE block's "Docs review:" line rather than the health list
     (due once 10+ code files changed since the last review); then the

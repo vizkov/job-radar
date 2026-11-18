@@ -88,7 +88,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 
 | Name | Is |
 |---|---|
-| `FOLLOW_UP_DAYS`, `REVIEW_EVERY_DAYS`, `GRACE` | 14, 7, 1 hour. |
+| `FOLLOW_UP_DAYS`, `GRACE` | 14, 1 hour. (`REVIEW_EVERY_DAYS` = 7 is still defined but nothing reads it: the weekly review moved to `cadence.py`.) |
 | (maintainer-only, `docs-review` skill) `DOCS_REVIEW_AFTER_FILES`, `CODE_PATHS`, `LAST_DOCS_REVIEW`, `docs_review_note(now, runner)` | Returns the reason when `docs-review` is due, once 10 distinct files changed under `CODE_PATHS` (`radar.py`, `verify_boards.py`, `jobradar/`, `tools/`, `.claude/skills/`, `.github/workflows/`; docs and settings don't count) since `work/.last_docs_review`, per `git log --since` (the stamp is UTC and passed with `+00:00`). On a fresh copy the first call only writes the stamp. Called from `main()`. |
 | `calibration_notes(now)`, `LAST_CALIBRATION` | Run `calibrate.apply` at most weekly; report each change with its undo command and a reminder to commit the config. |
 | `referral_route_pick(root, scores, items, by_ref, n)` | The brief's REFERRAL-ROUTE line: live (New/Shortlisted, not Done) cards scored apply/maybe at an employer with a contact in `profile/network.csv` (`referrals.contacts`) and no record in `data/referrals.jsonl`, at most 8. Any error returns no lines (a missing network file must not stop the brief). |
@@ -98,7 +98,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `stale_days(root)` | `board.stale_days` from the config, for the brief's "looks closed" line. |
 | `skipped_refs(root)` | Refs whose latest logged Stage is Skipped/Rejected, so an archived skip (gone from the board read) is not auto-scored or counted unscored again. |
 | `start_archive(now)`, `LAST_ARCHIVE` | Once a day (stamp `work/.last_archive`), start `board_sync.py archive` detached (log `work/board_archive.log`) when any card is in Stage = Skipped or Rejected. |
-| `LAST`, `LAST_REVIEW`, `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
+| `LAST`, `LAST_REVIEW` (defined, unused), `FILL_LOCK`, `SNAPSHOT`, `PIPELINE_LOG` | The files it reads and writes (`work/…`, `data/…`). |
 | `_CONTROL`, `_REF` | Characters stripped by `safe()`; the ref marker in issue bodies. |
 | Other thresholds (in code) | Top 6 new Tier 1 roles listed; "unscored" = Tier 1 from the last 14 days; "fresh" = posted in the last 3 days; "no run completed for 2+ days" warning; a CV gap needs 3+ scored roles missing it. Follow-ups only apply to cards with a logged stage change. |
 | `safe(text, limit)` | Sanitise third-party text for the brief. |
@@ -116,7 +116,7 @@ Walkthrough: [page 4, 4.2](04-Claude-session.md).
 | `last_due_slot(now, workflow)` | Latest cron slot (from `radar.yml`) that should have run, minus grace. |
 | `last_run_health(runner, now, workflow)` | Report a failed run; restart a skipped one. |
 | `workflows_health(runner, now)` | The trend and the other workflows: any of the last 5 search runs failed, no scheduled search run in 24 h (about 2 a day is normal), the weekly `registers.yml` not succeeded in 9 days, the monthly `verify.yml` not in 35; joined into the same run note. |
-| `health_checks(...)` | Career docs, run age, alert emails, review due, recurring CV gaps. |
+| `health_checks(...)` | Career docs, run age, alert emails, recurring CV gaps (the weekly review is a cadence job). |
 | `_age`, `brief(...)` | Format the brief. |
 | `main()` | The sequence; always exits 0. |
 

@@ -92,6 +92,8 @@ what is due without being asked, or, if you opened with a task of your own, offe
 and why. While no session is open, only GitHub works: the role search, reading the alert mailbox, the reply scan, the status card and the two
 maintenance runs (the GitHub rows below). Claude can only reach your Gmail connector and Chrome when you have it open, so the other checks happen then.
 
+Two more recurring jobs, the docs review and the weekly system review, exist only in the maintainer's own copy and are not shipped in the template, so you will not see them.
+
 | Job | Who runs it | When |
 |---|---|---|
 | Role search | GitHub, by itself | Three times a day, whether or not your computer is on |

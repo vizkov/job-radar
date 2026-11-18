@@ -41,7 +41,7 @@ also why the public template never runs anything.
 | 7 | `board_sync.py stale` | Label roles no longer listed | ignored |
 | 8 | `board_sync.py status` | Update the pinned "Radar status" issue | ignored |
 | 8b | Log application mail | `python tools/app_mail.py ingest --dir .app_mail` (no secrets) | ignored |
-| 9 | Commit state | `git add state digests data/matches.csv`, commit, then up to 3 tries of `git pull --rebase` + `git push` | run fails |
+| 9 | Commit state | `git add state digests data/matches.csv`, commit, then up to 3 tries of `git pull --rebase` + `git push` (a rebase conflict in `digests/latest.md`, `digests/status.md`, `state/health.json` or `state/application_mail_status.json` is resolved by taking the run's own version; any other conflict aborts the rebase, `radar.yml`) | run fails |
 
 Three details that matter:
 

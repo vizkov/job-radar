@@ -63,7 +63,7 @@ Why three places:
 | `jobradar/sources/` | One module per source adapter, plus the registry that runs them | public |
 | `tools/` | Command-line tools Claude (or a workflow) runs: board sync, JD prep and checks, rendering, publishing, the session brief | public |
 | `.github/workflows/` | The three scheduled workflows | public |
-| `.claude/` | `settings.json` (the SessionStart hook) and `skills/` (Claude's procedures) | public |
+| `.claude/` | `settings.json` (the SessionStart hook and the PostToolUse inbox hook) and `skills/` (Claude's procedures) | public |
 | `CLAUDE.md` | Claude's operating manual for this repo | public |
 | `.githooks/` | The post-commit hook that publishes code to the template | **maintainer-only**: not in the public template |
 | `docs/wiki/` | User guide: `Home.md`, `Your-part.md`, `Using-it.md`, `Board.md` (also mirrored to the GitHub Wiki tab) | public |

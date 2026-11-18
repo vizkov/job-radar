@@ -83,7 +83,7 @@ These are used from page 2 on, before their full entries further down. One line 
 | **Canary query** | A deliberately broad search each API source runs; if even that returns nothing, the API itself is probably broken. | `sources/search.py` |
 | **track_empty** | Per unit (one thing a source polls, defined just below; its health record is `UnitStatus`): whether zero results counts as a problem (False for narrow searches and quiet mailboxes). | `model.py: UnitStatus` |
 | **Design diff** | The difference between the board's actual views and the views defined in code (`VIEWS`). | `board_sync.py: design_diff()` |
-| **Source** / **adapter** | One place postings come from (`ats`, `bundesagentur`, `jobtech`, `eures`, `careers_page`, `alert_email`, `reed`), and the code that reads it. Every adapter turns its input into `Posting` objects. | `jobradar/sources/` |
+| **Source** / **adapter** | One place postings come from (`ats`, `bundesagentur`, `jobtech`, `eures`, `reed`, `hn_hiring`, `careers_page`, `alert_email`), and the code that reads it. Every adapter turns its input into `Posting` objects. | `jobradar/sources/` |
 | **Unit** | One thing a source polls: one ATS board, one search query, one careers page, one email provider. Health is tracked per unit. | `model.py: UnitStatus` |
 | **Target** | A company the user wants to work for, listed in `targets.tsv`. Roles at other companies are "outside your list" and dropped by default. | `profile/targets.tsv` |
 | **Alias** | Another spelling of a target's name ("PricewaterhouseCoopers" → "PwC"). | `profile/aliases.csv` |

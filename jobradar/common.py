@@ -10,6 +10,7 @@ from pathlib import Path
 from ats_scrapers.scrapers import get_scraper
 
 from jobradar import bamboohr_json  # noqa: F401  (patches the BambooHR listing parser; see that module)
+from jobradar import workday_paced  # (paces and searches Workday requests; see that module)
 
 from jobradar.paths import ROOT, profile_path
 
@@ -211,6 +212,64 @@ class BoardResult:
     jobs: list = field(default_factory=list)
 
 
+async def _fetch_workday(slug: str, kwargs: dict, timeout: float) -> list:
+    """One Workday tenant through the paced gate (jobradar/workday_paced.py). With `workday_search_terms` in config.json each term is its own
+    search (a few pages, not the whole board) and the results are merged; without it the whole board is crawled, as before."""
+    workday_paced.install(CONFIG.get("workday_min_interval", 2.0), CONFIG.get("workday_max_retries", 8), CONFIG.get("workday_max_pages", 2))
+    jobs, seen = [], set()
+    for term in CONFIG.get("workday_search_terms", ["security engineer", "application security"]) or [""]:
+        token = workday_paced.TERM.set(term)
+        try:
+            got = await asyncio.wait_for(get_scraper("workday", slug, **kwargs).afetch(), timeout=timeout)
+        finally:
+            workday_paced.TERM.reset(token)
+        for j in got:
+            key = j.ats_id or str(j.url)
+            if key not in seen:
+                seen.add(key)
+                jobs.append(j)
+    return jobs
+
+
+async def fetch_workday_boards(boards: list, tried: dict, budget: float) -> dict:
+    """Workday boards one at a time, least recently tried first, until `budget` seconds are spent (the user, 2026-11-21: Workday answers 429 to a
+    burst, so the run takes what it can and the rest wait for the next run). `tried` is {url: iso time of the last attempt} and is updated for every
+    board that was actually attempted; a board stopped by the budget gets `error` starting "deferred" and is NOT marked tried."""
+    import time
+    from datetime import datetime, timezone
+    workday_paced.install(CONFIG.get("workday_min_interval", 2.0), CONFIG.get("workday_max_retries", 8), CONFIG.get("workday_max_pages", 2))
+    workday_paced.DEADLINE[0] = time.monotonic() + budget
+    out = {}
+    timeout = CONFIG.get("board_timeout_seconds", 180)
+    try:
+        for a, slug, url in sorted(boards, key=lambda b: tried.get(b[2], "")):
+            res = BoardResult(url=url, ats=a)
+            if time.monotonic() >= workday_paced.DEADLINE[0]:
+                res.error = "deferred: Workday time budget spent"
+                out[url] = res
+                continue
+            sent = workday_paced.SENT[0]
+            try:
+                kwargs = {"include_descriptions": False, "timeout": 30.0, "max_fetch_seconds": float(timeout - 10)}
+                res.jobs = await _fetch_workday(slug, kwargs, timeout)
+                res.ok = True
+            except workday_paced.Deferred:
+                res.error = "deferred: Workday time budget spent"
+                out[url] = res
+                if workday_paced.SENT[0] > sent:   # it was refused until the budget ran out: the next run starts with another board
+                    tried[url] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+                continue
+            except asyncio.TimeoutError:
+                res.error = f"timeout after {timeout}s"
+            except Exception as e:
+                res.error = f"{type(e).__name__}: {str(e)[:200]}"
+            tried[url] = datetime.now(timezone.utc).isoformat(timespec="seconds")
+            out[url] = res
+    finally:
+        workday_paced.DEADLINE[0] = None
+    return out
+
+
 async def fetch_board(ats: str, slug: str, url: str, sem: asyncio.Semaphore) -> BoardResult:
     res = BoardResult(url=url, ats=ats)
     timeout = CONFIG.get("board_timeout_seconds", 180)
@@ -219,10 +278,9 @@ async def fetch_board(ats: str, slug: str, url: str, sem: asyncio.Semaphore) -> 
             kwargs = {"include_descriptions": False, "timeout": 30.0}
             if ats == "workday":
                 kwargs["max_fetch_seconds"] = float(timeout - 10)
-                # Big tenants (Nvidia, Palo Alto) get throttled deep into pagination and the library gives up
-                # after 3 tries; it has no option for this, only a module constant.
-                import ats_scrapers.scrapers.workday as _wd
-                _wd.MAX_RETRIES = max(_wd.MAX_RETRIES, int(CONFIG.get("workday_max_retries", 6)))
+                res.jobs = await _fetch_workday(slug, kwargs, timeout)
+                res.ok = True
+                return res
             scraper = get_scraper(ats, slug, **kwargs)
             res.jobs = await asyncio.wait_for(scraper.afetch(), timeout=timeout)
             res.ok = True

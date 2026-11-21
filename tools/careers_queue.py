@@ -102,7 +102,7 @@ def queue(rows: list[dict] | None = None, log: dict | None = None) -> list[tuple
     return sorted(out, key=lambda tn: (tn[0], (log.get(normalize(tn[1])) or {}).get("last", "")))
 
 
-def done(company: str, roles: int | None = None, note: str = "", now: str | None = None) -> str:
+def done(company: str, roles: int | None = None, note: str = "", now: str | None = None, added: int = 0) -> str:
     log = _load(STATE) or {}
     k = normalize(company)
     rec = log.get(k) or {}
@@ -114,6 +114,11 @@ def done(company: str, roles: int | None = None, note: str = "", now: str | None
     log[k] = rec
     STATE.parent.mkdir(parents=True, exist_ok=True)
     STATE.write_text(json.dumps(log, indent=1, sort_keys=True), encoding="utf-8")
+    try:
+        import sweep_yield
+        sweep_yield.record("careers", company, found=roles or 0, added=added, ledger=STATE.with_name("sweep_yield.jsonl"))
+    except Exception:   # the ledger is a measure, never a reason to lose the mark
+        pass
     return f"{company}: read recorded (run {rec['runs']})"
 
 
@@ -130,13 +135,13 @@ def set_url(company: str, url: str) -> str:
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
-    d = sub.add_parser("done"); d.add_argument("company"); d.add_argument("--roles", type=int); d.add_argument("--note", default="")
+    d = sub.add_parser("done"); d.add_argument("company"); d.add_argument("--roles", type=int, help="roles in the user's titles and countries the read surfaced"); d.add_argument("--added", type=int, default=0, help="new cards it created"); d.add_argument("--note", default="")
     u = sub.add_parser("url"); u.add_argument("company"); u.add_argument("url")
     sub.add_parser("status")
     a = ap.parse_args(argv)
     log = _load(STATE) or {}
     if a.cmd == "done":
-        print(done(a.company, a.roles, a.note))
+        print(done(a.company, a.roles, a.note, added=a.added))
     elif a.cmd == "url":
         print(set_url(a.company, a.url))
     else:

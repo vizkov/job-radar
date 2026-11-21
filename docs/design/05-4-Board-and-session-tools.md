@@ -225,6 +225,10 @@ countries and everything else remain the user's decision.
 
 `plan()` returns `(company, category, lane)` for every action of a post-discovery pass within `max_searches`: quotas per category (`sweep_quotas`: 3 product dream, 3 consulting dream, 2 network, 2 chrome-only), spare slots flowing down the categories, one lane per company (the LinkedIn post search or the Chrome careers read, whichever was done longer ago; a company the radar already reads gets the post search only). It marks nothing. Ranking is by a company's most recent action over all its lanes (so a company with two lanes does not outrank one with a single lane), and spare slots flow down from the first short category before wrapping to the top. `skipped()` names companies with no action because the radar reads them and their post search is off. `categories()` and `lanes()` build the lists; `post_leads.py searched` and `careers_queue.py done` mark an action when it finishes.
 
+## `tools/sweep_yield.py`: what the Chrome sweeps found
+
+`post_leads.py searched <key> --hits N --found N --added N` and `careers_queue.py done "<company>" --roles N --added N` each append one line to `state/sweep_yield.jsonl` (written next to the state file the mark uses, so tests never touch the real ledger). `found` = roles in the user's titles and countries the read surfaced, known or new; `added` = new cards it created. `record()` appends, `rows()` filters by age, `report()` prints per lane and per company: reads, hiring posts, roles found, roles added (`python tools/sweep_yield.py report`). Why: the sweeps cost many browser calls and, by 2026-11-21, had added no card; the ledger puts the cost next to the yield.
+
 ## `tools/careers_queue.py`: the Chrome careers-site log and queue
 
 Companies the radar cannot read (not VERIFIED in `data/coverage_report.csv`, or zero jobs in the user's countries, plus `chrome_always`) are read by Claude on their own careers pages in Chrome. They share ONE cap with the LinkedIn post searches (`max_searches`, planned by `tools/sweep_plan.py`; why: a separate cap would double it). State: `state/chrome_careers.json` (per company: last read, runs, url, note).

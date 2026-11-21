@@ -1,6 +1,7 @@
 """Company ATS boards (Greenhouse, Workday, …) from boards.json, fetched with ats-scrapers."""
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 from urllib.parse import urlsplit
@@ -88,10 +89,22 @@ class AtsSource:
         if not self.boards_file.exists():
             raise FileNotFoundError(f"{self.boards_file.name} missing — run verify_boards.py first")
         boards = json.loads(self.boards_file.read_text())
-        results = await fetch_many([(b["ats"], b["slug"], b["url"]) for b in boards], progress=False)
+        workday = [(b["ats"], b["slug"], b["url"]) for b in boards if b["ats"] == "workday"]
+        others = [(b["ats"], b["slug"], b["url"]) for b in boards if b["ats"] != "workday"]
+        tried_path = ROOT / "state" / "workday_tried.json"
+        tried = json.loads(tried_path.read_text()) if tried_path.exists() else {}
+        # Workday throttles bursts (429), so its boards run one at a time inside a time budget, next to the others
+        from jobradar.common import CONFIG, fetch_workday_boards
+        budget = float(CONFIG.get("workday_budget_seconds", 150))
+        results, wd = await asyncio.gather(fetch_many(others, progress=False), fetch_workday_boards(workday, tried, budget))
+        results.update(wd)
+        tried_path.parent.mkdir(parents=True, exist_ok=True)
+        tried_path.write_text(json.dumps(tried, indent=1, sort_keys=True))
         out = SourceResult(self.name)
         for b in boards:
             r = results[b["url"]]
+            if r.error.startswith("deferred"):
+                continue   # not tried this run: neither a failure nor an empty board
             out.units.append(UnitStatus(b["url"], ok=r.ok, raw_count=len(r.jobs), error=r.error,
                                         label=f"{', '.join(b['companies'])}: {b['url']}"))
             out.postings += [job_to_posting(j, b) for j in r.jobs]

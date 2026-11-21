@@ -2,8 +2,10 @@
 
     python tools/post_leads.py queries [--n N] [--urls] # the next searches to run (least recently run first); marks nothing;
                                                         # --urls also prints the LinkedIn link (author-company filter when the id is known)
-    python tools/post_leads.py searched <key> [<key> …] [--ceiling] [--hits N]   # mark searches finished (the key printed under each query): only these leave the queue;
-                                                        # --ceiling: scrolling stopped before the results passed the age window; --hits: real hiring posts found
+    python tools/post_leads.py searched <key> [<key> …] [--ceiling] [--hits N] [--found N] [--added N]   # mark searches finished (the key printed under each query): only these leave the queue;
+                                                        # --ceiling: scrolling stopped before the results passed the age window; --hits: real hiring posts found;
+                                                        # --found: roles in the user's titles and countries the search surfaced (known or new); --added: new cards it created
+                                                        # (both go to state/sweep_yield.jsonl: `python tools/sweep_yield.py report`)
     python tools/post_leads.py followup "<dream company>" [--urls]   # a second, title-words search for it, if its finished search hit the ceiling or found hiring posts
     python tools/post_leads.py company-id "<company>" <digits>   # record a company's LinkedIn id (from the Author company filter)
     python tools/post_leads.py person add --name "…" --url <profile> --company "…" [--headline "…"] [--function "…"]
@@ -244,13 +246,18 @@ def plan_queries(n: int | None = None) -> list[tuple[str, str]]:
     return out
 
 
-def mark_searched(keys: list[str], now: str | None = None, ceiling: bool = False, hits: int = 0) -> list[str]:
+def mark_searched(keys: list[str], now: str | None = None, ceiling: bool = False, hits: int = 0, found: int = 0, added: int = 0) -> list[str]:
     """Record that these searches (keys from `plan_queries`) finished. Returns the keys it marked. `ceiling`: the results had not passed the
     post-age window when scrolling stopped; `hits`: real hiring posts found. Both feed `followup_query` (the user, 2026-10-13)."""
     log = _load(QUERIES, {})
     stamp = now or _now()
     for key in keys:
         log[key] = {"last": stamp, "runs": (log.get(key) or {}).get("runs", 0) + 1, "ceiling": bool(ceiling), "hits": int(hits)}
+        try:
+            import sweep_yield
+            sweep_yield.record("post", key.split("|", 1)[-1], hits=hits, found=found, added=added, ledger=QUERIES.with_name("sweep_yield.jsonl"))
+        except Exception:   # the ledger is a measure, never a reason to lose the mark
+            pass
     QUERIES.parent.mkdir(parents=True, exist_ok=True)
     QUERIES.write_text(json.dumps(log, indent=1, sort_keys=True), encoding="utf-8")
     return list(keys)
@@ -447,7 +454,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
     q = sub.add_parser("queries"); q.add_argument("--n", type=int); q.add_argument("--urls", action="store_true")
-    sd = sub.add_parser("searched"); sd.add_argument("keys", nargs="+"); sd.add_argument("--ceiling", action="store_true"); sd.add_argument("--hits", type=int, default=0)
+    sd = sub.add_parser("searched"); sd.add_argument("keys", nargs="+"); sd.add_argument("--ceiling", action="store_true"); sd.add_argument("--hits", type=int, default=0); sd.add_argument("--found", type=int, default=0); sd.add_argument("--added", type=int, default=0)
     fu = sub.add_parser("followup"); fu.add_argument("company"); fu.add_argument("--urls", action="store_true")
     ci = sub.add_parser("company-id"); ci.add_argument("company"); ci.add_argument("id")
     p = sub.add_parser("person"); ps = p.add_subparsers(dest="what", required=True)
@@ -471,7 +478,7 @@ def main(argv=None) -> int:
             else:
                 print(f"{line}\t{key}")
     elif a.cmd == "searched":
-        print("marked searched: " + ", ".join(mark_searched(a.keys, ceiling=a.ceiling, hits=a.hits)))
+        print("marked searched: " + ", ".join(mark_searched(a.keys, ceiling=a.ceiling, hits=a.hits, found=a.found, added=a.added)))
     elif a.cmd == "followup":
         fq = followup_query(a.company)
         if not fq:

@@ -34,6 +34,7 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 | `tools/draft_experiment.py` | tailoring step 4b: two drafts (A tailored, B Opus from the ad + record; C, Opus from the ad alone, only with `--with-ad-only`) and the briefs for the four readers | [5.5](05-5-Application-tools.md) |
 | `tools/add_role.py` | add a role you found yourself (a job link) through the radar's own filters and bookkeeping | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/post_leads.py` | LinkedIn hiring-post discovery (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
+| `tools/sweep_yield.py` | the sweep yield ledger: one line per finished post search or careers read with roles found and added (`state/sweep_yield.jsonl`) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/careers_queue.py` | the Chrome careers-site log: which companies the radar cannot read and when each was last read | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/sweep_plan.py` | plans one post-discovery pass: one cap, split by kind of company, one action per company | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/sponsorship.py` | checked sponsorship verdicts (standard library only) | [5.4](05-4-Board-and-session-tools.md) |

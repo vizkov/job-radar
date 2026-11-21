@@ -30,7 +30,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-JOBS = {"inbox_check": 20, "post_discovery": 20, "auto_score": 4, "views_check": 24,
+JOBS = {"inbox_check": 20, "post_discovery": 168, "auto_score": 4, "views_check": 24,
         "health": 24, "cv_review": 168, "jd_cleanup": 48, "system_review": 168}   # name -> hours before it is due again
 
 

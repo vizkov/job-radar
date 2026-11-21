@@ -102,12 +102,28 @@ class AtsSource:
         tried_path.write_text(json.dumps(tried, indent=1, sort_keys=True))
         out = SourceResult(self.name)
         from jobradar import workday_paced
-        if workday and workday_paced.BLOCKED[0]:
+        from jobradar import workday_cache as _wc
+        _pc = _wc.load()
+        _cov = lambda u: u in _pc and (_wc.age_days(_pc[u]) or 99) <= float(CONFIG.get("workday_cache_days", 3))
+        if workday and workday_paced.BLOCKED[0] and not all(_cov(u) for _, _, u in workday):
             # one line instead of a failure per board: Cloudflare refuses this address, so nothing was fetched from Workday this run
             out.units.append(UnitStatus("workday|blocked", ok=False, raw_count=0, label=f"Workday ({len(workday)} boards)",
                                         error="Workday refuses this address (429, Cloudflare): no Workday board was fetched this run"))
+        from jobradar import workday_cache
+        pc = workday_cache.load()   # Workday jobs fetched by the user's PC (tools/workday_pc.py): the runner's address is blocked
+        max_age = float(CONFIG.get("workday_cache_days", 3))
         for b in boards:
             r = results[b["url"]]
+            if b["ats"] == "workday" and not r.ok and b["url"] in pc:
+                age = workday_cache.age_days(pc[b["url"]])
+                if age is not None and age <= max_age:
+                    jobs = workday_cache.jobs_of(pc[b["url"]])
+                    out.units.append(UnitStatus(b["url"], ok=True, raw_count=len(jobs), error="",
+                                                label=f"{', '.join(b['companies'])}: {b['url']} (PC copy, {age * 24:.0f} h old)"))
+                    out.postings += [job_to_posting(j, b) for j in jobs]
+                    continue
+                why = "unreadable date" if age is None else f"{age:.1f} days old"
+                r.error = f"PC copy too old ({why}); the runner could not fetch it"
             if r.error.startswith("deferred"):
                 continue   # not tried this run: neither a failure nor an empty board
             out.units.append(UnitStatus(b["url"], ok=r.ok, raw_count=len(r.jobs), error=r.error,

@@ -239,12 +239,14 @@ async def fetch_workday_boards(boards: list, tried: dict, budget: float) -> dict
     from datetime import datetime, timezone
     workday_paced.install(CONFIG.get("workday_min_interval", 2.0), CONFIG.get("workday_max_retries", 8), CONFIG.get("workday_max_pages", 2))
     workday_paced.DEADLINE[0] = time.monotonic() + budget
+    workday_paced.BLOCKED[0] = False
+    workday_paced._gates.clear()   # a new run starts with a fresh gate (spacing, counts)
     out = {}
     timeout = CONFIG.get("board_timeout_seconds", 180)
     try:
         for a, slug, url in sorted(boards, key=lambda b: tried.get(b[2], "")):
             res = BoardResult(url=url, ats=a)
-            if time.monotonic() >= workday_paced.DEADLINE[0]:
+            if workday_paced.BLOCKED[0] or time.monotonic() >= workday_paced.DEADLINE[0]:
                 res.error = "deferred: Workday time budget spent"
                 out[url] = res
                 continue

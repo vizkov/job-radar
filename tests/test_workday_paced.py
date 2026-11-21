@@ -31,6 +31,8 @@ def run(coro):
 
 @pytest.fixture(autouse=True)
 def fast(monkeypatch):
+    wp.BLOCKED[0] = False
+    monkeypatch.setitem(wp.SETTINGS, "block_after", 99)   # the blocked-address breaker has its own tests below
     monkeypatch.setitem(wp.SETTINGS, "min_interval", 0.0)
     monkeypatch.setitem(wp.SETTINGS, "max_retries", 4)
     monkeypatch.setattr(wp, "retry_delay", lambda attempt, ra: 0.0)
@@ -122,3 +124,31 @@ def call_offset(client, term, offset):
         finally:
             wp.TERM.reset(tok)
     return run(go())
+
+
+def test_two_refusals_with_nothing_served_block_the_run_and_later_boards_defer():
+    wp.BLOCKED[0] = False
+    wp.SETTINGS["block_after"] = 2
+    g = wp.Gate()
+    g.back_off(0)
+    assert not wp.BLOCKED[0]
+    g.back_off(0)
+    assert wp.BLOCKED[0]
+    c = FakeClient([200])
+    try:
+        with pytest.raises(wp.Deferred):
+            call(c)
+        assert c.bodies == []
+    finally:
+        wp.BLOCKED[0] = False
+        wp.SETTINGS["block_after"] = 99
+
+
+def test_a_served_request_means_the_address_is_not_blocked():
+    wp.BLOCKED[0] = False
+    wp.SETTINGS["block_after"] = 2
+    g = wp.Gate()
+    g.success(2.0)
+    g.back_off(0)
+    g.back_off(0)
+    assert not wp.BLOCKED[0]

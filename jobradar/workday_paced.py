@@ -10,6 +10,9 @@ address penalised for minutes. This module replaces the library's single-request
   Measured 2026-11-21: three requests two seconds apart got 200, the fourth 429, and requests made while blocked extended the block to 40-75 s;
 * sends a search term (`workday_search_terms`) and stops after `workday_max_pages` pages per term (a board then costs a few requests, not hundreds;
   results are newest first, and older listings were seen by earlier runs);
+* gives up for the run when the first two requests of the run are both refused ("blocked": measured 2026-11-21, GitHub's runner address got a 429
+  for the whole 150 s budget on the first board, while the same code from a home address was served after a pause): `BLOCKED[0]` is set, every board is
+  deferred and `AtsSource` reports one "Workday blocked" unit instead of a failure per board;
 * stops asking once the run's time budget (`DEADLINE`, `workday_budget_seconds`) has passed: the board in progress and every board not yet tried are
   "deferred", tried first on the next run (`common.fetch_workday_boards`).
 
@@ -26,7 +29,8 @@ from ats_scrapers.exceptions import CompanyNotFoundError, ScraperError
 from ats_scrapers.scrapers import workday as _wd
 
 TERM: contextvars.ContextVar[str] = contextvars.ContextVar("workday_term", default="")
-SETTINGS = {"min_interval": 2.0, "max_retries": 8, "max_pages": 2}
+SETTINGS = {"min_interval": 2.0, "max_retries": 8, "max_pages": 2, "block_after": 2}
+BLOCKED = [False]   # set when the run's first requests were all refused: the address is blocked, so stop asking
 SENT = [0]   # requests sent so far (the caller compares before and after a board)
 DEADLINE: list = [None]   # time.monotonic() value after which no request is sent; None = no budget
 
@@ -46,6 +50,8 @@ class Gate:
         self.next_at = 0.0
         self.interval = 0.0   # the current spacing; 0 = not set yet (SETTINGS["min_interval"])
         self.streak = 0       # successes since the last refusal
+        self.refused = 0      # refusals in a row
+        self.served = 0       # successes this run
 
     async def wait(self, base: float) -> None:
         async with self.lock:
@@ -60,9 +66,14 @@ class Gate:
         self.next_at = max(self.next_at, time.monotonic() + seconds)
         self.interval = min(30.0, (self.interval or SETTINGS["min_interval"]) * 2)
         self.streak = 0
+        self.refused += 1
+        if self.refused >= int(SETTINGS["block_after"]) and self.served == 0:
+            BLOCKED[0] = True
 
     def success(self, base: float) -> None:
         self.streak += 1
+        self.refused = 0
+        self.served += 1
         if self.streak >= 15 and self.interval > base:
             self.interval, self.streak = max(base, self.interval * 0.7), 0
 
@@ -90,6 +101,8 @@ async def paced_request(self, client: httpx.AsyncClient, api: str, sem: asyncio.
     last: Exception | str | None = None
     for attempt in range(int(SETTINGS["max_retries"])):
         self._check_deadline()
+        if BLOCKED[0]:
+            raise Deferred("Workday refuses this address (429): skipped for this run")
         if DEADLINE[0] is not None and time.monotonic() >= DEADLINE[0]:
             raise Deferred("Workday time budget for this run is spent")
         await g.wait(float(SETTINGS["min_interval"]))

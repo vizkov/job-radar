@@ -101,6 +101,11 @@ class AtsSource:
         tried_path.parent.mkdir(parents=True, exist_ok=True)
         tried_path.write_text(json.dumps(tried, indent=1, sort_keys=True))
         out = SourceResult(self.name)
+        from jobradar import workday_paced
+        if workday and workday_paced.BLOCKED[0]:
+            # one line instead of a failure per board: Cloudflare refuses this address, so nothing was fetched from Workday this run
+            out.units.append(UnitStatus("workday|blocked", ok=False, raw_count=0, label=f"Workday ({len(workday)} boards)",
+                                        error="Workday refuses this address (429, Cloudflare): no Workday board was fetched this run"))
         for b in boards:
             r = results[b["url"]]
             if r.error.startswith("deferred"):

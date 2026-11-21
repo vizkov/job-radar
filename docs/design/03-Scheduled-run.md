@@ -13,7 +13,7 @@ one real role all the way to the user's board.
 A workflow has **jobs**; each job has **steps**; each step runs a command on a fresh
 Ubuntu machine GitHub provides.
 
-**Triggers.** `schedule: cron: "47 2,8,14 * * *"` and `workflow_dispatch` (a manual
+**Triggers.** `schedule: cron: "23 0,4,8,12,16,20 * * *"` and `workflow_dispatch` (a manual
 "Run workflow" button, also what `gh workflow run job-radar` presses).
 
 **`permissions: {}` at the top** grants nothing by default; each job asks for what it

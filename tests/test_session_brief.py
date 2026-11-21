@@ -157,9 +157,11 @@ def test_archive_started_once_a_day(monkeypatch):
     assert len(started) == 2 and started[0][-1] == "archive"
 
 
-def test_missed_scheduled_run_is_restarted():
+def test_missed_scheduled_run_is_restarted(tmp_path):
     from datetime import datetime, timezone
     calls = []
+    wf = tmp_path / "radar.yml"  # fixed cron: the test must not depend on the real schedule
+    wf.write_text('on:\n  schedule:\n    - cron: "47 2,8,14 * * *"\n', encoding="utf-8")
 
     def runner(cmd, timeout):
         calls.append(cmd)
@@ -167,10 +169,10 @@ def test_missed_scheduled_run_is_restarted():
             return True, '[{"conclusion": "success", "status": "completed", "createdAt": "2026-09-28T07:03:18Z"}]'
         return True, ""
     now = datetime(2026, 9, 28, 10, 50, tzinfo=timezone.utc)  # 08:47 slot + 1 h grace has passed
-    note = sb.last_run_health(runner, now)
+    note = sb.last_run_health(runner, now, wf)
     assert "08:47 UTC" in note and ["gh", "workflow", "run", "job-radar"] in calls
     calls.clear()  # 09:30: the 08:47 run may just be late
-    assert sb.last_run_health(runner, datetime(2026, 9, 28, 9, 30, tzinfo=timezone.utc)) is None
+    assert sb.last_run_health(runner, datetime(2026, 9, 28, 9, 30, tzinfo=timezone.utc), wf) is None
     assert ["gh", "workflow", "run", "job-radar"] not in calls
 
 

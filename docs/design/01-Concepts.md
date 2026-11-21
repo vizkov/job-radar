@@ -54,7 +54,7 @@ These are used from page 2 on, before their full entries further down. One line 
 | **Field** | A column on a Project, with a value per card. job-radar's: *Stage*, *Tier*, *Country*, *Recommendation*, *Sponsor*, *Referral* (single-selects), *Fit* (a number), *Posted* (a date). Fields belong to the Project; labels belong to the issue. |
 | **View** | A saved way of looking at a Project: which columns show, which filter applies, sort order, and table or board layout. job-radar has *All Roles*, *Act now* and *Pipeline*. |
 | **GitHub Actions** / **workflow** | GitHub's automation: a YAML file in `.github/workflows/` describes steps that GitHub runs on its own servers, on a schedule or on demand. A **run** is one execution. |
-| **cron** | The schedule format in a workflow: `47 2,8,14 * * *` = minute 47 of hours 2, 8 and 14 UTC, every day. GitHub treats schedules as best-effort: runs can be late or skipped. |
+| **cron** | The schedule format in a workflow: `23 0,4,8,12,16,20 * * *` = minute 23 of hours 0, 4, 8, 12, 16 and 20 UTC, every day. GitHub treats schedules as best-effort: runs can be late or skipped. |
 | **Secret** | A value stored encrypted in the repo's settings (Settings → Secrets) and given to a workflow step as an environment variable. Never in files. |
 | **GITHUB_TOKEN** | A short-lived credential GitHub gives every workflow run, limited to that repo. It can create issues but **cannot edit a user-owned Project**, which shapes the whole board design. |
 | **`gh`** | GitHub's command-line tool. On the user's machine it uses their own login; in Actions it uses GITHUB_TOKEN. |

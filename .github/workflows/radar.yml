@@ -2,7 +2,12 @@ name: job-radar
 
 on:
   schedule:
-    - cron: "47 2,8,14 * * *"  # 08:17, 14:17, 20:17 IST: fresher listings, earlier applications
+    # One line on purpose: tools/session_brief.py (last_due_slot) reads only the first cron line.
+    # Six slots at an off-peak minute (the user, 2026-11-21: alerts reached the board late). GitHub drops or
+    # delays scheduled runs: with "47 2,8,14" the 02:47 slot never fired, 08:47 ran 0-2 h late and 14:47 ran
+    # 4-9 h late. More slots means one lands on time; runs are idempotent (dedupe), so extras are cheap.
+    # 05:53, 09:53, 13:53, 17:53, 21:53, 01:53 IST
+    - cron: "23 0,4,8,12,16,20 * * *"
   workflow_dispatch: {}
 
 permissions: {}   # granted per job below

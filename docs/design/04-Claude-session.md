@@ -184,7 +184,7 @@ The scheduled GitHub workflows (they run without the user; `workflows_health()` 
 
 | Workflow | Schedule (UTC) | Timeout | Does |
 |---|---|---|---|
-| `radar.yml` | cron `47 2,8,14 * * *` (three times a day) | 60 min | finds roles, scans the mailbox, opens issues, updates the status issue |
+| `radar.yml` | cron `23 0,4,8,12,16,20 * * *` (six times a day; GitHub drops or delays many of them, and a local task `tools/trigger_radar.ps1` fills gaps) | 60 min | finds roles, scans the mailbox, opens issues, updates the status issue |
 | `registers.yml` | cron `23 4 * * 1` (Mondays 04:23) | 15 min | refreshes the UK and NL sponsor registers; reported when not succeeded in 9 days |
 | `verify.yml` | cron `13 3 1 * *` (1st of the month 03:13) | 120 min | re-verifies ATS boards into `boards.json`; reported when not succeeded in 35 days |
 

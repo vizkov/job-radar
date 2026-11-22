@@ -107,3 +107,17 @@ def test_agencies_never_use_the_outside_rule():
     yes = {"uk": SponsorTag("yes", "X Ltd")}
     cfg = {"enabled": True, "tiers": [1, 2], "outside_tier1": {"min_title_weight": 3}}
     assert select_for_board([G("Senior Application Security Engineer", "Hays", {"GB"}, 1, canonical=False, sponsor=yes)], cfg, baseline=False) == []
+
+
+def test_outside_rule_score_and_age_limits():
+    from datetime import timedelta
+    yes = {"uk": SponsorTag("yes", "X Ltd")}
+    rule = {"enabled": True, "tiers": [1, 2], "outside_tier1": {"min_title_weight": 4, "min_score": 7, "max_age_days": 7}}
+    g = G("Senior Application Security Engineer", "Y", {"GB"}, 1, canonical=False, sponsor=yes)   # score 9, posted 2026-09-20
+    g.best.posted_at = datetime.now() - timedelta(days=2)
+    assert select_for_board([g], rule, baseline=False)
+    g.best.posted_at = datetime.now() - timedelta(days=9)
+    assert select_for_board([g], rule, baseline=False) == []                                        # a week old or more
+    g.best.posted_at = datetime.now() - timedelta(days=2)
+    g.tags["score"] = 6
+    assert select_for_board([g], rule, baseline=False) == []                                        # below min_score

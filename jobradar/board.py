@@ -12,6 +12,8 @@ so the same role seen on several sources has one ref.
 """
 from __future__ import annotations
 
+from datetime import datetime
+
 import hashlib
 import json
 import re
@@ -128,6 +130,11 @@ def outside_tier1_ok(g: Group, cfg: dict) -> bool:
         return False
     from jobradar.tiering import title_weight
     if title_weight(g.best.title) < rule.get("min_title_weight", 3) or is_agency(g.best.company, cfg):
+        return False
+    if int(g.tags.get("score") or 0) < rule.get("min_score", 0):
+        return False
+    posted = g.best.posted_at
+    if rule.get("max_age_days") and posted and (datetime.now(posted.tzinfo) - posted).days >= rule["max_age_days"]:
         return False
     return sponsor_status(g) == "yes" if primary_country(g) in ("GB", "NL") else True
 

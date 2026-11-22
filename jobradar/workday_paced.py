@@ -29,7 +29,7 @@ from ats_scrapers.exceptions import CompanyNotFoundError, ScraperError
 from ats_scrapers.scrapers import workday as _wd
 
 TERM: contextvars.ContextVar[str] = contextvars.ContextVar("workday_term", default="")
-SETTINGS = {"min_interval": 2.0, "max_retries": 8, "max_pages": 2, "block_after": 2}
+SETTINGS = {"min_interval": 2.0, "max_retries": 8, "max_pages": 2, "block_after": 2, "use_curl": False}
 BLOCKED = [False]   # set when the run's first requests were all refused: the address is blocked, so stop asking
 SENT = [0]   # requests sent so far (the caller compares before and after a board)
 DEADLINE: list = [None]   # time.monotonic() value after which no request is sent; None = no budget
@@ -93,6 +93,39 @@ def retry_delay(attempt: int, retry_after: str | None) -> float:
     return min(60.0, 30.0 + 5.0 * attempt)
 
 
+class _CurlResponse:
+    """The bits of an httpx response `paced_request` reads, from a curl run."""
+
+    def __init__(self, status: int, headers: dict, text: str) -> None:
+        self.status_code, self.headers, self.text = status, headers, text
+
+    def json(self):
+        import json
+        return json.loads(self.text)
+
+
+async def _curl_post(api: str, body: dict, timeout: float = 30.0) -> _CurlResponse:
+    """POST through the system curl (the user, 2026-11-22). Measured from the user's PC: Cloudflare answers Python's TLS client
+    (httpx, urllib) 429 with a challenge page at any pace, while curl gets 200 for the same request. Used by `tools/workday_pc.py` only
+    (`SETTINGS["use_curl"]`); the Action's runner is address-blocked either way."""
+    import json
+    proc = await asyncio.create_subprocess_exec(
+        "curl", "-s", "-m", str(int(timeout)), "-X", "POST", "-H", "Content-Type: application/json", "--data-binary", "@-",
+        "-D", "-", "-w", "\n%{http_code}", api,
+        stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.DEVNULL)
+    out, _ = await proc.communicate(json.dumps(body).encode("utf-8"))
+    text = out.decode("utf-8", "replace")
+    text, _, code = text.rpartition("\n")
+    if not code.strip().isdigit() or int(code) == 0:
+        raise httpx.ConnectError("curl got no answer")
+    head, _, payload = text.partition("\r\n\r\n")   # -D - puts the headers first, then a blank line, then the body
+    headers = {}
+    for line in head.splitlines()[1:]:
+        k, _, v = line.partition(":")
+        headers[k.strip().lower()] = v.strip()
+    return _CurlResponse(int(code), headers, payload)
+
+
 async def paced_request(self, client: httpx.AsyncClient, api: str, sem: asyncio.Semaphore, *, applied_facets: dict, offset: int) -> dict | None:
     if offset >= int(SETTINGS["max_pages"]) * _wd.PAGE_LIMIT and TERM.get():
         return {"total": offset, "jobPostings": []}   # newest-first results: the first pages hold what is new
@@ -108,7 +141,10 @@ async def paced_request(self, client: httpx.AsyncClient, api: str, sem: asyncio.
         await g.wait(float(SETTINGS["min_interval"]))
         SENT[0] += 1
         try:
-            response = await client.post(api, json=body, headers={"Content-Type": "application/json"})
+            if SETTINGS.get("use_curl"):
+                response = await _curl_post(api, body)
+            else:
+                response = await client.post(api, json=body, headers={"Content-Type": "application/json"})
         except httpx.HTTPError as exc:
             last = exc
             g.back_off(retry_delay(attempt, None) / 2)
@@ -129,7 +165,7 @@ async def paced_request(self, client: httpx.AsyncClient, api: str, sem: asyncio.
             continue
         if response.status_code in RETRYABLE:
             last = f"HTTP {response.status_code}"
-            g.back_off(retry_delay(attempt, response.headers.get("Retry-After")))
+            g.back_off(retry_delay(attempt, response.headers.get("retry-after")))
             continue
         raise ScraperError(f"Workday returned {response.status_code} for {self.company_slug} (offset={offset})")
     raise ScraperError(f"Workday gave up after {SETTINGS['max_retries']} tries at offset={offset}: {last}")

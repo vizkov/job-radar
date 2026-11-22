@@ -152,3 +152,18 @@ def test_a_served_request_means_the_address_is_not_blocked():
     g.back_off(0)
     g.back_off(0)
     assert not wp.BLOCKED[0]
+
+
+def test_curl_post_parses_status_headers_and_body(monkeypatch):
+    import asyncio
+    from jobradar import workday_paced
+
+    class FakeProc:
+        async def communicate(self, data):
+            return (b'HTTP/1.1 429 Too Many Requests\r\nRetry-After: 7\r\nX-A: b\r\n\r\n{"a": 1}\n429', None)
+
+    async def fake_exec(*a, **k):
+        return FakeProc()
+    monkeypatch.setattr(workday_paced.asyncio, "create_subprocess_exec", fake_exec)
+    r = asyncio.run(workday_paced._curl_post("https://x/jobs", {"limit": 1}))
+    assert (r.status_code, r.headers["retry-after"], r.json()) == (429, "7", {"a": 1})

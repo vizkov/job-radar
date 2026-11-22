@@ -155,6 +155,18 @@ def main(argv=None):
 
     out = [{"companies": sorted(cos), "ats": boards[u][0], "slug": boards[u][1], "url": u}
            for u, cos in sorted(keep.items(), key=lambda kv: sorted(kv[1])[0].lower())]
+    # A Workday board this machine could not fetch (refused: Cloudflare 429 for GitHub's runner and for Python's TLS client on a home PC, 2026-11-22)
+    # was not found dead, only unreachable: keep its earlier entry, or a verify run would wipe every Workday board.
+    try:
+        previous = json.loads((ROOT / "boards.json").read_text())
+    except (OSError, ValueError):
+        previous = []
+    listed = {b["url"] for b in out}
+    for b in previous:
+        st = board_stats.get(b["url"])
+        if b.get("ats") == "workday" and b["url"] not in listed and st and not st["ok"] \
+                and any(w in (st["error"] or "").lower() for w in ("429", "refuse", "gave up", "deferred", "blocked")):
+            out.append(b)
     (ROOT / "boards.json").write_text(json.dumps(out, indent=1))
 
     c = Counter(r["status"] for r in report)

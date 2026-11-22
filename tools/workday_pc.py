@@ -46,7 +46,8 @@ def remote_file(slug: str) -> tuple[dict, str | None]:
 
 
 async def fetch(budget: float, cache: dict) -> tuple[dict, dict]:
-    from jobradar import common, workday_cache
+    from jobradar import common, workday_cache, workday_paced
+    workday_paced.SETTINGS["use_curl"] = True   # Cloudflare serves curl from this PC but answers Python's TLS client 429 (2026-11-22)
     boards = [(b["ats"], b["slug"], b["url"]) for b in json.loads((ROOT / "boards.json").read_text()) if b["ats"] == "workday"]
     tried = {u: v.get("fetched_at", "") for u, v in cache.items()}   # least recently fetched first
     res = await common.fetch_workday_boards(boards, tried, budget)

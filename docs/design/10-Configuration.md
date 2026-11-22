@@ -204,7 +204,12 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | `tiering` | Score weights and `tier1_min_score`; see [Tiers and sponsorship](09-Tiers-and-sponsorship.md) |
 | `sponsorship.fuzzy_yes` / `fuzzy_unknown` | Fuzzy name-match thresholds (0–100) for the sponsor registers |
 | `board_timeout_seconds` | Time cap per ATS board fetch (180) |
-| `workday_max_retries` | Retries per Workday page before a board fails (6). It can only raise the library's own value (3), never lower it, and it sets a module global inside ats-scrapers for the rest of the process. Big tenants such as Nvidia and Palo Alto get throttled deep into pagination |
+| `workday_max_retries` | Retries per Workday request before a board fails (code default 8; `examples/config.json` sets 6). Read by `workday_paced.install()`, which replaces the library's request function with the paced one (see 5.2) |
+| `workday_min_interval` | Seconds between Workday requests, shared by all boards (2.0); doubles after each refusal |
+| `workday_search_terms` | Search terms run per board instead of crawling it (`security engineer`, `application security`) |
+| `workday_max_pages` | Pages fetched per term (2; results are newest first) |
+| `workday_budget_seconds` | Run deadline in seconds (150) after which remaining boards are deferred, not failed |
+| `workday_cache_days` | How old a PC-fetched copy in `state/workday_jobs.json` may be and still be used when the runner is blocked (3) |
 | `concurrency` | ATS boards fetched at once (6) |
 | `_comment` keys | Ignored by the code; notes for humans |
 

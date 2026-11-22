@@ -7,12 +7,12 @@
 ## The whole system on one page
 
 job-radar is a set of Python scripts plus instructions for Claude, living in one git
-repo. Code runs in **three places**, and they talk to each other only through files
+repo. Code runs in **three places** (plus one scheduled task on the user's PC, `tools/workday_pc.py`, which fetches the Workday boards that Cloudflare refuses to GitHub's runner and writes `state/workday_jobs.json` to the repo through the GitHub API; see 5.2 and 5.4), and they talk to each other only through files
 committed to the repo and through GitHub (issues, the board).
 
 ```
  ┌──────────────── 1. GitHub Actions (GitHub's servers, no human) ────────────────┐
- │ radar.yml, 3x a day                                                            │
+ │ radar.yml, 6x a day                                                            │
  │   fetch_alert_emails.py ─▶ .alert_mail/*.eml   (one of two steps with the mail secret)│
  │   fetch_application_mail.py ─▶ .app_mail/ ─▶ app_mail.py ingest ─▶ state/application_mail.jsonl │
  │   radar.py ─▶ poll sources ─▶ filter ─▶ match ─▶ dedupe ─▶ new? ─▶ tier/sponsor│

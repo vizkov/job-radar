@@ -1,10 +1,11 @@
 # 3. A scheduled run, step by step
 
-**What this is:** What happens three times a day in GitHub Actions, followed through the code, then one real role's journey from a job board to a card.  
+**What this is:** What happens six times a day in GitHub Actions, followed through the code, then one real role's journey from a job board to a card.  
 **Read first:** [2. Architecture](02-Architecture.md)  
 **Code:** `.github/workflows/radar.yml`, `radar.py`, `jobradar/`, `tools/board_sync.py` (roles/stale/status)
 
-Three times a day (02:47, 08:47, 14:47 UTC) GitHub starts `.github/workflows/radar.yml`.
+Six times a day (00:23, 04:23, 08:23, 12:23, 16:23, 20:23 UTC) GitHub starts `.github/workflows/radar.yml`.
+Workday boards are the exception to "the run fetches everything itself": Cloudflare refuses GitHub's runner address, so the Fetch step uses `state/workday_jobs.json`, a copy that the user's PC publishes twice a day (`tools/workday_pc.py`, 5.4), when the runner itself was refused.
 This page follows one run from start to finish, through the actual code, then follows
 one real role all the way to the user's board.
 

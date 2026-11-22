@@ -3,7 +3,7 @@
 **This page:** how to read your board: its columns, views and the status card.
 
 Your GitHub Project is the dashboard: one card per role, plus a "Radar status" card.
-New cards arrive three times a day. (How they get there, for the curious:
+New cards arrive up to six times a day. (How they get there, for the curious:
 [Board internals](../design/11-Board-internals.md).)
 
 **Columns stay blank until a Claude session fills them.** GitHub doesn't let the automatic runs write to your board's columns, so a card

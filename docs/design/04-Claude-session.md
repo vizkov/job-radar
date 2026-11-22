@@ -160,7 +160,7 @@ Jobs with an interval in `JOBS` (DUE when never run or older than the interval; 
 | Job | Interval (hours) | Who runs it | DUE only when | Stamp |
 |---|---|---|---|---|
 | `inbox_check` | 20 | Claude, `inbox-check` (Gmail connector) | an application is Applied or Interview | `cadence.py done inbox_check` |
-| `post_discovery` | 20 | Claude, `post-discovery` (Chrome) | `discovery.linkedin_posts.enabled` is true | `cadence.py done post_discovery` |
+| `post_discovery` | 168 | Claude, `post-discovery` (Chrome) | `discovery.linkedin_posts.enabled` is true | `cadence.py done post_discovery` |
 | `auto_score` | 4 | Claude, `score-roles`, run last | a board card is unscored or the AUTO-SCORE pick is not empty | `cadence.py done auto_score` |
 | `views_check` | 24 | Claude, edits `VIEWS` to match the live views | the board's views differ from `VIEWS` | `cadence.py done views_check` |
 | `health` | 24 | Claude, `health` | the last run listed source problems | `cadence.py done health` |

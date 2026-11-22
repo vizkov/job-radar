@@ -76,7 +76,7 @@ do?" or type `/manual` (it's generated from the system itself).
 
 ## What happens without you
 
-Three times a day (02:47, 08:47 and 14:47 UTC, i.e. Coordinated Universal Time; ask Claude for your local times; GitHub sometimes skips a slot, so two runs a day is normal) job-radar
+Six times a day (at 00:23, 04:23, 08:23, 12:23, 16:23 and 20:23 UTC, i.e. Coordinated Universal Time; ask Claude for your local times; GitHub sometimes skips or delays a slot, which is why there are six) job-radar
 checks for new roles and adds them
 to your board as **New** cards: Tier 1 and 2, at companies on your list. When you next
 open Claude Code, a briefing is ready: new roles, cards you moved, follow-ups due,
@@ -96,9 +96,10 @@ Two more recurring jobs, the docs review and the weekly system review, exist onl
 
 | Job | Who runs it | When |
 |---|---|---|
-| Role search | GitHub, by itself | Three times a day, whether or not your computer is on |
-| Job-alert emails (the alert providers switched on in your settings: LinkedIn and Indeed in your setup; Glassdoor is supported but off) | GitHub, by itself, as the first step of every role search | Three times a day, only if you set up the alert mailbox. Roles found only in alert emails reach you this way |
-| Reply tracking (receipts, rejections, interview invitations) | GitHub reads the mailbox and logs mail about roles you applied to; Claude later suggests board changes in the inbox check | Three times a day, only if the mailbox behind the secret is your normal inbox ([Which mailbox](Your-part.md#optional-job-alert-emails-linkedin-indeed-glassdoor)) |
+| Role search | GitHub, by itself | Six times a day, whether or not your computer is on |
+| Job-alert emails (the alert providers switched on in your settings: LinkedIn and Indeed in your setup; Glassdoor is supported but off) | GitHub, by itself, as the first step of every role search | Six times a day, only if you set up the alert mailbox. Roles found only in alert emails reach you this way |
+| Reply tracking (receipts, rejections, interview invitations) | GitHub reads the mailbox and logs mail about roles you applied to; Claude later suggests board changes in the inbox check | Six times a day, only if the mailbox behind the secret is your normal inbox ([Which mailbox](Your-part.md#optional-job-alert-emails-linkedin-indeed-glassdoor)) |
+| Workday boards fetched from your PC | A scheduled task on your computer (Windows Task Scheduler) | Twice a day, only while the PC is on. GitHub's servers are blocked by Workday's host, so your PC fetches those boards and uploads the result; if the PC stays off for more than 3 days those boards show as failing in the status card |
 | Radar status card | GitHub, by itself | Updated by every role search: what ran, which sources failed |
 | Sponsor registers refresh | GitHub, by itself | Weekly, Mondays 04:23 UTC |
 | Company-board check (which of your companies' job boards still work) | GitHub, by itself | Monthly, on the 1st at 03:13 UTC; it updates the coverage report, which Claude reads when you ask "is anything broken?" |
@@ -106,7 +107,7 @@ Two more recurring jobs, the docs review and the weekly system review, exist onl
 | Closed-role and old-card cleanup | Claude's session-start step archives Skipped cards and trims bulky job-description files of skipped and rejected roles | Once a day, when you open a session (job-description files after 14 days for Skipped, 30 for Rejected) |
 | Scoring | Claude | The unscored roles, as the last job of a session (see above) |
 | Inbox check | Claude, through the Gmail connector (read-only) | About once a day, when you have applications waiting for an answer |
-| LinkedIn post sweep | Claude, in your Chrome | About once a day, only if you switched it on |
+| LinkedIn post sweep | Claude, in your Chrome | About once a week, only if you switched it on |
 | Board views check | Claude | When you've changed a view in GitHub: Claude copies your layout into the saved design (your column order is never touched) |
 | CV review | Claude offers it in one line | At most once a week, while your scored roles keep showing the same CV gaps |
 | Scoring-weight tuning | Claude, automatically | About once a week, one small step on one title keyword when your own scores justify it; Claude says so with a one-line undo |

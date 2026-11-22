@@ -115,15 +115,15 @@ dedicated mailbox, the worst case is that someone reads job alerts.
 
 | The secret points to | What GitHub's servers can reach | Alert emails | Reply tracking |
 |---|---|---|---|
-| **A dedicated alert-only mailbox (recommended)** | A mailbox holding only forwarded alerts. The code opens it read-only and never marks, moves or deletes mail | Yes, three times a day | No. The daily scan looks for replies in that mailbox, and employers write to your normal address, so it finds nothing. You still get reply checks in a session through the Gmail connector (below) |
-| **Your normal inbox** | Your whole mailbox. The code still only reads: it checks the sender, subject and date of recent mail, and reads the start of the text only for mail that looks like it comes from a recruiting system or names a company you applied to. It keeps sender, subject, date and type in your private repository, never the email text | Yes | Yes, three times a day: receipts, rejections, interview invitations, assessments. If you choose this, create the app password on your main account, skip the forwarding filter, and revoke the password the day you stop using job-radar |
+| **A dedicated alert-only mailbox (recommended)** | A mailbox holding only forwarded alerts. The code opens it read-only and never marks, moves or deletes mail | Yes, six times a day | No. The daily scan looks for replies in that mailbox, and employers write to your normal address, so it finds nothing. You still get reply checks in a session through the Gmail connector (below) |
+| **Your normal inbox** | Your whole mailbox. The code still only reads: it checks the sender, subject and date of recent mail, and reads the start of the text only for mail that looks like it comes from a recruiting system or names a company you applied to. It keeps sender, subject, date and type in your private repository, never the email text | Yes | Yes, six times a day: receipts, rejections, interview invitations, assessments. If you choose this, create the app password on your main account, skip the forwarding filter, and revoke the password the day you stop using job-radar |
 | **No mailbox** | Nothing | No (you lose only roles that appear solely on LinkedIn, Indeed or Glassdoor) | Session checks only |
 
 **The Gmail connector is a separate access.** When you ask "did anyone reply?", Claude reads *your* Gmail in the session through the
 Gmail connector in Claude (you approve it once; read-only: it searches and reads, and never sends, labels or deletes). It can read a whole
 conversation, nothing about it goes through GitHub, and it works with any of the three choices above. It only runs while you have a session open.
 
-What the dedicated-mailbox option does: three times a day GitHub's servers log in to that mailbox and fetch the emails from
+What the dedicated-mailbox option does: six times a day GitHub's servers log in to that mailbox and fetch the emails from
 LinkedIn, Indeed and Glassdoor (emails that fail the sender's security signature are ignored). Sign-in codes, password resets
 and newsletters are skipped. Claude tells you what it found at the start of a session.
 
@@ -176,7 +176,7 @@ only LinkedIn uses are in [LinkedIn consent](#linkedin-consent-the-three-opt-ins
 
 ## Questions people ask
 
-- **My laptop is off. Does it still work?** The daily search runs on GitHub's servers three times a day whether or not
+- **My laptop is off. Does it still work?** The daily search runs on GitHub's servers six times a day whether or not
   your computer is on, and new roles wait for you. What needs you: Claude scoring roles, filling in the board's
   details and checking your inbox happen when you open a Claude Code session.
 - **Where is my board?** Ask Claude "give me the link to my board". It's on your GitHub account under Projects.

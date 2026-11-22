@@ -32,7 +32,7 @@ import inbox_outcomes  # noqa: E402
 
 LEDGER = "state/application_mail.jsonl"
 STATUS = "state/application_mail_status.json"
-SCAN_STALE_HOURS = 36   # the Action runs three times a day; a day and a half without a good scan is a problem
+SCAN_STALE_HOURS = 36   # the Action runs six times a day; a day and a half without a good scan is a problem
 INFO_DAYS = 3           # receipts and referral notices are mentioned for this long
 
 # An interview email is only trusted to move a card when it is an invitation, not boilerplate that mentions interviews.

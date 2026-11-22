@@ -4,7 +4,7 @@
 
 job-radar is a job-search assistant. Out of the box it's set up for AppSec, product
 security, pentest and security-consulting roles in Europe; the job titles, countries and
-companies are your settings, and Claude changes them for you. Three times a day it checks
+companies are your settings, and Claude changes them for you. Six times a day it checks
 the job boards of the companies you want to work for, plus public job services (EURES for the EU, the German
 and Swedish employment agencies, and optionally Reed for the UK) and, optionally, your job-alert emails.
 LinkedIn, Indeed and Glassdoor jobs come in only through those alert emails; job-radar's automatic runs never scrape those sites. The only exceptions are a few narrow, read-only uses in your own Chrome, off until you say yes, all listed in one place: [LinkedIn consent](Your-part.md#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup). It puts every new matching role on a board for you. You
@@ -24,7 +24,7 @@ and click a few settings on GitHub; [Your part](Your-part.md) lists every one.
 
 | # | Page | What you'll learn |
 |---|---|---|
-| 1 | [Your part](Your-part.md) | The handful of steps only you can do (a login, a secret, two board clicks) |
+| 1 | [Your part](Your-part.md) | The handful of steps only you can do (a login, a secret, three one-time clicks) |
 | 2 | [Using it](Using-it.md) | What to say to Claude, what happens without you, what it costs, where your data is |
 | 3 | [Board](Board.md) | How to read your board: the columns, the views, the status card |
 
@@ -59,7 +59,7 @@ developers and for Claude.
 ## The picture
 
 ```
- 3x a day on GitHub's servers (02:47, 08:47, 14:47 UTC), no one involved
+ 6x a day on GitHub's servers (every four hours from 00:23 UTC), no one involved
    (new cards appear on their own; some columns, such as Tier and Fit, fill in at your next session)
    → check your target companies' job boards, public job portals, your job-alert emails
    → keep matching roles → rate them → one card per new role on your board

@@ -204,6 +204,7 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | `tiering` | Score weights and `tier1_min_score`; see [Tiers and sponsorship](09-Tiers-and-sponsorship.md) |
 | `sponsorship.fuzzy_yes` / `fuzzy_unknown` | Fuzzy name-match thresholds (0–100) for the sponsor registers |
 | `board_timeout_seconds` | Time cap per ATS board fetch (180) |
+| `board.outside_tier1` | Off unless set. `{"min_title_weight": 3}` lets an employer not on your list reach the board when the role is Tier 1, its title carries a keyword worth 3+ title points, and in GB/NL the sponsor register says yes (`jobradar/board.py outside_tier1_ok`) |
 | `workday_max_retries` | Retries per Workday request before a board fails (code default 8; `examples/config.json` sets 6). Read by `workday_paced.install()`, which replaces the library's request function with the paced one (see 5.2) |
 | `workday_min_interval` | Seconds between Workday requests, shared by all boards (2.0); doubles after each refusal |
 | `workday_search_terms` | Search terms run per board instead of crawling it (`security engineer`, `application security`) |

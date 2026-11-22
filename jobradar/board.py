@@ -99,7 +99,20 @@ def select_for_board(new: list[Group], cfg: dict, baseline: bool) -> list[Group]
         return []
     tiers = set(cfg.get("baseline_tiers", [1]) if baseline else cfg.get("tiers", [1, 2]))
     return [g for g in new if g.tags.get("tier") in tiers
-            and (g.best.company_canonical or cfg.get("include_outside", False))]
+            and (g.best.company_canonical or cfg.get("include_outside", False) or outside_tier1_ok(g, cfg))]
+
+
+def outside_tier1_ok(g: Group, cfg: dict) -> bool:
+    """An employer not on the list reaches the board when `board.outside_tier1` is set (the user, 2026-11-22) and the role is Tier 1,
+    its title carries a focus keyword (tiering weight >= `min_title_weight`, 3: appsec, product security, pentest, threat model…), and,
+    in GB or NL, where a sponsor register exists, the register says yes. Elsewhere there is no register: `sponsorship-check` decides on the card."""
+    rule = cfg.get("outside_tier1")
+    if not rule or g.tags.get("tier") != 1:
+        return False
+    from jobradar.tiering import title_weight
+    if title_weight(g.best.title) < rule.get("min_title_weight", 3):
+        return False
+    return sponsor_status(g) == "yes" if primary_country(g) in ("GB", "NL") else True
 
 
 def ref_last_seen(seen: dict) -> dict[str, str]:

@@ -29,6 +29,8 @@ _COUNTRY_NAMES = {
     "FR": ["france"], "ES": ["spain", "españa"], "IT": ["italy", "italia"], "DK": ["denmark"],
     "FI": ["finland"], "NO": ["norway"], "AT": ["austria"], "BE": ["belgium"], "LU": ["luxembourg"],
     "PT": ["portugal"], "EE": ["estonia"], "LT": ["lithuania"], "PL": ["poland"], "CZ": ["czech republic", "czechia"],
+    "BG": ["bulgaria"], "HR": ["croatia"], "CY": ["cyprus"], "GR": ["greece"], "HU": ["hungary"], "LV": ["latvia"],
+    "MT": ["malta"], "RO": ["romania"], "SK": ["slovakia"], "SI": ["slovenia"],
     # Outside Europe: never targets, but naming them lets the status card say where dropped listings were.
     "IN": ["india"], "US": ["united states", "united states of america"], "CA": ["canada"],
     "AU": ["australia"], "SG": ["singapore"], "AE": ["united arab emirates", "uae"], "IL": ["israel"],

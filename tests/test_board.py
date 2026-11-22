@@ -81,3 +81,20 @@ def test_stale_refs_from_seen():
     refs = [role_ref(k_old), role_ref(k_new), "f" * 16]      # last one was pruned from seen.json
     stale, alive = stale_refs(refs, seen, "2026-09-28", 5)
     assert stale == sorted([role_ref(k_old), "f" * 16]) and alive == [role_ref(k_new)]
+
+
+def test_outside_tier1_rule():
+    """An unlisted employer reaches the board only with board.outside_tier1, Tier 1, a focus title, and (GB/NL) a sponsor-register yes."""
+    cfg = {"enabled": True, "tiers": [1, 2], "include_outside": False}
+    rule = {**cfg, "outside_tier1": {"min_title_weight": 3}}
+    yes = {"uk": SponsorTag("yes", "X Ltd")}
+    cases = [
+        (G("Senior Application Security Engineer", "Y", {"GB"}, 1, canonical=False, sponsor=yes), True),
+        (G("Senior Application Security Engineer", "Y", {"GB"}, 1, canonical=False), False),    # GB with no register match
+        (G("Senior Application Security Engineer", "Y", {"FR"}, 1, canonical=False), True),     # no register outside GB/NL
+        (G("Senior Security Engineer", "Y", {"FR"}, 1, canonical=False), False),                # generic title (weight 2 or 0)
+        (G("Senior Application Security Engineer", "Y", {"FR"}, 2, canonical=False), False),    # Tier 2
+    ]
+    for g, expected in cases:
+        assert bool(select_for_board([g], rule, baseline=False)) is expected, g.best.title
+        assert select_for_board([g], cfg, baseline=False) == []                                 # off without the setting

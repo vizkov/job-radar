@@ -21,6 +21,11 @@ _TITLE = [(keyword_re([k]), w) for k, w in (_CFG.get("title_keywords") or {}).it
 _SENIORITY = [(keyword_re([k]), w) for k, w in (_CFG.get("seniority_keywords") or {}).items()]
 
 
+def title_weight(title: str) -> int:
+    """The points of the best tiering title keyword in `title` (0 when none matches); the board's unlisted-employer rule uses it."""
+    return max((w for rx, w in _TITLE if rx.search(title or "")), default=0)
+
+
 def score(title: str, countries, on_list: bool, sponsor: dict | None = None,
           age_days: int | None = None, high_fit: bool = False, sectors=frozenset()) -> tuple[int, list[str]]:
     """Returns (score, reasons); reasons go to data/matches.csv to make tuning debuggable."""

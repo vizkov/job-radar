@@ -167,3 +167,33 @@ def test_curl_post_parses_status_headers_and_body(monkeypatch):
     monkeypatch.setattr(workday_paced.asyncio, "create_subprocess_exec", fake_exec)
     r = asyncio.run(workday_paced._curl_post("https://x/jobs", {"limit": 1}))
     assert (r.status_code, r.headers["retry-after"], r.json()) == (429, "7", {"a": 1})
+
+
+def test_curl_requests_go_through_the_same_throttle(monkeypatch):
+    """The curl transport must not bypass the shared gate: requests are spaced `min_interval` apart, and a 429 doubles the spacing."""
+    import asyncio, time
+    from types import SimpleNamespace as NS
+    from jobradar import workday_paced as wp
+    times, answers = [], [200, 200, 429, 200]
+
+    async def fake_curl(api, body, timeout=30.0):
+        times.append(time.monotonic())
+        code = answers.pop(0)
+        return wp._CurlResponse(code, {"retry-after": "0"}, '{"total": 0, "jobPostings": []}')
+    monkeypatch.setattr(wp, "_curl_post", fake_curl)
+    monkeypatch.setitem(wp.SETTINGS, "use_curl", True)
+    monkeypatch.setitem(wp.SETTINGS, "min_interval", 0.2)
+    monkeypatch.setattr(wp, "retry_delay", lambda attempt, ra: 0.0)
+    monkeypatch.setattr(wp, "DEADLINE", [None])
+    monkeypatch.setattr(wp, "BLOCKED", [False])
+    wp._gates.clear()
+    me = NS(_check_deadline=lambda: None, company_slug="x")
+
+    async def run():
+        for off in (0, 20, 40):
+            await wp.paced_request(me, None, "https://x/jobs", None, applied_facets={}, offset=off)
+        return wp.gate().interval
+    interval = asyncio.run(run())
+    gaps = [b - a for a, b in zip(times, times[1:])]
+    assert len(times) == 4 and all(g >= 0.18 for g in gaps)   # never faster than the interval
+    assert interval >= 0.39                                   # the 429 doubled the spacing for what follows

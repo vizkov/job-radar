@@ -98,3 +98,12 @@ def test_outside_tier1_rule():
     for g, expected in cases:
         assert bool(select_for_board([g], rule, baseline=False)) is expected, g.best.title
         assert select_for_board([g], cfg, baseline=False) == []                                 # off without the setting
+
+
+def test_agencies_never_use_the_outside_rule():
+    from jobradar.board import is_agency
+    assert all(is_agency(n) for n in ["Methodius IT Recruitment", "Robert Walters", "Jobgether", "Acme Staffing Ltd", "Rocken\ufffd"])
+    assert not any(is_agency(n) for n in ["Bridewell", "Anthropic", "Staffbase", "Hayes Software"])
+    yes = {"uk": SponsorTag("yes", "X Ltd")}
+    cfg = {"enabled": True, "tiers": [1, 2], "outside_tier1": {"min_title_weight": 3}}
+    assert select_for_board([G("Senior Application Security Engineer", "Hays", {"GB"}, 1, canonical=False, sponsor=yes)], cfg, baseline=False) == []

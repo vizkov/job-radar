@@ -102,6 +102,23 @@ def select_for_board(new: list[Group], cfg: dict, baseline: bool) -> list[Group]
             and (g.best.company_canonical or cfg.get("include_outside", False) or outside_tier1_ok(g, cfg))]
 
 
+# Recruitment agencies and staffing firms never come in through the unlisted-employer rule (the user, 2026-11-22): they re-advertise other firms' roles.
+# A name heuristic, not a verdict: words in the company name plus well-known agencies seen in the radar's own results. `board.agency_words` and
+# `board.agency_names` in config.json add to these.
+AGENCY_WORDS = ["recruit*", "staffing", "resourcing", "headhunt*", "executive search", "manpower", "personnel"]
+AGENCY_NAMES = ["adecco", "randstad", "robert walters", "robert half", "michael page", "page personnel", "hays", "jobgether", "oho group",
+                "lawrence harvey", "harvey nash", "eclectic", "bonhill partners", "levy global", "ixceed", "rocken", "eteam", "cbsbutler",
+                "methodius", "optimyze", "twentyfour it", "sthree", "morgan mckinley", "cpl", "experis", "kelly services", "hudson"]
+
+
+def is_agency(company: str, cfg: dict | None = None) -> bool:
+    """True when the employer name looks like a recruitment agency or staffing firm (see AGENCY_WORDS / AGENCY_NAMES)."""
+    from jobradar.common import keyword_re
+    cfg = cfg or {}
+    c = (company or "").lower().replace("�", "")
+    return bool(keyword_re(AGENCY_WORDS + list(cfg.get("agency_words") or []) + AGENCY_NAMES + list(cfg.get("agency_names") or [])).search(c))
+
+
 def outside_tier1_ok(g: Group, cfg: dict) -> bool:
     """An employer not on the list reaches the board when `board.outside_tier1` is set (the user, 2026-11-22) and the role is Tier 1,
     its title carries a focus keyword (tiering weight >= `min_title_weight`, 3: appsec, product security, pentest, threat model…), and,
@@ -110,7 +127,7 @@ def outside_tier1_ok(g: Group, cfg: dict) -> bool:
     if not rule or g.tags.get("tier") != 1:
         return False
     from jobradar.tiering import title_weight
-    if title_weight(g.best.title) < rule.get("min_title_weight", 3):
+    if title_weight(g.best.title) < rule.get("min_title_weight", 3) or is_agency(g.best.company, cfg):
         return False
     return sponsor_status(g) == "yes" if primary_country(g) in ("GB", "NL") else True
 

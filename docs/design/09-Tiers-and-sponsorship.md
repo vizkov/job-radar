@@ -86,7 +86,10 @@ Tier 1 when the score ≥ `tier1_min_score` (6). Examples:
 **Automatic tuning.** Once 30 roles are scored, `tools/calibrate.py` (run weekly by the session
 brief) lowers a title keyword's weight by one when roles matching it keep scoring Skip, or raises
 it when they keep scoring Apply (at least 5 such roles; weights stay 0–5; one change per keyword
-per week). Each change is logged and reported with an undo command.
+per week). It judges the last 90 days of scores, and leaves a weight alone for 14 days after the user
+changed it by hand (it notices a change by comparing with `state/calibration_seen.json`, the weights it
+last saw). `calibrate.py report` also shows outcomes per keyword (applied, interview/offer, rejected),
+for information only. Each change is logged and reported with an undo command.
 
 `data/matches.csv` has `tier`, `score` and `score_reasons` columns, so you can
 see why a role landed where it did and adjust the weights.

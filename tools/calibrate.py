@@ -30,10 +30,16 @@ SCORES = ROOT / "data" / "scores.jsonl"
 MATCHES = ROOT / "data" / "matches.csv"
 LOG = ROOT / "data" / "calibration_log.jsonl"
 PIPELINE = ROOT / "data" / "pipeline_log.jsonl"
+SEEN = ROOT / "state" / "calibration_seen.json"   # the weights the tuner last saw: a different one is a hand edit
 MIN_TOTAL, MIN_PER, MAX_WEIGHT = 30, 5, 5
 LOWER_IF = {"avg_fit_below": 45, "skip_rate_at_least": 0.7}
 RAISE_IF = {"avg_fit_at_least": 70, "apply_rate_at_least": 0.6}
 COOLDOWN = timedelta(days=7)   # at most one change per keyword per week
+HAND_EDIT_FREEZE = timedelta(days=14)   # a weight the user changed is left alone this long (the user, 2026-11-24)
+WINDOW = timedelta(days=90)   # tuning judges the last 90 days of scores, not the lifetime average (the user, 2026-11-24)
+SEEN = ROOT / "state" / "calibration_seen.json"   # the weights the tuner last saw: a different one is a hand edit
+HAND_EDIT_FREEZE = timedelta(days=14)   # a weight the user changed is left alone this long (the user, 2026-11-24)
+WINDOW = timedelta(days=90)   # tuning judges the last 90 days of scores, not the lifetime average (the user, 2026-11-24)
 
 
 def _kw_re(word: str) -> re.Pattern:
@@ -71,7 +77,16 @@ def outcomes() -> dict[str, set]:
     return seen
 
 
-def stats(kw: dict[str, int] | None = None) -> tuple[int, dict[str, dict]]:
+def _when(row: dict) -> datetime | None:
+    try:
+        t = datetime.fromisoformat(str(row.get("scored_at")))
+    except ValueError:
+        return None
+    return t if t.tzinfo else t.replace(tzinfo=timezone.utc)
+
+
+def stats(kw: dict[str, int] | None = None, since: datetime | None = None) -> tuple[int, dict[str, dict]]:
+    """since: only scores made on or after it (a score with no scored_at counts as old)."""
     kw = kw if kw is not None else weights()
     titles = {}
     if MATCHES.exists():
@@ -79,6 +94,8 @@ def stats(kw: dict[str, int] | None = None) -> tuple[int, dict[str, dict]]:
             titles = {r["ref"]: r["title"] for r in csv.DictReader(fh) if r.get("ref")}
     scored = [json.loads(l) for l in SCORES.read_text(encoding="utf-8").splitlines() if l.strip()] \
         if SCORES.exists() else []
+    if since is not None:
+        scored = [x for x in scored if _when(x) and _when(x) >= since]
     per: dict[str, dict] = {}
     reached = outcomes()
     for s in scored:
@@ -104,13 +121,38 @@ def _log_rows() -> list[dict]:
     return [json.loads(l) for l in LOG.read_text(encoding="utf-8").splitlines() if l.strip()] if LOG.exists() else []
 
 
-def proposals(now: datetime | None = None) -> list[dict]:
+def hand_edited(kw: dict[str, int], now: datetime, write: bool = False) -> set[str]:
+    """Keywords whose weight differs from the one the tuner last saw: the user (or a revert) changed it, so leave it
+    alone for HAND_EDIT_FREEZE from when the change was first noticed. The first run only records the weights."""
+    try:
+        seen = json.loads(SEEN.read_text(encoding="utf-8")) if SEEN.exists() else {}
+    except ValueError:
+        seen = {}
+    frozen = set()
+    for k, w in kw.items():
+        old = seen.get(k)
+        if old is None:
+            old = {"weight": w}
+        elif old.get("weight") != w:
+            old = {"weight": w, "edited_at": now.isoformat(timespec="seconds")}
+        seen[k] = old
+        at = old.get("edited_at")
+        if at and now - datetime.fromisoformat(at) < HAND_EDIT_FREEZE:
+            frozen.add(k)
+    if write:
+        SEEN.parent.mkdir(parents=True, exist_ok=True)
+        SEEN.write_text(json.dumps(seen, indent=1, sort_keys=True), encoding="utf-8")
+    return frozen
+
+
+def proposals(now: datetime | None = None, write_seen: bool = False) -> list[dict]:
     now = now or datetime.now(timezone.utc)
     kw = weights()
-    total, per = stats(kw)
+    total, per = stats(kw, since=now - WINDOW)
     if total < MIN_TOTAL:
         return []
     recent = {r["keyword"] for r in _log_rows() if now - datetime.fromisoformat(r["at"]) < COOLDOWN}
+    recent |= hand_edited(kw, now, write_seen)
     out = []
     for k, d in per.items():
         if d["n"] < MIN_PER or k in recent:
@@ -143,7 +185,7 @@ def set_weight(keyword: str, value: int) -> None:
 
 def apply(dry_run: bool = False, now: datetime | None = None) -> list[dict]:
     now = now or datetime.now(timezone.utc)
-    changes = proposals(now)
+    changes = proposals(now, write_seen=not dry_run)
     if dry_run:
         return changes
     for c in changes:
@@ -151,6 +193,11 @@ def apply(dry_run: bool = False, now: datetime | None = None) -> list[dict]:
         LOG.parent.mkdir(parents=True, exist_ok=True)
         with open(LOG, "a", encoding="utf-8") as fh:
             fh.write(json.dumps({**c, "at": now.isoformat(timespec="seconds")}) + "\n")
+    if changes:   # the tuner's own change is not a hand edit
+        seen = json.loads(SEEN.read_text(encoding="utf-8"))
+        for c in changes:
+            seen[c["keyword"]] = {"weight": c["to"]}
+        SEEN.write_text(json.dumps(seen, indent=1, sort_keys=True), encoding="utf-8")
     return changes
 
 

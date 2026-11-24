@@ -43,7 +43,7 @@ def _isolate_tool_state(tmp_path, monkeypatch):
     monkeypatch.setattr(render_resume, "APPS", tmp_path / "_iso_apps")
     monkeypatch.setattr(render_resume, "SCRATCH", tmp_path / "_iso_scratch")
     import calibrate, referrals, sponsorship
-    for attr in ("SCORES", "MATCHES", "LOG"):
+    for attr in ("SCORES", "MATCHES", "LOG", "PIPELINE", "SEEN"):
         monkeypatch.setattr(calibrate, attr, tmp_path / f"_iso_cal_{attr.lower()}")
     _cfg = tmp_path / "_iso_config.json"
     _cfg.write_text((Path(__file__).resolve().parent.parent / "examples" / "config.json").read_text(encoding="utf-8"), encoding="utf-8")

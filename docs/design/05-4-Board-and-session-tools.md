@@ -215,7 +215,9 @@ by hand once skipped the age filter (posted 89 and 623 days before, `max_age_day
 |---|---|
 | `MIN_TOTAL`, `MIN_PER`, `MAX_WEIGHT`, `LOWER_IF`, `RAISE_IF`, `COOLDOWN` | 30 scored roles overall, 5 per keyword, weights 0..5, lower when average Fit < 45 and ≥70% skip, raise when ≥ 70 and ≥60% apply, one change per keyword per 7 days |
 | `_kw_re`, `best_keyword(title, kw)` | Which title keyword set a role's weight (same rule as `tiering.score`) |
-| `weights()`, `stats()`, `proposals(now)`, `config_path()` | Current weights; per-keyword n / average Fit / skip and apply rates; changes the evidence supports; the config file edited |
+| `WINDOW`, `HAND_EDIT_FREEZE`, `SEEN`, `hand_edited(kw, now, write)` | Scores older than 90 days are ignored; a weight that differs from the one in `state/calibration_seen.json` is a hand edit and frozen for 14 days from when it was first noticed (the first run only records) |
+| `outcomes()` | Stages each role ever reached, from `data/pipeline_log.jsonl`; shown in `report`, never read by a weight |
+| `weights()`, `stats(kw, since)`, `proposals(now, write_seen)`, `config_path()` | Current weights; per-keyword n / average Fit / skip and apply rates (and outcomes); changes the evidence supports; the config file edited |
 | `set_weight(keyword, value)` | Edit one weight in `config.json` in place, keeping layout and comments |
 | `apply(dry_run, now)`, `revert(keyword)`, `describe(c)` | Apply and log; undo the last automatic change; one-line description for the brief |
 

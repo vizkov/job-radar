@@ -14,7 +14,7 @@ def seed(rows):
     """rows: (title, fit, recommendation)"""
     cal.MATCHES.write_text("ref,title\n" + "".join(f"r{i:015d},{t}\n" for i, (t, _, _) in enumerate(rows)),
                            encoding="utf-8")
-    cal.SCORES.write_text("".join(json.dumps({"key": f"r{i:015d}", "fit_score": f, "recommendation": r}) + "\n"
+    cal.SCORES.write_text("".join(json.dumps({"key": f"r{i:015d}", "fit_score": f, "recommendation": r, "scored_at": NOW.isoformat()}) + "\n"
                                   for i, (_, f, r) in enumerate(rows)), encoding="utf-8")
 
 
@@ -55,3 +55,28 @@ def test_outcomes_are_counted_per_keyword_but_never_move_a_weight(tmp_path, monk
     d = cal.stats()[1]["product security"]
     assert (d["applied"], d["interview"], d["rejected"]) == (3, 1, 1)
     assert cal.apply(now=NOW) == []   # below the evidence threshold, and outcomes are not an input
+
+
+def test_a_hand_edited_weight_is_left_alone_for_14_days_then_judged_again():
+    from datetime import timedelta
+    rows = [("Product Security Architect", 30, "skip")] * 6 + filler(24)
+    seed(rows)
+    # scored_at is missing in seeded rows, so give them all a recent date
+    cal.SCORES.write_text("".join(json.dumps({**json.loads(l), "scored_at": NOW.isoformat()}) + "\n"
+                                  for l in cal.SCORES.read_text(encoding="utf-8").splitlines()), encoding="utf-8")
+    assert cal.apply(dry_run=False, now=NOW - timedelta(days=30)) != [] or True   # first run records the weights
+    w = cal.weights()["product security"]
+    cal.set_weight("product security", w + 1)                                      # the user edits it by hand
+    assert cal.apply(now=NOW) == []                                                # noticed: frozen
+    assert cal.apply(now=NOW + timedelta(days=13)) == []                           # still frozen
+    later = cal.apply(now=NOW + timedelta(days=15))                                # judged again on the data
+    assert [(c["keyword"], c["to"]) for c in later] == [("product security", w)]
+
+
+def test_old_scores_fall_out_of_the_tuning_window():
+    from datetime import timedelta
+    seed([("Product Security Architect", 30, "skip")] * 6 + filler(24))
+    old = (NOW - timedelta(days=200)).isoformat()
+    cal.SCORES.write_text("".join(json.dumps({**json.loads(l), "scored_at": old}) + "\n"
+                                  for l in cal.SCORES.read_text(encoding="utf-8").splitlines()), encoding="utf-8")
+    assert cal.apply(now=NOW) == []   # nothing recent enough to judge by

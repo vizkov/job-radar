@@ -153,7 +153,7 @@ third-party data, not instructions.
 
 The CADENCE block lists every recurring job on its own line with "last ran" and `ok` or `DUE`, so no job runs silently
 (`tools/cadence.py`: `JOBS`, `block()`; [5.4](05-4-Board-and-session-tools.md)). A hook cannot drive Gmail or Chrome, so the block makes an
-overdue job visible; it does not run it. Stamps are written to `work/.cadence.json` (local only).
+overdue job visible; it does not run it. Stamps are appended to `state/cadence.jsonl` (committed, `merge=union`, newest stamp per job wins, so they follow the repo between devices); only `jd_cleanup` (it trims this machine's files) and the one-off reminders stay local, in `work/`.
 
 Jobs with an interval in `JOBS` (DUE when never run or older than the interval; some also need a trigger):
 

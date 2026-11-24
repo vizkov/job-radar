@@ -7,7 +7,7 @@ security, pentest and security-consulting roles in Europe; the job titles, count
 companies are your settings, and Claude changes them for you. Six times a day it checks
 the job boards of the companies you want to work for, plus public job services (EURES for the EU, the German
 and Swedish employment agencies, and optionally Reed for the UK) and, optionally, your job-alert emails.
-LinkedIn, Indeed and Glassdoor jobs come in only through those alert emails; job-radar's automatic runs never scrape those sites. The only exceptions are a few narrow, read-only uses in your own Chrome, off until you say yes, all listed in one place: [LinkedIn consent](Your-part.md#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup). It puts every new matching role on a board for you. You
+LinkedIn, Indeed and Glassdoor jobs come in only through those alert emails; job-radar's automatic runs never scrape those sites. The only exceptions are a few narrow, read-only uses in your own Chrome, off until you say yes (except one narrow date lookup, which has standing permission), all listed in one place: [LinkedIn consent](Your-part.md#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup). It puts every new matching role on a board for you. You
 use it through **two things only**:
 
 1. **Claude.** You talk to it in Claude Code, in your private copy of this project. It

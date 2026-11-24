@@ -119,7 +119,7 @@ All text is HTML-escaped. **Watch out:** the design is two pages for the CV and 
 Used by the `inbox-check` skill ([4.10](04-Claude-session.md)). No mailbox access and no LLM. `pending()` lists refs in Stage Applied or Interview
 (`latest_stages()` overlays the stage log on `data/pipeline_snapshot.json`; `applied_dates()` gives the date each moved there) with a Gmail
 search string; `classify()` matches phrase rules in the order rejection, offer, referral ("X has referred you"), interview, acknowledgement (unknown otherwise); `seen_ids()` and
-`add_seen()` keep `state/inbox_seen.json`; `main()` is the CLI (`pending`, `classify`, `seen`).
+`add_seen()` keep `state/inbox_seen.json`; `main()` is the CLI (`pending`, `classify`, `seen`, `checked`).
 
 ## `tools/inbox_hook.py`: inbox-check bookkeeping without the model
 

@@ -12,7 +12,7 @@
 | Did it find anything? | `digests/status.md` ("New today"), `data/matches.csv` | Nothing new is normal on quiet days |
 | Is it queued? | `state/board_queue.json` | More than 40 new roles wait for the next run (`max_per_run`) |
 | Did issues get created but not appear? | Issues labelled `role` exist, cards don't | The Project's **Auto-add to project** workflow is off or has the wrong filter (`is:issue label:role`) |
-| Is the tier/company excluded? | `config.json` → `board.tiers`, `include_outside` | Only Tier 1–2 roles at target companies go to the board |
+| Is the tier/company excluded? | `config.json` → `board.tiers`, `include_outside` | Only Tier 1–2 roles at target companies go to the board (and Tier 1 roles of unlisted employers when `board.outside_tier1` is set and `outside_tier1_ok` passes) |
 
 ## Cards have empty fields
 

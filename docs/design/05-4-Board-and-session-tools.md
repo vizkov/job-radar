@@ -73,13 +73,14 @@ what it would queue),
 
 ## `tools/cadence.py`: the cadence ledger (standard library only)
 
-The session brief's CADENCE block lists every recurring job and whether it is due, so none runs silently ([page 4](04-Claude-session.md#cadence-the-recurring-jobs) has the full table). Jobs Claude runs (they need Gmail or Chrome, which a hook cannot drive) stamp themselves in `work/.cadence.json` when finished.
+The session brief's CADENCE block lists every recurring job and whether it is due, so none runs silently ([page 4](04-Claude-session.md#cadence-the-recurring-jobs) has the full table). Jobs Claude runs (they need Gmail or Chrome, which a hook cannot drive) stamp themselves in `state/cadence.jsonl` (synced between devices through git) when finished.
 
 | Name | Is |
 |---|---|
 | `JOBS` | Job name to hours before it is due again: `inbox_check` 20, `post_discovery` 168, `auto_score` 4, `views_check` 24, `health` 24, `cv_review` 168, `jd_cleanup` 48, `system_review` 168 (eight jobs; the system review only where the maintainer-only `system-review` skill exists, shown through `block(..., system_review_job=True)`). The same table with who runs each: [page 4](04-Claude-session.md#cadence-the-recurring-jobs). |
 | `done(name, root, now)`, `last(name, root)`, `load(root)` | Stamp a job as just finished; read a stamp; read the ledger. CLI: `python tools/cadence.py done <name>` and `show`. |
 | `is_due(name, now, root)`, `when(name, now, root, fallback)` | True when never run or older than its interval; the "last ran … (Nh ago)" text. |
+| `reminders(root)`, `reminder_add(rid, due, text)`, `reminder_done(rid)`, `reminder_lines(now, root)` | One-off reminders in `work/.reminders.json`: read them, add or replace one (bad date raises `ValueError`), remove one (unknown id raises), and the brief lines plus due names for those whose date has come. CLI: `cadence.py reminder add|done|list`. |
 | `block(now, root, …)` | Returns the brief's CADENCE lines and the names of the due jobs, then one line per **one-off reminder** (`work/.reminders.json`, managed by `cadence.py reminder add|done|list`: it shows from its due date until `reminder done` removes it). Which line exists, when each is DUE and how it is stamped: the table on [page 4](04-Claude-session.md#cadence-the-recurring-jobs). Arguments that make a line DUE: `views_drift`, `docs_review` (the reason from `docs_review_note()`), `source_problems` (a count from `status_info()`), `cv_gaps` (the note from `health_checks()`), `mail_scan` (from `app_mail.scan_line()`). `session_brief.cadence_block()` gathers the inputs from `matches.csv`, the issue map, the queue and the board. |
 
 ## `tools/session_brief.py`: the SessionStart hook (standard library only)
@@ -250,4 +251,6 @@ CLI: `done`, `url`, `status`. The pass is planned by `tools/sweep_plan.py`; this
 
 Read-only. Compares the full saved ad texts (`work/jd/<ref>/jd.txt`) of cards from the same company, never titles alone. A pair is `SAME` when at least 90% of the shorter ad's 8-word runs are in the longer one and the shorter ad is not tiny; the tool also prints the sentences only one ad has, so the verdict is checked against the differing text. It writes nothing and moves no card: one job is posted once per country and each gets its own ref, and the user decides what is skipped. Run by `score-roles` step 2b.
 
-`session_brief.score_pick_now()` (CLI `session_brief.py --score-pick`) recomputes the auto-score pick from the live board and `matches.csv`, so roles added by the session's sweeps are included; it is read-only and starts no background job.
+### `session_brief.score_pick_now()`
+
+`score_pick_now()` (CLI `session_brief.py --score-pick`) recomputes the auto-score pick from the live board and `matches.csv`, so roles added by the session's sweeps are included; it is read-only and starts no background job.

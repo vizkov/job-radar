@@ -1,3 +1,4 @@
 * text=auto eol=lf
 *.eml -text
 *.docx binary
+state/cadence.jsonl merge=union

@@ -13,9 +13,6 @@ These are used from page 2 on, before their full entries further down. One line 
 | Word | Meaning |
 |---|---|
 | **Posting** | The code object for one job as one source reported it (`jobradar/model.py`). Full shape under "Data shapes". |
-| **Unit** | One thing a source polls: one ATS board, one search query, one careers page, one email provider. Health is tracked per unit. |
-| **Group** | All postings that are the same role (same content key), merged; one link is the best, the rest are "also on". |
-| **ref** | The 16-character ID of a role. It links the role's issue, `matches.csv` row, JD folder, score and application. |
 | **Session** | One conversation with Claude Code in the user's private copy. Scoring, tailoring and board edits happen in sessions; finding roles does not. |
 | **Brief** | The text the SessionStart hook prints at the start of a session ([page 4](04-Claude-session.md#42-session-start-toolssession_briefpy)). |
 | **CADENCE** | The brief's block listing every recurring job, when it last ran and which are DUE ([table](04-Claude-session.md#cadence-the-recurring-jobs)). |
@@ -93,6 +90,12 @@ These are used from page 2 on, before their full entries further down. One line 
 | **Group** | All postings sharing a content key. The best one (by source rank) supplies the link; the others become "also on". | `dedupe.py: Group` |
 | **ref** (Role ID) | The first 16 hex characters of the SHA-1 of the content key, e.g. `3140f52f7d4f47fc`. It links a role's issue, its `matches.csv` row, its JD folder, its score and its application. | `board.py: role_ref()` |
 | **`matches.csv`** | `data/matches.csv`: the private log of every role the radar has found, one row per role, keyed by its ref ([page 2](02-Architecture.md)). | `radar.py: append_matches()` |
+| **DKIM** | A signature a mail provider adds to prove who sent a message. The alert-mail fetch ignores mail whose signature fails, so a forged "job alert" cannot reach the radar. | `jobradar/alert_providers.py` |
+| **IMAP** | The protocol the code uses to read the alert mailbox. It opens the mailbox read-only (`EXAMINE`), so it never marks, moves or deletes mail. | `tools/fetch_alert_emails.py` |
+| **robots.txt** | A site's published rules about what automated clients may fetch. The `careers_page` source and the JD fetch obey it; a disallowed page is read in the user's Chrome or pasted instead. | `jobradar/sources/careers_page.py` |
+| **Cloudflare** | A bot-protection service in front of many careers sites. It answers HTTP 429 to bursts and refuses GitHub's runner address for Workday, which is why the PC fetch exists. | `jobradar/workday_paced.py` |
+| **JSON-LD** | Structured job data some careers pages embed in their HTML; the `careers_page` source can read it. | `jobradar/sources/careers_page.py` |
+| **Playwright** | A browser driver used only locally for pages that need JavaScript (`render: js` in `careers_pages.yaml`); the scheduled run never uses it. | `profile/careers_pages.yaml` |
 | **Seen** | `state/seen.json` remembers every posting ID and content key already reported, with the last date seen. A role is "new" only if none of its keys were seen. | `radar.py: diff_seen()` |
 | **Baseline** | The very first run (empty `seen.json`). Everything open is recorded, but only Tier 1 goes to the board so the user doesn't start with hundreds of cards. | `board.py: select_for_board()` |
 | **Score** / **tier** | A rule-based number from title keywords, seniority, country, list membership, sponsor status and freshness. Tier 1 if score ≥ 6, else Tier 2. No AI involved, and not the same as **Fit** (below), the AI-judged score. This is the provisional tier on the card; once a role is scored against the CV, Apply makes it T1 and Skip makes it T2 (`jd_check.TIER_FROM_SCORE`). | `tiering.py` |

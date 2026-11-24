@@ -67,7 +67,7 @@ descriptions) as `tests/fixtures/ats/<name>.json`.
 | `.github/workflows/radar.yml` | The scheduled pipeline. [Page 3](03-Scheduled-run.md). |
 | `.github/workflows/verify.yml` | Monthly `verify_boards.py`, commits `boards.json` and reports. |
 | `.github/workflows/registers.yml` | Weekly `refresh_registers.py`, commits registers only when they changed. |
-| `.claude/settings.json` | The SessionStart hook: runs `session_brief.py`, 90 s limit, on startup and resume. |
+| `.claude/settings.json` | The hooks: SessionStart runs `session_brief.py` (90 s limit, on startup and resume); a PostToolUse hook runs `tools/inbox_hook.py` after Gmail `search_threads`/`get_thread`/`get_message` calls (see [5.5](05-5-Application-tools.md)). |
 | `.githooks/post-commit` | Finds a Python (venv first) and runs `public_template.py autopublish`. Active only after `git config core.hooksPath .githooks`; does nothing without `git config jobradar.templateDir`. |
 | `.gitignore` | `.venv/`, caches, `.alert_mail/`, `work/`. |
 | `.gitattributes` | LF line endings; `.eml` and `.docx` untouched (binary-exact). |

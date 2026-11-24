@@ -118,7 +118,7 @@ class AtsSource:
                 age = workday_cache.age_days(pc[b["url"]])
                 if age is not None and age <= max_age:
                     jobs = workday_cache.jobs_of(pc[b["url"]])
-                    out.units.append(UnitStatus(b["url"], ok=True, raw_count=len(jobs), error="",
+                    out.units.append(UnitStatus(b["url"], ok=True, raw_count=len(jobs), error="", track_empty=False,   # the PC copy keeps only title-matching jobs: 0 is normal, only an old copy is a failure
                                                 label=f"{', '.join(b['companies'])}: {b['url']} (PC copy, {age * 24:.0f} h old)"))
                     out.postings += [job_to_posting(j, b) for j in jobs]
                     continue

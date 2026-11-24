@@ -620,7 +620,7 @@ def refresh_bodies(gh: Gh) -> str:
 VIEWS = [
     {"name": "All Roles", "layout": "TABLE_LAYOUT", "filter": "-stage:Applied -status:Done -stage:Skipped",
      "fields": ["Title", "Stage", "Tier", "Fit", "Recommendation", "Sponsor", "Posted", "Referral", "Country"],
-     "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},
+     "sort": [("Fit", "DESC"), ("Posted", "DESC")], "group": []},  # the user changed it in GitHub, 2026-11-23
     # "Act now" = open roles not yet applied to/skipped that are brand new or posted 14+ days ago, so about to expire
     # (the user changed it in GitHub, 2026-10-02; All Roles hides Applied cards).
     {"name": "Act now", "layout": "TABLE_LAYOUT", "filter": "(is:open -stage:Applied,Skipped -label:possibly-closed -recommendation:Skip) AND (posted:<=@today-14d OR stage:New)",

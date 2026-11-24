@@ -30,6 +30,10 @@ only), `--include-outside` (keep employers not on the list).
 | `render_digest(...)` | The full Markdown digest (tiers → companies → roles, outside list, broken sources, source table). |
 | `render_status(...)` | The short "Radar status" text: counts, source table and per-source drop reasons, no job titles. |
 | `append_matches(new, today)` | Appends one row per new group to `data/matches.csv`, migrating the header if columns changed. |
+| `LOG_DROPS_SOURCES`, `LOG_DROPS`, `DROPPED_ROWS`, `DROPPED_FIELDS` | Which sources have their dropped listings logged (only `alert_email`), the switch `select()` sets for a real run, this run's collected rows, and the column order of `state/dropped_alerts.csv`. |
+| `_log_drop(res, p, matcher, tgt, first)` | Records one dropped listing with **every** filter it fails (country, title, company), not only the first one `select()` stopped at. |
+| `write_dropped_log(today, keep_days=45)` | Merges this run's dropped alert listings into `state/dropped_alerts.csv` (first/last seen; rows expire after 45 days); returns the rows kept. Private; read it to judge whether the title list, employer list or location parser loses roles. |
+| `ALERT_HIT_FIELDS`, `write_alert_hits(results, today, keep_days=45)` | `state/alert_hits.csv`: which LinkedIn alert (search name from the digest mail's subject; `(single-job mail)` when it has none) listed each role, kept or dropped, so one search can be judged by the roles only it surfaces. |
 | `main(argv)` | The sequence: load → fetch → select → group → diff → enrich → health → render → queue → write. |
 
 **Watch out**

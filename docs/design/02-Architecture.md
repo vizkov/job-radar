@@ -111,7 +111,7 @@ doesn't match `PRIVATE`.
 | `network.csv` | Who can help where: `name,company,added`, one row per person per company. Nothing about how people are related or what they do (the user's choice) | Claude (`referrals` skill), from what the user says | `tools/referrals.py` |
 | `board.json` | The Project's owner, number, node ID, URL, field IDs and option IDs | `board_sync.py setup-project` | `board_sync.py`, `session_brief.py` |
 
-### Pipeline memory (`state/`, committed by the scheduled run)
+### Pipeline memory (`state/`, committed to the repo: by the scheduled run, by sessions, or by the PC task; see each row's "Written by")
 
 | File | Holds | Written by | Read by |
 |---|---|---|---|
@@ -123,8 +123,12 @@ doesn't match `PRIVATE`.
 | `stale_flagged.json` | Refs currently labelled `possibly-closed` | `board_sync.py stale` | `board_sync.py stale` |
 | `inbox_checked.json` | Per role, the day its mail was last searched and read: the next `inbox-check` search starts there, so no run re-reads old mail | `inbox_outcomes.py mark_checked` (CLI `checked`) | `inbox_outcomes.py pending` |
 | `inbox_seen.json` | IDs of every email the Gmail inbox check has already read (suggested or not), so none is read twice | `inbox_outcomes.py add_seen` (CLI `seen`) | `inbox_outcomes.py seen_ids` |
+| `workday_jobs.json` | `{board url: {fetched_at, jobs}}`: Workday jobs fetched from the user's PC, title-filtered | `tools/workday_pc.py` (GitHub contents API) | `AtsSource` via `workday_cache.py` |
+| `workday_tried.json` | `{board url: last attempt time}`, so the next run tries the least recently tried Workday boards first | `AtsSource` (`fetch_workday_boards`) | the same |
+| `sweep_yield.jsonl` | One line per finished post search or careers read, with roles found and added | `post_leads.py searched`, `careers_queue.py done` | `tools/sweep_yield.py report` |
 | `chrome_careers.json` | Per company the radar cannot read: when Claude last read its careers page in Chrome, how many runs, the search URL that worked, a note | `tools/careers_queue.py` (`done`, `url`) | `careers_queue.py`, `tools/sweep_plan.py` |
 | `linkedin_company_ids.json` | LinkedIn's numeric company id per normalised company name, for the post-search "posts written by employees" filter | `post_leads.py company-id` (`set_company_id`) | `post_leads.py` (`search_url`) |
+| `state/cadence.jsonl` | When each recurring cadence job last finished (UTC): an append-only ledger, committed and merged with `merge=union`, so a job done on one device shows as done on the other; `jd_cleanup` alone stays in local `work/.cadence.json`, for the brief's CADENCE block ([page 4](04-Claude-session.md#cadence-the-recurring-jobs)) | `tools/cadence.py done <job>` (Claude, or `jd_cleanup.py` itself) |
 
 ### Output (`data/`, `digests/`)
 
@@ -159,7 +163,6 @@ starts them from scratch (so both review timers reset).
 | `work/jd/<ref>/jd.txt`, `meta.json`, `packet.md` | A role's JD text, facts, and the packet Claude reads | `jd_prep.py` (or the user pastes `jd.txt`) |
 | `work/jd/<ref>/score.json` | Claude's fit assessment, before validation | Claude |
 | `work/jd/<ref>/sponsorship.json` | Claude's sponsorship verdict and evidence, before validation | Claude |
-| `work/.cadence.json` | When each recurring cadence job last finished (UTC), for the brief's CADENCE block ([page 4](04-Claude-session.md#cadence-the-recurring-jobs)) | `tools/cadence.py done <job>` (Claude, or `jd_cleanup.py` itself) |
 | `.app_mail/messages.json`, `_status.json` | The daily application-mail scan's candidate messages (headers and the first 2,500 characters of text) and whether the scan worked; deleted with the runner, `.gitignore`d | `tools/fetch_application_mail.py` (read by `app_mail.py ingest` in the same run) |
 | `work/.last_calibration` | When calibration last ran | `session_brief.py` |
 | `work/discovered_boards.csv` | Proposed boards for uncovered targets | `discover_boards.py` |

@@ -45,6 +45,8 @@ Part of the [5. Code reference](05-Code-reference.md) (the index of every file a
 | `DEFAULT_EMPLOYMENT_EXCLUDE`, `not_permanent(text)` | Permanent roles only: true if a title or ATS employment type says contract, fixed-term, temporary, interim, freelance, internship… (`config.json` → `employment_exclude`). "Smart contract" is removed first so smart-contract security roles survive. |
 | `BoardResult` | One board fetch result: `url`, `ats`, `ok`, `error`, `jobs`. |
 | `fetch_board(ats, slug, url, sem)` | Fetch one board with ats-scrapers under a time cap and a concurrency semaphore; never raises. |
+| `fetch_workday_boards(boards, tried, budget)` | Workday boards one at a time, least recently tried first, until `budget` seconds are spent; a board stopped by the budget gets an `error` starting `deferred` and is not marked tried. Used by the Action and by `tools/workday_pc.py`. |
+| `_fetch_workday(slug, kwargs, timeout)` | One Workday tenant through the paced gate; with `workday_search_terms` each term is its own search and results are merged. |
 | `fetch_many(boards, progress)` | Fetch many boards concurrently (`concurrency` from config); returns `url → BoardResult`. |
 
 **Watch out**
@@ -120,6 +122,7 @@ Part of the [5. Code reference](05-Code-reference.md) (the index of every file a
 |---|---|
 | `score(title, countries, on_list, sponsor, age_days, high_fit, sectors)` | Best title keyword + all seniority words + best country + on-list bonus + `target_fit_high` bonus (employer's Fit column in targets.tsv is High) + sponsor bonus + freshness bonus; returns `(total, reasons)`. `matching.load_high_fit()` reads the Fit = High names; `radar.high_fit_targets()` caches them. |
 | `tier(total)` | 1 if total ≥ `tier1_min_score`, else 2. |
+| `title_weight(title)` | The points of the best tiering title keyword in the title (0 when none); the board's unlisted-employer rule uses it. |
 
 Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
 
@@ -152,7 +155,10 @@ Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
 | `sponsor_status(g)` | The UK tag for GB roles, NL tag for NL roles, else none. |
 | `payload(g)` | `{ref, title, body, labels}` for one role. |
 | `row_payload(row)` | The same issue payload rebuilt from a `matches.csv` row, for `board_sync.py promote`. |
-| `select_for_board(new, cfg, baseline)` | New groups in the configured tiers, on the list (unless `include_outside`). |
+| `select_for_board(new, cfg, baseline)` | New groups in the configured tiers, on the list (unless `include_outside`), plus unlisted employers that pass `outside_tier1_ok` when `board.outside_tier1` is set. |
+| `AGENCY_WORDS`, `AGENCY_NAMES` | Name fragments and names of recruitment agencies and staffing firms; `board.agency_words` / `board.agency_names` in config add to them. |
+| `is_agency(company, cfg)` | True when the employer name matches those lists. |
+| `outside_tier1_ok(g, cfg)` | Whether an employer not on the list reaches the board: needs `board.outside_tier1`, Tier 1, a title keyword worth `min_title_weight` (3) or more, not an agency, `min_score`/`max_age_days` if set, and in GB or NL a register `yes`; elsewhere no register, so `sponsorship-check` decides on the card. |
 | `ref_last_seen(seen)` | `ref → last date seen`, from the content keys in `seen.json`. |
 | `stale_refs(board_refs, seen, today, days)` | `(stale refs, refs seen today)`. |
 | `load_queue`, `save_queue`, `enqueue` | Read/write the queue; append payloads whose ref isn't already queued. |
@@ -206,6 +212,19 @@ flushed by the same code path; `Z999` is then removed.
 ## `jobradar/workday_paced.py`: Workday at a pace Cloudflare accepts
 
 Workday's job API sits behind Cloudflare, which answers 429 to a burst, scores clients per address and extends the block while a blocked client keeps asking (measured 2026-11-21: three requests two seconds apart got 200, the fourth 429; a block lasted tens of seconds to minutes and covered every tenant, not just the one asked). `ats-scrapers` fetches every page of a tenant 10 at a time and six tenants at once, so from about 2026-11-14 about 40 boards failed with "Workday gave up after 6 retries". `install()` replaces `WorkdayScraper._request` with `paced_request()`: one shared `Gate` (all tenants, `workday_min_interval` apart, doubling to 30 s on every refusal and easing back after 15 successes; a refusal pushes everybody back), a search term (`workday_search_terms`) and at most `workday_max_pages` pages per term (results are newest first), and a run deadline (`DEADLINE`, from `workday_budget_seconds`) after which it raises `Deferred`. `common.fetch_workday_boards()` runs the Workday boards one at a time, least recently tried first (`state/workday_tried.json`), inside the budget; boards it did not reach are "deferred" and `AtsSource.fetch` records neither a failure nor an empty board for them. **Finding from the first GitHub run (2026-11-21): pacing does not help from the runner.** Cloudflare refused GitHub's address on the very first board for the whole 150 s budget, while a home address was served after a pause. So the breaker (`BLOCKED`): when the first two requests of a run are both refused and nothing has been served, every Workday board is deferred for the run and `AtsSource` reports one `workday|blocked` unit (not a failure per board). The fix that works fetches Workday from another address: **the user's PC** (2026-11-22, the user: "ok"). `tools/workday_pc.py` (scheduled by `tools/run_workday_pc.ps1`, task `job-radar-workday`, twice a day) runs this same paced fetch, keeps title-matching jobs and writes `state/workday_jobs.json` to the repo with one `gh api` contents PUT (no local git, no working-tree change, so no conflict with the user's checkout or the Action's commits). `AtsSource` uses a board's copy (`jobradar/workday_cache.py`) when the runner could not fetch it and the copy is at most `workday_cache_days` (3) old; an older copy is a failing unit, so a PC that is off is visible. Rollup locations ("2 Locations") are resolved by the runner and need Workday too, so they stay unresolved for PC copies. Tests: `tests/test_workday_paced.py`, `tests/test_workday_cache.py`.
+
+## `jobradar/workday_cache.py`: Workday jobs fetched by the user's PC
+
+Cloudflare refuses the GitHub runner's address for Workday, so a scheduled task on the user's PC (`tools/workday_pc.py`, started by `run_workday_pc.ps1`, task `job-radar-workday`) fetches the boards and pushes `state/workday_jobs.json` through the GitHub contents API. The module is a pure data helper; `AtsSource` ([5.3](05-3-Sources.md)) uses a board's copy when the runner could not fetch it and the copy is at most `workday_cache_days` (default 3) old. The file is `{url: {"fetched_at": iso, "jobs": [Job dumps]}}`, and only jobs whose title passes the radar's title filter are kept, so an empty copy is normal (a copy that is **too old** is the failure; health does not count an empty PC copy as silent).
+
+| Name | Is |
+|---|---|
+| `PATH` | `state/workday_jobs.json`. |
+| `load(path)` | The cache dict, or `{}` when the file is missing or broken. |
+| `dumps(cache)` | Stable JSON text (sorted keys, indent 1, trailing newline) so the contents-API write is deterministic. |
+| `entry(jobs, now)` | One board's record: `fetched_at` plus the jobs as JSON dumps. |
+| `age_days(item, now)` | Days since `fetched_at`, or `None` when the date is missing or unreadable (treated as too old). |
+| `jobs_of(item)` | The record's jobs as `Job` objects; one bad row is skipped, never the board. |
 
 ## `jobradar/bamboohr_json.py`: BambooHR listing fix
 

@@ -19,7 +19,9 @@ stamp themselves when they finish:
     python tools/cadence.py reminder done <id>    # finish it: the reminder is removed, it never shows again
     python tools/cadence.py reminder list
 
-Stamps live in work/.cadence.json (private, local). The radar search and the new-role additions are
+Stamps are an append-only ledger, state/cadence.jsonl (private, committed, merged with `merge=union` in .gitattributes), so a job
+done on one device shows as done on the others once they pull; the newest stamp per job wins. `jd_cleanup` trims this machine's own
+files, so its stamp stays local in work/.cadence.json, as do the one-off reminders (work/.reminders.json). The radar search and the new-role additions are
 read from what the GitHub Action already writes (digests/status.md, matches.csv, the issue map, the board).
 """
 from __future__ import annotations
@@ -34,15 +36,39 @@ JOBS = {"inbox_check": 20, "post_discovery": 168, "auto_score": 4, "views_check"
         "health": 24, "cv_review": 168, "jd_cleanup": 48, "system_review": 168}   # name -> hours before it is due again
 
 
+LOCAL_ONLY = {"jd_cleanup"}   # stamps that describe this machine's own files and never sync
+
+
 def _file(root: Path) -> Path:
+    """The local stamps (jd_cleanup, and every stamp written before the ledger existed)."""
     return root / "work" / ".cadence.json"
 
 
+def _ledger(root: Path) -> Path:
+    return root / "state" / "cadence.jsonl"
+
+
 def load(root: Path = ROOT) -> dict:
+    """job -> ISO time of its newest stamp: the local file first, then the ledger lines, newest wins."""
     try:
-        return json.loads(_file(root).read_text(encoding="utf-8"))
+        data = json.loads(_file(root).read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        return {}
+        data = {}
+    if not isinstance(data, dict):
+        data = {}
+    try:
+        lines = _ledger(root).read_text(encoding="utf-8").splitlines()
+    except OSError:
+        lines = []
+    for line in lines:
+        try:
+            r = json.loads(line)
+            job, at = r["job"], r["at"]
+        except (ValueError, KeyError, TypeError):
+            continue   # a half-written or merged-garbled line never breaks the brief
+        if _naive(at) and (job not in data or (_naive(data[job]) or datetime.min) < _naive(at)):
+            data[job] = at
+    return data
 
 
 def _naive(text: str) -> datetime | None:
@@ -61,11 +87,20 @@ def done(name: str, root: Path = ROOT, now: datetime | None = None) -> str:
     if name not in JOBS:
         raise ValueError(f"unknown cadence job {name!r}; one of {sorted(JOBS)}")
     now = now or datetime.now(timezone.utc).replace(tzinfo=None)
-    data = load(root)
-    data[name] = now.isoformat(timespec="seconds")
-    _file(root).parent.mkdir(parents=True, exist_ok=True)
-    _file(root).write_text(json.dumps(data, indent=1, sort_keys=True), encoding="utf-8")
-    return f"{name}: stamped {data[name]} UTC"
+    at = now.isoformat(timespec="seconds")
+    if name in LOCAL_ONLY:
+        try:
+            data = json.loads(_file(root).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            data = {}
+        data[name] = at
+        _file(root).parent.mkdir(parents=True, exist_ok=True)
+        _file(root).write_text(json.dumps(data, indent=1, sort_keys=True), encoding="utf-8")
+    else:
+        _ledger(root).parent.mkdir(parents=True, exist_ok=True)
+        with _ledger(root).open("a", encoding="utf-8", newline="\n") as f:
+            f.write(json.dumps({"job": name, "at": at}, sort_keys=True) + "\n")
+    return f"{name}: stamped {at} UTC"
 
 
 def is_due(name: str, now: datetime, root: Path = ROOT) -> bool:

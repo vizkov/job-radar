@@ -10,7 +10,7 @@ What the user sees is in [docs/wiki/Board.md](../wiki/Board.md). This page is ho
 
 1. Each scheduled run records every new matching role in `data/matches.csv` and queues
    the ones for the board in `state/board_queue.json`: Tier 1 and 2 at companies on
-   the list (`profile/config.json` → `board`).
+   the list (plus Tier 1 roles of unlisted employers that pass `outside_tier1_ok`, when `board.outside_tier1` is set (`jobradar/board.py`); `profile/config.json` → `board`).
 2. `tools/board_sync.py roles` opens one **issue** per queued role in the private
    repo, labelled `role` (no tier, sponsor or country label: the Action cannot edit Project fields, and a label copy of Tier/Sponsor goes stale).
    Up to 40 per run, 2 seconds apart (GitHub throttles bursts); the rest wait.

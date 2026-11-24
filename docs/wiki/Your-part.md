@@ -28,7 +28,7 @@ If `gh auth login` fails or the browser step never finishes: run `gh auth status
 Stuck on any of these? Once Claude Code runs, say "check my setup" and Claude tells you what's missing and walks you through it.
 
 GitHub's free plan includes 2,000 minutes a month of automated runs for private
-projects; job-radar uses roughly 450–750 a month (15–25 minutes a day across its three daily runs).
+projects; job-radar uses roughly 450–750 a month (15–25 minutes a day across its scheduled runs).
 If you ever pass the 2,000, GitHub stops the runs until the next month. It only charges you if you have raised your Actions spending limit above its default of $0, so with the default nothing is billed; the radar simply pauses.
 
 ## Setup, in order
@@ -87,7 +87,7 @@ Setup is complete without these; do any of them afterwards, in any order.
 - **Form filling.** Install the Claude in Chrome extension. It works in your **real Chrome**, where
   you're already logged in to sites, and asks Chrome for broad permissions when you install it.
   How Claude limits what it does with it: [What Claude can do in your browser](#what-claude-can-do-in-your-browser).
-- **LinkedIn uses** (job pages, contact lookup, hiring posts): all off until you say yes; see
+- **LinkedIn uses** (job pages, contact lookup, hiring posts): off until you say yes, except the narrow date lookup, which has standing permission in the project instructions (3 a session at most); see
   [LinkedIn consent](#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup).
 
 ## Optional: job-alert emails (LinkedIn, Indeed, Glassdoor)

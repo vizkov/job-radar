@@ -4,7 +4,7 @@
 **Read first:** [2. Architecture](02-Architecture.md)  
 **Code:** `.github/workflows/radar.yml`, `radar.py`, `jobradar/`, `tools/board_sync.py` (roles/stale/status)
 
-Six times a day (00:23, 04:23, 08:23, 12:23, 16:23, 20:23 UTC) GitHub starts `.github/workflows/radar.yml`.
+Six times a day (00:23, 04:23, 08:23, 12:23, 16:23, 20:23 UTC) GitHub is scheduled to start `.github/workflows/radar.yml`. In practice GitHub drops or delays many slots and about two runs a day arrive (`workflows_health` treats that as normal); a local task, `tools/trigger_radar.ps1`, fills gaps (see [4](04-Claude-session.md)).
 Workday boards are the exception to "the run fetches everything itself": Cloudflare refuses GitHub's runner address, so the Fetch step uses `state/workday_jobs.json`, a copy that the user's PC publishes twice a day (`tools/workday_pc.py`, 5.4), when the runner itself was refused.
 This page follows one run from start to finish, through the actual code, then follows
 one real role all the way to the user's board.
@@ -153,7 +153,7 @@ jobs is therefore not "broken". A whole-source crash is tracked as unit `*`.
   source table. Every third-party string goes through `md()` (escapes Markdown) and every
   link through `md_url()` (only http/https).
 - `select_for_board()` picks new groups for the board: tiers in `config.board.tiers`
-  (only `baseline_tiers` on the first run), and only companies on the list. It returns nothing unless `board.enabled` is true (default false).
+  (only `baseline_tiers` on the first run), and only companies on the list, plus Tier 1 roles of unlisted employers that pass `outside_tier1_ok`, when `board.outside_tier1` is set (`jobradar/board.py`). It returns nothing unless `board.enabled` is true (default false).
 - `payload()` turns each into `{ref, title, body, labels}`. `enqueue()` appends them to
   `state/board_queue.json`, skipping refs already queued.
 - `render_status()` builds the short "Radar status" text: counts and source health, no

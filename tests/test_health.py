@@ -52,3 +52,13 @@ def test_error_is_reported_even_if_the_unit_never_worked():
                                                         label="linkedin DKIM", track_empty=False)])
     run(h, bad)
     assert run(h, bad) == [("alert_email", "linkedin DKIM", "3 of 3 failed DKIM")]
+
+
+def test_pc_copy_board_with_no_matching_jobs_is_not_flagged():
+    """The Workday PC copy keeps only title-matching jobs, so an empty copy is normal (ats.py sets track_empty=False for it)."""
+    h = {}
+    unit = lambda n: SourceResult("ats", units=[UnitStatus("wd", ok=True, raw_count=n, track_empty=False, label="wd")])
+    assert run(h, unit(3)) == []
+    for _ in range(4):
+        assert run(h, unit(0)) == []
+    assert h["ats|wd"]["bad_streak"] == 0

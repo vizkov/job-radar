@@ -29,6 +29,7 @@ from jobradar.paths import profile_path  # noqa: E402  (stdlib-only)
 SCORES = ROOT / "data" / "scores.jsonl"
 MATCHES = ROOT / "data" / "matches.csv"
 LOG = ROOT / "data" / "calibration_log.jsonl"
+PIPELINE = ROOT / "data" / "pipeline_log.jsonl"
 MIN_TOTAL, MIN_PER, MAX_WEIGHT = 30, 5, 5
 LOWER_IF = {"avg_fit_below": 45, "skip_rate_at_least": 0.7}
 RAISE_IF = {"avg_fit_at_least": 70, "apply_rate_at_least": 0.6}
@@ -56,6 +57,20 @@ def best_keyword(title: str, kw: dict[str, int]) -> str | None:
     return max(hits)[1] if hits else None
 
 
+def outcomes() -> dict[str, set]:
+    """Stages each role ever reached, from the board log (Stage changes only). Report-only: no weight reads it."""
+    seen: dict[str, set] = {}
+    if PIPELINE.exists():
+        for line in PIPELINE.read_text(encoding="utf-8").splitlines():
+            try:
+                r = json.loads(line)
+            except ValueError:
+                continue
+            if r.get("field") == "Stage" and r.get("ref"):
+                seen.setdefault(r["ref"], set()).add(str(r.get("value")))
+    return seen
+
+
 def stats(kw: dict[str, int] | None = None) -> tuple[int, dict[str, dict]]:
     kw = kw if kw is not None else weights()
     titles = {}
@@ -65,15 +80,20 @@ def stats(kw: dict[str, int] | None = None) -> tuple[int, dict[str, dict]]:
     scored = [json.loads(l) for l in SCORES.read_text(encoding="utf-8").splitlines() if l.strip()] \
         if SCORES.exists() else []
     per: dict[str, dict] = {}
+    reached = outcomes()
     for s in scored:
         k = best_keyword(titles.get(s["key"], s.get("title", "")), kw)
         if not k:
             continue
-        d = per.setdefault(k, {"n": 0, "fit": 0, "skip": 0, "apply": 0})
+        d = per.setdefault(k, {"n": 0, "fit": 0, "skip": 0, "apply": 0, "applied": 0, "interview": 0, "rejected": 0})
         d["n"] += 1
         d["fit"] += s.get("fit_score", 0)
         d["skip"] += s.get("recommendation") == "skip"
         d["apply"] += s.get("recommendation") == "apply"
+        st = reached.get(s["key"], set())
+        d["applied"] += bool(st & {"Applied", "Interview", "Offer", "Rejected"})
+        d["interview"] += bool(st & {"Interview", "Offer"})
+        d["rejected"] += "Rejected" in st
     for d in per.values():
         d["avg_fit"] = round(d["fit"] / d["n"])
         d["skip_rate"], d["apply_rate"] = d["skip"] / d["n"], d["apply"] / d["n"]
@@ -160,10 +180,11 @@ def main(argv=None) -> int:
     if args.cmd == "report":
         kw = weights()
         total, per = stats(kw)
-        print(f"{total} scored roles (automatic tuning starts at {MIN_TOTAL}; a keyword needs {MIN_PER})")
+        print(f"{total} scored roles (automatic tuning starts at {MIN_TOTAL}; a keyword needs {MIN_PER}; the outcomes column is information only, no weight reads it)")
         for k, d in sorted(per.items(), key=lambda x: -x[1]["n"]):
             print(f"  {k:24} weight {kw[k]}  n={d['n']:3}  avg Fit {d['avg_fit']:3}  "
-                  f"skip {int(d['skip_rate'] * 100):3}%  apply {int(d['apply_rate'] * 100):3}%")
+                  f"skip {int(d['skip_rate'] * 100):3}%  apply {int(d['apply_rate'] * 100):3}%  "
+                  f"| outcomes: applied {d['applied']}, interview/offer {d['interview']}, rejected {d['rejected']}")
     elif args.cmd == "apply":
         changes = apply(args.dry_run)
         print("\n".join(("would change " if args.dry_run else "changed ") + describe(c) for c in changes)

@@ -127,7 +127,7 @@ def status_paths(lines: list[str]) -> set[str]:
     return out
 
 
-def publish(template_dir: Path, message: str) -> None:
+def publish(template_dir: Path, message: str, hint: bool = True) -> None:
     files = drift()
     if not files:
         print("nothing to publish: the template already has all code changes")
@@ -152,7 +152,9 @@ def publish(template_dir: Path, message: str) -> None:
     subprocess.run([sys.executable, "tools/public_template.py", "check"], cwd=template_dir, check=True)
     subprocess.run(["git", "commit", "-q", "-m", message], cwd=template_dir, check=True)
     subprocess.run(["git", "push", "-q", "origin", "main"], cwd=template_dir, check=True)
-    print(f"published {len(files)} files: {', '.join(files)}\nnow run: git pull template main")
+    print(f"published {len(files)} files: {', '.join(files)}")
+    if hint:   # autopublish merges the template back itself, so it passes hint=False
+        print("now run: git pull template main")
 
 
 def maintainer_only_files(root: Path = ROOT) -> list[str]:
@@ -184,7 +186,7 @@ def autopublish() -> None:
             return
         subject = subprocess.run(["git", "log", "-1", "--format=%s"], cwd=ROOT, capture_output=True,
                                  text=True).stdout.strip()
-        publish(template_dir, f"{subject}\n\n(auto-published from a private job-radar copy)")
+        publish(template_dir, f"{subject}\n\n(auto-published from a private job-radar copy)", hint=False)
         before = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
         tracked = maintainer_only_files()
         subprocess.run(["git", "pull", "-q", "--no-rebase", "--no-edit", "template", "main"], cwd=ROOT)

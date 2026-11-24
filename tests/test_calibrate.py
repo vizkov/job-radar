@@ -43,3 +43,15 @@ def test_raises_a_keyword_whose_roles_keep_scoring_apply_within_bounds():
          + filler(22))
     changes = {c["keyword"]: c for c in cal.apply(now=NOW)}
     assert changes["security engineer"]["to"] == changes["security engineer"]["from"] + 1
+
+
+def test_outcomes_are_counted_per_keyword_but_never_move_a_weight(tmp_path, monkeypatch):
+    seed([("Product Security Engineer", 60, "maybe")] * 3)
+    log = tmp_path / "pipeline_log.jsonl"
+    log.write_text("".join(json.dumps({"ref": f"r{i:015d}", "field": "Stage", "value": v}) + "\n"
+                           for i, v in enumerate(["Applied", "Interview", "Rejected"]))
+                   + json.dumps({"ref": "r000000000000000", "field": "Fit", "value": 5}) + "\n", encoding="utf-8")
+    monkeypatch.setattr(cal, "PIPELINE", log)
+    d = cal.stats()[1]["product security"]
+    assert (d["applied"], d["interview"], d["rejected"]) == (3, 1, 1)
+    assert cal.apply(now=NOW) == []   # below the evidence threshold, and outcomes are not an input

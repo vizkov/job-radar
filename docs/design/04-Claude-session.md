@@ -441,7 +441,7 @@ for final stages (Offer, Rejected, Skipped). When no card is found, `no_card_rea
 posted as a comment on the issue. That is how feedback reaches the card: nothing reads comments
 the user writes on issues themselves.
 
-**Views as code.** `VIEWS` in `board_sync.py` defines *All Roles*, *Act now* and
+**Views as code.** `VIEWS` in `board_sync.py` defines *All Roles* and
 *Pipeline*: layout, filter, columns, sort, grouping. `apply_views()` creates missing views
 (GraphQL `createProjectV2View`) and corrects layout, filter and columns
 (`updateProjectV2View`). GitHub's API can't set sort or board grouping, so it prints the

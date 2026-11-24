@@ -8,7 +8,7 @@ New cards arrive up to six times a day. (How they get there, for the curious:
 
 **Columns stay blank until a Claude session fills them.** GitHub doesn't let the automatic runs write to your board's columns, so a card
 that arrived since your last session may have blank Stage, Tier, Country or Posted fields until you next open Claude Code (it fills
-them in the background at the start of every session, in a minute or two). Views filter on those columns, so "Act now" won't show a blank card yet; the
+them in the background at the start of every session, in a minute or two). Views filter on those columns, so a view won't show a blank card yet; the
 **All Roles** view shows every card except the ones you've already applied to, so it still shows them. Nothing is lost in the meantime. If
 you add a column later and it is empty on older cards, Claude notices at the start of the next session and fills it in wherever it can work the value out.
 
@@ -73,7 +73,6 @@ can see it.
 
 | View | What it's for |
 |---|---|
-| **Act now** | The roles that need a decision today: ones you haven't applied to or skipped (and that Claude hasn't scored Skip or flagged as probably closed) which are either brand new or have been listed for 14 days or more and may close soon, best fit first |
 | **All Roles** | Every role you haven't applied to yet, best fit first |
 | **Pipeline** | A board with one column per Stage; drag cards as things happen |
 
@@ -87,6 +86,6 @@ Claude. It adds the view to your board and saves it with your copy of job-radar,
 the board is ever rebuilt. (It changes only your board, nobody else's.)
 
 A card whose job ad seems to have disappeared (no source has listed it for more than 5 days) gets a
-`possibly-closed` label, drops out of "Act now", and Claude suggests moving it to Skipped.
+`possibly-closed` label, drops out of the views' open roles, and Claude suggests moving it to Skipped.
 
 That's the guide. Back to [Home](Home.md).

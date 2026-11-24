@@ -49,7 +49,7 @@ These are used from page 2 on, before their full entries further down. One line 
 | **Label** | A coloured tag on an issue: `role`, `possibly-closed`, `radar-status`. Tier, Sponsor and Country are board fields, not labels ([where each card value comes from](11-Board-internals.md#where-each-card-value-comes-from)). |
 | **Project** / **board** | GitHub Projects: a spreadsheet- or kanban-like view over issues. Each issue on it is a **card** (an *item* in the API). |
 | **Field** | A column on a Project, with a value per card. job-radar's: *Stage*, *Tier*, *Country*, *Recommendation*, *Sponsor*, *Referral* (single-selects), *Fit* (a number), *Posted* (a date). Fields belong to the Project; labels belong to the issue. |
-| **View** | A saved way of looking at a Project: which columns show, which filter applies, sort order, and table or board layout. job-radar has *All Roles*, *Act now* and *Pipeline*. |
+| **View** | A saved way of looking at a Project: which columns show, which filter applies, sort order, and table or board layout. job-radar has *All Roles* and *Pipeline*. |
 | **GitHub Actions** / **workflow** | GitHub's automation: a YAML file in `.github/workflows/` describes steps that GitHub runs on its own servers, on a schedule or on demand. A **run** is one execution. |
 | **cron** | The schedule format in a workflow: `23 0,4,8,12,16,20 * * *` = minute 23 of hours 0, 4, 8, 12, 16 and 20 UTC, every day. GitHub treats schedules as best-effort: runs can be late or skipped. |
 | **Secret** | A value stored encrypted in the repo's settings (Settings → Secrets) and given to a workflow step as an environment variable. Never in files. |

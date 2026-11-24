@@ -167,7 +167,7 @@ own lines. The worst a trick could do is produce a wrong score, which you'd see.
   Change visibility) to resume. Anything that was visible while it was public may have been
   seen.
 - **You skip the job-alert emails:** you only lose jobs that appear solely on LinkedIn,
-  Indeed or Glassdoor. Everything else, including "Act now", works the same.
+  Indeed or Glassdoor. Everything else, including the board, works the same.
 
 ## Who contacts whom
 

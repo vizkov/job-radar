@@ -74,7 +74,7 @@ GitHub gives Claude no way to do these three, so they are yours. Claude tells yo
   Workflows → Auto-add to project**, set the filter to `is:issue label:role`, and turn
   it on. This is what puts each new job on the board.
 - [ ] **View sort order (once per view).** Claude prints the menu item to pick, for example
-  "Act now → Sort by → Posted, descending → Save view".
+  "All Roles → Sort by → Posted, descending → Save view".
 - [ ] **Stop the email flood (once).** On your repository page: **Watch → Participating and
   @mentions**. Otherwise GitHub emails you about every new job.
 

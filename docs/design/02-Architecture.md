@@ -169,7 +169,7 @@ starts them from scratch (so both review timers reset).
 | `work/.last_session`, `.fill_started`, `board_fill.log` | Timestamps and logs for the session brief | `session_brief.py` |
 | `.claude/settings.local.json` | Personal Claude Code settings; never copied to the template (`NEVER_COPY`) | the user / Claude Code |
 | `work/.last_docs_review` | When the last docs review happened | `session_brief.py` (first start), Claude (`docs-review` skill) |
-| `work/.last_review` | When the last weekly review happened | Claude, at the end of the `system-review` skill (no tool writes it) |
+| `work/.last_review` | Legacy stamp of the weekly review; the CADENCE block now reads the `system_review` entry of `state/cadence.jsonl` | `tools/cadence.py done system_review` (maintainer's copy only) |
 | `.alert_mail/*.eml`, `_status.json` | This run's alert emails and fetch status | `fetch_alert_emails.py` |
 
 ## External services

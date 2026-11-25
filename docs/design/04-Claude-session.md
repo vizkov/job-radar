@@ -25,7 +25,7 @@ The skills, and the tools each one runs:
 |---|---|---|
 | `setup` | "set this up" | `refresh_registers.py`, `build_candidates.py`, `verify_boards.py`, `board_sync.py setup-project` (its CLI runs `setup_project()` for the Project and fields, then `apply_views()`) |
 | `consultant-brief` | "what's new?" | reads the session brief, `board_sync.py fill` if needed |
-| `score-roles` | "which of these fit me?" | `jd_prep.py`, then Claude writes `score.json`, then `jd_check.py score --board` |
+| `score-roles` | "which of these fit me?" | `jd_prep.py`, then Claude writes `score.json`, then `jd_check.py score <ref> [<ref> …] --board` (give all refs in one call: they share one board read) |
 | `tailor-application` | "tailor my CV for X" | Claude writes `tailored.json`, `jd_check.py tailor`, `render_resume.py` |
 | `inbox-check` | brief has an `INBOX-CHECK` line, or the user asks whether anyone replied | `inbox_outcomes.py pending`, the Gmail connector (search and read only), `inbox_outcomes.py classify`; suggests, the user confirms, then `track` (see [4.10](#410-reading-replies-inbox-check)) |
 | `master-update` | a master document (`master_resume.md`, `cover_blocks.md`, `stories.md`) changed, by the user or by Claude | `consistency_check.py` on the masters and `master_drift.py`, then (only on the user's word, rule 12) two read-only subagents (master consistency auditor, cold reader); `cover_sync.py` and the masters-clear gate (`master_drift.py status`) are the only automatic steps; stale applications are rebuilt from the current masters once the masters are cleared (see [4.5](#45-when-the-master-documents-change-master-update)) |
@@ -198,6 +198,7 @@ Session-start work that runs on its own timer or trigger and has no line in the 
 | Board archive (`board_sync.py archive`: moves Skipped and old Rejected cards out of the live board) | At most daily | `work/.last_archive` |
 | Board fill (`board_sync.py fill`: Tier, Sponsor, Country fields on new cards) | When new cards lack fields, at most every 10 minutes | the fill lock (`FILL_LOCK`) |
 | Starting the GitHub run again | When `last_run_health` sees a skipped slot | `gh workflow run job-radar` |
+| Scheduled tasks on the user's Windows PC (not GitHub, not Claude; only while the PC is on) | `job-radar-workday` twice a day (`tools/run_workday_pc.ps1` → `tools/workday_pc.py`: fetches Workday boards the runner's address cannot, pushes `state/workday_jobs.json`; log `work/workday_pc.log`). `job-radar-trigger` every 2 hours (`tools/trigger_radar.ps1`: starts a radar run when none was created in the last 3 hours; log `work/trigger_radar.log`) | Failure shows as `workday|blocked` or "PC copy too old" in the status page; no stamp |
 | Referral follow-up notes (`referral_notes()`) | Asks with no answer after `referrals.wait_days` | the referral log |
 | Background JD fetch (`start_prep`) | Every session, for new roles | `work/jd_prep.log` |
 | Inbox bookkeeping (`tools/inbox_hook.py`) | After every Gmail read, by the PostToolUse hook in `.claude/settings.json`, not by the model | `state/inbox_seen.json`, `state/inbox_checked.json` |

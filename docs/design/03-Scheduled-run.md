@@ -264,7 +264,7 @@ application folder.
 **`verify.yml` (1st of each month, or on demand).** Same guard. Runs
 `verify_boards.py --quiet`: fetches every candidate board (from `data/candidates.csv`
 plus `profile/overrides.csv`), keeps a board only if it lists jobs in the target
-countries (this rules out dead boards and same-name companies elsewhere), and writes
+countries (this rules out dead boards and same-name companies elsewhere; a Workday board that was refused with a 429 or similar is not dead, so its earlier `boards.json` entry is kept), and writes
 `boards.json`, `data/verified_boards.csv` and `data/coverage_report.csv`. Commits them.
 
 **`registers.yml` (Mondays).** Runs `tools/refresh_registers.py`: downloads the UK

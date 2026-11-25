@@ -32,7 +32,7 @@ after each request. `PAUSE`/`BACKOFF` are module variables so tests can set them
 | `job_to_posting(job, board)` | ats-scrapers `Job` → `Posting`, with the board's targets as `company_hint`. |
 | `workday_detail_url(url)` | A Workday job URL → its detail-API URL. |
 | `resolve_workday_rollups(postings, client)` | For Workday jobs listed as "N Locations" whose title matches, fetch the real offices. |
-| `AtsSource.fetch()` | Read `boards.json`, fetch all boards, one unit per board, then resolve Workday roll-ups. |
+| `AtsSource.fetch()` | Read `boards.json`; fetch the non-Workday boards in parallel and the Workday boards one at a time inside `workday_budget_seconds` (`fetch_workday_boards`, with `state/workday_tried.json` rotating which are tried); one unit per board. A Workday board the runner could not fetch uses the PC's copy (`state/workday_jobs.json`) when it is at most `workday_cache_days` old, else the unit fails ("PC copy too old"); if Workday refuses the runner's address, one `workday|blocked` unit replaces a failure per board. Then resolve Workday roll-ups. |
 
 **Watch out**: `ext = gid if ":" in gid else str(job.url)`: ats-scrapers invents a random
 UUID when a board has no job ID; that would look new every run, so only `ats:id`-form IDs

@@ -71,6 +71,11 @@ def _log_drop(res, p, matcher, tgt, first: str) -> None:
         reasons.append("title")
     if first != "company" and matcher.resolve(p.company, p.company_hint) is None:
         reasons.append("company")
+    if first != "employment" and (not_permanent(p.title) or not_permanent(p.raw.get("employment", ""))):
+        reasons.append("employment")
+    max_age = int(CONFIG.get("max_age_days") or 0)
+    if first != "old" and max_age and p.posted_at and (date.today() - p.posted_at.date()).days > max_age:
+        reasons.append("old")
     DROPPED_ROWS.append({"company": p.company or "", "title": p.title or "", "location": p.location or "",
                          "reasons": ",".join(reasons), "source": res.source, "url": p.url or ""})
 

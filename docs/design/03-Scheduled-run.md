@@ -109,8 +109,7 @@ For every posting from every source:
 
 It also counts matches per source, and every drop by reason (country, title, not permanent,
 posted too long ago, employer not on the list; `DROP_REASONS`), so the status card can say what each source found and why
-listings were dropped. The dropped-alert log names the first failing filter plus any of country, title and employer that also
-fail; "not permanent" and "too old" appear only when they were the first.
+listings were dropped. The dropped-alert log names every filter a listing fails, not only the first.
 
 ### Deduplicate and diff: `group_postings()` then `diff_seen()`
 
@@ -179,7 +178,7 @@ save_queue(...)
 stale check (below)
 write state/seen.json, state/health.json
 append_matches(new, today)                              # data/matches.csv
-write_dropped_log(today)                                # state/dropped_alerts.csv: alert listings the filters dropped, with their failing filters, 45-day expiry
+write_dropped_log(today)                                # state/dropped_alerts.csv: alert listings the filters dropped, every failing filter, 45-day expiry
 write_alert_hits(results, today)                        # state/alert_hits.csv: every LinkedIn alert listing and the alert that found it, 45-day expiry
 register_check.add_holds(held, today, keep)             # state/register_check.csv: roles missing a card only on the register name
 ```

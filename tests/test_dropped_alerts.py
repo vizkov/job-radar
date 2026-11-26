@@ -1,5 +1,6 @@
 """state/dropped_alerts.csv: the alert-email listings the radar's filters drop, with every reason (radar.select, write_dropped_log)."""
 import csv
+from datetime import datetime, timedelta
 
 import pytest
 
@@ -37,6 +38,14 @@ def test_alert_drops_logged_with_every_reason():
     assert by_title[("Application Security Engineer", "London")] == ["company"]
     assert set(by_title[("Marketing Manager", "London")]) == {"title", "company"}
     assert "country" in by_title[("Application Security Engineer", "Mars")]
+
+
+def test_later_filters_are_logged_when_an_earlier_one_dropped_the_listing(monkeypatch):
+    monkeypatch.setitem(radar.CONFIG, "max_age_days", 30)
+    old_contract = post("alert_email", "Nobody Ltd", "Marketing Manager (Contract)", "London", {"GB"})
+    old_contract.posted_at = datetime.now() - timedelta(days=90)
+    run([SourceResult("alert_email", postings=[old_contract])])
+    assert set(radar.DROPPED_ROWS[0]["reasons"].split(",")) == {"title", "company", "employment", "old"}
 
 
 def test_other_sources_and_default_off_are_not_logged():

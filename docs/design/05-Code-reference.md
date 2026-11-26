@@ -39,6 +39,7 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 | `tools/careers_queue.py` | the Chrome careers-site log: which companies the radar cannot read and when each was last read | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/sweep_plan.py` | plans one post-discovery pass: one cap, split by kind of company, one action per company | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/sponsorship.py` | checked sponsorship verdicts (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
+| `tools/register_check.py` | legal-name lookups for employers the sponsor register missed (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/calibrate.py` | automatic tier tuning (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/jd_prep.py` | fetch job descriptions | [5.5](05-5-Application-tools.md) |
 | `tools/jd_check.py` | validate Claude's output | [5.5](05-5-Application-tools.md) |

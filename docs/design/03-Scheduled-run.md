@@ -172,6 +172,7 @@ write state/seen.json, state/health.json
 append_matches(new, today)                              # data/matches.csv
 write_dropped_log(today)                                # state/dropped_alerts.csv: alert listings the filters dropped, every failing filter, 45-day expiry
 write_alert_hits(results, today)                        # state/alert_hits.csv: every LinkedIn alert listing and the alert that found it, 45-day expiry
+register_check.add_holds(held, today, keep)             # state/register_check.csv: roles missing a card only on the register name
 ```
 
 **Stale check.** A role on the board that no source has listed for more than `stale_days` (5) days is

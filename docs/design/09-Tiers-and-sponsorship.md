@@ -41,6 +41,9 @@ entities, and a group can sponsor through a subsidiary with a different name
 
 **Fix a wrong match** in `profile/sponsor_overrides.csv`:
 
+**A name the register misses** is not a "no": for a role that would otherwise get a card, `tools/register_check.py` records the legal name found by research in `profile/sponsor_names.csv`.
+
+
 ```csv
 company,uk,nl
 Wise,Wise Payments Limited,

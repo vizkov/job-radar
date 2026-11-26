@@ -177,7 +177,7 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
           posts_enabled: bool, posts_fallback: datetime | None = None, views_drift: str | None = None,
           docs_review: str | None = None, cv_gaps: str | None = None, source_problems: int = 0,
           docs_review_job: bool = True, system_review_job: bool = False,
-          mail_scan: tuple[str, bool] | None = None) -> tuple[list[str], list[str]]:
+          mail_scan: tuple[str, bool] | None = None, register_pending: int = 0) -> tuple[list[str], list[str]]:
     """(lines for the brief, names of the jobs that are due). Every job gets a line, due or not."""
     lines = ["- CADENCE (each recurring job and when it last ran). Run every one marked DUE, or tell the user in one "
              "line which you skipped and why; never skip one silently:"]
@@ -208,6 +208,14 @@ def block(now: datetime, root: Path, *, radar_last: str, new_total: int, new_on_
     else:
         scoring_line = (f"  - Scoring: every board card is scored at session start; {when('auto_score', now, root)} · run "
                         "`python tools/session_brief.py --score-pick` after the other jobs, in case they added roles")
+    # employers the sponsor register did not match by name (jobradar/register_check.py): due while any role waits, no stamp
+    if register_pending:
+        due.append("register_check")
+        lines.append(f"  - Sponsor register check: {register_pending} role(s) held back because the employer's name is not on the "
+                     "register · DUE: after answering the first message (if they opened with a task, offer it in one line), look "
+                     "up the legal names (`sponsorship-check` skill, `tools/register_check.py list`)")
+    else:
+        lines.append("  - Sponsor register check: no role waiting for a name lookup · ok")
     # inbox
     if awaiting:
         state = "DUE: run `inbox-check`, then `cadence.py done inbox_check`" if is_due("inbox_check", now, root) else "ok"

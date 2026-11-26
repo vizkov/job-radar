@@ -104,6 +104,7 @@ doesn't match `PRIVATE`.
 | `board_blocklist.csv` | Boards never to poll: `ats,slug,board_url,reason` | Claude | `verify_boards.py` (`load_blocklist`) |
 | `careers_pages.yaml` | Careers pages without an ATS, with CSS selectors | Claude | `sources/careers_page.py` |
 | `sponsor_overrides.csv` | Pinned sponsor-register matches | Claude | `sponsors.py` |
+| `sponsor_names.csv` | Legal names looked up for employers the register missed, with evidence | `register_check.py` (Claude) | `sponsors.py`, the session brief |
 | `career/master_resume.md`, `stories.md`, `cover_blocks.md` | The user's CV lines, STAR stories and cover paragraphs, each with an ID | Claude (converted from the user's CV, confirmed by them) | `career.py` → `jd_check.py`, `render_resume.py`, skills |
 | `applications/<folder>/` | Per-application `tailored.json`, `validated.sha256`, `resume.pdf`, `cover_letter.pdf` (Markdown copies for the reviewers in `work/apps/<folder>/`; `resume.docx` only when asked), `submitted.md` | Claude, `jd_check.py`, `render_resume.py` | the user, `apply-assist` |
 | `domains.json` | Optional. Which industry domains the user's record backs: domains with strength and evidence IDs, `lead_ids`, `not_claimed`; stamped with the masters' digest when valid | Claude (`domain-profile` skill, after a quiz); `tools/domain_profile.py validate` checks and stamps it | `tools/domain_profile.py` (`status`, `lead`), `tailor-application` |
@@ -118,6 +119,7 @@ doesn't match `PRIVATE`.
 | `seen.json` | `{key: last-seen date}` for every posting ID and content key reported; entries older than 120 days are pruned | `radar.py` | `radar.py` (what's new), `board.py: stale_refs()` |
 | `health.json` | `{"source|unit": {last_ok_count, bad_streak, label}}` | `radar.py` via `health.py` | `radar.py` |
 | `board_queue.json` | Payloads waiting to become issues | `radar.py` (adds), `board_sync.py roles` (removes) | `board_sync.py roles`, `status` |
+| `register_check.csv` | Roles held back only because the sponsor register has no entry under the employer's name; expires with the board rule's age limit | `radar.py` | `register_check.py`, the session brief |
 | `issue_map.json` | `{ref: issue number}` | `board_sync.py roles`, `backfill-map` | `radar.py` (stale check), `board_sync.py stale` |
 | `stale_roles.json` | `{stale: [refs], alive: [refs]}` from the latest healthy run | `radar.py` | `board_sync.py stale` |
 | `stale_flagged.json` | Refs currently labelled `possibly-closed` | `board_sync.py stale` | `board_sync.py stale` |

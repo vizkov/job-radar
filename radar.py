@@ -28,7 +28,9 @@ from collections import Counter, defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from jobradar.board import enqueue, load_queue, payload, role_ref, save_queue, select_for_board, stale_refs
+from jobradar import register_check
+from jobradar.board import (enqueue, load_queue, payload, register_holds, role_ref, save_queue, select_for_board,
+                            stale_refs)
 from jobradar.common import CONFIG, ROOT, not_permanent, target_countries, title_matches
 from jobradar.dedupe import Group, group_postings
 from jobradar.health import BROKEN_AFTER_RUNS, update_health
@@ -439,6 +441,7 @@ def main(argv=None):
 
     board_groups = select_for_board(new, CONFIG.get("board", {}), baseline)
     queue = enqueue(load_queue(STATE / "board_queue.json"), [payload(g) for g in board_groups])
+    held = register_holds(new, CONFIG.get("board", {}), baseline, today)
     status_md = render_status(today, baseline, new, broken, results, matched, len(queue), dropped)
     summary = (f"{len(new)} new roles, {len(board_groups)} for the board, {len(broken)} silent sources, "
                + ", ".join(f"{r.source}={'ok' if r.ok else 'FAILED'}" for r in results))
@@ -467,6 +470,8 @@ def main(argv=None):
     append_matches(new, today)
     write_dropped_log(today)
     write_alert_hits(results, today)
+    keep = int((CONFIG.get("board", {}).get("outside_tier1") or {}).get("max_age_days") or 30)
+    register_check.add_holds(held, today, keep, STATE / "register_check.csv")
 
     print(summary if args.quiet else digest)
     if gh := os.environ.get("GITHUB_OUTPUT"):

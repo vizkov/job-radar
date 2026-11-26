@@ -102,6 +102,7 @@ Two more recurring jobs, the docs review and the weekly system review, exist onl
 | Workday boards fetched from your PC | A scheduled task on your computer (Windows Task Scheduler) | Twice a day, only while the PC is on. GitHub's servers are blocked by Workday's host, so your PC fetches those boards and uploads the result; if the PC stays off for more than 3 days those boards show as failing in the status card |
 | Radar status card | GitHub, by itself | Updated by every role search: what ran, which sources failed |
 | Sponsor registers refresh | GitHub, by itself | Weekly, Mondays 04:23 UTC |
+| Sponsor name check | Claude, with a web search | When a role would reach your board but the employer's name is not on the UK or Dutch register (companies often register under another legal name): Claude finds the legal name, then adds the card if it is licensed |
 | Company-board check (which of your companies' job boards still work) | GitHub, by itself | Monthly, on the 1st at 03:13 UTC; it updates the coverage report, which Claude reads when you ask "is anything broken?" |
 | New roles reach your board | GitHub creates the cards; Claude fills in their columns | Fields are filled at the start of your next session |
 | Closed-role and old-card cleanup | Claude's session-start step archives Skipped cards and trims bulky job-description files of skipped and rejected roles | Once a day, when you open a session (job-description files after 14 days for Skipped, 30 for Rejected) |

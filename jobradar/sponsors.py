@@ -26,6 +26,7 @@ from pathlib import Path
 
 from rapidfuzz import fuzz, process
 
+from jobradar import register_check
 from jobradar.common import CONFIG, ROOT
 from jobradar.matching import normalize, normalize_words
 from jobradar.paths import profile_path
@@ -106,14 +107,22 @@ def _load_names(path: Path) -> list[str]:
         return [r["name"] for r in csv.DictReader(fh)]
 
 
-def _load_overrides(path: Path | None = None) -> dict[str, dict[str, str]]:
+def _load_overrides(path: Path | None = None, names: Path | None = None) -> dict[str, dict[str, str]]:
+    """Pinned register entries: the user's sponsor_overrides.csv, plus the legal names looked up for employers the register
+    did not match (sponsor_names.csv, written by tools/register_check.py). A pin in sponsor_overrides.csv wins."""
     path = path or profile_path("sponsor_overrides.csv")
-    if not path.exists():
-        return {}
-    with open(path, encoding="utf-8") as fh:
-        rows = csv.DictReader(line for line in fh if not line.lstrip().startswith("#"))
-        return {normalize(r["company"]): {"uk": (r.get("uk") or "").strip(), "nl": (r.get("nl") or "").strip()}
-                for r in rows if r.get("company")}
+    out: dict[str, dict[str, str]] = {}
+    for (company, country), legal in register_check.decided(names).items():
+        if legal:
+            out.setdefault(company, {"uk": "", "nl": ""})[country] = legal
+    if path.exists():
+        with open(path, encoding="utf-8") as fh:
+            for r in csv.DictReader(line for line in fh if not line.lstrip().startswith("#")):
+                if r.get("company"):
+                    row = out.setdefault(normalize(r["company"]), {"uk": "", "nl": ""})
+                    for country in ("uk", "nl"):
+                        row[country] = (r.get(country) or "").strip() or row[country]
+    return out
 
 
 class Sponsors:

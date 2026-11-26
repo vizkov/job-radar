@@ -134,7 +134,7 @@ Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
 | `SponsorTag` | `status` (yes/no/unknown), `matched` (register name), `how` (exact/prefix/trading-as/fuzzy:N/override). |
 | `Register` | One register indexed by normalized key and by normalized words, sorted for prefix search. |
 | `.lookup(company)` | Exact → whole-word prefix (one entity = yes, several = unknown) → exact "trading as" name of an entry (one entity = yes, several = unknown) → fuzzy (≥94 yes, ≥86 unknown) → no. |
-| `_load_names()`, `_load_overrides()` | Read a register CSV / `sponsor_overrides.csv`. |
+| `_load_names()`, `_load_overrides()` | Read a register CSV / `sponsor_overrides.csv` plus the confirmed names in `sponsor_names.csv`. |
 | `Sponsors.tag(company, canonical)` | For UK and NL: an override if pinned; else look up the canonical name first, then the raw name. |
 | `default_sponsors()` | Cached, loads both registers (~135k names). |
 
@@ -143,6 +143,17 @@ Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
   "Amazon" never prefix-matches "Amazonico".
 - The canonical name is tried first because it's curated: a source's "Starling" would hit
   an unrelated "STARLING GROUP LTD", but the target "Starling Bank" matches correctly.
+
+## `jobradar/register_check.py`: roles held for a name lookup
+
+Standard library only (the session brief imports it).
+
+| Name | Is |
+|---|---|
+| `HOLDS`, `names_path()` | `state/register_check.csv` (written by the daily run only) and `profile/sponsor_names.csv` (the answers). |
+| `add_holds(rows, today, keep_days)` | Merges new held roles and drops those past the age limit. |
+| `pending(today, keep_days, …)` | Held roles not yet answered, carded, queued or expired. |
+| `decided()`, `record()` | Read and save answers per company and country; an empty `legal_name` means checked and not found. `sponsors._load_overrides` reads the confirmed ones (a pin in `sponsor_overrides.csv` wins). |
 
 ## `jobradar/board.py`: role → issue payload
 
@@ -159,6 +170,7 @@ Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
 | `AGENCY_WORDS`, `AGENCY_NAMES` | Name fragments and names of recruitment agencies and staffing firms; `board.agency_words` / `board.agency_names` in config add to them. |
 | `is_agency(company, cfg)` | True when the employer name matches those lists. |
 | `outside_tier1_ok(g, cfg)` | Whether an employer not on the list reaches the board: needs `board.outside_tier1`, Tier 1, a title keyword worth `min_title_weight` (3) or more, not an agency, `min_score`/`max_age_days` if set, and in GB or NL a register `yes`; elsewhere no register, so `sponsorship-check` decides on the card. |
+| `register_holds(new, cfg, baseline, today)` | Roles that pass every part of that rule except the GB/NL register (a pinned `no` excepted); `radar.py` writes them to `state/register_check.csv`. `_outside_rule_but_register` is the shared test. |
 | `ref_last_seen(seen)` | `ref → last date seen`, from the content keys in `seen.json`. |
 | `stale_refs(board_refs, seen, today, days)` | `(stale refs, refs seen today)`. |
 | `load_queue`, `save_queue`, `enqueue` | Read/write the queue; append payloads whose ref isn't already queued. |

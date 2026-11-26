@@ -209,6 +209,18 @@ by hand once skipped the age filter (posted 89 and 623 days before, `max_age_day
 | `upsert`, `company_records(company)` | Log one verdict per role; earlier verdicts for the same employer (loose name match) |
 | `record(ref, board, gh=None)`, `main` | CLI `record <ref> [<ref> …] [--board]` (refs share one `Gh`, so one board read) and `company "<name>"` |
 
+## `tools/register_check.py`: employers the register missed (standard library only)
+
+The registers list legal names, so a miss means "unknown". The daily run holds such roles ([5.2](05-2-Package.md#jobradarregister_checkpy-roles-held-for-a-name-lookup)); this tool is how Claude answers them (`sponsorship-check`, "Held roles").
+
+| Name | Is |
+|---|---|
+| `list` | Held roles waiting, grouped by company and country. |
+| `find(words, country)` | Register entries containing all the words. |
+| `confirm(company, country, legal, evidence, today)` | Requires an exact register entry and a web page that is not LinkedIn, Indeed or Glassdoor; saves the answer, `mark_matches` the held rows' sponsor column, and `board_sync.promote` queues their cards. |
+| `notfound` | Saves an empty answer, so the company is not listed again. |
+| `keep_days()`, `register_names(country)`, `check_evidence(url)`, `mark_matches(refs, column, legal, path)` | Age limit from `board.outside_tier1.max_age_days` (default 30); helpers for the above. |
+
 ## `tools/calibrate.py`: automatic tier tuning (standard library only)
 
 | Name | Is |

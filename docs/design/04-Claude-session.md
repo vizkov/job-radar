@@ -164,6 +164,7 @@ Jobs with an interval in `JOBS` (DUE when never run or older than the interval; 
 | `auto_score` | 4 | Claude, `score-roles`, run last | a board card is unscored or the AUTO-SCORE pick is not empty | `cadence.py done auto_score` |
 | `views_check` | 24 | Claude, edits `VIEWS` to match the live views | the board's views differ from `VIEWS` | `cadence.py done views_check` |
 | `health` | 24 | Claude, `health` | the last run listed source problems | `cadence.py done health` |
+| `register_check` | none (due while roles wait) | Claude, `sponsorship-check` (WebSearch) | `register_check.pending` is not empty | no stamp: `register_check.py confirm` / `notfound` |
 | `cv_review` | 168 | Claude offers `cv-review` | the brief shows recurring CV gaps | `cadence.py done cv_review` |
 | `jd_cleanup` | 48 | the SessionStart hook runs `tools/jd_cleanup.py` | always | `jd_cleanup.py` stamps itself |
 | `system_review` | 168 | Claude offers `system-review` | the maintainer-only skill exists in this copy | `cadence.py done system_review` |

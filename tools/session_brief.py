@@ -34,6 +34,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).resolve().parent))   # tools/ for cadence.py when imported from elsewhere
 import cadence  # noqa: E402
 import app_mail  # noqa: E402
+sys.path.insert(1, str(ROOT))
+from jobradar import register_check  # noqa: E402  (stdlib-only)
 
 WORK = ROOT / "work"
 LAST = WORK / ".last_session"
@@ -597,6 +599,14 @@ def _age(posted: str, today: date) -> str:
         return "date unknown"
 
 
+def register_pending(root: Path, now: datetime, cfg: dict) -> int:
+    """Roles held for a sponsor-register name lookup (jobradar/register_check.py)."""
+    rule = (cfg.get("board") or {}).get("outside_tier1") or {}
+    return len(register_check.pending(now.date().isoformat(), int(rule.get("max_age_days") or 30),
+                                      holds=root / "state" / "register_check.csv", names=root / "profile" / "sponsor_names.csv",
+                                      issue_map=root / "state" / "issue_map.json", queue=root / "state" / "board_queue.json"))
+
+
 def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, items: list[dict] | None,
                   new_on_list: list[dict], last_run: str, auto_picks: int, by_ref: dict,
                   views_drift: str | None = None, docs_review: str | None = None, cv_gaps: str | None = None,
@@ -626,7 +636,7 @@ def cadence_block(root: Path, now: datetime, rows: list[dict], scores: dict, ite
                                 docs_review=docs_review, cv_gaps=cv_gaps, source_problems=source_problems,
                                 docs_review_job=(root / ".claude" / "skills" / "docs-review").exists(),
                                 system_review_job=(root / ".claude" / "skills" / "system-review").exists(),
-                                mail_scan=app_mail.scan_line(root, now))
+                                mail_scan=app_mail.scan_line(root, now), register_pending=register_pending(root, now, cfg))
     return lines
 
 

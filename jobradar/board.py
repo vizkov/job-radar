@@ -121,10 +121,8 @@ def is_agency(company: str, cfg: dict | None = None) -> bool:
     return bool(keyword_re(AGENCY_WORDS + list(cfg.get("agency_words") or []) + AGENCY_NAMES + list(cfg.get("agency_names") or [])).search(c))
 
 
-def outside_tier1_ok(g: Group, cfg: dict) -> bool:
-    """An employer not on the list reaches the board when `board.outside_tier1` is set (the user, 2026-11-22) and the role is Tier 1,
-    its title carries a focus keyword (tiering weight >= `min_title_weight`, 3: appsec, product security, pentest, threat model…), and,
-    in GB or NL, where a sponsor register exists, the register says yes. Elsewhere there is no register: `sponsorship-check` decides on the card."""
+def _outside_rule_but_register(g: Group, cfg: dict) -> bool:
+    """Every condition of the unlisted-employer rule except the sponsor register."""
     rule = cfg.get("outside_tier1")
     if not rule or g.tags.get("tier") != 1:
         return False
@@ -134,7 +132,35 @@ def outside_tier1_ok(g: Group, cfg: dict) -> bool:
     if int(g.tags.get("score") or 0) < rule.get("min_score", 0):
         return False
     posted = g.best.posted_at
-    if rule.get("max_age_days") and posted and (datetime.now(posted.tzinfo) - posted).days >= rule["max_age_days"]:
+    return not (rule.get("max_age_days") and posted and (datetime.now(posted.tzinfo) - posted).days >= rule["max_age_days"])
+
+
+def register_holds(new: list[Group], cfg: dict, baseline: bool, today: str) -> list[dict]:
+    """Rows for state/register_check.csv: unlisted-employer roles that miss a card only because the GB/NL register has no
+    sure match under their name (jobradar/register_check.py). A pinned "no" in sponsor_overrides.csv is an answer: not held."""
+    if not cfg.get("enabled", False) or cfg.get("include_outside", False):
+        return []
+    tiers = set(cfg.get("baseline_tiers", [1]) if baseline else cfg.get("tiers", [1, 2]))
+    rows = []
+    for g in new:
+        p, cc = g.best, primary_country(g)
+        if (p.company_canonical or not p.company or cc not in ("GB", "NL") or g.tags.get("tier") not in tiers
+                or sponsor_status(g) == "yes" or not _outside_rule_but_register(g, cfg)):
+            continue
+        tag = (g.tags.get("sponsor") or {}).get("uk" if cc == "GB" else "nl")
+        if getattr(tag, "how", "") == "override":
+            continue
+        rows.append({"ref": role_ref(g.key), "found": today,
+                     "posted": p.posted_at.date().isoformat() if p.posted_at else "", "company": p.company,
+                     "country": cc, "title": p.title, "url": p.url, "register": str(tag or "unknown")})
+    return rows
+
+
+def outside_tier1_ok(g: Group, cfg: dict) -> bool:
+    """An employer not on the list reaches the board when `board.outside_tier1` is set (the user, 2026-11-22) and the role is Tier 1,
+    its title carries a focus keyword (tiering weight >= `min_title_weight`, 3: appsec, product security, pentest, threat model…), and,
+    in GB or NL, where a sponsor register exists, the register says yes. Elsewhere there is no register: `sponsorship-check` decides on the card."""
+    if not _outside_rule_but_register(g, cfg):
         return False
     return sponsor_status(g) == "yes" if primary_country(g) in ("GB", "NL") else True
 

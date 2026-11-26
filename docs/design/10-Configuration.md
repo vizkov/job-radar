@@ -19,6 +19,7 @@ files to change from `examples/` into `profile/`.
 | `board_blocklist.csv` | Boards `verify_boards.py` must never poll (`ats,slug,board_url,reason`; match on ats+slug or on the URL). For placeholder boards that list fake jobs |
 | `careers_pages.yaml` | Careers pages without an ATS |
 | `sponsor_overrides.csv` | Pinned sponsor-register matches |
+| `sponsor_names.csv` | Looked-up legal names (written by `tools/register_check.py`) |
 
 Aliases only count when their `canonical` is one of the user's targets: an alias to a
 company the user doesn't track is ignored rather than putting it on the user's list.

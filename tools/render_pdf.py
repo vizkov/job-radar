@@ -3,9 +3,9 @@
 Called by  python tools/render_resume.py <folder>  (the default output; it first checks the SHA-256 that
 tools/jd_check.py tailor saved, so only validated text is rendered). Writes resume.pdf and cover_letter.pdf.
 
-The layout (Roboto from tools/fonts, A4 CV / US Letter cover letter, teal #0f766e headings with a rule under each, rules
-between roles, no "Profile" heading, right-aligned dates on roles; education and volunteering years stay inline so
-parsers keep them attached). Phrases listed in tailored.json "highlight" are bold in Key achievements, and hyphenated
+The layout (Roboto from tools/fonts, A4 CV / US Letter cover letter, black headings with a rule under each; teal #0f766e only on links, skill
+category names and bold words in list items (achievement labels and highlights, the letter's run-in labels); rules
+between roles, no "Profile" heading, right-aligned dates on roles, education and volunteering). Phrases listed in tailored.json "highlight" are bold in Key achievements, and hyphenated
 words never break across lines (a text extractor would join them: "insiderthreat"). profile/config.json
 "cv_company_summary": false leaves out the one-line company description. The text is the tailored text; the structure (company,
 role, city and dates for each bullet, skill categories, education years) comes from profile/career/master_resume.md,
@@ -28,6 +28,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TEAL, INK, GREY, HAIR = "#0f766e", "#151412", "#44464a", "#c9c8c3"
+NAME_PT, LEAD_PT, BODY_PT = 23, 10.6, 9.6   # the only type sizes: name; headline and letter text; everything else
 FONTS = ROOT / "tools" / "fonts"   # Roboto (SIL OFL 1.1, see OFL.txt): stored here so a render needs no network
 
 BROWSERS = [
@@ -138,24 +139,25 @@ def font_css() -> str:
 
 CSS = f"""
 * {{ box-sizing: border-box; }}
-body {{ font-family: Roboto, Arial, Helvetica, sans-serif; color: {INK}; margin: 0; font-size: 9.6pt; line-height: 1.43; }}
+body {{ font-family: Roboto, Arial, Helvetica, sans-serif; color: {INK}; margin: 0; font-size: {BODY_PT}pt; line-height: 1.43; }}
 a {{ color: {TEAL}; text-decoration: none; }}
-h1 {{ font-size: 23pt; line-height: 1.15; margin: 0; font-weight: 900; }}
-.headline {{ font-weight: 500; font-size: 10.6pt; margin-top: 4pt; line-height: 1.3; }}
-.contact {{ color: {GREY}; font-size: 9.5pt; line-height: 1.65; }}
+h1 {{ font-size: {NAME_PT}pt; line-height: 1.15; margin: 0; font-weight: 900; }}
+.headline {{ font-weight: 500; font-size: {LEAD_PT}pt; margin-top: 4pt; line-height: 1.3; }}
+.contact {{ color: {GREY}; font-size: {BODY_PT}pt; line-height: 1.65; }}
 .contact span {{ margin-right: 9pt; white-space: nowrap; }}
 .headline + .contact {{ margin-top: 5pt; }}
 .rule {{ border: 0; border-top: 1.6pt solid {INK}; margin: 7pt 0 0; }}
-h2 {{ color: {TEAL}; font-size: 9.5pt; letter-spacing: 0; text-transform: uppercase; margin: 10.4pt 0 4pt;
+h2 {{ font-size: {BODY_PT}pt; letter-spacing: 0; text-transform: uppercase; margin: 10.4pt 0 4pt;
      font-weight: bold; break-after: avoid; border-bottom: .6pt solid {INK}; padding-bottom: 2pt; }}
 p {{ margin: 0; }}
 ul {{ margin: 0; padding-left: 12pt; }}
+li b {{ color: {TEAL}; }}
 li {{ margin-top: 2.6pt; orphans: 2; widows: 2; }}
 ul ul {{ list-style: circle; margin-top: 3pt; }}
 .row {{ display: flex; justify-content: space-between; align-items: baseline; gap: 12pt; }}
 .row .meta {{ color: {GREY}; white-space: nowrap; }}
-.co {{ font-size: 10.5pt; font-weight: bold; }}
-.co small {{ font-size: 10pt; font-weight: normal; color: {GREY}; }}
+.co {{ font-weight: bold; }}
+.co small {{ font-size: 1em; font-weight: normal; color: {GREY}; }}
 .desc {{ color: {GREY}; font-style: italic; }}
 .role {{ margin-top: 9pt; break-inside: avoid; break-after: avoid; }}
 .block ul + .role {{ border-top: .5pt solid {HAIR}; margin-top: 7pt; padding-top: 6pt; }}
@@ -167,6 +169,7 @@ ul ul {{ list-style: circle; margin-top: 3pt; }}
 .skills p {{ margin: 0 0 3pt; padding-left: 0; }}
 .skills b {{ font-weight: bold; color: {TEAL}; }}
 .edu p {{ margin-top: 2pt; }}
+.edu .row {{ margin-top: 2pt; }}
 """
 
 
@@ -252,6 +255,16 @@ def without_company_summary(data: dict, career, config: Path | None = None) -> d
                                  for s in data["sections"]]}
 
 
+_YEARS = re.compile(r"\s*\(((?:19|20)\d{2}[^()]*)\)\s*\.?$")
+
+
+def dated_entry(markup: str, years: str) -> str:
+    """An education or volunteering line with its years right-aligned like role dates (the user, 2026-11-26). The years
+    follow their own entry in the HTML, but a text extractor that reads by column could still detach them."""
+    meta = f'<span class="meta">{esc(years)}</span>' if years else ""
+    return f'<div class="row"><p>{markup}</p>{meta}</div>'
+
+
 def resume_html(data: dict, career, contact: dict) -> str:
     chosen = [(b["source_id"], b["text"]) for sec in data["sections"] for b in sec["bullets"]]
     by_id = dict(chosen)
@@ -320,17 +333,18 @@ def resume_html(data: dict, career, contact: dict) -> str:
             if not label:   # the entry name lives in the master heading, so the line itself need not repeat it
                 parts = career.items[i].context.split(" — ")
                 label = parts[1] if len(parts) > 1 else parts[0]
-            # the year stays in the entry's own text: a right-aligned date column is read as a separate column by text extractors
-            # (ATS parsers), which detach it from its entry (found by two ATS readers on 2026-10-07)
-            rows.append(f'<p><b>{esc(label)}</b>: {esc(rest.rstrip("."))} ({esc(year)})</p>')   # the year ends the entry, as in Education
+            rows.append(dated_entry(f'<b>{esc(label)}</b>: {esc(rest.rstrip("."))}', year))
         out.append('<h2>Volunteering</h2><div class="edu">' + "".join(rows) + "</div>")
 
     edu = [(i, t) for i, t in chosen if i[0] == "E"]
     if edu:
         rows = []
-        for _, t in edu:   # the master line already carries its years, "(2019 – 2020)": keep them inline (see Volunteering)
+        for _, t in edu:   # the master line ends in its years, "(2019 – 2020)": they move to the right-hand side
             label, rest = split_label(t)
-            rows.append(f'<p><b>{esc(label)}</b>{": " + esc(rest) if rest else ""}</p>')
+            years = _YEARS.search(rest)
+            rest = rest[:years.start()] if years else rest
+            markup = f'<b>{esc(label)}</b>{": " + esc(rest) if rest else ""}'
+            rows.append(dated_entry(markup, years.group(1) if years else ""))
         out.append('<h2>Education</h2><div class="edu">' + "".join(rows) + "</div>")
     return page("@page { size: A4; margin: 35.4pt 43pt 30pt 43pt; }", "".join(out))
 
@@ -376,12 +390,12 @@ def cover_html(data: dict, career, contact: dict, role_title: str = "", company:
         if i in CLOSING:
             body.append(f"<p>{esc(t)}</p>")
     body.append(f'<p>Kind regards,</p><p><b>{esc(contact.get("name", ""))}</b></p>')
-    css = ("@page { size: Letter; margin: 40pt 54pt 34pt 54pt; } body { font-size: 10.5pt; line-height: 1.5; } "
+    css = ("@page { size: Letter; margin: 40pt 54pt 34pt 54pt; } body { font-size: %spt; line-height: 1.5; } "
            "p { margin: 0 0 8.5pt; } .addr { margin: 0 0 1.5pt; } hr.rule + .addr { margin-top: 13.5pt; } "
            ".salute { margin-top: 9.5pt; } .lead { margin-bottom: 4.5pt; } "
            "ul.blocks { padding-left: 14pt; margin: 0 0 8.5pt; } ul.blocks > li { margin-top: 5pt; } "
            "ul.blocks ul { list-style: circle; padding-left: 16pt; margin-top: 4pt; } ul ul:empty { display: none; }")
-    return page(css, "".join(body))
+    return page(css % LEAD_PT, "".join(body))
 
 
 def render_pdfs(app: Path, data: dict, career, ref: str) -> list[str]:

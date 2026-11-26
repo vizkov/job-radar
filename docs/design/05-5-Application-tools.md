@@ -88,7 +88,7 @@ Called by `render_resume.py` (the default). No LLM, nothing to pip install: HTML
 
 To change the look, change `CSS` and the `@page` rules:
 
-- CV: Roboto (the files in `tools/fonts/`, SIL OFL, inlined into the page so a render needs no network), A4, 43 pt side margins, teal `#0f766e` headings with a rule under each, thin rules between roles, a heavier rule under the header, no "Profile" heading, 9.6 pt body at a 1.43 line height, right-aligned city and dates. Phrases in `tailored.json` `highlight` are bold in Key achievements; hyphenated words never break (`keep_hyphens()`), because a text extractor joins the halves; `cv_company_summary: false` in `profile/config.json` omits the company's one-line description (`without_company_summary()`).
+- CV: Roboto (the files in `tools/fonts/`, SIL OFL, inlined into the page so a render needs no network), A4, 43 pt side margins, black headings with a rule under each, teal `#0f766e` only on links, skill category names and bold words in list items, thin rules between roles, a heavier rule under the header, no "Profile" heading, 9.6 pt body at a 1.43 line height, right-aligned city and dates. Phrases in `tailored.json` `highlight` are bold in Key achievements; hyphenated words never break (`keep_hyphens()`), because a text extractor joins the halves; `cv_company_summary: false` in `profile/config.json` omits the company's one-line description (`without_company_summary()`).
 - Cover letter: US Letter, 54 pt margins, 10.5 pt at 1.5.
 
 Small helpers:
@@ -108,7 +108,7 @@ Building the pages:
 | Function | Does |
 |---|---|
 | `experience_structure()` | Groups every `B` line by its master heading (company block with city and dates, roles under it; a four-part heading `Title — Company — City — Dates` is its own company). |
-| `resume_html()` | `P` lines under "Summary" become the profile paragraph, "Key achievements" lines get their bold label, the tailored `K` lines (a `Skills` section in `tailored.json`; every master `K` line if none were chosen) become the skills grid, `E` lines get right-aligned years. |
+| `resume_html()` | `P` lines under "Summary" become the profile paragraph, "Key achievements" lines get their bold label, the tailored `K` lines (a `Skills` section in `tailored.json`; every master `K` line if none were chosen) become the skills grid, `E` and volunteering lines get right-aligned years. |
 | `cover_html()` | Merges `C01`+`C02` into the opening, lists the middle blocks as bullets titled from their master heading (an "(optional)" block becomes a sub-point of the block before it), puts `C12`-`C14` after them; the role title and company come from `data/matches.csv` by the key. |
 | `render_pdfs()` | Writes `resume.pdf` and `cover_letter.pdf`. |
 

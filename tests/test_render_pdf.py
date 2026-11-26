@@ -69,7 +69,7 @@ def test_resume_layout_follows_the_design():
     assert "OldCo <small>(now NewCo)</small>" in h and "Paris · Jan 2018 – Dec 2020" in h   # a 4-part role is its own company
     assert '<a href="https://github.com/alex/oss">github.com/alex/oss</a>: a code review method.' in h
     assert "<p><b>Application security:</b> pentesting, code review</p>" in h
-    assert 'Example University</b>: B.Sc. Computer Science (2010 – 2014)' in h and ">2010 – 2014<" not in h   # years stay in the entry's text, not a right-hand column
+    assert 'Example University</b>: B.Sc. Computer Science</p><span class="meta">2010 – 2014</span>' in h   # years stay in the entry's text, not a right-hand column
     assert 'mailto:alex@example.com' in h and "linkedin.com/in/alex" in h and "size: A4" in h
 
 
@@ -114,7 +114,7 @@ def test_posting_title_hyphen_is_tidied_and_volunteering_takes_its_label_from_th
     c = career()
     c.items["B09"] = Item("B09", "Ran sessions for young people.", "Experience", "Volunteering — Helpers Abroad — 2023")
     data = dict(DATA, sections=[{"heading": "x", "bullets": DATA["sections"][0]["bullets"] + [{"source_id": "B09", "text": "Ran sessions for young people."}]}])
-    assert "<b>Helpers Abroad</b>: Ran sessions for young people (2023)" in rp.resume_html(data, c, CONTACT)
+    assert '<b>Helpers Abroad</b>: Ran sessions for young people</p><span class="meta">2023</span>' in rp.resume_html(data, c, CONTACT)
 
 
 def test_highlight_bolds_only_listed_achievement_phrases():
@@ -139,3 +139,11 @@ def test_company_summary_is_dropped_only_when_the_config_says_so(tmp_path):
     cfg.write_text('{"cv_company_summary": false}', encoding="utf-8")
     h = rp.resume_html(rp.without_company_summary(DATA, career(), cfg), career(), CONTACT)
     assert "Security for banks and airlines" not in h and 'class="co">ExampleSec' in h and "Led threat modelling" in h
+
+
+def test_cv_and_letter_use_only_the_three_type_sizes():
+    import re
+    allowed = {rp.NAME_PT, rp.LEAD_PT, rp.BODY_PT}
+    for h in (rp.resume_html(DATA, career(), CONTACT), rp.cover_html(DATA, career(), CONTACT, "Engineer", "ExampleCo")):
+        sizes = re.findall(r"font-size:\s*([\d.]+)(pt|em)", h)
+        assert sizes and all(float(n) in allowed if unit == "pt" else float(n) == 1 for n, unit in sizes), sizes

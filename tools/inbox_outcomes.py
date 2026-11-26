@@ -44,7 +44,8 @@ RULES: list[tuple[str, list[str]]] = [
     ]),
     ("acknowledgement", [
         r"thank(?:s| you) for (?:applying|(?:thinking of us|your (?:application|interest)))", r"thanks for your interest",
-        r"(?:we(?:'ve| have)? )?(?:just )?received your (?:application|resume|cv)",
+        r"(?:we(?:'ve| have)? )?(?:just )?received your (?:(?:job )?application|resume|cv)",
+        r"your application [^\n]{0,160}?successfully submitted",
         r"application (?:has been )?received", r"we will (?:review|be in touch)", r"keep track of your application",
         r"now with us",
     ]),

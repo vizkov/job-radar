@@ -239,6 +239,14 @@ def test_auto_score_includes_unscored_tier2_cards_that_are_live_on_the_board():
     assert [r["ref"] for r in sb.auto_score_pick(rows, {}, items, 8)] == ["a" * 16]
 
 
+def test_auto_score_takes_board_cards_before_newer_roles_off_the_board():
+    rows = [{"ref": "a" * 16, "tier": "2", "on_list": "yes", "posted": "2026-09-20"},   # old card on the board
+            {"ref": "b" * 16, "tier": "1", "on_list": "yes", "posted": "2026-09-28"}]   # newer, no card
+    items = [{"stage": "New", "content": {"body": "<!-- job-radar:ref=" + "a" * 16 + " -->"}}]
+    assert [r["ref"] for r in sb.auto_score_pick(rows, {}, items, 1)] == ["a" * 16]
+    assert [r["ref"] for r in sb.auto_score_pick(rows, {}, items, 8)] == ["a" * 16, "b" * 16]
+
+
 def test_auto_score_skips_roles_skipped_in_the_log_even_if_archived(tmp_path):
     (tmp_path / "data").mkdir()
     a, b = "a" * 16, "b" * 16

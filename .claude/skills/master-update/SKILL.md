@@ -94,6 +94,21 @@ For each `STALE` or `MISSING`/relevant `DIFFERS` application folder:
 4. Tell the user which applications were refreshed and what changed in each (the checker's diff), and which they should look at
    before applying.
 
+## 6. The general resume (the user, 2026-11-26)
+`profile/general-resume/` holds the untargeted CV (`tailored.json`, `resume.pdf`): for sharing when there is no job ad. It is not an
+application. After the masters are cleared, run `python tools/master_drift.py general`. It lists master CV lines that are new,
+changed or removed since that CV was last reviewed. Offer an update **in one line** only when it matters, and say which lines:
+- a line on it was removed or its facts changed (a figure, title, scope or outcome);
+- new material deserves a place: a new role or title, an achievement stronger than one it shows, a new skill or project that is
+  part of the record for any role;
+- the headline or a Profile line changed.
+
+Wording polish alone is not worth an offer: run `python tools/master_drift.py general-done` and say nothing more. On the user's
+yes: rebuild its `tailored.json` from the current masters (same rules as `tailor-application`, no job ad, no cover letter), then
+`python tools/jd_check.py tailor <absolute path to profile/general-resume>` and `python tools/render_resume.py <same path>`
+(no draft experiment: there is no ad), check it is 2 pages, show what changed, then `general-done` and commit. On a no, run
+`general-done` so the same lines are not offered again. Never update it unasked; reviews of it need their own yes (rule 12).
+
 ## Guardrails
 - Never invent experience to make documents agree (rule 2); rephrase, drop or ask.
 - Client and employer names never go into the masters ("a Fortune 100 global financial and banking institution", "a global airline", "a credit and payments client").

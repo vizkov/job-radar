@@ -29,6 +29,7 @@ sys.path.insert(0, str(ROOT))
 from jobradar.career import load_career  # noqa: E402
 
 APPS = ROOT / "profile" / "applications"
+GENERAL = ROOT / "profile" / "general-resume"   # untargeted CV: no ad, so no draft experiment
 SCRATCH = ROOT / "work" / "apps"   # review text (Markdown) for each application
 CONTACT_FIELDS = ("email", "phone", "location", "links")
 
@@ -90,7 +91,7 @@ def main(argv=None) -> int:
         print("tailored.json has not been validated in its current form: run  python tools/jd_check.py tailor "
               f"{app.name}")
         return 1
-    if not text_only and not skip_experiment and not any((SCRATCH / app.name / "experiment" / n).exists() for n in ("draft_B.json", "resume_B.md")):
+    if not text_only and not skip_experiment and app.resolve() != GENERAL.resolve() and not any((SCRATCH / app.name / "experiment" / n).exists() for n in ("draft_B.json", "resume_B.md")):
         # tailor-application step 4b was skipped on 2026-10-31 (Citi); the Opus draft comes before any PDF
         print("no Opus draft yet (tailor-application step 4b): run  python tools/draft_experiment.py prep "
               f"{app.name}  and spawn the writer, then render. --skip-experiment only on the user's word.")

@@ -370,6 +370,9 @@ def cmd_tailor(folder: str) -> int:
     for w in warns:
         print(f"WARNING: {w}")
     (app / "validated.sha256").write_text(_digest(src), encoding="utf-8")
+    if app.resolve() == (ROOT / "profile" / "general-resume").resolve():   # no job ad, so no draft experiment
+        print(f'\nok: validated. Render with  python tools/render_resume.py "{app}"')
+        return 0
     print(f"\nok: validated. Step 4b first: python tools/draft_experiment.py prep {app.name} (Opus draft); then render with  python tools/render_resume.py {app.name}")
     return 0
 

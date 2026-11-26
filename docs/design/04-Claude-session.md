@@ -119,8 +119,8 @@ the brief with an undo line).
    freshest first.
 3. **AUTO-SCORE:** `auto_score_pick()` (skipping roles the board shows closed and, via
    `skipped_refs()`, roles whose latest logged Stage is Skipped/Rejected, since an archived card
-   vanishes from the board read) chooses up to `scoring.auto_per_session` roles from one pool, newest posting first: unscored live board cards (Stage none, New or
-   Shortlisted, any tier) and unscored Tier 1 roles of listed employers (so a newer off-board role can take a card's place); `start_prep()` fetches their job descriptions in the background (the virtualenv's Python,
+   vanishes from the board read) chooses up to `scoring.auto_per_session` roles: unscored live board cards first (Stage none, New or Shortlisted, any tier), then
+   unscored Tier 1 roles of listed employers, newest posting first in each group; `start_prep()` fetches their job descriptions in the background (the virtualenv's Python,
    no Claude usage), and the **AUTO-SCORE** line tells Claude to score as the last job of the session (why: sweeps add roles after the brief is written), starting from `python tools/session_brief.py --score-pick`, which recomputes the
    pick from the live board (`score_pick_now()`); the CADENCE block lists Scoring last. Claude can't act before the user types.
 4. **SPONSOR-CHECK:** live apply/maybe cards with no sponsorship verdict.

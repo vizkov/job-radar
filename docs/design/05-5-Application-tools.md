@@ -166,6 +166,11 @@ similar, most of which are deliberate condensations), `main()` prints one block 
 per role from `data/pipeline_log.jsonl` (`LOG`); an application whose stage is in `SUBMITTED` (Applied, Interview, Offer, Rejected) is printed as
 `SUBMITTED` and not checked, because its PDFs are the record of what was sent (only a `MISSING` note is kept); `--all` checks those too.
 
+**The general resume.** `profile/general-resume/` (`GENERAL`) is the untargeted CV, outside `applications/`. `master_drift.py general` compares
+the master CV lines (P/B/K/E) with `master_lines.json` in that folder (`cv_fingerprints()`, `general_report()`) and lists new, changed and
+removed ids; `general-done` records the current lines (`general_done()`). The `master-update` skill judges the list and offers a rebuild.
+`render_resume.py` asks no draft experiment for this folder, because there is no job ad.
+
 ## `tools/cv_lint.py`: form and section rules for CV and letter text
 
 Used by `jd_check.py tailor` (errors fail validation) and by `master-update` (`python tools/cv_lint.py master`). No LLM. The rules are in `.claude/skills/tailor-application/writing-rules.md`; this is the pattern-matching half.

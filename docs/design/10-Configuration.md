@@ -161,9 +161,9 @@ The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 
 | Key | Default | Meaning |
 |---|---|---|
-| `auto_per_session` | 8 | Roles Claude scores automatically in each session, as the last job (after the sweeps, which add roles; `session_brief.py --score-pick` lists the current set): unscored live board cards of any tier and unscored Tier 1 roles, one pool, newest posting first; closed or skipped cards are not picked (see 4.2). 0 = only when asked. 0.25–0.5% of a session per role (measured) |
+| `auto_per_session` | 8 | Roles Claude scores automatically in each session, as the last job (after the sweeps, which add roles; `session_brief.py --score-pick` lists the current set): unscored live board cards of any tier first, then unscored Tier 1 roles, newest posting first in each; closed or skipped cards are not picked (see 4.2). 0 = only when asked. 0.25–0.5% of a session per role (measured) |
 
-`scoring.linkedin_job_pages` (default false) lets `score-roles` read one LinkedIn job page at a time in the user's logged-in Chrome to get a description; LinkedIn's terms ban automated access, so this is the user's risk to accept. `cleanup.skipped_days` and `cleanup.rejected_days` (14 and 30) set when `tools/jd_cleanup.py` trims `jd.txt` and `packet.md` from `work/jd/<ref>/` for Skipped and Rejected roles.
+`scoring.linkedin_job_pages` (default false) lets `score-roles` read one LinkedIn job page at a time in the user's logged-in Chrome to get a description; LinkedIn's terms ban automated access, so this is the user's risk to accept. `scoring.linkedin_date_lookup` (default false) allows one LinkedIn job search for a role with no posted date, at most 3 a session (`CLAUDE.md` rule 4d). `cleanup.skipped_days` and `cleanup.rejected_days` (14 and 30) set when `tools/jd_cleanup.py` trims `jd.txt` and `packet.md` from `work/jd/<ref>/` for Skipped and Rejected roles.
 
 ## Referrals (`config.json` → `referrals`)
 

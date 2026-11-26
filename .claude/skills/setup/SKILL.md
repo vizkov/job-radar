@@ -39,6 +39,9 @@ plain language; do the typing yourself.
 4b. **LinkedIn job pages (ask, default off).** Say the risk plainly: LinkedIn's terms ban automated access, so reading job pages in their
    logged-in Chrome could get the account restricted, even one page at a time. Ask whether to switch it on; set `scoring.linkedin_job_pages`
    in `profile/config.json` to `true` only on a clear yes, otherwise leave it `false` (scoring then asks them to paste LinkedIn descriptions).
+4c. **LinkedIn date lookup (ask, default off).** Same risk. When a role found on a careers site has no posted date, one LinkedIn job
+   search for that company and title reads the date (at most 3 a session). Set `scoring.linkedin_date_lookup` to `true` only on a
+   clear yes; otherwise leave it `false` and such roles stay undated.
 5. **Alert emails (optional).** Explain why a dedicated Gmail is needed (docs/design/12-Job-alert-emails.md),
    guide them through alerts, forwarding filter and app password, and adding the two secrets in the GitHub
    UI themselves. Never ask them to paste the password into chat or a file.

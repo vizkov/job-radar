@@ -20,7 +20,7 @@ These are design limits, not settings. `CLAUDE.md` repeats them as rules for Cla
   connects or messages. It still breaches LinkedIn's terms (any automated access); the user
   accepted that risk for their own account. A second exception, standing (`scoring.linkedin_job_pages`, `CLAUDE.md` rule 4a): `score-roles` has Claude in Chrome read **one** LinkedIn job page at a time
   for a role already on the list, saving only the description text; no search pages, no loops, no clicking.
-  `jd_prep.py` itself still never fetches LinkedIn. A fourth, narrow one (`CLAUDE.md` rule 4d): when a role has no posted date, Claude may open one LinkedIn job search for that company and title (at most 3 a session) and read only the matching listing's date and location. The user-facing list of all these uses, with how to turn each off, is [LinkedIn consent](../wiki/Your-part.md#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup) in the user guide.
+  `jd_prep.py` itself still never fetches LinkedIn. A fourth, narrow one (`scoring.linkedin_date_lookup`, default false, `CLAUDE.md` rule 4d): when a role has no posted date, Claude may open one LinkedIn job search for that company and title (at most 3 a session) and read only the matching listing's date and location. The user-facing list of all these uses, with how to turn each off, is [LinkedIn consent](../wiki/Your-part.md#linkedin-consent-the-four-opt-ins) in the user guide.
 - Submit an application. `apply-assist` may pre-fill a form in the user's Chrome, page
   by page after they approve the values; the final Submit is always the user's click.
 - Email or message anyone on the user's behalf.

@@ -58,7 +58,7 @@ Two steps start it; Claude does the rest and pauses when it needs you. The few c
       (this logs `gh` out entirely; log in again with `gh auth login` if you still need it).
    3. **Two questions with a default of no.** Claude asks whether to let it read LinkedIn job
       pages when scoring, and whether you want job-alert emails. Both are explained below
-      ([LinkedIn consent](#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup),
+      ([LinkedIn consent](#linkedin-consent-the-four-opt-ins),
       [job-alert emails](#optional-job-alert-emails-linkedin-indeed-glassdoor)); say no to either and setup is still complete.
 3. **Make the manual clicks** (checklist below). Claude tells you in chat when each one is due; the first, board auto-add, comes right after your board is created.
 
@@ -87,8 +87,8 @@ Setup is complete without these; do any of them afterwards, in any order.
 - **Form filling.** Install the Claude in Chrome extension. It works in your **real Chrome**, where
   you're already logged in to sites, and asks Chrome for broad permissions when you install it.
   How Claude limits what it does with it: [What Claude can do in your browser](#what-claude-can-do-in-your-browser).
-- **LinkedIn uses** (job pages, contact lookup, hiring posts): off until you say yes, except the narrow date lookup, which has standing permission in the project instructions (3 a session at most); see
-  [LinkedIn consent](#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup).
+- **LinkedIn uses** (job pages, contact lookup, hiring posts, date lookup): off until you say yes; see
+  [LinkedIn consent](#linkedin-consent-the-four-opt-ins).
 
 ## Optional: job-alert emails (LinkedIn, Indeed, Glassdoor)
 
@@ -134,11 +134,11 @@ and newsletters are skipped. Claude tells you what it found at the start of a se
    the same way as the mail secrets. Never paste it into Claude.
 3. Tell Claude it's added; it switches the Reed source on. The key only allows searching jobs.
 
-## LinkedIn consent: the three opt-ins and one narrow lookup
+## LinkedIn consent: the four opt-ins
 
 This is the one place that lists every way Claude touches LinkedIn. Everything else on LinkedIn, Indeed and Glassdoor stays
 untouched: job-radar never scrapes those sites, never opens Indeed or Glassdoor pages (you paste those descriptions), and
-never opens LinkedIn job-search pages beyond the date lookup in the last row.
+never opens LinkedIn job-search pages beyond the date lookup in the last row, if you switch it on.
 
 **The risk, stated once:** LinkedIn's terms ban any automated use of the site, even read-only and at low volume, so each use below could
 get your LinkedIn account restricted. That is your risk to accept. All reading happens in your own logged-in Chrome, never from the
@@ -149,7 +149,7 @@ automatic GitHub runs. Claude never reacts, comments, reposts, connects, message
 | **Job-description pages** | One LinkedIn job page at a time, for a role already on your list that it is scoring, and saves only the description text. No searching or browsing | Off in a fresh copy; setup asks you | Say "switch on / off the LinkedIn job-page reading", or set `scoring.linkedin_job_pages` to `true` / `false` in `profile/config.json`. Off means Claude asks you to paste the description |
 | **Referral lookup** | LinkedIn people-search results for one company, for one role you are about to apply to, only when you ask, to find a likely hiring manager and a recruiter | Off | Say "switch on / off the LinkedIn lookup", or `referrals.linkedin_lookup` |
 | **Hiring-post discovery** | LinkedIn post-search results and known recruiters' own posts, at the start of a session or when you ask, capped (a set number of searches, scrolls and people per session), to find roles announced in posts | Off | Say "switch on / off the LinkedIn post search", or `discovery.linkedin_posts.enabled` |
-| **Date lookup** (narrow) | When a role found on a company's own careers site shows no posted date and the age filter needs one: one LinkedIn job search for that exact company and title, reading only the matching listing's posted date and location. At most 3 a session; never a sweep | Standing permission in the project instructions (`CLAUDE.md` rule 4, part d), no setting in `config.json` | Ask Claude to remove that rule. Without it, Claude leaves such roles undated and says so |
+| **Date lookup** (narrow) | When a role found on a company's own careers site shows no posted date and the age filter needs one: one LinkedIn job search for that exact company and title, reading only the matching listing's posted date and location. At most 3 a session; never a sweep | Off in a fresh copy; setup asks you | Say "switch on / off the LinkedIn date lookup", or `scoring.linkedin_date_lookup`. Off means Claude leaves such roles undated and says so |
 
 With the lookup off, Claude gives you LinkedIn search links to open yourself.
 
@@ -161,7 +161,7 @@ your other logged-in tabs; Claude doesn't use them. You approve the answers for 
 page before they're typed. It never answers questions about visas, salary, diversity or
 consent for you, never logs in or creates accounts for you (you do that in the tab), and
 never clicks the final Submit. It won't touch LinkedIn, Indeed or Glassdoor applications at all (the
-only LinkedIn uses are in [LinkedIn consent](#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup)).
+only LinkedIn uses are in [LinkedIn consent](#linkedin-consent-the-four-opt-ins)).
 
 ## Every so often
 
@@ -169,7 +169,7 @@ only LinkedIn uses are in [LinkedIn consent](#linkedin-consent-the-three-opt-ins
 |---|---|
 | Claude has a tailored CV or cover letter ready | Read it: Claude only reuses your own lines, but you're the one sending it |
 | Claude has filled an application form | Check each page; **you** click Submit |
-| An Indeed/Glassdoor job needs scoring | Paste the job description (Claude never opens those sites). LinkedIn job descriptions it reads itself in your Chrome if you switched that on ([LinkedIn consent](#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup)) |
+| An Indeed/Glassdoor job needs scoring | Paste the job description (Claude never opens those sites). LinkedIn job descriptions it reads itself in your Chrome if you switched that on ([LinkedIn consent](#linkedin-consent-the-four-opt-ins)) |
 | Claude proposes a settings change, new job boards or a fix | Say yes or no; these wait for your answer. The routine things Claude does by itself (filling card columns, moving Skip-scored and closed roles to Skipped, the weekly title-rating adjustment) are described in [Using it](Using-it.md) and [Board](Board.md) |
 | Claude asks who can help at a company you'd apply to | Tell it the names. Message people you know yourself (Claude gives you the role links); for recruiters or hiring managers it drafts the note in the chat (never saved to a file) after a fresh reviewer has read it as the recruiter would. **You** send everything, then tell it what happened |
 | You get a new job, certification or achievement | Tell Claude; it adds it to your CV lines so future applications can use it |

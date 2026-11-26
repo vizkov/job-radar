@@ -296,7 +296,7 @@ def skipped_refs(root: Path) -> set:
 
 def auto_score_pick(rows: list[dict], scored: dict, items: list[dict] | None, n: int,
                     skipped: set = frozenset()) -> list[dict]:
-    """The freshest unscored roles: Tier 1 roles on the list plus every live board card, skipping cards the user already closed or skipped."""
+    """Unscored roles, live board cards first and then Tier 1 roles on the list, newest first in each; closed or skipped cards are left out."""
     done = set(skipped)
     for i in items or []:
         hit = _REF.search((i.get("content") or {}).get("body") or "")
@@ -312,7 +312,7 @@ def auto_score_pick(rows: list[dict], scored: dict, items: list[dict] | None, n:
     todo = [r for r in rows if ((str(r.get("tier")) == "1" and r.get("on_list") == "yes") or r.get("ref") in on_board)
             and r.get("ref") not in scored and r.get("ref") not in done]
     seen, out = set(), []
-    for r in sorted(todo, key=lambda r: (r.get("posted") or r.get("date") or ""), reverse=True):
+    for r in sorted(todo, key=lambda r: (r.get("ref") in on_board, r.get("posted") or r.get("date") or ""), reverse=True):
         if r["ref"] not in seen:
             seen.add(r["ref"])
             out.append(r)

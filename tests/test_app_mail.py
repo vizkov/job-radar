@@ -288,3 +288,10 @@ def test_n8n_style_rejection_without_the_word_unfortunately_is_a_rejection():
             "process with some other talents. It wasn't an easy decision")
     assert app_mail.classify_mail("n8n | Follow-up on your application", text)[0] == "rejection"
     assert app_mail.classify_mail("Next steps", "We would like to move on to the next stage with you")[0] != "rejection"
+
+
+def test_receipt_for_a_job_titled_assessments_is_not_action_needed():
+    kind, _, _, action = app_mail.classify_mail(
+        "We received your job application (Job Number: 1)",
+        "Your application for the position listed below was successfully submitted. Assessments & Exercises Vice President")
+    assert (kind, action) == ("receipt", False)

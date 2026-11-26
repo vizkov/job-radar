@@ -73,14 +73,14 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
 
 ## How the machinery fits together
 
-- Daily GitHub Action (`radar.yml`): finds roles → `data/matches.csv`, queues new ones
+- Scheduled GitHub Action (`radar.yml`, six times a day): finds roles → `data/matches.csv`, queues new ones
   (`state/board_queue.json`) → opens one issue per role (label `role`) → the Project
   auto-adds them. Updates the pinned "Radar status" issue. Mail alerts are fetched in
   a separate stdlib-only step (`tools/fetch_alert_emails.py`).
 - **A register miss is not a "no" (the user, 2026-11-26: "instead of hardcoding fix the issue", then option A).** A role that passes the unlisted-employer board rule except for the GB/NL sponsor register is held in `state/register_check.csv` (written by the daily run). The CADENCE block lists it as **Sponsor register check**: find the legal name with web research and record it with `tools/register_check.py confirm` (exact register entry plus evidence page) or `notfound` (`sponsorship-check`, "Held roles"); a confirmed name cards the role and is remembered in `profile/sponsor_names.csv`. Never confirm a name on resemblance alone.
 - **Dropped alert roles are logged (the user, 2026-10-27: "are we sure the alert roles are not dropped by static matching?").** The daily run
   writes every LinkedIn/Indeed alert listing the filters drop to `state/dropped_alerts.csv` (first/last seen, company, title, location, **every**
-  failing filter: title, company, country, old, employment; rows expire after 45 days; private, committed by the Action with `state/`). Read it
+  failing filter among title, company and country; "old" and "employment" are recorded only when they were the first to fail; rows expire after 45 days; private, committed by the Action with `state/`). Read it
   to judge whether the title list, the employer list or the location parser is losing roles you want; it never adds a card by itself, and a
   dropped role comes in only through `add_role.py` with the user's word. Since 2026-10-27 `alert_email` has `include_outside_list: true` in
   `profile/sources.yaml` (the user: "alerts are already location anchored in LinkedIn, so don't filter twice"): the employer list no longer drops alert
@@ -128,7 +128,7 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
   A role can have an issue and a score but no live card (aged out by `max_age_days`, then archived, even if later scored apply):
   "the roles on the board" always means what `gh project item-list` returns, never `state/issue_map.json` or `matches.csv`.
   `max_age_days` in `profile/config.json` drops roles posted longer ago than that (0 = no limit).
-  **Unlisted employers and the board (the user, 2026-11-22):** `board.include_outside` stays false. `board.outside_tier1: {"min_title_weight": 4, "min_score": 7, "max_age_days": 30}` is **on** in the user's copy (since 2026-11-22; confirmed by the user 2026-11-26; off unless set in the template). It lets an unlisted employer's role onto the board when it is Tier 1, its title has a focus keyword (tiering weight 4+), it scores 7+, is within 30 days old, is not from a recruitment agency and, in GB/NL, the sponsor register says yes (`board.outside_tier1_ok`). `include_extra_countries` is on since 2026-11-22, the extra countries now cover the whole EU plus AU, and "security engineer" is worth 2 title points.
+  **Unlisted employers and the board (the user, 2026-11-22):** `board.include_outside` stays false. `board.outside_tier1: {"min_title_weight": 4, "min_score": 7, "max_age_days": 30}` is **on** in the user's copy (since 2026-11-22; confirmed by the user 2026-11-26; off unless set in the template). It lets an unlisted employer's role onto the board when it is Tier 1, its title has a focus keyword (tiering weight 4+), it scores 7+, is within 30 days old, is not from a recruitment agency and, in GB/NL, the sponsor register says yes (`board.outside_tier1_ok`). `include_extra_countries` is on since 2026-11-22, the extra countries now cover the whole EU plus AU, and "security engineer" is worth 1 title point (lowered from 2 on 2026-11-24, with the user's agreement).
 - **Roles the user hands you go through the same door as the daily run (the user, 2026-10-07: two Anthropic roles added by hand, posted 89 and 623 days
   before while `max_age_days` is 30, skipped every filter).** For a job link: `python tools/add_role.py <url>` (`--dry-run` first; for a link it cannot fetch, such as LinkedIn or a company site, give `--company --title --location --posted` by hand); for a LinkedIn hiring
   post: `post_leads.py add-role`. Both run `jobradar/intake.py`: country, title, permanent-only, age and employer filters, dedupe, sponsor tags, tier, `matches.csv`,

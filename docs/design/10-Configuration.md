@@ -161,7 +161,7 @@ The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 
 | Key | Default | Meaning |
 |---|---|---|
-| `auto_per_session` | 8 | Roles Claude scores automatically in each session, as the last job (after the sweeps, which add roles; `session_brief.py --score-pick` lists the current set): every unscored live board card of any tier first, then the freshest unscored Tier 1 roles; closed or skipped cards are not picked (see 4.2). 0 = only when asked. 0.25–0.5% of a session per role (measured) |
+| `auto_per_session` | 8 | Roles Claude scores automatically in each session, as the last job (after the sweeps, which add roles; `session_brief.py --score-pick` lists the current set): unscored live board cards of any tier and unscored Tier 1 roles, one pool, newest posting first; closed or skipped cards are not picked (see 4.2). 0 = only when asked. 0.25–0.5% of a session per role (measured) |
 
 `scoring.linkedin_job_pages` (default false) lets `score-roles` read one LinkedIn job page at a time in the user's logged-in Chrome to get a description; LinkedIn's terms ban automated access, so this is the user's risk to accept. `cleanup.skipped_days` and `cleanup.rejected_days` (14 and 30) set when `tools/jd_cleanup.py` trims `jd.txt` and `packet.md` from `work/jd/<ref>/` for Skipped and Rejected roles.
 
@@ -206,6 +206,7 @@ Contacts are in `profile/network.csv` (see [2](02-Architecture.md)).
 | `tiering` | Score weights and `tier1_min_score`; see [Tiers and sponsorship](09-Tiers-and-sponsorship.md) |
 | `sponsorship.fuzzy_yes` / `fuzzy_unknown` | Fuzzy name-match thresholds (0–100) for the sponsor registers |
 | `board_timeout_seconds` | Time cap per ATS board fetch (180) |
+| `static_profile` | `true`: the CV Profile is not tailored; every master Profile line is copied unchanged, in master order (`tools/cv_lint.py static_profile()` makes anything else an error). Default false |
 | `board.outside_tier1` | Off unless set. `{"min_title_weight": 3}` lets an employer not on your list reach the board when the role is Tier 1, its title carries a keyword worth 3+ title points, and in GB/NL the sponsor register says yes (`jobradar/board.py outside_tier1_ok`). Optional keys: `min_score` (Tier 1 score floor, e.g. 7) and `max_age_days` (e.g. 7); recruitment agencies and staffing firms are never let in (`is_agency`, `board.agency_words` / `board.agency_names` extend it) |
 | `workday_max_retries` | Retries per Workday request before a board fails (code default 8; `examples/config.json` sets 6). Read by `workday_paced.install()`, which replaces the library's request function with the paced one (see 5.2) |
 | `workday_min_interval` | Seconds between Workday requests, shared by all boards (2.0); doubles after each refusal |

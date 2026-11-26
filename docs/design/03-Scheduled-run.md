@@ -57,7 +57,7 @@ Three details that matter:
 
 ## 3.2 Inside `radar.py: main()`
 
-Read `radar.py` alongside this. `main()` (`radar.py:407`) runs these blocks in order.
+Read `radar.py` alongside this. `main()` (in `radar.py`) runs these blocks in order.
 
 ### Load
 
@@ -109,13 +109,10 @@ For every posting from every source:
 
 It also counts matches per source, and every drop by reason (country, title, not permanent,
 posted too long ago, employer not on the list; `DROP_REASONS`), so the status card can say what each source found and why
-listings were dropped.
+listings were dropped. The dropped-alert log names the first failing filter plus any of country, title and employer that also
+fail; "not permanent" and "too old" appear only when they were the first.
 
 ### Deduplicate and diff: `group_postings()` then `diff_seen()`
-
-**Retitled listings.** A listing keeps its ID when its title changes, so `diff_seen()` alone would never report it again.
-`follow_retitles()` runs next: if the earlier role has no card, the new title is added as a new role (once); if it has one,
-the card stays marked as seen and no second card is made.
 
 `group_postings()` (in `dedupe.py`) puts postings with the same **content key**
 (company + title + primary country, all normalized) into one `Group`. The same
@@ -128,6 +125,11 @@ all its keys get today's date in `seen.json`. (Checking IDs too means a role who
 was slightly edited is still recognised, as long as its ID doesn't include the title: ATS
 and API postings have stable IDs, but careers-page postings use `url|title`, so an edited
 title there shows up as a new role.)
+
+**Retitled listings.** A listing keeps its ID when its title or country changes, so `diff_seen()` alone would never report it
+again. `follow_retitles()` runs after it and matches the posting ID against earlier `matches.csv` rows: if the earlier role is
+neither on a card nor queued for one, the new version is recorded and judged as a new role (once); otherwise the earlier card
+stays marked as seen and no second card is made.
 
 ### Enrich: `enrich()`
 
@@ -158,6 +160,9 @@ jobs is therefore not "broken". A whole-source crash is tracked as unit `*`.
   link through `md_url()` (only http/https).
 - `select_for_board()` picks new groups for the board: tiers in `config.board.tiers`
   (only `baseline_tiers` on the first run), and only companies on the list, plus Tier 1 roles of unlisted employers that pass `outside_tier1_ok`, when `board.outside_tier1` is set (`jobradar/board.py`). It returns nothing unless `board.enabled` is true (default false).
+- `register_holds()` picks the new roles that pass the unlisted-employer rule except for the GB/NL sponsor register. They get
+  no card; they are written to `state/register_check.csv` until Claude looks up the legal name (`tools/register_check.py`,
+  the `sponsorship-check` skill) and either confirms it, which queues the card, or records it as not found.
 - `payload()` turns each into `{ref, title, body, labels}`. `enqueue()` appends them to
   `state/board_queue.json`, skipping refs already queued.
 - `render_status()` builds the short "Radar status" text: counts and source health, no
@@ -174,7 +179,7 @@ save_queue(...)
 stale check (below)
 write state/seen.json, state/health.json
 append_matches(new, today)                              # data/matches.csv
-write_dropped_log(today)                                # state/dropped_alerts.csv: alert listings the filters dropped, every failing filter, 45-day expiry
+write_dropped_log(today)                                # state/dropped_alerts.csv: alert listings the filters dropped, with their failing filters, 45-day expiry
 write_alert_hits(results, today)                        # state/alert_hits.csv: every LinkedIn alert listing and the alert that found it, 45-day expiry
 register_check.add_holds(held, today, keep)             # state/register_check.csv: roles missing a card only on the register name
 ```

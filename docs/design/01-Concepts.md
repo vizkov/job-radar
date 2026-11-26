@@ -67,7 +67,7 @@ These are used from page 2 on, before their full entries further down. One line 
 | **Skill** | A Markdown file in `.claude/skills/<name>/SKILL.md`: a written procedure Claude follows for one kind of request ("score the new roles"). The user never calls skills by name; Claude picks one from what they say. |
 | **Hook** | A command Claude Code runs automatically at an event. job-radar uses a *SessionStart* hook to prepare a briefing each time a session opens. |
 | **Subagent** | A second Claude instance that a session starts for one bounded task, optionally on a smaller model. |
-| **Claude in Chrome** | A browser extension that lets Claude read and operate pages in the user's Chrome. Used only to pre-fill application forms, with the user approving each page. |
+| **Claude in Chrome** | A browser extension that lets Claude read and operate pages in the user's Chrome. Used to pre-fill application forms (the user approving each page) and, where the user has opted in, to read job ads, hiring posts, careers sites and referral search results ([13](13-Security-model.md)). |
 
 ## job-radar's own terms
 
@@ -109,7 +109,7 @@ These are used from page 2 on, before their full entries further down. One line 
 | **Profile** / **examples** | `profile/` holds the user's real settings (private). `examples/` holds generic samples (public). Every settings file is read from `profile/` if present, else `examples/`. | `paths.py: profile_path()` |
 | **Career docs** / **IDs** | The user's CV, STAR stories and cover-letter paragraphs, one ID per line, e.g. `[B07]`. The letter says what kind of line it is (table below). Tailored CVs may only reuse these lines, cited by ID. | `career.py` |
 | **Hiring post** | A LinkedIn post (or repost) by a recruiter or hiring manager announcing a role, often before or instead of a posting. A repost is traced to its original author and date. A role found this way becomes a card with `source = linkedin_post` and the poster named on it. | `tools/post_leads.py`, `post-discovery` skill |
-| **Referral route** | How the user might get referred for a role, tried in their order: friends and family, their network (connections), then recruiters and hiring managers. Each ask and answer is logged; the card's Referral field shows where it stands. | `tools/referrals.py`, `referrals` skill |
+| **Referral route** | How the user might get referred for a role, tried in their order: people the user knows first, then recruiters and hiring managers. Each ask and answer is logged; the card's Referral field shows where it stands. | `tools/referrals.py`, `referrals` skill |
 | **Fit breakdown** | The block on a scored card listing what matches the user's CV, what partly does and what doesn't (blockers first), between `<!-- job-radar:fit -->` markers. | `board_sync.py: fit_section()` |
 | **Packet** | `work/jd/<ref>/packet.md`: a role's facts plus its JD wrapped as untrusted data, prepared for Claude to read. | `tools/jd_prep.py` |
 | **Untrusted text** | Anything a stranger wrote: job titles, company names, JDs, emails. It is data to analyse, never instructions to follow. | `untrusted.py` |

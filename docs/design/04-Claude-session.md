@@ -119,8 +119,8 @@ the brief with an undo line).
    freshest first.
 3. **AUTO-SCORE:** `auto_score_pick()` (skipping roles the board shows closed and, via
    `skipped_refs()`, roles whose latest logged Stage is Skipped/Rejected, since an archived card
-   vanishes from the board read) chooses up to `scoring.auto_per_session` roles: every unscored live board card (Stage none, New or Shortlisted, any tier), then
-   the freshest unscored Tier 1 roles; `start_prep()` fetches their job descriptions in the background (the virtualenv's Python,
+   vanishes from the board read) chooses up to `scoring.auto_per_session` roles from one pool, newest posting first: unscored live board cards (Stage none, New or
+   Shortlisted, any tier) and unscored Tier 1 roles of listed employers (so a newer off-board role can take a card's place); `start_prep()` fetches their job descriptions in the background (the virtualenv's Python,
    no Claude usage), and the **AUTO-SCORE** line tells Claude to score as the last job of the session (why: sweeps add roles after the brief is written), starting from `python tools/session_brief.py --score-pick`, which recomputes the
    pick from the live board (`score_pick_now()`); the CADENCE block lists Scoring last. Claude can't act before the user types.
 4. **SPONSOR-CHECK:** live apply/maybe cards with no sponsorship verdict.
@@ -155,7 +155,8 @@ The CADENCE block lists every recurring job on its own line with "last ran" and 
 (`tools/cadence.py`: `JOBS`, `block()`; [5.4](05-4-Board-and-session-tools.md)). A hook cannot drive Gmail or Chrome, so the block makes an
 overdue job visible; it does not run it. Stamps are appended to `state/cadence.jsonl` (committed, `merge=union`, newest stamp per job wins, so they follow the repo between devices); only `jd_cleanup` (it trims this machine's files) and the one-off reminders stay local, in `work/`.
 
-Jobs with an interval in `JOBS` (DUE when never run or older than the interval; some also need a trigger):
+The jobs below are DUE when never run or older than the interval, and some also need a trigger. Two exceptions: `auto_score` and
+`views_check` are DUE whenever their trigger holds (the interval is not consulted), and `register_check` has no interval.
 
 | Job | Interval (hours) | Who runs it | DUE only when | Stamp |
 |---|---|---|---|---|
@@ -201,7 +202,7 @@ Session-start work that runs on its own timer or trigger and has no line in the 
 | Starting the GitHub run again | When `last_run_health` sees a skipped slot | `gh workflow run job-radar` |
 | Scheduled tasks on the user's Windows PC (not GitHub, not Claude; only while the PC is on) | `job-radar-workday` twice a day (`tools/run_workday_pc.ps1` → `tools/workday_pc.py`: fetches Workday boards the runner's address cannot, pushes `state/workday_jobs.json`; log `work/workday_pc.log`). `job-radar-trigger` every 2 hours (`tools/trigger_radar.ps1`: starts a radar run when none was created in the last 3 hours; log `work/trigger_radar.log`) | Failure shows as `workday|blocked` or "PC copy too old" in the status page; no stamp |
 | Referral follow-up notes (`referral_notes()`) | Asks with no answer after `referrals.wait_days` | the referral log |
-| Background JD fetch (`start_prep`) | Every session, for new roles | `work/jd_prep.log` |
+| Background JD fetch (`start_prep`) | Each session, for the auto-score pick only, and only if `.venv` exists | `work/jd_prep.log` |
 | Inbox bookkeeping (`tools/inbox_hook.py`) | After every Gmail read, by the PostToolUse hook in `.claude/settings.json`, not by the model | `state/inbox_seen.json`, `state/inbox_checked.json` |
 | Board auto-add | GitHub Projects' own workflow, set up once by the user (see the wiki's manual clicks); adds each new `role` issue to the board | none |
 
@@ -302,7 +303,7 @@ The `tailored.json` contract:
 
 ```text
 {"key": "<the role's ref: 16 hex characters>",
- "headline": "1-120 chars, no contact details, no names not in the career docs",
+ "headline": "1-120 chars, no contact details, no names not in the career docs (by convention the master P00 line, unchanged)",
  "sections": [{"heading": "1-80 chars",
                "bullets": [{"source_id": "P/B/E/K id", "text": "1-450 chars, or no longer than its own master line"}]}],
  "skills": ["each must appear in the career docs"],

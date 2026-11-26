@@ -120,7 +120,7 @@ Nothing beyond your paid Claude subscription (Claude Pro or Max, billed by Anthr
 Claude's work counts toward your plan's normal usage limits. Briefings and tracking are
 light; scoring means reading each job description in full, and tailoring is heavier still.
 Measured on Claude Pro (three scoring batches, 45 roles): scoring costs **0.25–0.5% of a
-session per role** ("session" here means one usage window of your plan, the limit that resets after a few hours, not one conversation), so 10% of a session scores roughly 20–40 roles. Claude also scores a few new roles automatically at the start of a session; ask it to turn that off if you'd rather spend your allowance yourself. Large batches are cheaper per
+session per role** ("session" here means one usage window of your plan, the limit that resets after a few hours, not one conversation), so 10% of a session scores roughly 20–40 roles. Claude also scores unscored roles automatically, as the last job of a session; ask it to turn that off if you'd rather spend your allowance yourself. Large batches are cheaper per
 role (31 roles took 8%; batches of 6–8 took 3–4%). Score the freshest roles first. If you
 reach your limit, pick up where you left off when it resets: nothing is lost. The automatic runs use about 15–25 minutes a day of GitHub Actions, within the free
 plan's 2,000 minutes a month for private repos.

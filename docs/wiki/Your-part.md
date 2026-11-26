@@ -74,7 +74,7 @@ GitHub gives Claude no way to do these three, so they are yours. Claude tells yo
   Workflows → Auto-add to project**, set the filter to `is:issue label:role`, and turn
   it on. This is what puts each new job on the board.
 - [ ] **View sort order (once per view).** Claude prints the menu item to pick, for example
-  "All Roles → Sort by → Posted, descending → Save view".
+  "All Roles → Sort by → Fit, descending → Save view".
 - [ ] **Stop the email flood (once).** On your repository page: **Watch → Participating and
   @mentions**. Otherwise GitHub emails you about every new job.
 
@@ -170,7 +170,7 @@ only LinkedIn uses are in [LinkedIn consent](#linkedin-consent-the-three-opt-ins
 | Claude has a tailored CV or cover letter ready | Read it: Claude only reuses your own lines, but you're the one sending it |
 | Claude has filled an application form | Check each page; **you** click Submit |
 | An Indeed/Glassdoor job needs scoring | Paste the job description (Claude never opens those sites). LinkedIn job descriptions it reads itself in your Chrome if you switched that on ([LinkedIn consent](#linkedin-consent-the-three-opt-ins-and-one-narrow-lookup)) |
-| Claude proposes a settings change, new job boards or a fix | Say yes or no. Nothing changes without your yes |
+| Claude proposes a settings change, new job boards or a fix | Say yes or no; these wait for your answer. The routine things Claude does by itself (filling card columns, moving Skip-scored and closed roles to Skipped, the weekly title-rating adjustment) are described in [Using it](Using-it.md) and [Board](Board.md) |
 | Claude asks who can help at a company you'd apply to | Tell it the names. Message people you know yourself (Claude gives you the role links); for recruiters or hiring managers it drafts the note in the chat (never saved to a file) after a fresh reviewer has read it as the recruiter would. **You** send everything, then tell it what happened |
 | You get a new job, certification or achievement | Tell Claude; it adds it to your CV lines so future applications can use it |
 
@@ -206,6 +206,6 @@ only LinkedIn uses are in [LinkedIn consent](#linkedin-consent-the-three-opt-ins
 | Pause the search | Tell Claude "pause the radar" (it switches off the scheduled runs), or on GitHub: Actions → job-radar → ⋯ → Disable workflow |
 | Revoke board access | GitHub → Settings → Applications → Authorized OAuth Apps → GitHub CLI → Revoke |
 | Revoke mailbox access | Delete the app password in your Google Account, and the two secrets in the repo settings |
-| Delete everything | Delete your private repository, its board and the folder on your computer. job-radar stores nothing anywhere else. Two things sit outside it: Claude Code keeps its own conversation history on your computer, and what you paste into a Claude conversation (your CV, job descriptions) is processed by Anthropic under your account's data settings, so check those if that matters to you |
+| Delete everything | Delete your private repository, its board and the folder on your computer. Also remove what sits outside those, if you set it up: the two scheduled tasks on your PC, `job-radar-workday` and `job-radar-trigger` (ask Claude to remove them before you delete the folder), the app password and any mail forwarding filter in your Google Account, the Gmail connector in Claude and the Chrome extension, and the GitHub CLI's authorisation. Two more things are kept elsewhere: Claude Code keeps its own conversation history on your computer, and what you paste into a Claude conversation (your CV, job descriptions) is processed by Anthropic under your account's data settings, so check those if that matters to you |
 
 **Next:** [2. Using it](Using-it.md)

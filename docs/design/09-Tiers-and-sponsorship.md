@@ -39,10 +39,9 @@ company's pages, with evidence and links on the card ([4](04-Claude-session.md))
 entities, and a group can sponsor through a subsidiary with a different name
 (that shows as `no`). A short, generic brand can hit an unrelated company.
 
-**Fix a wrong match** in `profile/sponsor_overrides.csv`:
-
 **A name the register misses** is not a "no": for a role that would otherwise get a card, `tools/register_check.py` records the legal name found by research in `profile/sponsor_names.csv`.
 
+**Fix a wrong match** in `profile/sponsor_overrides.csv`:
 
 ```csv
 company,uk,nl

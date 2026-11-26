@@ -4,7 +4,9 @@ For a posting's employer, look it up in data/registers/{uk,nl}_sponsors.csv
 (refreshed weekly by tools/refresh_registers.py) and return:
 
   yes      exact normalized match, a prefix match ("Adyen" -> "ADYEN N.V. LONDON
-           BRANCH"), or a very close fuzzy match
+           BRANCH"), the exact "trading as" name of one entry ("Lemonade Finance" ->
+           "Rightcard Payment Services Limited t/a Lemonade Finance"), or a very close
+           fuzzy match
   unknown  a plausible but uncertain fuzzy match, or no employer name
   no       nothing close in the register
 
@@ -17,6 +19,7 @@ from __future__ import annotations
 
 import bisect
 import csv
+import re
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -29,6 +32,7 @@ from jobradar.paths import profile_path
 
 REG_DIR = ROOT / "data" / "registers"
 MIN_PREFIX = 4  # "ing" must not prefix-match "ingenieursbureau"
+_TRADING = re.compile(r"\b(?:t/as?|trading as)\b", re.I)  # "Legal Name Ltd T/A Brand"
 
 
 @dataclass(frozen=True)
@@ -52,6 +56,11 @@ class Register:
                 self.by_key[k] = n
             if w and (w not in by_words or len(n) < len(by_words[w])):
                 by_words[w] = n
+        self.trading: dict[str, set[str]] = {}  # "lemonadefinance" -> register names trading under it
+        for n in names:
+            for brand in _TRADING.split(n)[1:]:
+                if len(k := normalize(brand)) >= MIN_PREFIX:
+                    self.trading.setdefault(k, set()).add(n)
         self.keys = sorted(self.by_key)
         self.words = sorted(by_words)
         self.by_words = by_words
@@ -76,6 +85,13 @@ class Register:
                 names = sorted((self.by_words[h] for h in hits), key=len)
                 more = f" +{len(names) - 2} more" if len(names) > 2 else ""
                 return SponsorTag("unknown", " / ".join(names[:2]) + more, f"prefix:{len(names)} entities")
+        if k in self.trading:
+            # one legal entity (the register may list it twice in different capitals) is a match; several are ambiguous
+            entities = {normalize(n): n for n in sorted(self.trading[k])}
+            names = sorted(entities.values(), key=len)
+            if len(names) == 1:
+                return SponsorTag("yes", names[0], "trading-as")
+            return SponsorTag("unknown", " / ".join(names[:2]), f"trading-as:{len(names)} entities")
         best = process.extractOne(k, self.keys, scorer=fuzz.ratio, score_cutoff=self.unknown_score)
         if best:
             name, score = self.by_key[best[0]], round(best[1])

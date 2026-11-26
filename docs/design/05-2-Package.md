@@ -131,9 +131,9 @@ Worked examples: [Tiers and sponsorship](09-Tiers-and-sponsorship.md).
 | Name | Is |
 |---|---|
 | `MIN_PREFIX` | 4: shortest name allowed to prefix-match ("ing" must not match "ingenieursbureau"). |
-| `SponsorTag` | `status` (yes/no/unknown), `matched` (register name), `how` (exact/prefix/fuzzy:N/override). |
+| `SponsorTag` | `status` (yes/no/unknown), `matched` (register name), `how` (exact/prefix/trading-as/fuzzy:N/override). |
 | `Register` | One register indexed by normalized key and by normalized words, sorted for prefix search. |
-| `.lookup(company)` | Exact → whole-word prefix (one entity = yes, several = unknown) → fuzzy (≥94 yes, ≥86 unknown) → no. |
+| `.lookup(company)` | Exact → whole-word prefix (one entity = yes, several = unknown) → exact "trading as" name of an entry (one entity = yes, several = unknown) → fuzzy (≥94 yes, ≥86 unknown) → no. |
 | `_load_names()`, `_load_overrides()` | Read a register CSV / `sponsor_overrides.csv`. |
 | `Sponsors.tag(company, canonical)` | For UK and NL: an override if pinned; else look up the canonical name first, then the raw name. |
 | `default_sponsors()` | Cached, loads both registers (~135k names). |

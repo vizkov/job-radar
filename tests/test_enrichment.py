@@ -48,6 +48,16 @@ def test_overrides_and_canonical_fallback():
     assert s.tag("Northwave Cyber Security B.V.", "Northwave")["nl"].matched == "Northwave Nederland B.V."
 
 
+def test_trading_as_name_matches_its_legal_entity():
+    reg = Register(["Rightcard Payment Services Limited t/a Lemonade Finance", "Alpha Ltd T/A Bluebird",
+                    "Beta Ltd trading as Bluebird"])
+    tag = reg.lookup("Lemonade Finance")
+    assert (tag.status, tag.how) == ("yes", "trading-as")
+    assert tag.matched.startswith("Rightcard")
+    assert reg.lookup("Bluebird").status == "unknown"  # two legal entities trade under it
+    assert reg.lookup("Lemonade").status != "yes"      # only the whole trading name counts
+
+
 def test_missing_register_is_unknown():
     s = Sponsors(Register([]), NL)
     assert s.tag("Adyen")["uk"] == SponsorTag("unknown", how="register missing")

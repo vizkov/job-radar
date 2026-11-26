@@ -231,7 +231,9 @@ def check_tailor(data: dict, career: Career) -> tuple[list[str], list[str]]:
     """Returns (errors, warnings)."""
     errs, warns = [], []
     allowed = {"key", "headline", "sections", "skills", "cover_letter"}
-    optional = {"location", "dropped"}   # location: per-copy header location (the user's decision); dropped: {id: "no JD match: why"} for a master bullet left out (tools/cv_lint.py)
+    # location: per-copy header location (the user's decision); dropped: {id: "no JD match: why"} for a master bullet left out
+    # (tools/cv_lint.py); highlight: phrases of the chosen Key achievements to print in bold (tools/render_pdf.py)
+    optional = {"location", "dropped", "highlight"}
     if extra := set(data) - allowed - optional:
         errs.append(f"unexpected fields: {sorted(extra)}")
     if missing := allowed - set(data):
@@ -300,6 +302,15 @@ def check_tailor(data: dict, career: Career) -> tuple[list[str], list[str]]:
             check_line(f"sections[{i}].bullets[{j}]", b, SECTION_KINDS)
             if isinstance(b, dict):
                 used.append(str(b.get("source_id")))
+    if "highlight" in data:
+        achieved = [b["text"] for s in sections if isinstance(s, dict) for b in (s.get("bullets") or [])
+                    if isinstance(b, dict) and isinstance(b.get("text"), str) and career.has(str(b.get("source_id")))
+                    and career.items[str(b["source_id"])].section == "Key achievements"]
+        marks = data["highlight"]
+        if not isinstance(marks, list) or len(marks) > 8 or not all(isinstance(m, str) and 2 <= len(m) <= 60 for m in marks):
+            errs.append("highlight must be a list of at most 8 phrases, 2-60 characters each")
+        elif (absent := [m for m in marks if not any(m in t for t in achieved)]):
+            errs.append(f"highlight phrases not found word for word in a chosen Key achievement: {absent}")
     if (dupes := sorted({u for u in used if used.count(u) > 1})):
         errs.append(f"lines used twice: {dupes}")
     for i, sk in enumerate(data["skills"] if isinstance(data["skills"], list) else []):

@@ -56,10 +56,11 @@ def test_headline_uses_the_designs_middots():
 
 def test_resume_layout_follows_the_design():
     h = rp.resume_html(DATA, career(), CONTACT)
-    order = [h.index(s) for s in ("<h2>Profile", "<h2>Key achievements", "<h2>Experience", "<h2>Skills",
+    order = [h.index(s) for s in ('<p class="profile">', "<h2>Key achievements", "<h2>Experience", "<h2>Skills",
                                   "Projects &amp; writing", "<h2>Education")]
     assert order == sorted(order)                                     # the design's section order
-    assert "Application security engineer with 6+ years. Hands-on in pentesting." in h   # profile = one paragraph
+    assert 'Application security engineer with 6+ years. <span class="nw">Hands-on</span> in pentesting.' in h   # one paragraph
+    assert "<h2>Profile" not in h
     assert "<b>Impact:</b> found a chain" in h                        # bold label on a key achievement
     assert '<span class="co">ExampleSec <small>(formerly Acme)</small></span>' in h
     assert "Leeds · Jan 2021 – Present" in h                          # city and dates, right-aligned meta
@@ -114,3 +115,27 @@ def test_posting_title_hyphen_is_tidied_and_volunteering_takes_its_label_from_th
     c.items["B09"] = Item("B09", "Ran sessions for young people.", "Experience", "Volunteering — Helpers Abroad — 2023")
     data = dict(DATA, sections=[{"heading": "x", "bullets": DATA["sections"][0]["bullets"] + [{"source_id": "B09", "text": "Ran sessions for young people."}]}])
     assert "<b>Helpers Abroad</b>: Ran sessions for young people (2023)" in rp.resume_html(data, c, CONTACT)
+
+
+def test_highlight_bolds_only_listed_achievement_phrases():
+    h = rp.resume_html({**DATA, "highlight": ["chain of flaws", "not there"]}, career(), CONTACT)
+    assert "<b>Impact:</b> found a <b>chain of flaws</b>" in h and "not there" not in h
+
+
+def test_hyphenated_words_never_break_and_tags_are_left_alone():
+    out = rp.keep_hyphens('<a href="https://a-b.example/x-y">insider-threat and source-code-level</a>')
+    assert out == ('<a href="https://a-b.example/x-y"><span class="nw">insider-threat</span> and '
+                   '<span class="nw">source-code-level</span></a>')
+
+
+def test_fonts_are_inlined_from_the_project():
+    css = rp.font_css()
+    assert css.count("@font-face") == 5 and "font-style: italic" in css and "fonts.googleapis" not in css
+
+
+def test_company_summary_is_dropped_only_when_the_config_says_so(tmp_path):
+    cfg = tmp_path / "config.json"
+    assert rp.without_company_summary(DATA, career(), cfg) == DATA          # no config: keep it
+    cfg.write_text('{"cv_company_summary": false}', encoding="utf-8")
+    h = rp.resume_html(rp.without_company_summary(DATA, career(), cfg), career(), CONTACT)
+    assert "Security for banks and airlines" not in h and 'class="co">ExampleSec' in h and "Led threat modelling" in h

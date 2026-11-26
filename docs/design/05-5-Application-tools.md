@@ -82,13 +82,13 @@ unless `validated.sha256` matches the current `tailored.json`). By default it wr
 reviewers; `--md` also writes it into the application folder, `--docx` adds the Word file. With no Chrome or Edge it
 falls back to Markdown in the folder.
 
-## `tools/render_pdf.py`: the CV and cover letter as PDFs in the user's Claude Design layout
+## `tools/render_pdf.py`: the CV and cover letter as PDFs
 
 Called by `render_resume.py` (the default). No LLM, nothing to pip install: HTML is printed to PDF with headless Chrome or Edge (`find_browser()`, `print_pdf()` with a throwaway user-data dir so an open browser doesn't interfere). `resume_html(data, career, contact)` takes the **tailored text** and the **structure from the master CV**, so the PDF cannot show a date or employer the master doesn't have.
 
-The look was measured from the user's `Downloads/cv.pdf` and `cover.pdf`; change `CSS` and the `@page` rules to change it:
+To change the look, change `CSS` and the `@page` rules:
 
-- CV: Arial, A4, 43 pt side margins, teal `#005477` headings, 10 pt body at a 1.43 line height, a rule under the header, right-aligned city and dates, a two-column skills grid.
+- CV: Roboto (the files in `tools/fonts/`, SIL OFL, inlined into the page so a render needs no network), A4, 43 pt side margins, teal `#0f766e` headings with a rule under each, thin rules between roles, a heavier rule under the header, no "Profile" heading, 9.6 pt body at a 1.43 line height, right-aligned city and dates. Phrases in `tailored.json` `highlight` are bold in Key achievements; hyphenated words never break (`keep_hyphens()`), because a text extractor joins the halves; `cv_company_summary: false` in `profile/config.json` omits the company's one-line description (`without_company_summary()`).
 - Cover letter: US Letter, 54 pt margins, 10.5 pt at 1.5.
 
 Small helpers:

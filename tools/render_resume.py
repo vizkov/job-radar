@@ -99,6 +99,8 @@ def main(argv=None) -> int:
     contact = load_career().contact
     if data.get("location"):
         contact = {**contact, "location": data["location"]}
+    from render_pdf import without_company_summary  # tools/ is on sys.path when run as a script
+    data = without_company_summary(data, load_career())
     scratch = SCRATCH / app.name
     scratch.mkdir(parents=True, exist_ok=True)
     md, cover = to_markdown(data, contact), cover_letter(data, contact)

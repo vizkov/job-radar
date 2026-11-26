@@ -1,18 +1,23 @@
-"""Render a validated tailored CV and cover letter as PDFs in the user's Claude Design layout. No LLM here.
+"""Render a validated tailored CV and cover letter as PDFs in one layout. No LLM here.
 
 Called by  python tools/render_resume.py <folder>  (the default output; it first checks the SHA-256 that
 tools/jd_check.py tailor saved, so only validated text is rendered). Writes resume.pdf and cover_letter.pdf.
 
-The layout (Arial, A4 CV / US Letter cover letter, teal #005477 headings, a rule under the header, right-aligned
-dates on roles; education and volunteering years stay inline so parsers keep them attached) copies the user's Downloads/cv.pdf and cover.pdf. The text is the tailored text; the structure (company,
+The layout (Roboto from tools/fonts, A4 CV / US Letter cover letter, teal #0f766e headings with a rule under each, rules
+between roles, no "Profile" heading, right-aligned dates on roles; education and volunteering years stay inline so
+parsers keep them attached). Phrases listed in tailored.json "highlight" are bold in Key achievements, and hyphenated
+words never break across lines (a text extractor would join them: "insiderthreat"). profile/config.json
+"cv_company_summary": false leaves out the one-line company description. The text is the tailored text; the structure (company,
 role, city and dates for each bullet, skill categories, education years) comes from profile/career/master_resume.md,
 so nothing is invented. HTML is printed to PDF with headless Chrome or Edge (already on the machine, no extra
 packages); the PDF is real text, not an image, so applicant tracking systems can read it.
 """
 from __future__ import annotations
 
+import base64
 import csv
 import html
+import json
 import os
 import re
 import shutil
@@ -22,7 +27,8 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-TEAL, INK, GREY = "#005477", "#1d1e20", "#44464a"
+TEAL, INK, GREY, HAIR = "#0f766e", "#151412", "#44464a", "#c9c8c3"
+FONTS = ROOT / "tools" / "fonts"   # Roboto (SIL OFL 1.1, see OFL.txt): stored here so a render needs no network
 
 BROWSERS = [
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -119,18 +125,29 @@ def header_html(contact: dict, headline: str) -> str:
             f'<div class="contact">{"".join(f"<span>{p}</span>" for p in line2)}</div><hr class="rule">')
 
 
+def font_css() -> str:
+    """@font-face rules with the font files inlined: the page is printed from a temporary folder."""
+    rules = []
+    for path in sorted(FONTS.glob("roboto-*.ttf")):
+        _, weight, *style = path.stem.split("-")
+        data = base64.b64encode(path.read_bytes()).decode("ascii")
+        rules.append(f"@font-face {{ font-family: Roboto; font-weight: {weight}; font-style: {style[0] if style else 'normal'}; "
+                     f"src: url(data:font/ttf;base64,{data}) format('truetype'); }}")
+    return "\n".join(rules)
+
+
 CSS = f"""
 * {{ box-sizing: border-box; }}
-body {{ font-family: Arial, Helvetica, sans-serif; color: {INK}; margin: 0; font-size: 10pt; line-height: 1.43; }}
+body {{ font-family: Roboto, Arial, Helvetica, sans-serif; color: {INK}; margin: 0; font-size: 9.6pt; line-height: 1.43; }}
 a {{ color: {TEAL}; text-decoration: none; }}
-h1 {{ font-size: 23pt; line-height: 1.15; margin: 0; font-weight: bold; }}
-.headline {{ color: {TEAL}; font-size: 11.5pt; margin-top: 4pt; line-height: 1.3; }}
+h1 {{ font-size: 23pt; line-height: 1.15; margin: 0; font-weight: 900; }}
+.headline {{ font-weight: 500; font-size: 10.6pt; margin-top: 4pt; line-height: 1.3; }}
 .contact {{ color: {GREY}; font-size: 9.5pt; line-height: 1.65; }}
 .contact span {{ margin-right: 9pt; white-space: nowrap; }}
 .headline + .contact {{ margin-top: 5pt; }}
-.rule {{ border: 0; border-top: .75pt solid {INK}; margin: 7pt 0 0; }}
+.rule {{ border: 0; border-top: 1.6pt solid {INK}; margin: 7pt 0 0; }}
 h2 {{ color: {TEAL}; font-size: 9.5pt; letter-spacing: 0; text-transform: uppercase; margin: 10.4pt 0 4pt;
-     font-weight: bold; break-after: avoid; }}
+     font-weight: bold; break-after: avoid; border-bottom: .6pt solid {INK}; padding-bottom: 2pt; }}
 p {{ margin: 0; }}
 ul {{ margin: 0; padding-left: 12pt; }}
 li {{ margin-top: 2.6pt; orphans: 2; widows: 2; }}
@@ -140,18 +157,32 @@ ul ul {{ list-style: circle; margin-top: 3pt; }}
 .co {{ font-size: 10.5pt; font-weight: bold; }}
 .co small {{ font-size: 10pt; font-weight: normal; color: {GREY}; }}
 .desc {{ color: {GREY}; font-style: italic; }}
-.role {{ margin-top: 7pt; break-inside: avoid; break-after: avoid; }}
+.role {{ margin-top: 9pt; break-inside: avoid; break-after: avoid; }}
+.block ul + .role {{ border-top: .5pt solid {HAIR}; margin-top: 7pt; padding-top: 6pt; }}
 .sub {{ color: {GREY}; }}
 .block {{ margin-top: 8pt; }}
-.block + .block {{ margin-top: 10pt; }}
+.block + .block {{ border-top: .5pt solid {HAIR}; margin-top: 8pt; padding-top: 7pt; }}
+.profile {{ margin-top: 9pt; }}
+.nw {{ white-space: nowrap; }}
 .skills p {{ margin: 0 0 3pt; padding-left: 0; }}
-.skills b {{ font-weight: bold; }}
+.skills b {{ font-weight: bold; color: {TEAL}; }}
 .edu p {{ margin-top: 2pt; }}
 """
 
 
+_HYPHENATED = re.compile(r"[^\s<>()/,;:]+(?:-[^\s<>()/,;:]+)+")
+
+
+def keep_hyphens(body: str) -> str:
+    """Wrap every hyphenated word in the page's text (never inside a tag) so it cannot break at the hyphen."""
+    parts = re.split(r"(<[^>]*>)", body)
+    return "".join(p if p.startswith("<") else _HYPHENATED.sub(lambda m: f'<span class="nw">{m.group(0)}</span>', p)
+                   for p in parts)
+
+
 def page(css_extra: str, body: str) -> str:
-    return f'<!doctype html><html><head><meta charset="utf-8"><style>{CSS}{css_extra}</style></head><body>{body}</body></html>'
+    return (f'<!doctype html><html><head><meta charset="utf-8"><style>{font_css()}{CSS}{css_extra}</style></head>'
+            f'<body>{keep_hyphens(body)}</body></html>')
 
 
 # ---------------------------------------------------------------- resume
@@ -193,6 +224,34 @@ def split_label(text: str) -> tuple[str, str]:
     return "", text.strip()
 
 
+def highlight(markup: str, phrases: list[str]) -> str:
+    """Bold the first occurrence of each phrase in an achievement's text, never inside a tag."""
+    for phrase in phrases:
+        parts = re.split(r"(<[^>]*>)", markup)
+        for n, part in enumerate(parts):
+            if not part.startswith("<") and esc(phrase) in part:
+                parts[n] = part.replace(esc(phrase), f"<b>{esc(phrase)}</b>", 1)
+                break
+        markup = "".join(parts)
+    return markup
+
+
+def without_company_summary(data: dict, career, config: Path | None = None) -> dict:
+    """With "cv_company_summary": false in profile/config.json, drop the company's one-line description (a B line under a
+    "Company — City — dates" heading that has roles of its own). The line stays in the master and in tailored.json."""
+    path = config or ROOT / "profile" / "config.json"
+    try:
+        keep = json.loads(path.read_text(encoding="utf-8")).get("cv_company_summary", True)
+    except (OSError, ValueError):
+        keep = True
+    if keep:
+        return data
+    contexts = {b["desc_ctx"] for b in experience_structure(career) if b["desc_ctx"] and b["roles"]}
+    hidden = {i for i, it in career.items.items() if i.startswith("B") and it.context in contexts}
+    return {**data, "sections": [{**s, "bullets": [b for b in s["bullets"] if b["source_id"] not in hidden]}
+                                 for s in data["sections"]]}
+
+
 def resume_html(data: dict, career, contact: dict) -> str:
     chosen = [(b["source_id"], b["text"]) for sec in data["sections"] for b in sec["bullets"]]
     by_id = dict(chosen)
@@ -202,12 +261,13 @@ def resume_html(data: dict, career, contact: dict) -> str:
 
     out = [header_html(contact, pretty_headline(data["headline"]))]
     if profile := of("Summary"):
-        out.append('<h2>Profile</h2><p>' + esc(" ".join(t for _, t in profile)) + "</p>")
+        out.append('<p class="profile">' + esc(" ".join(t for _, t in profile)) + "</p>")   # no heading: the rule above sets it apart
     if ach := of("Key achievements"):
         lis = []
         for _, t in ach:
             label, rest = split_label(t)
-            lis.append(f"<li><b>{esc(label)}:</b> {rich(rest)}</li>" if label else f"<li>{rich(t)}</li>")
+            text = highlight(rich(rest if label else t), data.get("highlight") or [])
+            lis.append(f"<li><b>{esc(label)}:</b> {text}</li>" if label else f"<li>{text}</li>")
         out.append("<h2>Key achievements</h2><ul>" + "".join(lis) + "</ul>")
 
     exp = []
@@ -329,6 +389,7 @@ def render_pdfs(app: Path, data: dict, career, ref: str) -> list[str]:
     if data.get("location"):
         contact = {**contact, "location": data["location"]}
     role_title, company = role_and_company(ref)
+    data = without_company_summary(data, career)
     print_pdf(resume_html(data, career, contact), app / "resume.pdf")
     if not data.get("cover_letter"):   # CV-only application (the user, 2026-11-02): no letter PDF, not an empty one
         return ["resume.pdf"]

@@ -57,6 +57,10 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    - Skills must appear somewhere in the career docs.
    - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
      two pages.
+   - **Bold numbers:** set `"highlight"` in `tailored.json` to the exact phrases of the chosen Key achievements that carry the
+     result (usually one per line, e.g. "around 50%", "three weeks to one"); the renderer bolds only those, and
+     `jd_check.py` rejects a phrase that is not word for word in an achievement. `"cv_company_summary": false` in
+     `profile/config.json` leaves the company's one-line description out of the PDF (still cite it in `tailored.json`).
    - **Match the user's design (their `cv.pdf` / `cover.pdf`)**: sections in this order:
      `Summary` (the `P` lines under "Summary", which become the profile paragraph; **rewrite them heavily for the role**, in the JD's vocabulary, from facts the master and stories back: the Profile is the section that converges most; `writing-rules.md` section 2), `Key achievements`
      (**always include it**: it is part of the user's design and their master CV. **Tailor it like every other section (but it tells outcomes, not methods; `writing-rules.md` section 2):**

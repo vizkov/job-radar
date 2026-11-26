@@ -88,7 +88,7 @@ Called by `render_resume.py` (the default). No LLM, nothing to pip install: HTML
 
 To change the look, change `CSS` and the `@page` rules:
 
-- CV: Roboto (the files in `tools/fonts/`, SIL OFL, inlined into the page so a render needs no network), A4, 43 pt side margins, black headings with a rule under each, teal `#0f766e` only on links, skill category names and bold words in list items, thin rules between roles, a heavier rule under the header, no "Profile" heading, 9.6 pt body at a 1.43 line height, right-aligned city and dates. Phrases in `tailored.json` `highlight` are bold in Key achievements; hyphenated words never break (`keep_hyphens()`), because a text extractor joins the halves; `cv_company_summary: false` in `profile/config.json` omits the company's one-line description (`without_company_summary()`).
+- CV: Roboto (the files in `tools/fonts/`, SIL OFL, inlined into the page so a render needs no network), A4, 43 pt side margins, black headings with a rule under each, teal `#0f766e` only on links, skill category names and bold words in list items, thin rules between roles, a heavier rule under the header, no "Profile" heading, 10 pt body at a 1.43 line height, right-aligned city and dates. Phrases in `tailored.json` `highlight` are bold in Key achievements; hyphenated words never break (`keep_hyphens()`), because a text extractor joins the halves; `cv_company_summary: false` in `profile/config.json` omits the company's one-line description (`without_company_summary()`).
 - Cover letter: US Letter, 54 pt margins, 10.5 pt at 1.5.
 
 Small helpers:

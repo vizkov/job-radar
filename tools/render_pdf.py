@@ -28,7 +28,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 TEAL, INK, GREY, HAIR = "#0f766e", "#151412", "#44464a", "#c9c8c3"
-NAME_PT, LEAD_PT, BODY_PT = 23, 10.6, 9.6   # the only type sizes: name; headline and letter text; everything else
+NAME_PT, LEAD_PT, BODY_PT = 23, 10.6, 10   # the only type sizes: name; headline and letter text; everything else
 FONTS = ROOT / "tools" / "fonts"   # Roboto (SIL OFL 1.1, see OFL.txt): stored here so a render needs no network
 
 BROWSERS = [

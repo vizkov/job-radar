@@ -144,6 +144,41 @@ def diff_seen(groups: list[Group], seen: dict, today: str) -> list[Group]:
     return new
 
 
+def follow_retitles(groups: list[Group], unseen: set[str], seen: dict, rows: list[dict], carded: set[str],
+                    today: str) -> list[Group]:
+    """A listing keeps its ID when its title (or country) changes, so diff_seen calls it already reported. For a group whose
+    posting ID is on an earlier matches.csv row under another ref:
+    - that earlier role has a card (or one queued): keep it marked as seen, so it isn't labelled possibly-closed; no new card;
+    - otherwise, the first time the new title appears (its key is in `unseen`): return the group, to be recorded and
+      considered for the board like any new role (the user, 2026-11-26: a "Lead" role retitled "Senior" vanished).
+    Mutates `seen`."""
+    by_id: dict[tuple[str, str], set[str]] = {}
+    for row in rows:
+        if row.get("external_id"):
+            by_id.setdefault((row.get("source") or "", row["external_id"]), set()).add(row["ref"])
+    keys_of: dict[str, str] = {}
+    out = []
+    for g in groups:
+        earlier = set().union(*(by_id.get((p.source, p.external_id), set()) for p in g.postings)) - {role_ref(g.key)}
+        if not earlier:
+            continue
+        if earlier & carded:
+            keys_of = keys_of or {role_ref(k): k for k in seen if k.startswith("c:")}
+            for ref in earlier & carded:
+                if ref in keys_of:
+                    seen[keys_of[ref]] = today
+        elif g.key in unseen:
+            out.append(g)
+    return out
+
+
+def read_matches_rows(path) -> list[dict]:
+    if not path.exists():
+        return []
+    with open(path, encoding="utf-8", newline="") as fh:
+        return list(csv.DictReader(fh))
+
+
 @lru_cache(maxsize=1)
 def high_fit_targets() -> frozenset:
     """Companies marked Fit = High in targets.tsv (read once per run)."""
@@ -434,7 +469,13 @@ def main(argv=None):
     LOG_DROPS = True
     kept, matched = select(results, outside, dropped=dropped)
     LOG_DROPS = False
-    new = diff_seen(group_postings(kept), seen, today)
+    groups = group_postings(kept)
+    unseen = {g.key for g in groups if g.key not in seen}
+    new = diff_seen(groups, seen, today)
+    carded = set(load(STATE / "issue_map.json", {})) | {q["ref"] for q in load_queue(STATE / "board_queue.json")}
+    fresh = {g.key for g in new}
+    new += follow_retitles([g for g in groups if g.key not in fresh], unseen, seen,
+                           read_matches_rows(DATA / "matches.csv"), carded, today)
     enrich(new)
     broken = update_health(health, results)
     digest = render_digest(today, baseline, new, broken, results, matched)

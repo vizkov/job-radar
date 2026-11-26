@@ -113,6 +113,10 @@ listings were dropped.
 
 ### Deduplicate and diff: `group_postings()` then `diff_seen()`
 
+**Retitled listings.** A listing keeps its ID when its title changes, so `diff_seen()` alone would never report it again.
+`follow_retitles()` runs next: if the earlier role has no card, the new title is added as a new role (once); if it has one,
+the card stays marked as seen and no second card is made.
+
 `group_postings()` (in `dedupe.py`) puts postings with the same **content key**
 (company + title + primary country, all normalized) into one `Group`. The same
 "Senior Penetration Tester" at Bridewell in the UK, found on its ATS board and on

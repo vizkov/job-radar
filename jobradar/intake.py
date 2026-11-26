@@ -58,6 +58,8 @@ def admit(p: Posting, override: frozenset[str] | set[str] = frozenset(), dry_run
     seen = _load(radar.STATE / "seen.json", {})
     groups = group_postings([p])
     new = radar.diff_seen(groups, seen, today)
+    if not new and role_ref(groups[0].key) not in {r["ref"] for r in radar.read_matches_rows(radar.DATA / "matches.csv")}:
+        new = groups   # marked as seen but never recorded (a retitled listing): a role the user hands over is added
     if not new:
         return {"status": "known", "reasons": reasons, "ref": role_ref(groups[0].key)}
     radar.enrich(new)

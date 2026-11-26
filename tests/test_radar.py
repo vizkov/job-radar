@@ -165,3 +165,20 @@ def test_unrecognised_places_are_sampled_only_for_matching_titles(monkeypatch):
           Posting("ats", "Acme", "Sales Manager", "2 Locations", frozenset(), "u3")]
     radar.select([SourceResult("ats", postings=ps)], include_outside=False, matcher=CompanyMatcher(["Acme"], []))
     assert radar.UNRECOGNISED["ats"] == ["Smalltown"] and radar.UNRECOGNISED_N["ats"] == 2
+
+
+def test_a_retitled_listing_is_recorded_once_unless_the_old_title_has_a_card():
+    def group(title):
+        return group_postings([Posting(source="linkedin_email", company="Acme", title=title, location="London",
+                                       countries=frozenset(["GB"]), url="https://example.com/9", external_id="9")])[0]
+
+    lead, senior = group("Lead Security Engineer"), group("Senior Security Engineer")
+    rows = [{"ref": radar.role_ref(lead.key), "source": "linkedin_email", "external_id": "9"}]
+    seen = {lead.key: "2026-01-01", "linkedin_email:9": "2026-01-01"}
+    assert radar.diff_seen([senior], seen, "2026-01-10") == []          # the ID is known, so diff_seen skips it
+    assert radar.follow_retitles([senior], {senior.key}, seen, rows, set(), "2026-01-10") == [senior]
+    assert radar.follow_retitles([senior], set(), seen, rows, set(), "2026-01-11") == []   # only the first time
+    carded = {radar.role_ref(lead.key)}
+    assert radar.follow_retitles([senior], {senior.key}, seen, rows, carded, "2026-01-12") == []
+    assert seen[lead.key] == "2026-01-12"                              # the card is not left to look closed
+    assert radar.follow_retitles([lead], set(), seen, rows, set(), "2026-01-12") == []     # unchanged title

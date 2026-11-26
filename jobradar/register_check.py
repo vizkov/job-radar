@@ -13,7 +13,7 @@ from datetime import date, timedelta
 from pathlib import Path
 
 from jobradar.matching import normalize
-from jobradar.paths import profile_path
+from jobradar.paths import profile_dir
 
 ROOT = Path(__file__).resolve().parent.parent
 HOLDS = ROOT / "state" / "register_check.csv"
@@ -25,7 +25,9 @@ COUNTRY_KEY = {"GB": "uk", "NL": "nl"}
 
 
 def names_path() -> Path:
-    return profile_path("sponsor_names.csv")
+    """Always in the user's own settings folder. Not profile_path(): that falls back to the public examples/ when the file
+    does not exist yet, and this one is created by writing to it."""
+    return profile_dir() / "sponsor_names.csv"
 
 
 def _read(path: Path) -> list[dict]:

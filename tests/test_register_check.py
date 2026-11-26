@@ -58,6 +58,12 @@ def test_a_manual_pin_beats_a_looked_up_name(tmp_path):
     assert _load_overrides(manual, names)["brandname"]["uk"] == "no"
 
 
+def test_answers_are_never_written_to_the_public_examples(monkeypatch, tmp_path):
+    monkeypatch.setenv("JOBRADAR_PROFILE", str(tmp_path / "profile"))   # no sponsor_names.csv there yet
+    rc.record("Brandname", "uk", "Legal Entity Ltd", "https://brandname.example", TODAY)
+    assert (tmp_path / "profile" / "sponsor_names.csv").exists()
+
+
 def test_confirm_needs_a_real_entry_and_a_real_source(monkeypatch):
     monkeypatch.setattr(tool, "register_names", lambda country: ["Legal Entity Ltd"])
     with pytest.raises(ValueError):

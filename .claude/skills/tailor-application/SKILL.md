@@ -57,6 +57,8 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    - Skills must appear somewhere in the career docs.
    - Put the strongest evidence for the JD's must-haves first; drop irrelevant lines; keep it to what fits
      two pages.
+   - **Static Profile:** if `profile/config.json` has `"static_profile": true`, do not rewrite the Profile: copy the master's
+     Summary lines (without `P00`) unchanged and in master order; this overrides the "rewrite them heavily" advice below.
    - **Bold numbers:** set `"highlight"` in `tailored.json` to the exact phrases of the chosen Key achievements that carry the
      result (usually one per line, e.g. "around 50%", "three weeks to one"); the renderer bolds only those, and
      `jd_check.py` rejects a phrase that is not word for word in an achievement. `"cv_company_summary": false` in

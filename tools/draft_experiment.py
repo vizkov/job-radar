@@ -25,6 +25,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "tools"))
+from cv_lint import static_profile  # noqa: E402
+
 APPS, WORK = ROOT / "profile" / "applications", ROOT / "work"
 PERSONAS = ROOT / ".claude" / "skills" / "application-review" / "personas.md"
 RULES = ROOT / ".claude" / "skills" / "tailor-application" / "writing-rules.md"
@@ -49,7 +52,8 @@ def briefs(jd: Path, exp: Path, with_ad_only: bool = False, letter: bool = True)
     out = {
         "writer_with_record": writer + f"The candidate's record is the ONLY source of facts; read in full: {CAREER / 'master_resume.md'}, {CAREER / 'stories.md'} and "
             f"(optional) {CAREER / 'cover_blocks.md'}. Do NOT read anything under profile\\applications or work\\apps, or any other file.\n"
-            "Never invent: no employers, titles, dates, numbers, tools, certifications, links or claims the record does not support; select, reorder, merge and "
+            + ("The Profile is fixed: copy every master Summary line except P00 into the Summary section, unchanged and in master order. " if static_profile() else "")
+            + "Never invent: no employers, titles, dates, numbers, tools, certifications, links or claims the record does not support; select, reorder, merge and "
             "reword freely; use the ad's vocabulary only where the record backs it; leave out what the ad asks and the record lacks. "
             "The candidate is in India and would need visa sponsorship to relocate to the job's country; the notice period is 3 months. Never name the candidate's "
             "clients. Resume: two pages when printed (750-900 words). Cover letter: one page (300-380 words), first person, tied to this company and role.\n"

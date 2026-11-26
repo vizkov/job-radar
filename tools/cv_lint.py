@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -209,6 +210,15 @@ def ad_paraphrases(text: str, jd: str, skip: set[str] = frozenset(), min_pairs: 
     return out
 
 
+def static_profile() -> bool:
+    """"static_profile": true in the profile's config.json: the Profile is the master's, identical on every CV."""
+    path = ROOT / os.environ.get("JOBRADAR_PROFILE", "profile") / "config.json"
+    try:
+        return bool(json.loads(path.read_text(encoding="utf-8")).get("static_profile", False))
+    except (OSError, ValueError):
+        return False
+
+
 def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
     errs, warns = [], []
     chosen: dict[str, str] = {}
@@ -353,6 +363,15 @@ def tailored_issues(data: dict, career: Career) -> tuple[list[str], list[str]]:
     summ_lines = {s: chosen[s] for s in chosen if s in career.items and career.items[s].section == "Summary" and s != "P00"}
     for a, b, ph in cross_line_repeats(summ_lines):
         warns.append(f"Profile lines [{a}] and [{b}] both say \"{ph}\": say it once, reword the second")
+    if static_profile():   # the user, 2026-11-26: the Profile is not tailored; every master line, unchanged, in master order
+        master = [s for s, it in career.items.items() if it.section == "Summary" and s != "P00"]
+        used = [s for s in chosen if s in career.items and career.items[s].section == "Summary" and s != "P00"]
+        if used != master:
+            errs.append(f"the Profile is static: use {master} in that order (found {used})")
+        for s in used:
+            if norm(chosen[s]) != norm(career.items[s].text):
+                errs.append(f"[{s}] is a static Profile line: copy it from the master unchanged")
+        return errs, warns
     # Profile is the main place to converge with the JD: a Summary that is mostly the master's text was not tailored
     summ = [s for s in chosen if s in career.items and career.items[s].section == "Summary" and s != "P00"]
     changed = [s for s in summ if norm(chosen[s]) != norm(career.items[s].text)]

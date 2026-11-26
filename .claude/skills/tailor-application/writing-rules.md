@@ -29,6 +29,8 @@ The same event can appear in all three, told for each one's job, in different wo
 contact line). They are copied from the master verbatim; the checker requires them. Fit the page by trimming the tailored
 sections, never these.
 
+**Static Profile setting:** with `"static_profile": true` in `profile/config.json`, none of the tailoring below applies to the Profile: copy every master Summary line except `P00` unchanged, in master order (`cv_lint.py` errors otherwise), and put JD vocabulary only in bullets and Skills where the stories back it.
+
 **Profile** (P00-P04 and any P line under Summary; 2-3 sentences, about 40-60 words, three lines (the user, 2026-10-02: five lines was too long and repeated the achievements; `cv_lint.py` warns above 65)). **Tailored heavily, per role** (the user, 2026-10-01: the Profile is not
 static like the other sections; it converges a lot on the particular role). Who you are for *this* job: title, years, domain, the two or three strengths the JD
 asks for, your working level. Rewrite the P lines freely in the JD's own vocabulary (the checker only warns about heavy rewording here) as long as every

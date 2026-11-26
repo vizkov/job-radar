@@ -94,6 +94,7 @@ never skip it silently. A hook cannot drive Gmail or Chrome, so the block is the
   `tools/draft_experiment.py` (tailoring step 4b: writes the tailored draft's text and the agents' briefs for the Opus-draft comparison),
   `tools/add_role.py` (a job link the user hands you: runs it through the radar's own filters and bookkeeping, see below),
   `tools/discover_boards.py` (finds boards for targets with none; proposals only), `tools/manual.py`.
+- With `static_profile: true` in `profile/config.json` (the user's copy since 2026-11-26) the CV Profile is the master's, unchanged on every CV; `cv_lint.py` enforces it.
 - Tailoring always starts from `profile/career/` (never from another application's `tailored.json`); the CV headline is static (the user, 2026-10-05): master `P00` verbatim, never retitled per role; the CV header location is always
   "Open to relocation" (no destination); facts the user adds go into `stories.md` as "Also true" lines.
 - `profile/application_answers.json` (private) holds the user's standing answers to application-form questions (sponsorship, notice period,

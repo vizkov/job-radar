@@ -194,3 +194,21 @@ def test_comparable_without_a_baseline_warns():
     assert any("comparable" in x for x in w)
     _, w2 = cv_lint.line_issues("P09", "Tooling: Built a workflow, cutting an assessment's usual delivery from three weeks to one.")
     assert not any("comparable" in x for x in w2)
+
+
+def test_static_profile_demands_the_master_lines_unchanged(monkeypatch):
+    summary = [s for s, it in test_tailor.CAREER.items.items() if it.section == "Summary" and s != "P00"]
+    d = copy.deepcopy(test_tailor.GOOD)
+    d["sections"] = [s for s in d["sections"] if s["heading"] != "Summary"]
+    exact = [{"source_id": s, "text": test_tailor.CAREER.items[s].text} for s in summary]
+    d["sections"].insert(0, {"heading": "Summary", "bullets": exact})
+    monkeypatch.setattr(cv_lint, "static_profile", lambda: True)
+    assert not any("static Profile" in x or "Profile is static" in x for x in cv_lint.tailored_issues(d, test_tailor.CAREER)[0])
+    exact[0]["text"] += " Reworded for the ad."
+    assert any("static Profile line" in x for x in cv_lint.tailored_issues(d, test_tailor.CAREER)[0])
+    d["sections"][0]["bullets"] = exact[1:]
+    assert any("Profile is static" in x for x in cv_lint.tailored_issues(d, test_tailor.CAREER)[0])
+
+
+def test_static_profile_is_off_without_the_setting():
+    assert cv_lint.static_profile() is False   # tests run against examples/, which does not set it

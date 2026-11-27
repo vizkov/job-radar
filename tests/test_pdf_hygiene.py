@@ -1,4 +1,5 @@
 import sys
+import zipfile
 import zlib
 from pathlib import Path
 
@@ -34,3 +35,14 @@ def test_a_real_render_has_no_ligatures_or_browser_metadata(tmp_path):
     rp.print_pdf(rp.page("", "<p>workflow flaws, fixed efficiently, official offline files</p>" * 20, "Jane Doe"), out)
     pdf = out.read_bytes()
     assert rp.ligatures_in(pdf) == [] and b"HeadlessChrome" not in pdf and b"Skia/PDF" not in pdf
+
+
+def test_a_word_file_carries_the_name_not_the_library(tmp_path):
+    docx = pytest.importorskip("docx")
+    import render_resume as rr
+    out = tmp_path / "r.docx"
+    rr.to_docx({"headline": "H", "sections": [], "skills": []}, {"name": "Jane Doe"}, out)
+    p = docx.Document(out).core_properties
+    assert (p.author, p.last_modified_by, p.title, p.comments) == ("Jane Doe", "Jane Doe", "Jane Doe", "") and p.created.year >= 2026
+    with zipfile.ZipFile(out) as z:
+        assert not any(b"python-docx" in z.read(n) for n in z.namelist())

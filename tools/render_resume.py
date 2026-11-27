@@ -54,11 +54,22 @@ def cover_letter(data: dict, contact: dict) -> str:
     return "\n\n".join(["Dear Hiring Manager,", *paras, "Kind regards,", contact.get("name", "")]) + "\n"
 
 
+def own_properties(doc, name: str) -> None:
+    """python-docx stamps its own author, comment and a 2013 date into every file: make them the candidate's and today's."""
+    from datetime import datetime, timezone
+    p = doc.core_properties
+    p.author = p.last_modified_by = p.title = name
+    p.comments = p.subject = p.keywords = p.category = ""
+    p.created = p.modified = datetime.now(timezone.utc).replace(tzinfo=None, microsecond=0)
+    p.revision = 1
+
+
 def to_docx(data: dict, contact: dict, path: Path) -> None:
     from docx import Document
     from docx.shared import Pt
 
     doc = Document()
+    own_properties(doc, contact.get("name", ""))
     style = doc.styles["Normal"]
     style.font.name, style.font.size = "Calibri", Pt(11)
     doc.add_heading(contact.get("name", ""), level=0)

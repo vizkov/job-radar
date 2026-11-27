@@ -115,3 +115,8 @@ description: Build a tailored, ATS-safe CV and cover letter for one role from th
    and what you changed in its wording, and the **Skills rows chosen and dropped** the same way. Then show the user the diff the checker printed (what changed from their master
    CV), where the two files are, any JD must-haves their CV couldn't evidence, and the review verdict. They review, edit and
    apply themselves. Then offer to move the card to Shortlisted (`track`).
+8. **Last of all: the diff against the general resume** (the user, 2026-11-27: "once the 4 check scan has been run, provide a diff with
+   general resume as the final task"). After the last four-reader run and its fixes are rendered, run
+   `python tools/resume_diff.py <folder>` and put its output in the chat as it is (the user cannot see tool output), as the final thing in the
+   hand-over: nothing about the application follows it. If a later fix changes `tailored.json`, run it again. If the user skipped the
+   four readers, say so and give the diff all the same.

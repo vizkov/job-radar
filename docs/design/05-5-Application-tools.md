@@ -166,6 +166,10 @@ similar, most of which are deliberate condensations), `main()` prints one block 
 per role from `data/pipeline_log.jsonl` (`LOG`); an application whose stage is in `SUBMITTED` (Applied, Interview, Offer, Rejected) is printed as
 `SUBMITTED` and not checked, because its PDFs are the record of what was sent (only a `MISSING` note is kept); `--all` checks those too.
 
+**The closing diff** (the user, 2026-11-27). `tools/resume_diff.py <folder>` compares `tailored.json` with the general resume's,
+matched on master line IDs (reworded, added, left out, moved, skills and highlights). `tailor-application` ends with it,
+after the four-reader check.
+
 **PDF hygiene** (the user, 2026-11-27). `render_pdf.page()` titles each PDF with the candidate's name and turns ligatures off;
 `print_pdf()` blanks the browser's Creator and Producer strings (`blank_browser_metadata()`) and refuses a PDF whose text would
 come out with joined-letter characters (`ligatures_in()`), which breaks keyword search.

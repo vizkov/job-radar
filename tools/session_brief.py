@@ -457,16 +457,18 @@ def calibration_notes(now: datetime) -> list[str]:
             "data/calibration_log.jsonl so the scheduled runs use it" for c in changes]
 
 
-def referral_notes(now: datetime) -> list[str]:
-    """Referral asks with no answer after referrals.wait_days: suggest one follow-up or applying directly."""
+def referral_notes(now: datetime, closed: set[str] = frozenset()) -> list[str]:
+    """Referral asks with no answer after referrals.wait_days, for roles still live: a role in `closed` (latest Stage
+    Skipped or Rejected) has nothing left to follow up."""
     try:
         sys.path.insert(0, str(ROOT / "tools"))
         import referrals  # stdlib-only
         rows = referrals.pending(referrals.wait_days(), now.replace(tzinfo=timezone.utc))
+        rows = [r for r in rows if r["ref"] not in closed]
     except Exception:
         return []
     return [f"referral ask unanswered: {safe(r['person'], 30)} for role {r['ref']} ({r['days']} days); offer a "
-            "follow-up message once, or suggest applying directly (referrals skill)" for r in rows[:5]]
+            "follow-up message once, or, if not applied yet, applying directly (referrals skill)" for r in rows[:5]]
 
 
 GRACE = timedelta(hours=1)  # GitHub often starts scheduled runs late
@@ -744,7 +746,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append("- System updated since last session (re-read CLAUDE.md / skills if relevant; tell the user "
                      "about new capabilities in one line):")
         lines += [f"  - {u}" for u in updates[:8]]
-    checks += referral_notes(now)
+    checks += referral_notes(now, skipped)
     checks += calibration_notes(now)
     if design_note:
         checks.append(design_note)

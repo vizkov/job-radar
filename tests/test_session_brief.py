@@ -397,3 +397,13 @@ def test_workflows_health_flags_failures_thin_schedules_and_stale_maintenance_ru
     assert "1 of the last 3 search runs failed" in note and "weekly sponsor-register refresh has not succeeded in 9+ days" in note
     assert "monthly company-board check has not succeeded in 35+ days" in note
     assert sb.workflows_health(lambda cmd, t: (False, ""), now) is None            # gh unreachable: say nothing
+
+
+def test_referral_notes_leave_out_closed_roles(tmp_path, monkeypatch):
+    import referrals
+    log = tmp_path / "referrals.jsonl"
+    log.write_text("".join(json.dumps({"ref": r, "person": p, "status": "asked", "at": "2026-09-01T00:00:00+00:00"}) + "\n"
+                           for r, p in (("dead", "Anna"), ("live", "Ben"))), encoding="utf-8")
+    monkeypatch.setattr(referrals, "LOG", log)
+    out = sb.referral_notes(NOW, {"dead"})
+    assert len(out) == 1 and "Ben" in out[0] and "live" in out[0]

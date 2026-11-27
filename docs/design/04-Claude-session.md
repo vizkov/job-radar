@@ -201,7 +201,7 @@ Session-start work that runs on its own timer or trigger and has no line in the 
 | Board fill (`board_sync.py fill`: Tier, Sponsor, Country fields on new cards) | When new cards lack fields, at most every 10 minutes | the fill lock (`FILL_LOCK`) |
 | Starting the GitHub run again | When `last_run_health` sees a skipped slot | `gh workflow run job-radar` |
 | Scheduled tasks on the user's Windows PC (not GitHub, not Claude; only while the PC is on) | `job-radar-workday` twice a day (`tools/run_workday_pc.ps1` → `tools/workday_pc.py`: fetches Workday boards the runner's address cannot, pushes `state/workday_jobs.json`; log `work/workday_pc.log`). `job-radar-trigger` every 2 hours (`tools/trigger_radar.ps1`: starts a radar run when none was created in the last 3 hours; log `work/trigger_radar.log`) | Failure shows as `workday|blocked` or "PC copy too old" in the status page; no stamp |
-| Referral follow-up notes (`referral_notes()`) | Asks with no answer after `referrals.wait_days` | the referral log |
+| Referral follow-up notes (`referral_notes()`) | Asks with no answer after `referrals.wait_days`, on roles not Skipped or Rejected | the referral log |
 | Background JD fetch (`start_prep`) | Each session, for the auto-score pick only, and only if `.venv` exists | `work/jd_prep.log` |
 | Inbox bookkeeping (`tools/inbox_hook.py`) | After every Gmail read, by the PostToolUse hook in `.claude/settings.json`, not by the model | `state/inbox_seen.json`, `state/inbox_checked.json` |
 | Board auto-add | GitHub Projects' own workflow, set up once by the user (see the wiki's manual clicks); adds each new `role` issue to the board | none |
@@ -380,7 +380,7 @@ links and job IDs. For strangers Claude drafts a note in the chat (never saved t
 user's own lines, after a fresh agent has read it as the recruiter would, and the user sends it. `referrals.py ask/result/route` log every step to
 `data/referrals.jsonl`, set the card's **Referral** field (Finding contact, Asked, Referred, No
 route, Not needed) and comment the step on the issue. The session brief's `referral_notes()` lists
-asks unanswered after `referrals.wait_days` (default 4): one follow-up, or apply directly.
+asks unanswered after `referrals.wait_days` (default 4) on roles not Skipped or Rejected: one follow-up, or, if not applied yet, apply directly.
 
 Each opened profile gets a verdict (verified, unverified or not a route) from a short checklist (current employer, function and team, recent activity, shared
 ground); a hiring post's author is checked for where they work now. A recruiter is suggested as a route only with evidence that they hire for this function (the headline or activity names it, or the JD names them);

@@ -53,7 +53,7 @@ MATCHES = ROOT / "data" / "matches.csv"
 KINDS = ["person", "job_board"]   # a hiring post by someone at the company, or a job-board / "follow me for every opening" repost
 DEFAULTS = {
     "enabled": False, "max_searches": 8, "max_scrolls": 12, "max_people_per_session": 8, "max_post_age_days": 30,
-    "company_queries": 6, "company_extra": [], "dream_companies": [], "dream_consulting": [], "chrome_always": [], "sweep_quotas": {"dream_product": 3, "dream_consulting": 3, "network": 2, "other": 2}, "followup_max": 3, "followup_words": '("application security" OR "product security" OR "threat modelling" OR pentest OR "penetration testing")', "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
+    "company_queries": 6, "company_extra": [], "dream_companies": [], "dream_consulting": [], "chrome_always": [], "sweep_quotas": {"dream_product": 3, "dream_consulting": 3, "network": 2, "other": 2}, "followup_max": 3, "followup_reserve": 0, "followup_words": '("application security" OR "product security" OR "threat modelling" OR pentest OR "penetration testing")', "company_fit": "High", "network_only": False, "careers_site_companies": [], "not_words": ["contract", "contractor", "freelance"],
     # Each title is a LinkedIn query fragment, used as written: quotes keep a phrase together, OR joins spellings.
     "titles": ['("application security" OR appsec)', '"product security"', '("penetration tester" OR pentester OR "pen tester")',
                '("threat modelling" OR "threat modeling")', '("AI security" OR "LLM security")', '"security consultant"',
@@ -329,12 +329,21 @@ def lead_id(post_url: str) -> str:
     return hashlib.sha1(_clean_url(post_url).lower().encode()).hexdigest()[:10]
 
 
+OPTIONAL_SENIOR = re.compile(r"\(\s*senior\s*\)", re.I)   # "(Senior)" marks an optional level
+
+
 def _title_words(title: str) -> set[str]:
-    return set(re.findall(r"[a-z0-9]+", (title or "").lower())) - {"and", "the", "of", "for", "a", "in", "m", "f", "d", "w"}
+    title = OPTIONAL_SENIOR.sub(" ", (title or "").lower())
+    return set(re.findall(r"[a-z0-9]+", title)) - {"and", "the", "of", "for", "a", "in", "m", "f", "d", "w", "x", "team"}
 
 
-def known_roles(company: str, title: str, path: Path | None = None) -> list[dict]:
-    """Rows of matches.csv for the same employer and a similar title (most of the title's words shared)."""
+# words that make two otherwise alike titles different jobs
+RANKS = {"junior", "intermediate", "senior", "staff", "principal", "lead", "manager", "i", "ii", "iii", "iv"}
+SAME_ROLE, SIMILAR_ROLE = 0.75, 0.6
+
+
+def _title_matches(company: str, title: str, path: Path | None = None) -> list[tuple[bool, float, int, dict]]:
+    """(same job, share of all words, words shared, row) for the employer's rows with an alike title, closest first."""
     path = path or MATCHES
     if not path.exists():
         return []
@@ -345,10 +354,32 @@ def known_roles(company: str, title: str, path: Path | None = None) -> list[dict
         if not (key and other and (other == key or other.startswith(key + " ") or key.startswith(other + " "))):
             continue
         have = _title_words(row.get("title", ""))
-        share = len(want & have) / min(len(want), len(have)) if want and have else 0
-        if share >= 0.6:
-            hits.append((share, len(want & have), row))
-    return [r for *_, r in sorted(hits, key=lambda h: h[:2], reverse=True)]   # closest title first
+        if not (want and have):
+            continue
+        shared = len(want & have)
+        overall = shared / len(want | have)
+        optional = {"senior"} if any(OPTIONAL_SENIOR.search(x or "") for x in (title, row.get("title"))) else set()
+        ranks = RANKS - optional
+        same = (len((want - optional) & (have - optional)) / len((want | have) - optional or {""}) >= SAME_ROLE
+                and want & ranks == have & ranks)
+        if same or shared / min(len(want), len(have)) >= SIMILAR_ROLE:
+            hits.append((same, overall, shared, row))
+    return sorted(hits, key=lambda h: h[:3], reverse=True)
+
+
+def known_roles(company: str, title: str, path: Path | None = None) -> list[dict]:
+    """Rows of matches.csv that are the same job: same employer, nearly the same title words and the same rank."""
+    return [row for same, *_, row in _title_matches(company, title, path) if same]
+
+
+def similar_roles(company: str, title: str, path: Path | None = None) -> list[dict]:
+    """Alike but not the same: shown next to a new role so the session can check; never a reason to drop it."""
+    return [row for same, *_, row in _title_matches(company, title, path) if not same]
+
+
+def similar_note(company: str, title: str, path: Path | None = None) -> str:
+    near = similar_roles(company, title, path)[:1]
+    return "".join(f" (similar, check: ref {r['ref']} {r['title']} | {r.get('location', '')})" for r in near)
 
 
 def log_lead(post_url: str, author: str, company: str, title: str, location: str = "", posted: str = "",
@@ -384,6 +415,8 @@ def log_lead(post_url: str, author: str, company: str, title: str, location: str
            "stale": f"stale: the original post is {age} days old and the role is not confirmed open",
            "job_board": "job-board repost: not a contact; counts only as a sign the role is live",
            "new": "NEW: not in matches.csv. Check the JD, then add-role"}[status]
+    if status == "new":
+        msg += similar_note(company, title)
     return f"lead {lid}: {msg}", rec
 
 

@@ -23,6 +23,11 @@ def setup(monkeypatch):
     monkeypatch.setattr(pl, "fit_targets", lambda fit: ["O1", "O2"])
 
 
+def test_a_follow_up_reserve_leaves_slots_unplanned(monkeypatch):
+    setup(monkeypatch)
+    assert len(sp.plan(s(followup_reserve=1), ROWS, {}, {})) == 9
+
+
 def test_the_pass_is_split_3_3_2_2_and_each_company_appears_once(monkeypatch):
     setup(monkeypatch)
     out = sp.plan(s(), ROWS, {}, {})

@@ -33,6 +33,7 @@ reference.
 | 13 | [Security model](13-Security-model.md) | Threats and the defence for each |
 | 14 | [Setup and publishing](14-Setup-and-publishing.md) | Public template vs private copy, first-time setup, auto-publishing |
 | 15 | [Troubleshooting](15-Troubleshooting.md) | Symptoms → causes → fixes |
+| 16 | [Decision history](16-Decision-history.md) | The dates, reasons and incidents behind Claude's operating rules |
 
 ## Conventions in these pages
 

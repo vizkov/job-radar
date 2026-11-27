@@ -1,5 +1,7 @@
 """LinkedIn post discovery bookkeeping: query rotation, the people list, lead status, and add-role."""
+import pytest
 import csv
+
 import json
 import sys
 from datetime import date
@@ -121,6 +123,34 @@ def test_add_role_goes_through_the_radars_filters_and_needs_an_override(monkeypa
     assert "Posted by: [Ana](https://www.linkedin.com/in/ana)" in row_payload(row)["body"]
     assert "not added" in pl.add_role(rec["id"], "NL")    # now status added: cannot be added twice
     assert pl.stats()["added"] == 1
+
+
+@pytest.mark.parametrize("found, listed", [
+    ("Research Engineer, Platform Group: Research", "Intermediate Software Engineer, Platform Group: Tooling"),
+    ("(Senior) AI and cloud Security Consultant, Advisory", "(Senior) Security Engineer"),
+    ("Security Engineering Manager, Platform", "Security Engineer, Platform"),
+    ("Product Security Engineer (hardening)", "Security Engineer"),
+    ("Senior Application Security Engineer", "Application Security Engineer"),
+])
+def test_an_alike_title_is_similar_not_known(found, listed):
+    write_matches(["r" * 16 + f',Acme,"{listed}",London,GB,u,ats,,1'])
+    assert pl.known_roles("Acme", found) == []
+
+
+@pytest.mark.parametrize("found, listed", [
+    ("(Senior) Offensive Security Specialist", "Senior Offensive Security Specialist"),
+    ("(Senior) Offensive Security Specialist", "Offensive Security Specialist"),
+    ("Senior Security Engineer, Security Verification & Validation", "Senior Security Engineer, Cloud Security Verification & Validation Team"),
+])
+def test_small_title_differences_are_still_the_same_role(found, listed):
+    write_matches(["r" * 16 + f',Acme,"{listed}",London,GB,u,ats,,1'])
+    assert pl.known_roles("Acme", found)
+
+
+def test_a_new_lead_names_the_similar_role_to_check():
+    write_matches(["r" * 16 + ",Acme,Security Engineer,London,GB,u,ats,,1"])
+    msg, rec = pl.log_lead("https://x/p/7", "Ana", "Acme", "Product Security Engineer", today=date(2026, 10, 1))
+    assert rec["status"] == "new" and "similar, check: ref " + "r" * 16 in msg
 
 
 def test_closest_title_wins_when_an_employer_has_several_similar_roles():

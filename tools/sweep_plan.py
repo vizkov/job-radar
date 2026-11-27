@@ -80,7 +80,8 @@ def plan(s: dict | None = None, rows: list[dict] | None = None, post_log: dict |
     rows = cq._coverage_rows() if rows is None else rows
     post_log = pl._load(pl.QUERIES, {}) if post_log is None else post_log
     careers_log = cq._load(cq.STATE) if careers_log is None else careers_log
-    total = int(s.get("max_searches", 10)) if total is None else total
+    if total is None:   # `followup_reserve` slots of the cap stay unplanned, for follow-up searches
+        total = max(int(s.get("max_searches", 10)) - int(s.get("followup_reserve", 0)), 0)
     quotas = {**{"dream_product": 3, "dream_consulting": 3, "network": 2, "other": 2}, **(s.get("sweep_quotas") or {})}
     cats = categories(s, rows)
     ranked: dict[str, list[tuple[str, str]]] = {}

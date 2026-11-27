@@ -203,7 +203,7 @@ by hand once skipped the age filter (posted 89 and 623 days before, `max_age_day
 | `next_queries(n, now)` | `plan_queries` and `mark_searched` in one step, for tests and one-shot callers |
 | `people()`, `add_person`, `next_people`, `mark_read` | The recruiters and managers worth re-reading: latest record per profile URL, longest unread first |
 | `leads()`, `lead_id(url)`, `_clean_url` | Every lead by id (later records overwrite fields); id = hash of the post URL without tracking parameters |
-| `known_roles(company, title)` | Rows of `matches.csv` for the same employer (loose name match) with a similar title (60% of the shorter title's words shared) |
+| `known_roles(company, title)` / `similar_roles(…)` | The same job: same employer, at least 75% of all title words shared and the same rank words. Alike but not the same (60% of the shorter title) is only shown next to a new role to check, never a reason to drop it |
 | `log_lead(...)` | Log one post; status `known`, `job_board`, `stale` (older than `max_post_age_days` and not confirmed open) or `new`; one record per post |
 | `add_role(id, countries)` | A `new` lead becomes a `matches.csv` row (new columns `poster`, `poster_url`) and a queued card via `board_sync.promote`; the ref is the hash of the radar's own `c:company|title|country` key, so a later radar hit lands on the same card |
 | `stats(days)` | Counts of new, added, known, stale and job-board leads, and known people |

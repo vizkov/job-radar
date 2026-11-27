@@ -44,6 +44,11 @@ mailbox for them, **read-only**, and **suggests** board changes. It never moves 
 7. Emails the user says are wrong (a different role, an auto-reply) go into `seen` too.
 8. **Stamp the cadence** when the check is finished (even if nothing was found): `python tools/cadence.py done inbox_check`. The session brief's CADENCE block shows this job as DUE until you do.
 
+9. **Then run `python tools/auto_reject.py run`** (the user, 2026-11-27): applications past `board.auto_reject_days` with no
+   answer move to Rejected, only for roles whose mail was searched on or after the deadline. Report each move in one line, commit `data/`
+   and any removed application folder, and push. If any email shows the employer did answer (even "still reviewing"), run
+   `auto_reject.py hold <ref> --note "…"` **before** this step. It is off when the setting is 0.
+
 ## Limits to state honestly
 - This finds emails only in the connected mailbox; replies sent elsewhere, or by phone or LinkedIn, are invisible.
 - Classification is by phrases, so a polite or unusual rejection may read as `unknown`: show those subjects and let the user judge.

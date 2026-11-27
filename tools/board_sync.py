@@ -451,7 +451,7 @@ def _edit(gh: Gh, board: dict, item_id: str, name: str, value) -> None:
             card[name.lower()] = float(value) if opts is None else canon
 
 
-def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: str = "") -> str:
+def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: str = "", by: str = "claude") -> str:
     """Set fields on a role's card. `note` (the user's reason, e.g. why they skipped it) is logged
     with the stage change and posted as a comment on the issue, so the card shows it later."""
     board = load_board()
@@ -469,7 +469,7 @@ def set_role_fields(gh: Gh, ref: str, values: dict, close: bool = False, note: s
     for name, value in values.items():
         _edit(gh, board, item["id"], name, value)
         if not gh.dry_run and name in ("Stage", "Recommendation"):
-            log_stage(ref, name, str(value), "claude", note)
+            log_stage(ref, name, str(value), by, note)
     url = (item.get("content") or {}).get("url")
     if note and url:
         path = _body_file(f"**{', '.join(f'{k}: {v}' for k, v in values.items())}**. {note}")

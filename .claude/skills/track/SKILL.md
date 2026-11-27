@@ -26,5 +26,7 @@ description: Update an application's stage on the GitHub Projects board (shortli
 6. Moving to **Rejected** → offer `rejection-review`. Moving to **Applied** → offer the stranger outreach from `referrals` (the user's rule, 2026-10-01: recruiters and other strangers are contacted
    *after* applying, with that role's tailored CV attached; the user writes to people they know before applying). Moving to **Interview** → offer `interview-prep`. Cards labelled `possibly-closed` that the user
    hasn't applied to → suggest Skipped.
-7. Confirm in one line. When relevant, suggest the next action (e.g. "want interview prep from your
+7. If the user says they heard back on an application but the Stage stays Applied (a reply by phone or LinkedIn, "still reviewing"), run
+   `python tools/auto_reject.py hold <ref> --note "…"` so the automatic no-answer rejection never moves it.
+8. Confirm in one line. When relevant, suggest the next action (e.g. "want interview prep from your
    STAR stories for this role?").

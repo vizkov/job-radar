@@ -70,6 +70,8 @@ errors become one-line notes, and it always exits 0.
    `data/pipeline_snapshot.json` from last time. Differences are cards the user dragged;
    they're appended to `data/pipeline_log.jsonl` with `by: "board"`. Then it saves the new
    snapshot.
+Before it, `auto_reject.run()` moves applications past `board.auto_reject_days` with no answer to Rejected ([5.4](05-4-Board-and-session-tools.md)).
+
 6. **`stale_applications()`**: cards in *Applied* whose last logged stage change is 14+
    days old → "follow-up due".
 7. **`start_fill()`**: when `_needs_fill(items)` finds something `fill` can set (a card with no Stage, or without a Country or

@@ -67,7 +67,9 @@
     "baseline_tiers": [1],
     "include_outside": false,
     "max_per_run": 40,
-    "stale_days": 5
+    "stale_days": 5,
+    "_auto_reject_comment": "Move an application with no answer to Rejected after this many days (0 = never). Its tailored application folder is deleted; the mail scan watches it 60 more days.",
+    "auto_reject_days": 0
   },
 
   "scoring": {

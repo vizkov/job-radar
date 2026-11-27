@@ -646,7 +646,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
           board_note: str | None, fill_note: str | None, changes: list[dict], follow_ups: list[tuple[str, int]],
           run_note: str | None, updates: list[str] = (), unpublished: list[str] = (),
           design_note: str | None = None, docs_note: str | None = None,
-          closed_now: tuple[list[str], list[str]] = ((), ()), start_background: bool = False) -> str:
+          closed_now: tuple[list[str], list[str]] = ((), ()), start_background: bool = False, auto_lines: list[str] = ()) -> str:
     rows = read_matches(root)
     scores = read_scores(root)
     skipped = skipped_refs(root)
@@ -738,6 +738,7 @@ def brief(root: Path, now: datetime, since: datetime, pull_note: str | None, ite
         lines.append(f"- INBOX-CHECK: {len(awaiting)} applications await an answer ({names}); once per session, run the "
                      "`inbox-check` skill (Gmail connector, read-only; suggest only, the user confirms)")
     lines += app_mail.brief_lines(root, now)
+    lines += auto_lines
     for ref, days in follow_ups:
         r = by_ref.get(ref, {})
         lines.append(f"- Follow-up due: {safe(r.get('company'), 30)} — {safe(r.get('title'), 60)}, "
@@ -789,7 +790,7 @@ def main() -> int:
         since = _read_stamp(LAST) or now - timedelta(days=7)
         note = pull(run)
         items, board_note = board_items(ROOT, run)
-        changes, follow_ups, fill_note = [], [], None
+        changes, follow_ups, fill_note, auto_lines = [], [], None, []
         closed_skipped, closed_ask = [], []
         if items is not None:
             try:
@@ -798,6 +799,13 @@ def main() -> int:
                 closed_ask = []
                 note = (note + "; " if note else "") + f"couldn't sync closed cards ({type(e).__name__})"
             changes = track_stage_changes(items, now)
+            auto_lines: list[str] = []
+            try:   # applications with no answer past board.auto_reject_days (tools/auto_reject.py); never stops the brief
+                import auto_reject
+                result = auto_reject.run(ROOT, items, now.date())
+                auto_lines = auto_reject.lines(result)
+            except Exception as e:
+                auto_lines = [f"- AUTO-REJECT failed ({type(e).__name__}: {safe(str(e), 100)}): run `python tools/auto_reject.py list`"]
             follow_ups = stale_applications(items, now)
             if _needs_fill(items):
                 fill_note = start_fill(now)
@@ -812,7 +820,7 @@ def main() -> int:
         updates, unpublished = template_status(since, run)
         print(brief(ROOT, now, since, note, items, board_note, fill_note, changes, follow_ups, "; ".join(n for n in (last_run_health(run), workflows_health(run)) if n) or None,
                     updates, unpublished, board_design_note() if items is not None else None,
-                    docs_review_note(now, run), (closed_skipped, closed_ask), start_background=True))
+                    docs_review_note(now, run), (closed_skipped, closed_ask), start_background=True, auto_lines=auto_lines))
         WORK.mkdir(exist_ok=True)
         LAST.write_text(now.isoformat())
     except Exception as e:  # never break a session

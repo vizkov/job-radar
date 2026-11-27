@@ -153,6 +153,7 @@ Every source takes `enabled` and `timeout_seconds` (a cap on the whole source). 
 | `include_outside` | false | Also make cards for employers not on the target list |
 | `max_per_run` | 40 | Issues created per run; the rest wait in the queue |
 | `stale_days` | 5 | Days unlisted before a card gets `possibly-closed` |
+| `auto_reject_days` | 0 | Days an application may go unanswered before `tools/auto_reject.py` moves it to Rejected (0 = off) |
 
 The board's fields and views are code, not settings: `FIELDS` and `VIEWS` in
 `tools/board_sync.py` ([Board internals](11-Board-internals.md)).

@@ -49,6 +49,7 @@ do?" or type `/manual` (it's generated from the system itself).
 | You say | Claude does |
 |---|---|
 | "I applied to Starling" / "Got an interview with Fortinet" / "Rejected by X" / "Not interested in Y" | Moves the card (final stages also close it) and, if you say why, saves your reason as a comment on the card. Dragging the card yourself works too: Claude notices at the next session. Tell Claude your feedback rather than writing comments on the card yourself: nothing reads those |
+| "Reject applications with no answer after 15 days" | Sets `board.auto_reject_days`: an Applied card with no reply moves to Rejected after that many days, once your mail has been searched; its tailored CV folder is removed and late replies are still watched for 60 days. "I heard back from X" holds that one. |
 
 ### Improving the search and your CV
 

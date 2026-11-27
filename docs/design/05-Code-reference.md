@@ -26,6 +26,7 @@ Files are grouped by where they run. A lookup section: skim the index now, open 
 | `tools/cover_sync.py` | the cover blocks follow the stories and CV lines they expand (`status`, `done`) | [5.5](05-5-Application-tools.md) |
 | `tools/jd_dupes.py` | compare the saved ad texts of one company's cards to tell a duplicate listing from a different job | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/domain_profile.py` | validate `profile/domains.json` against the masters; list the IDs to lead with for a sector | [5.5](05-5-Application-tools.md) |
+| `tools/auto_reject.py` | moves Applied cards with no answer to Rejected after `board.auto_reject_days` | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/jd_cleanup.py` | trims `jd.txt` and `packet.md` of skipped and rejected roles after 14 and 30 days | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/session_brief.py` | the SessionStart hook (standard library only) | [5.4](05-4-Board-and-session-tools.md) |
 | `tools/public_template.py` | keep the public template current and clean | [5.4](05-4-Board-and-session-tools.md) |

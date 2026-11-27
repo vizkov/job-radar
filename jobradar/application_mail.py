@@ -11,11 +11,13 @@ from __future__ import annotations
 import csv
 import json
 import re
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 # Stages whose roles can be the subject of an email. Shortlisted is included on purpose: the user often applies
 # before moving the card, and the receipt email is the first evidence that they did.
 WATCHED = ("Shortlisted", "Applied", "Interview")
+LATE_REPLY_DAYS = 60
 
 # Sender domains of recruiting systems and big employers' no-reply senders. Mail from these is considered even when the
 # company's name is not in the sender (Lever and Greenhouse send for many companies).
@@ -85,7 +87,22 @@ def latest_stages(root: Path) -> dict[str, str]:
     return stages
 
 
-def targets(root: Path, stages: tuple[str, ...] = WATCHED) -> list[dict]:
+def auto_rejected(root: Path, today: date | None = None) -> set[str]:
+    """Roles moved to Rejected for silence (by="auto", tools/auto_reject.py) within LATE_REPLY_DAYS: a reply can still come."""
+    today = today or datetime.now(timezone.utc).date()
+    log, out = root / "data" / "pipeline_log.jsonl", set()
+    if log.exists():
+        for line in log.read_text(encoding="utf-8").splitlines():
+            try:
+                rec = json.loads(line)
+                if rec.get("by") == "auto" and (today - date.fromisoformat(str(rec["at"])[:10])).days <= LATE_REPLY_DAYS:
+                    out.add(rec["ref"])
+            except (ValueError, KeyError):
+                continue
+    return out
+
+
+def targets(root: Path, stages: tuple[str, ...] = WATCHED, today: date | None = None) -> list[dict]:
     """The roles an email may be about: [{ref, stage, company, title, c (normalised company), t (normalised title)}]."""
     live = latest_stages(root)
     rows: dict[str, dict] = {}
@@ -93,9 +110,10 @@ def targets(root: Path, stages: tuple[str, ...] = WATCHED) -> list[dict]:
     if matches.exists():
         with open(matches, newline="", encoding="utf-8") as fh:
             rows = {r.get("ref"): r for r in csv.DictReader(fh)}
+    late = auto_rejected(root, today) if stages == WATCHED else set()
     out = []
     for ref, stage in live.items():
-        if stage not in stages or ref not in rows:
+        if not (stage in stages or stage == "Rejected" and ref in late) or ref not in rows:
             continue
         company, title = (rows[ref].get("company") or "").strip(), (rows[ref].get("title") or "").strip()
         if company:

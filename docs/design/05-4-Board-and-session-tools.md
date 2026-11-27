@@ -67,6 +67,19 @@ itself: the `setup-project` command runs `setup_project()` then `apply_views()`.
 what it would queue),
 `--max N` (roles: issues per run). `sync_roles()` takes the queue oldest first.
 
+## `tools/auto_reject.py`: no answer means Rejected
+
+Off unless `board.auto_reject_days` is above 0. Run by the SessionStart hook and as the last step of `inbox-check`.
+
+| Function | What it does |
+|---|---|
+| `applied_since(root, ref)` | First Applied entry of the current run in the stage log, else the first application receipt in the mail ledger. |
+| `assess(root, items, today)` | Splits Applied cards past the limit into due, waiting (mail not searched since the deadline), held (a `hold`, or an unhandled reply) and undated. |
+| `run(root, items, today)` | Moves due cards (at most 10 a run) to Rejected with `by: auto`, updates the board snapshot and deletes the application folder. |
+| `lines(result)` | The brief's AUTO-REJECT lines. |
+
+`jobradar/application_mail.targets()` keeps watching an auto-rejected role for 60 days, so a late reply still reaches the MAIL lines.
+
 ## `tools/jd_cleanup.py`: trim the JD packets of roles you are done with
 
 `candidates(root, now)` lists `work/jd/<ref>/` folders whose `jd.txt` and `packet.md` are past their retention: Stage Skipped 14 days after it was skipped, Rejected 30 days after, scored skip with no stage change 14 days after the score (days overridable in `profile/config.json` `cleanup`). `run(root, now, dry)` removes those two files (never `score.json`, `meta.json` or `sponsorship.json`) and stamps the `jd_cleanup` cadence job; the SessionStart hook calls it whenever the cadence marks it due (48 hours since the last run) and the CADENCE block has a line for it. Roles in New, Shortlisted, Applied, Interview or Offer are never touched.

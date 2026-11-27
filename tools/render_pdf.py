@@ -23,6 +23,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import zlib
 from datetime import date
 from pathlib import Path
 
@@ -60,6 +61,29 @@ def find_browser() -> str | None:
     return next((b for b in BROWSERS if os.path.exists(b)), None)
 
 
+_BROWSER_META = re.compile(rb"(/(?:Creator|Producer) \()((?:\\.|[^\\)])*)(\))")
+_LIGATURES = {chr(c) for c in range(0xFB00, 0xFB07)}   # ff, fi, fl, ffi, ffl and the two st forms
+
+
+def blank_browser_metadata(pdf: bytes) -> bytes:
+    """The browser's /Creator and /Producer strings overwritten with spaces, same length, so byte offsets stay valid."""
+    return _BROWSER_META.sub(lambda m: m.group(1) + b" " * len(m.group(2)) + m.group(3), pdf)
+
+
+def ligatures_in(pdf: bytes) -> list[str]:
+    """Joined-letter characters a text extractor would get from this PDF (from its ToUnicode maps): "flaws" read as
+    one "fl" character does not match the word, so an applicant tracking system can miss it."""
+    found: set[str] = set()
+    for m in re.finditer(rb"stream\r?\n(.*?)endstream", pdf, re.S):
+        try:
+            text = zlib.decompressobj().decompress(m.group(1))
+        except zlib.error:
+            continue
+        for block in re.findall(rb"beginbf(?:char|range)(.*?)endbf(?:char|range)", text, re.S):
+            found |= {chr(int(h, 16)) for h in re.findall(rb"<([Ff][Bb]0[0-6])>", block)} & _LIGATURES
+    return sorted(found)
+
+
 def print_pdf(html_text: str, pdf_path: Path) -> None:
     browser = find_browser()
     if not browser:
@@ -72,6 +96,11 @@ def print_pdf(html_text: str, pdf_path: Path) -> None:
         subprocess.run(cmd, check=True, capture_output=True, timeout=90)
     if not pdf_path.exists() or pdf_path.stat().st_size < 1000:
         raise RuntimeError(f"the browser did not write {pdf_path.name}")
+    pdf = blank_browser_metadata(pdf_path.read_bytes())
+    pdf_path.write_bytes(pdf)
+    if joined := ligatures_in(pdf):
+        codes = ", ".join(f"U+{ord(c):04X}" for c in joined)
+        raise RuntimeError(f"{pdf_path.name} has joined-letter characters ({codes}) that break text search; keep ligatures off")
 
 
 # ---------------------------------------------------------------- shared header / helpers
@@ -138,7 +167,7 @@ def font_css() -> str:
 
 
 CSS = f"""
-* {{ box-sizing: border-box; }}
+* {{ box-sizing: border-box; font-variant-ligatures: none; }}
 body {{ font-family: Roboto, Arial, Helvetica, sans-serif; color: {INK}; margin: 0; font-size: {BODY_PT}pt; line-height: 1.43; }}
 a {{ color: {TEAL}; text-decoration: none; }}
 h1 {{ font-size: {NAME_PT}pt; line-height: 1.15; margin: 0; font-weight: 900; }}
@@ -183,8 +212,8 @@ def keep_hyphens(body: str) -> str:
                    for p in parts)
 
 
-def page(css_extra: str, body: str) -> str:
-    return (f'<!doctype html><html><head><meta charset="utf-8"><style>{font_css()}{CSS}{css_extra}</style></head>'
+def page(css_extra: str, body: str, title: str = "") -> str:
+    return (f'<!doctype html><html><head><meta charset="utf-8"><title>{esc(title)}</title><style>{font_css()}{CSS}{css_extra}</style></head>'
             f'<body>{keep_hyphens(body)}</body></html>')
 
 
@@ -346,7 +375,7 @@ def resume_html(data: dict, career, contact: dict) -> str:
             markup = f'<b>{esc(label)}</b>{": " + esc(rest) if rest else ""}'
             rows.append(dated_entry(markup, years.group(1) if years else ""))
         out.append('<h2>Education</h2><div class="edu">' + "".join(rows) + "</div>")
-    return page("@page { size: A4; margin: 35.4pt 43pt 30pt 43pt; }", "".join(out))
+    return page("@page { size: A4; margin: 35.4pt 43pt 30pt 43pt; }", "".join(out), contact.get("name", ""))
 
 
 # ---------------------------------------------------------------- cover letter
@@ -395,7 +424,7 @@ def cover_html(data: dict, career, contact: dict, role_title: str = "", company:
            ".salute { margin-top: 9.5pt; } .lead { margin-bottom: 4.5pt; } "
            "ul.blocks { padding-left: 14pt; margin: 0 0 8.5pt; } ul.blocks > li { margin-top: 5pt; } "
            "ul.blocks ul { list-style: circle; padding-left: 16pt; margin-top: 4pt; } ul ul:empty { display: none; }")
-    return page(css % LEAD_PT, "".join(body))
+    return page(css % LEAD_PT, "".join(body), contact.get("name", ""))
 
 
 def render_pdfs(app: Path, data: dict, career, ref: str) -> list[str]:

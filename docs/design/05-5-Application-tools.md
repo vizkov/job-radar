@@ -166,6 +166,10 @@ similar, most of which are deliberate condensations), `main()` prints one block 
 per role from `data/pipeline_log.jsonl` (`LOG`); an application whose stage is in `SUBMITTED` (Applied, Interview, Offer, Rejected) is printed as
 `SUBMITTED` and not checked, because its PDFs are the record of what was sent (only a `MISSING` note is kept); `--all` checks those too.
 
+**PDF hygiene** (the user, 2026-11-27). `render_pdf.page()` titles each PDF with the candidate's name and turns ligatures off;
+`print_pdf()` blanks the browser's Creator and Producer strings (`blank_browser_metadata()`) and refuses a PDF whose text would
+come out with joined-letter characters (`ligatures_in()`), which breaks keyword search.
+
 **The general resume.** `profile/general-resume/` (`GENERAL`) is the untargeted CV, outside `applications/`. `master_drift.py general` compares
 the master CV lines (P/B/K/E) with `master_lines.json` in that folder (`cv_fingerprints()`, `general_report()`) and lists new, changed and
 removed ids; `general-done` records the current lines (`general_done()`). The `master-update` skill judges the list and offers a rebuild.
